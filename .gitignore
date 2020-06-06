@@ -1,0 +1,12 @@
+# directories
+.metadata/*
+RemoteSystemTempFiles/*
+H760VBT6-flight-board-v0/Debug/*
+H760VBT6-flight-board-v0/.settings/*
+H760VBT6-flight-board-v0/.metadata/*
+
+
+# files
+.cproject
+.mxproject
+.project

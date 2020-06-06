@@ -2,3 +2,609 @@
 
 
 2020-06-06 13:57:05,234 [INFO] Activator:177 - !SESSION log4j initialized
+2020-06-06 13:57:13,078 [INFO] ApplicationProperties:181 - Using Application install path: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303
+2020-06-06 13:57:13,078 [INFO] DbMcusXml:72 - Set database path to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/mcu/
+2020-06-06 13:57:13,094 [INFO] DbBoardsPdsc:54 - Set plugin database path to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/plugins/boardmanager/
+2020-06-06 13:57:13,094 [INFO] DbMcus:235 - Set plugin images path to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/plugins/mcufinder/images/
+2020-06-06 13:57:13,094 [INFO] DbBoards:232 - Set plugin images path to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/plugins/mcufinder/images/
+2020-06-06 13:57:13,100 [INFO] DbMcusAds:85 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:13,100 [INFO] DbMcusDocs:108 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:13,100 [INFO] DbMcusJson:61 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:13,100 [INFO] DbBoardsDocs:97 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:13,100 [INFO] DbBoardsJson:51 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:14,107 [INFO] CrossReferenceDbSqlite:197 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/cs/
+2020-06-06 13:57:14,191 [INFO] RulesReader:52 - Compatibility file has been processed (208 Rules)
+2020-06-06 13:57:14,276 [INFO] MicroXplorer:570 - Detected Java Version = 1.8.0_242
+2020-06-06 13:57:14,276 [INFO] DbMcusXml:72 - Set database path to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/mcu/
+2020-06-06 13:57:14,276 [INFO] DbBoardsPdsc:54 - Set plugin database path to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/plugins/boardmanager/
+2020-06-06 13:57:14,276 [INFO] DbMcus:235 - Set plugin images path to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/plugins/mcufinder/images/
+2020-06-06 13:57:14,276 [INFO] DbBoards:232 - Set plugin images path to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/plugins/mcufinder/images/
+2020-06-06 13:57:14,276 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:14,276 [INFO] DbMcusAds:85 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:14,276 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:14,276 [INFO] DbMcusDocs:108 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:14,276 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:14,276 [INFO] DbMcusJson:61 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:14,276 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:14,276 [INFO] DbBoardsDocs:97 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:14,276 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:14,276 [INFO] DbBoardsJson:51 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:14,276 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:14,276 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:15,109 [INFO] CrossReferenceDbSqlite:197 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/cs/
+2020-06-06 13:57:15,163 [INFO] MainPanel:181 - HeapMemory: 306184192
+2020-06-06 13:57:15,216 [INFO] DbMcusXml:72 - Set database path to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/mcu/
+2020-06-06 13:57:15,216 [INFO] DbBoardsPdsc:54 - Set plugin database path to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/plugins/boardmanager/
+2020-06-06 13:57:15,216 [INFO] DbMcus:235 - Set plugin images path to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/plugins/mcufinder/images/
+2020-06-06 13:57:15,216 [INFO] DbBoards:232 - Set plugin images path to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/plugins/mcufinder/images/
+2020-06-06 13:57:15,216 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:15,216 [INFO] DbMcusAds:85 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:15,216 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:15,216 [INFO] DbMcusDocs:108 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:15,216 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:15,216 [INFO] DbMcusJson:61 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:15,216 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:15,216 [INFO] DbBoardsDocs:97 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:15,216 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:15,216 [INFO] DbBoardsJson:51 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/
+2020-06-06 13:57:15,216 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:15,216 [WARN] DbFile:36 - Overriding database path with different value: C:\Users\amirz\.stmcufinder\plugins\mcufinder/ => C:\Users\amirz\.stmcufinder\plugins\mcufinder
+2020-06-06 13:57:16,096 [INFO] CrossReferenceDbSqlite:197 - Set database path to: C:\Users\amirz\.stmcufinder\plugins\mcufinder//mcu/cs/
+2020-06-06 13:57:16,134 [INFO] ApplicationProperties:181 - Using Application install path: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303
+2020-06-06 13:57:16,134 [INFO] PluginManage:178 - Search for loadable plugins [exclusion list=, tutovideos]
+2020-06-06 13:57:16,134 [INFO] PluginManage:292 - Check plugin analytics
+2020-06-06 13:57:16,134 [INFO] PluginManage:342 - Loaded plugin analytics (category:tool,tabindex:-1)
+2020-06-06 13:57:16,134 [INFO] PluginManage:292 - Check plugin clock
+2020-06-06 13:57:16,150 [INFO] PluginManage:342 - Loaded plugin clock (category:base,tabindex:2)
+2020-06-06 13:57:16,150 [INFO] PluginManage:292 - Check plugin ddr
+2020-06-06 13:57:16,150 [INFO] PluginManage:342 - Loaded plugin ddr (category:tool,tabindex:6)
+2020-06-06 13:57:16,150 [INFO] PluginManage:292 - Check plugin filemanager
+2020-06-06 13:57:16,250 [INFO] PluginManage:342 - Loaded plugin filemanager (category:base,tabindex:10)
+2020-06-06 13:57:16,250 [INFO] PluginManage:292 - Check plugin ipmanager
+2020-06-06 13:57:16,266 [INFO] PluginManage:342 - Loaded plugin ipmanager (category:base,tabindex:5)
+2020-06-06 13:57:16,266 [INFO] PluginManage:292 - Check plugin pinoutandconfiguration
+2020-06-06 13:57:16,266 [INFO] PluginManage:342 - Loaded plugin pinoutandconfiguration (category:base,tabindex:1)
+2020-06-06 13:57:16,281 [INFO] PluginManage:292 - Check plugin pinoutconfig
+2020-06-06 13:57:16,297 [INFO] PluginManage:342 - Loaded plugin pinoutconfig (category:base,tabindex:0)
+2020-06-06 13:57:16,297 [INFO] PluginManage:292 - Check plugin power
+2020-06-06 13:57:16,312 [INFO] PluginManage:342 - Loaded plugin power (category:power,tabindex:4)
+2020-06-06 13:57:16,312 [INFO] PluginManage:292 - Check plugin projectmanager
+2020-06-06 13:57:16,319 [INFO] PluginManage:342 - Loaded plugin projectmanager (category:projectmanager,tabindex:3)
+2020-06-06 13:57:16,319 [INFO] PluginManage:292 - Check plugin thirdparty
+2020-06-06 13:57:16,381 [INFO] ThirdPartyDb:295 - Open Third Party DataBase File (C:/Users/amirz/.stm32cubemx/plugins/thirdparty/db/thirdparties_db.xml) : 31 ms. number of Sw pack : 12
+2020-06-06 13:57:16,397 [INFO] PluginManage:342 - Loaded plugin thirdparty (category:base,tabindex:-1)
+2020-06-06 13:57:16,397 [INFO] PluginManage:292 - Check plugin tools
+2020-06-06 13:57:16,397 [INFO] PluginManage:342 - Loaded plugin tools (category:base,tabindex:7)
+2020-06-06 13:57:16,397 [INFO] PluginManage:292 - Check plugin tutovideos
+2020-06-06 13:57:16,397 [INFO] PluginManage:347 - Ignore plugin tutovideos (category:base)
+2020-06-06 13:57:16,397 [INFO] PluginManage:292 - Check plugin updater
+2020-06-06 13:57:16,413 [INFO] PluginManage:342 - Loaded plugin updater (category:base,tabindex:12)
+2020-06-06 13:57:16,413 [INFO] PluginManage:265 - PluginManage : Loaded plugins [12]
+2020-06-06 13:57:16,551 [INFO] PinOutPanel:1420 - setPackage(No Configuration,No Configuration)
+2020-06-06 13:57:16,635 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,635 [INFO] PluginManager:200 - loadIPPluginJar : add adc
+2020-06-06 13:57:16,651 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,651 [INFO] PluginManager:200 - loadIPPluginJar : add aes
+2020-06-06 13:57:16,651 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,651 [INFO] PluginManager:200 - loadIPPluginJar : add can
+2020-06-06 13:57:16,651 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,651 [INFO] PluginManager:200 - loadIPPluginJar : add comp
+2020-06-06 13:57:16,651 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,651 [INFO] PluginManager:200 - loadIPPluginJar : add cryp
+2020-06-06 13:57:16,651 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,651 [INFO] PluginManager:200 - loadIPPluginJar : add dfsdm
+2020-06-06 13:57:16,651 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,667 [INFO] PluginManager:200 - loadIPPluginJar : add dma
+2020-06-06 13:57:16,667 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,667 [INFO] PluginManager:200 - loadIPPluginJar : add fatfs
+2020-06-06 13:57:16,667 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,667 [INFO] PluginManager:200 - loadIPPluginJar : add fmc
+2020-06-06 13:57:16,667 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,667 [INFO] PluginManager:200 - loadIPPluginJar : add freertos
+2020-06-06 13:57:16,667 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,667 [INFO] PluginManager:200 - loadIPPluginJar : add genericplugin
+2020-06-06 13:57:16,667 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,667 [INFO] PluginManager:200 - loadIPPluginJar : add gfxmmu
+2020-06-06 13:57:16,682 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,682 [INFO] PluginManager:200 - loadIPPluginJar : add gic
+2020-06-06 13:57:16,720 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,720 [INFO] PluginManager:200 - loadIPPluginJar : add gpio
+2020-06-06 13:57:16,720 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,720 [INFO] PluginManager:200 - loadIPPluginJar : add gtzc
+2020-06-06 13:57:16,720 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,720 [INFO] PluginManager:200 - loadIPPluginJar : add hash
+2020-06-06 13:57:16,736 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,736 [INFO] PluginManager:200 - loadIPPluginJar : add i2c
+2020-06-06 13:57:16,736 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,736 [INFO] PluginManager:200 - loadIPPluginJar : add i2s
+2020-06-06 13:57:16,736 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,736 [INFO] PluginManager:200 - loadIPPluginJar : add ipddr
+2020-06-06 13:57:16,736 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,736 [INFO] PluginManager:200 - loadIPPluginJar : add ltdc
+2020-06-06 13:57:16,751 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,751 [INFO] PluginManager:200 - loadIPPluginJar : add mdma
+2020-06-06 13:57:16,751 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,751 [INFO] PluginManager:200 - loadIPPluginJar : add nvic
+2020-06-06 13:57:16,751 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,751 [INFO] PluginManager:200 - loadIPPluginJar : add opamp
+2020-06-06 13:57:16,751 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,751 [INFO] PluginManager:200 - loadIPPluginJar : add pdm2pcm
+2020-06-06 13:57:16,767 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,767 [INFO] PluginManager:200 - loadIPPluginJar : add plateformsettings
+2020-06-06 13:57:16,767 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,767 [INFO] PluginManager:200 - loadIPPluginJar : add quadspi
+2020-06-06 13:57:16,767 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,767 [INFO] PluginManager:200 - loadIPPluginJar : add resmgrutility
+2020-06-06 13:57:16,767 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,767 [INFO] PluginManager:200 - loadIPPluginJar : add sai
+2020-06-06 13:57:16,782 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,782 [INFO] PluginManager:200 - loadIPPluginJar : add spi
+2020-06-06 13:57:16,782 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,782 [INFO] PluginManager:200 - loadIPPluginJar : add stm32_wpan
+2020-06-06 13:57:16,782 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,782 [INFO] PluginManager:200 - loadIPPluginJar : add tim
+2020-06-06 13:57:16,782 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,782 [INFO] PluginManager:200 - loadIPPluginJar : add touchsensing
+2020-06-06 13:57:16,782 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,782 [INFO] PluginManager:200 - loadIPPluginJar : add tracer_emb
+2020-06-06 13:57:16,782 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,782 [INFO] PluginManager:200 - loadIPPluginJar : add ts
+2020-06-06 13:57:16,782 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,782 [INFO] PluginManager:200 - loadIPPluginJar : add tsc
+2020-06-06 13:57:16,798 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,798 [INFO] PluginManager:200 - loadIPPluginJar : add ucpd
+2020-06-06 13:57:16,798 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:57:16,798 [INFO] PluginManager:200 - loadIPPluginJar : add usart
+2020-06-06 13:57:17,237 [INFO] BoardConnectionPanel:3472 - [DDR PANEL] STM32CubeIDE environment
+2020-06-06 13:57:17,237 [INFO] MainDdrPanel:103 - [DDR PANEL] GETTER - cubeProgrammerPath is: null
+2020-06-06 13:57:17,407 [FATAL] Updater:277 - Updater called before beeing initialized
+2020-06-06 13:57:17,600 [FATAL] Updater:277 - Updater called before beeing initialized
+2020-06-06 13:57:17,615 [INFO] PinOutPanel:1420 - setPackage(No Configuration,No Configuration)
+2020-06-06 13:57:17,615 [FATAL] Updater:277 - Updater called before beeing initialized
+2020-06-06 13:57:17,622 [INFO] BoardConnectionPanel:3472 - [DDR PANEL] STM32CubeIDE environment
+2020-06-06 13:57:17,622 [INFO] MainDdrPanel:103 - [DDR PANEL] GETTER - cubeProgrammerPath is: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.win32_1.3.0.202002181050\tools\bin
+2020-06-06 13:57:17,622 [INFO] ProgrammerExecThread:148 - [ProgrammerAPI] CubeProgrammer command construction: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.win32_1.3.0.202002181050\tools\bin\STM32_Programmer_CLI.exe -l
+2020-06-06 13:57:17,833 [INFO] MainDdrPanel:93 - [DDR PANEL] SETTER - Set cubeProgrammerPath to: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.win32_1.3.0.202002181050\tools\bin
+2020-06-06 13:57:17,835 [INFO] Updater:886 - Updater Version found : 5.6.1
+2020-06-06 13:57:17,853 [INFO] ApplicationProperties:181 - Using Application install path: C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303
+2020-06-06 13:57:18,094 [INFO] MainUpdater:2230 - connection check result : 10
+2020-06-06 13:57:18,094 [INFO] MainUpdater:236 - Updater Check For Update Now.
+2020-06-06 13:57:18,094 [INFO] MicroXplorer:420 - Change Database Version : DB.5.0.60
+2020-06-06 13:57:18,137 [INFO] CheckServerUpdateThread:92 - End of CheckServer Thread
+2020-06-06 13:57:18,315 [INFO] MainUpdater:2230 - connection check result : 10
+2020-06-06 13:57:18,315 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Successfull proxy connection.
+2020-06-06 13:57:18,381 [INFO] McuFinderGlobals:40 - Set McuFinder mode to 2 (CubeIDE integrated)
+2020-06-06 13:57:18,397 [INFO] FinderPluginLoader:86 - Searching for filters in installed packs
+2020-06-06 13:57:18,397 [INFO] DbMcusXml:110 - Load MCU database from C:\ST\STM32CubeIDE_1.3.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_5.6.1.202004052303\\db\/mcu/families.xml
+2020-06-06 13:57:19,091 [INFO] DbMcusJson:90 - JSON generation date=Wed Jun 03 11:10:31 EDT 2020 (1591197031)
+2020-06-06 13:57:19,463 [INFO] ThirdPartyDb:261 - Close Third Party DataBase File (C:/Users/amirz/.stm32cubemx/plugins/thirdparty/db/thirdparties_db.xml)
+2020-06-06 13:57:19,571 [INFO] IntegrityCheckThread:98 - End integrity checks thread
+2020-06-06 13:57:19,802 [INFO] DbMcus:171 - Found 1670 MCUs (1625 are supported by CubeMX, 1625 are visible in CubeMX)
+2020-06-06 13:57:19,802 [INFO] ApiDb:158 - Load user favorites file C:\Users\amirz/.stm32cubeide/favorites.mcus.txt: 0 item(s)
+2020-06-06 13:57:19,802 [INFO] ApiDb:163 - User favorites MCUs=[]
+2020-06-06 13:57:19,802 [INFO] DbMcus:183 - Set 0 / 0 favorites MCUs
+2020-06-06 13:57:20,404 [INFO] DbMcusAds:143 - JSON generation date=Thu Apr 30 09:50:56 EDT 2020 (1588254656)
+2020-06-06 13:57:20,404 [INFO] LoadUrlFilesThread:161 - End of LoadServerUrlFiles without Thread
+2020-06-06 13:57:20,420 [INFO] McuDetailPanel:181 - Set advertising image to C:/Users/amirz/STM32Cube/Repository/\PR_STM32Cube_GitHub_0320_V1.png
+2020-06-06 13:57:20,827 [INFO] McuFilterPanel:249 - Update 0 favorites MCUs
+2020-06-06 13:57:21,006 [INFO] DbBoardsPdsc:92 - Found 22 items
+2020-06-06 13:57:21,006 [INFO] DbBoardsPdsc:92 - Found 9 items
+2020-06-06 13:57:21,006 [INFO] DbBoardsPdsc:92 - Found 28 items
+2020-06-06 13:57:21,006 [INFO] DbBoardsPdsc:92 - Found 1 items
+2020-06-06 13:57:21,019 [INFO] DbBoardsPdsc:92 - Found 40 items
+2020-06-06 13:57:21,019 [INFO] DbBoardsPdsc:92 - Found 39 items
+2020-06-06 13:57:21,027 [INFO] DbBoardsPdsc:92 - Found 2 items
+2020-06-06 13:57:21,027 [INFO] DbBoardsPdsc:92 - Found 4 items
+2020-06-06 13:57:21,029 [WARN] DbBoardsPdsc:256 - Board STM32H7B3I-DK: unknown feature type=Audio, name=, username=Audio stereo codec with Headphone Amp (CS42L51-CNZ), n=1
+2020-06-06 13:57:21,029 [WARN] DbBoardsPdsc:256 - Board STM32H7B3I-DK: unknown feature type=WIFI, name=, username=WIFI 802.11 b/g/n, n=1
+2020-06-06 13:57:21,029 [WARN] DbBoardsPdsc:256 - Board STM32H7B3I-EVAL: unknown feature type=Audio, name=, username=Multi-Channel Audio Codec (CS42L51-CNZ), n=1
+2020-06-06 13:57:21,029 [WARN] DbBoardsPdsc:256 - Board STM32H7B3I-EVAL: unknown feature type=Meter, name=, username=Power-metering and Temperature-monitoring with sigma-delta modulators, n=1
+2020-06-06 13:57:21,029 [WARN] DbBoardsPdsc:256 - Board STM32H7B3I-EVAL: unknown feature type=WIFI, name=, username=WIFI 802.11 a/b/g/n, n=1
+2020-06-06 13:57:21,029 [WARN] DbBoardsPdsc:256 - Board STM32H7B3I-EVAL: unknown feature type=Motor, name=, username=Motor Control, n=1
+2020-06-06 13:57:21,057 [INFO] DbBoardsJson:80 - JSON generation date=Wed May 20 07:36:55 EDT 2020 (1589974615)
+2020-06-06 13:57:21,067 [INFO] DbBoards:120 - Found 145 boards (142 are supported by CubeMX)
+2020-06-06 13:57:21,069 [INFO] DbBoardsDocs:131 - JSON generation date=Wed Jun 03 11:10:31 EDT 2020 (1591197031)
+2020-06-06 13:57:21,089 [INFO] DbBoardsDocs:70 - Found 183 boards documents
+2020-06-06 13:57:21,089 [WARN] DbBoards:130 - board NUCLEO-H743ZI2 has no document id list !
+2020-06-06 13:57:21,089 [WARN] DbBoards:130 - board P-NUCLEO-WB55-Nucleo has no document id list !
+2020-06-06 13:57:21,089 [WARN] DbBoards:130 - board P-NUCLEO-WB55-USBDongle has no document id list !
+2020-06-06 13:57:21,089 [WARN] DbBoards:130 - board NUCLEO-WB35CE has no document id list !
+2020-06-06 13:57:21,089 [WARN] DbBoards:130 - board STM32F401C-DISCO has no document id list !
+2020-06-06 13:57:21,089 [WARN] DbBoards:130 - board STM32F769I-DISC1 has no document id list !
+2020-06-06 13:57:21,097 [WARN] DbBoards:130 - board STM32L-DISCOVERY has no document id list !
+2020-06-06 13:57:21,097 [WARN] DbBoards:130 - board STM32H747I-DISC1 has no document id list !
+2020-06-06 13:57:21,097 [WARN] DbBoards:130 - board STM32MP157A-DK1 has no document id list !
+2020-06-06 13:57:21,097 [WARN] DbBoards:130 - board STM32H743I-EVAL2 has no document id list !
+2020-06-06 13:57:21,099 [WARN] DbBoards:130 - board STM32H753I-EVAL2 has no document id list !
+2020-06-06 13:57:21,099 [WARN] DbBoards:130 - board STM32G474E-EVAL1 has no document id list !
+2020-06-06 13:57:21,099 [WARN] DbBoards:130 - board STEVAL-BFA001V1B has no document id list !
+2020-06-06 13:57:21,099 [WARN] DbBoards:130 - board STEVAL-BFA001V2B has no document id list !
+2020-06-06 13:57:21,099 [WARN] DbBoards:130 - board STEVAL-MKSBOX1V1 has no document id list !
+2020-06-06 13:57:21,099 [WARN] DbBoards:130 - board STEVAL-STWINKT1 has no document id list !
+2020-06-06 13:57:21,099 [WARN] DbBoards:130 - board STEVAL-IDP005V1 has no document id list !
+2020-06-06 13:57:21,099 [WARN] DbBoards:130 - board STEVAL-IDP005V2 has no document id list !
+2020-06-06 13:57:22,279 [INFO] ApiDb:158 - Load user favorites file C:\Users\amirz/.stm32cubeide/favorites.boards.txt: 0 item(s)
+2020-06-06 13:57:22,279 [INFO] ApiDb:163 - User favorites Boards=[]
+2020-06-06 13:57:22,279 [INFO] DbBoards:209 - Set 0 / 0 favorites Boards
+2020-06-06 13:57:22,384 [INFO] LoadUrlFilesThread:161 - End of LoadServerUrlFiles without Thread
+2020-06-06 13:57:22,384 [INFO] BoardDetailPanel:180 - Set advertising image to C:/Users/amirz/STM32Cube/Repository/\PR_STM32Cube_GitHub_0320_V1.png
+2020-06-06 13:57:22,414 [INFO] BoardFilterPanel:211 - Update 0 favorites Boards
+2020-06-06 13:57:22,518 [INFO] CrossSelectorPresenter:1319 - Cross Selector saved comparison directory: C:\Users\amirz\.stmcufinder\plugins\mcufinder\mcu\cs_comparisons_mx
+2020-06-06 13:58:08,881 [INFO] MainUpdater:2230 - connection check result : 10
+2020-06-06 13:58:08,954 [INFO] MicroXplorer:390 - Change Database Path : 
+2020-06-06 13:58:08,954 [INFO] MicroXplorer:420 - Change Database Version : DB.5.0.60
+2020-06-06 13:58:08,954 [INFO] PinOutPanel:1420 - setPackage(No Configuration,No Configuration)
+2020-06-06 13:58:08,954 [INFO] UtilMem:74 - Begin LoadConfig() Used Memory: 322275424 Bytes (381681664)
+2020-06-06 13:58:08,964 [INFO] MicroXplorer:390 - Change Database Path : C:/Users/amirz/.stm32cubemx/databases/DB.5.0.50/db/
+2020-06-06 13:58:08,964 [INFO] MicroXplorer:420 - Change Database Version : DB.5.0.50
+2020-06-06 13:58:08,964 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] *****Project Manager Settings
+2020-06-06 13:58:10,646 [INFO] OpenFileManager:274 - Change cursor
+2020-06-06 13:58:21,162 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (ADC1) : Parameter (Rank) has Id (0#ChannelRegularConversion) currently not set
+2020-06-06 13:58:21,162 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (ADC1) : Parameter (Channel) has Id (0#ChannelRegularConversion) currently not set
+2020-06-06 13:58:21,162 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (ADC1) : Parameter (SamplingTime) has Id (0#ChannelRegularConversion) currently not set
+2020-06-06 13:58:21,170 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (ADC1) : Parameter (OffsetNumber) has Id (0#ChannelRegularConversion) currently not set
+2020-06-06 13:58:21,170 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (ADC2) : Parameter (Rank) has Id (0#ChannelRegularConversion) currently not set
+2020-06-06 13:58:21,170 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (ADC2) : Parameter (Channel) has Id (0#ChannelRegularConversion) currently not set
+2020-06-06 13:58:21,170 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (ADC2) : Parameter (SamplingTime) has Id (0#ChannelRegularConversion) currently not set
+2020-06-06 13:58:21,170 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (ADC2) : Parameter (OffsetNumber) has Id (0#ChannelRegularConversion) currently not set
+2020-06-06 13:58:21,170 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (ADC3) : Parameter (Rank) has Id (0#ChannelRegularConversion) currently not set
+2020-06-06 13:58:21,170 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (ADC3) : Parameter (Channel) has Id (0#ChannelRegularConversion) currently not set
+2020-06-06 13:58:21,170 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (ADC3) : Parameter (SamplingTime) has Id (0#ChannelRegularConversion) currently not set
+2020-06-06 13:58:21,170 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (ADC3) : Parameter (OffsetNumber) has Id (0#ChannelRegularConversion) currently not set
+2020-06-06 13:58:21,172 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (RCC) : Parameter (DFSDMFreq_Value) has invalid value (120000000)
+2020-06-06 13:58:21,172 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) IP (RCC) : Invalid parameter (FamilyName)
+2020-06-06 13:58:21,735 [INFO] UtilMem:74 - End LoadConfig() Used Memory: 471947952 Bytes (722468864)
+2020-06-06 13:58:21,755 [INFO] ThirdPartyDb:295 - Open Third Party DataBase File (C:/Users/amirz/.stm32cubemx/plugins/thirdparty/db/thirdparties_db.xml) : 10 ms. number of Sw pack : 12
+2020-06-06 13:58:21,765 [INFO] DependencyParser:785 - This component is not compatible with the current MCU : [1583595952076]
+2020-06-06 13:58:21,765 [INFO] ThirdPartyModel:521 - Component with status : MCU_INCOMPATIBLE for condition : OS Tick GTIM id : 1583595951403
+2020-06-06 13:58:21,765 [INFO] DependencyParser:785 - This component is not compatible with the current MCU : [1583595954652, 1583595952159]
+2020-06-06 13:58:21,884 [INFO] ThirdParty:899 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-BLE1 5.0.0
+2020-06-06 13:58:21,884 [INFO] ThirdParty:899 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-SUBG2 1.1.0
+2020-06-06 13:58:21,884 [INFO] ThirdParty:899 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-GNSS1 4.1.0
+2020-06-06 13:58:21,884 [INFO] ThirdParty:899 - CMSIS Pack Vendor :ARM CMSIS 5.6.0
+2020-06-06 13:58:21,884 [INFO] ThirdParty:899 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-TOUCHGFX 4.13.0
+2020-06-06 13:58:21,884 [INFO] ThirdParty:899 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-NFC4 1.5.2
+2020-06-06 13:58:21,884 [INFO] ThirdParty:899 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-MEMS1 7.1.0
+2020-06-06 13:58:21,886 [INFO] ThirdParty:899 - CMSIS Pack Vendor :STMicroelectronics FreeRTOS 0.0.1
+2020-06-06 13:58:21,886 [INFO] ThirdParty:899 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-MEMS1 7.2.0
+2020-06-06 13:58:21,886 [INFO] ThirdParty:899 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-AI 5.0.0
+2020-06-06 13:58:21,886 [INFO] ThirdParty:899 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-BLE2 1.0.0
+2020-06-06 13:58:22,286 [INFO] PinOutPanel:1420 - setPackage(No Configuration,No Configuration)
+2020-06-06 13:58:22,286 [INFO] PinOutPanel:1420 - setPackage(STM32H750VBTx,LQFP100)
+2020-06-06 13:58:23,009 [INFO] UtilMem:74 - Before build in PCC Used Memory: 454006464 Bytes (722468864)
+2020-06-06 13:58:23,471 [INFO] SharedServices:71 - Folder for power plug-in: C:/Users/amirz/.stm32cubemx/plugins/power
+2020-06-06 13:58:23,522 [INFO] SharedServices:71 - Folder for power plug-in: C:/Users/amirz/.stm32cubemx/plugins/power
+2020-06-06 13:58:23,572 [INFO] SharedServices:71 - Folder for power plug-in: C:/Users/amirz/.stm32cubemx/plugins/power
+2020-06-06 13:58:23,580 [INFO] SharedServices:71 - Folder for power plug-in: C:/Users/amirz/.stm32cubemx/plugins/power
+2020-06-06 13:58:23,773 [INFO] UtilMem:74 - After build in PCC Used Memory: 524787384 Bytes (722468864)
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,874 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,882 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,882 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,882 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,882 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,882 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,882 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,882 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,882 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,882 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,882 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,882 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,884 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,892 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,892 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,892 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,892 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,892 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,892 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,892 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,892 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,892 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,892 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,894 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,894 [INFO] IPUIPlugin:65 - create IPUIPlugin
+2020-06-06 13:58:23,964 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] toolchainItems.length=====1
+2020-06-06 13:58:24,044 [INFO] OpenFileManager:294 - Restore cursor
+2020-06-06 13:58:24,054 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 590850576 Bytes (722468864)
+2020-06-06 13:58:25,612 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 462959112 Bytes (722468864)
+2020-06-06 13:58:25,752 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 475542024 Bytes (722468864)
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: SPI
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: SPI
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: SPI
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: SPI
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: TIM1_8H7
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: USB_DEVICE
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: ADC
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: SYS
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: ADC
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: ADC
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: RCC
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: I2C
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: RTC
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: USB_OTG_FS
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: NVIC
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: CORTEX_M7
+2020-06-06 13:58:26,171 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: TIM1_8H7
+2020-06-06 13:58:26,173 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: UART
+2020-06-06 13:58:26,173 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: DEBUG
+2020-06-06 13:58:26,173 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: GPIO
+2020-06-06 13:58:26,173 [INFO] CodeGenerator:603 - code generatio: config db path: C:/Users/amirz/.stm32cubemx/databases/DB.5.0.50/db/
+2020-06-06 13:58:26,947 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\license.tmp_save
+2020-06-06 13:58:27,289 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\license.tmp
+2020-06-06 13:58:27,648 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\gpio.tmp_save
+2020-06-06 13:58:27,780 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\gpio.tmp
+2020-06-06 13:58:27,780 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 13:58:28,122 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_vars.tmp_save
+2020-06-06 13:58:28,203 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_vars.tmp
+2020-06-06 13:58:28,223 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_inc.tmp_save
+2020-06-06 13:58:28,293 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_inc.tmp
+2020-06-06 13:58:28,331 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_HalInit.tmp_save
+2020-06-06 13:58:28,434 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_HalInit.tmp
+2020-06-06 13:58:28,462 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_Msp.tmp_save
+2020-06-06 13:58:28,564 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_Msp.tmp
+2020-06-06 13:58:29,296 [WARN] IPConfigManager:90 - WARNING: Missing Config File for DEBUG ip!!
+2020-06-06 13:58:31,517 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 13:58:31,517 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for ADC
+2020-06-06 13:58:31,517 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 13:58:31,517 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 13:58:31,517 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for CORTEX_M7
+2020-06-06 13:58:31,525 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 13:58:31,545 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\cortex.tmp_save
+2020-06-06 13:58:31,607 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\cortex.tmp
+2020-06-06 13:58:31,607 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 13:58:31,607 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for DEBUG
+2020-06-06 13:58:31,607 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 13:58:31,607 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 13:58:31,607 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for I2C
+2020-06-06 13:58:31,607 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 13:58:31,623 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 13:58:31,623 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for RTC
+2020-06-06 13:58:31,623 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 13:58:31,623 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 13:58:31,623 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for SPI
+2020-06-06 13:58:31,623 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 13:58:31,623 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 13:58:31,623 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for TIM
+2020-06-06 13:58:31,623 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 13:58:31,623 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 13:58:31,623 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for USART
+2020-06-06 13:58:31,623 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 13:58:31,639 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 13:58:31,645 [INFO] ApiDbMcu:451 - Load IP Config File for USB_DEVICE
+2020-06-06 13:58:31,661 [INFO] Middleware:1103 - No code input for Bsp Dependency
+2020-06-06 13:58:31,692 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usb_device.c_save
+2020-06-06 13:58:31,786 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usb_device.c
+2020-06-06 13:58:31,808 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usb_device.h_save
+2020-06-06 13:58:31,888 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usb_device.h
+2020-06-06 13:58:31,908 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\Target\usbd_conf.h_save
+2020-06-06 13:58:31,989 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\Target\usbd_conf.h
+2020-06-06 13:58:32,019 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\Target\usbd_conf.c_save
+2020-06-06 13:58:32,129 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\Target\usbd_conf.c
+2020-06-06 13:58:32,150 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_desc.h_save
+2020-06-06 13:58:32,218 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_desc.h
+2020-06-06 13:58:32,243 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_desc.c_save
+2020-06-06 13:58:32,344 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_desc.c
+2020-06-06 13:58:32,359 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_cdc_if.h_save
+2020-06-06 13:58:32,444 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_cdc_if.h
+2020-06-06 13:58:32,475 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_cdc_if.c_save
+2020-06-06 13:58:32,591 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_cdc_if.c
+2020-06-06 13:58:32,591 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for NVIC
+2020-06-06 13:58:32,591 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 13:58:32,639 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Src\stm32h7xx_it.c_save
+2020-06-06 13:58:32,741 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Src\stm32h7xx_it.c
+2020-06-06 13:58:32,759 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Inc\stm32h7xx_it.h_save
+2020-06-06 13:58:32,822 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Inc\stm32h7xx_it.h
+2020-06-06 13:58:33,007 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Src\stm32h7xx_hal_msp.c_save
+2020-06-06 13:58:33,207 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Src\stm32h7xx_hal_msp.c
+2020-06-06 13:58:33,223 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\system.tmp_save
+2020-06-06 13:58:33,276 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\system.tmp
+2020-06-06 13:58:33,308 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Inc\stm32h7xx_hal_conf.h_save
+2020-06-06 13:58:33,408 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Inc\stm32h7xx_hal_conf.h
+2020-06-06 13:58:33,461 [WARN] IPConfigManager:2701 - IP not found : TIM
+2020-06-06 13:58:33,461 [WARN] IPConfigManager:2701 - IP not found : gpio
+2020-06-06 13:58:33,461 [WARN] CodeGenerator:2649 - IP not found : TIM
+2020-06-06 13:58:33,461 [WARN] CodeGenerator:2649 - IP not found : gpio
+2020-06-06 13:58:33,493 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Inc\main.h_save
+2020-06-06 13:58:33,577 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Inc\main.h
+2020-06-06 13:58:33,608 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Src\main.c_save
+2020-06-06 13:58:33,850 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Src\main.c
+2020-06-06 13:58:34,582 [INFO] ProjectBuilder:2002 - Time for Copy HAL[1] : 255mS.
+2020-06-06 13:58:34,598 [INFO] ProjectBuilder:2727 - Project Generator version: 3.7.1
+2020-06-06 13:58:34,828 [INFO] ConfigFileManager:1066 - The Die is : DIE450
+2020-06-06 13:58:37,140 [INFO] ProjectBuilder:2894 - Time for Generating toolchain IDE Files: 2542mS.
+2020-06-06 13:58:37,140 [INFO] ProjectBuilder:1878 - Time for Copy CMSIS : 0mS.
+2020-06-06 13:58:37,150 [INFO] ProjectBuilder:1878 - Time for Copy CMSIS : 0mS.
+2020-06-06 14:02:29,354 [INFO] DbMcusDocs:142 - JSON generation date=Wed Jun 03 11:10:31 EDT 2020 (1591197031)
+2020-06-06 14:02:29,486 [INFO] DbMcusDocs:77 - Found 580 MCUs documents
+2020-06-06 14:02:30,070 [INFO] I2cTimingTraitement:320 - 0x307075B1
+2020-06-06 14:07:21,136 [INFO] NvicIntPanel:88 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,450x420,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2020-06-06 14:14:20,650 [INFO] I2cTimingTraitement:320 - 0x307075B1
+2020-06-06 14:14:20,665 [INFO] I2cTimingTraitement:320 - 0x307075B1
+2020-06-06 14:16:10,235 [INFO] I2cTimingTraitement:320 - 0x307075B1
+2020-06-06 14:16:10,267 [INFO] I2cTimingTraitement:320 - 0x307075B1
+2020-06-06 14:20:27,735 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 772123064 Bytes (968884224)
+2020-06-06 14:20:29,859 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 786144544 Bytes (968884224)
+2020-06-06 14:20:30,043 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 800824608 Bytes (968884224)
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: SPI
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: SPI
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: SPI
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: SPI
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: TIM1_8H7
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: USB_DEVICE
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: ADC
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: SYS
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: ADC
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: ADC
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: RCC
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: I2C
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: RTC
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: USB_OTG_FS
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: NVIC
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: CORTEX_M7
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: DMA
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: TIM1_8H7
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: UART
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: DEBUG
+2020-06-06 14:20:30,244 [INFO] BlockDiagram:2671 - set Specific Code input for plugin: GPIO
+2020-06-06 14:20:30,244 [INFO] CodeGenerator:603 - code generatio: config db path: C:/Users/amirz/.stm32cubemx/databases/DB.5.0.50/db/
+2020-06-06 14:20:30,745 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\license.tmp_save
+2020-06-06 14:20:30,799 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\license.tmp
+2020-06-06 14:20:30,974 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\gpio.tmp_save
+2020-06-06 14:20:31,036 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\gpio.tmp
+2020-06-06 14:20:31,047 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 14:20:31,296 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_vars.tmp_save
+2020-06-06 14:20:31,358 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_vars.tmp
+2020-06-06 14:20:31,378 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_inc.tmp_save
+2020-06-06 14:20:31,439 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_inc.tmp
+2020-06-06 14:20:31,477 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_HalInit.tmp_save
+2020-06-06 14:20:31,557 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_HalInit.tmp
+2020-06-06 14:20:31,579 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_Msp.tmp_save
+2020-06-06 14:20:31,670 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\usb_otg_fs_Msp.tmp
+2020-06-06 14:20:32,344 [WARN] IPConfigManager:90 - WARNING: Missing Config File for DEBUG ip!!
+2020-06-06 14:20:34,290 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 14:20:34,290 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for ADC
+2020-06-06 14:20:34,290 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 14:20:34,290 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 14:20:34,290 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for CORTEX_M7
+2020-06-06 14:20:34,290 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 14:20:34,308 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\cortex.tmp_save
+2020-06-06 14:20:34,365 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\cortex.tmp
+2020-06-06 14:20:34,365 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 14:20:34,365 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for DEBUG
+2020-06-06 14:20:34,365 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 14:20:34,365 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 14:20:34,365 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for DMA
+2020-06-06 14:20:34,381 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 14:20:34,465 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\dma.tmp_save
+2020-06-06 14:20:34,534 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\dma.tmp
+2020-06-06 14:20:34,566 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\dma_GV.tmp_save
+2020-06-06 14:20:34,619 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\dma_GV.tmp
+2020-06-06 14:20:34,619 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 14:20:34,619 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for I2C
+2020-06-06 14:20:34,619 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 14:20:34,619 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 14:20:34,619 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for RTC
+2020-06-06 14:20:34,619 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 14:20:34,619 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 14:20:34,619 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for SPI
+2020-06-06 14:20:34,619 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 14:20:34,619 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 14:20:34,635 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for TIM
+2020-06-06 14:20:34,635 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 14:20:34,635 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 14:20:34,635 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for USART
+2020-06-06 14:20:34,635 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 14:20:34,635 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2020-06-06 14:20:34,650 [INFO] Middleware:1103 - No code input for Bsp Dependency
+2020-06-06 14:20:34,682 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usb_device.c_save
+2020-06-06 14:20:34,751 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usb_device.c
+2020-06-06 14:20:34,766 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usb_device.h_save
+2020-06-06 14:20:34,835 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usb_device.h
+2020-06-06 14:20:34,866 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\Target\usbd_conf.h_save
+2020-06-06 14:20:34,920 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\Target\usbd_conf.h
+2020-06-06 14:20:34,951 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\Target\usbd_conf.c_save
+2020-06-06 14:20:35,051 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\Target\usbd_conf.c
+2020-06-06 14:20:35,067 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_desc.h_save
+2020-06-06 14:20:35,136 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_desc.h
+2020-06-06 14:20:35,167 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_desc.c_save
+2020-06-06 14:20:35,268 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_desc.c
+2020-06-06 14:20:35,283 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_cdc_if.h_save
+2020-06-06 14:20:35,383 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_cdc_if.h
+2020-06-06 14:20:35,421 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_cdc_if.c_save
+2020-06-06 14:20:35,521 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\USB_DEVICE\App\usbd_cdc_if.c
+2020-06-06 14:20:35,521 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Debug : prepare data for NVIC
+2020-06-06 14:20:35,521 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line test
+2020-06-06 14:20:35,553 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Src\stm32h7xx_it.c_save
+2020-06-06 14:20:35,653 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Src\stm32h7xx_it.c
+2020-06-06 14:20:35,684 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Inc\stm32h7xx_it.h_save
+2020-06-06 14:20:35,753 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Inc\stm32h7xx_it.h
+2020-06-06 14:20:35,922 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Src\stm32h7xx_hal_msp.c_save
+2020-06-06 14:20:36,123 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Src\stm32h7xx_hal_msp.c
+2020-06-06 14:20:36,139 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\system.tmp_save
+2020-06-06 14:20:36,185 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\MXTmpFiles\system.tmp
+2020-06-06 14:20:36,223 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Inc\stm32h7xx_hal_conf.h_save
+2020-06-06 14:20:36,323 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Inc\stm32h7xx_hal_conf.h
+2020-06-06 14:20:36,355 [WARN] IPConfigManager:2701 - IP not found : TIM
+2020-06-06 14:20:36,355 [WARN] IPConfigManager:2701 - IP not found : gpio
+2020-06-06 14:20:36,355 [WARN] CodeGenerator:2649 - IP not found : TIM
+2020-06-06 14:20:36,355 [WARN] CodeGenerator:2649 - IP not found : gpio
+2020-06-06 14:20:36,386 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Inc\main.h_save
+2020-06-06 14:20:36,455 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Inc\main.h
+2020-06-06 14:20:36,486 [INFO] CodeEngine:188 - oldGeneratedFile, C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Src\main.c_save
+2020-06-06 14:20:36,687 [INFO] CodeEngine:206 - Generated code: C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\Core\Src\main.c
+2020-06-06 14:20:37,333 [INFO] ProjectBuilder:2002 - Time for Copy HAL[1] : 220mS.
+2020-06-06 14:20:37,333 [INFO] ProjectBuilder:2727 - Project Generator version: 3.7.1
+2020-06-06 14:20:37,549 [INFO] ConfigFileManager:1066 - The Die is : DIE450
+2020-06-06 14:20:39,116 [INFO] ProjectBuilder:2894 - Time for Generating toolchain IDE Files: 1783mS.
+2020-06-06 14:20:39,117 [INFO] ProjectBuilder:1878 - Time for Copy CMSIS : 1mS.
+2020-06-06 14:20:39,122 [INFO] ProjectBuilder:1878 - Time for Copy CMSIS : 0mS.
