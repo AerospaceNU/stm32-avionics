@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-#include "usart.h"
+#include "usbd_cdc_if.h"
 
 //uses serial to implement a printf
 //Buffer size is 256 characters
@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-int uartprintf(const char *format, ...);
+int debugprintf(const char *format, ...);
 
 #ifdef __cplusplus
 }

@@ -52,8 +52,8 @@ void Scheduler::run(void)
 
     while(1)
     {
-        /* rate limiting code for 10 Hz */
-        while((HAL_GetTick() - lastTime) < SCHEDULER_10HZ_RATE);
+        /* rate limiting code for 1 Hz */
+        while((HAL_GetTick() - lastTime) < SCHEDULER_1HZ_RATE);
         lastTime = HAL_GetTick();
 
         /* scheduler main loop */

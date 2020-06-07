@@ -1,7 +1,6 @@
 #include "serialPrint.h"
 
-// TODO modify this function to use USB OTG
-int uartprintf(const char *format, ...)
+int debugprintf(const char *format, ...)
 {
     //declare variable arguments list
     va_list args;
@@ -19,8 +18,9 @@ int uartprintf(const char *format, ...)
     //end list
     va_end(args);
 
-    //send string out uart
-    // TODO put USB OTG print call here
+    //send string out over usb
+    return CDC_Transmit_FS((uint8_t *)buff, sizeof(buff));
+
+    // old function call for uart print
     //return HAL_UART_Transmit(&huart2, (uint8_t*)buff, sizeof(buff), 10000);
-    return 0;
 }

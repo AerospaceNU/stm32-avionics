@@ -33,6 +33,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "scheduler.h"
+#include "usbd_cdc_if.h"
 
 /* USER CODE END Includes */
 
@@ -89,7 +90,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+   HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -125,6 +126,9 @@ int main(void)
 
   /* Initialize scheduler */
   Scheduler scheduler = Scheduler();
+
+  /* Delay after init */
+  HAL_Delay(1000);
 
   /* run scheduler, this function should never return */
   scheduler.run();

@@ -10,7 +10,10 @@
 
 #include <cstdint>
 
+#define SCHEDULER_1HZ_RATE		(1000)
 #define SCHEDULER_10HZ_RATE		(100)
+#define SCHEDULER_20HZ_RATE		(50)
+#define SCHEDULER_25HZ_RATE		(25)
 #define SCHEDULER_100HZ_RATE	(10)
 
 class Scheduler{

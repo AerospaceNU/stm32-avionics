@@ -47,5 +47,6 @@ void State::general(void)
 
     /* read data from sensors */
 	HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
+	debugprintf("Toggle GPIO\r\n");
 
 }
