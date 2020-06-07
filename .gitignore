@@ -11,3 +11,12 @@ H750VBT6-flight-board-v0/RemoteSystemTempFiles/
 .cproject
 .mxproject
 .project
+
+# build files
+*.map
+*.elf
+*.bin
+*.list
+*.so
+*.o
+*.d
