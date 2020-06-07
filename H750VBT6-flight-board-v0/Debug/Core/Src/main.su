@@ -1,3 +1,0 @@
-main.cpp:175:6:void SystemClock_Config()	328	static
-main.cpp:87:5:int main()	32	static
-main.cpp:273:6:void Error_Handler()	0	static
