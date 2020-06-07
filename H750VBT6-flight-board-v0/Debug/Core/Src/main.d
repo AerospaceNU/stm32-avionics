@@ -1,4 +1,4 @@
-Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
+Core/Src/main.o: ../Core/Src/main.cpp ../Core/Inc/main.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h \
  ../Core/Inc/stm32h7xx_hal_conf.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h \
@@ -41,9 +41,15 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h \
- ../USB_DEVICE/App/usb_device.h \
+ ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/dma.h ../Core/Inc/i2c.h \
+ ../Core/Inc/rtc.h ../Core/Inc/spi.h ../Core/Inc/tim.h \
+ ../Core/Inc/usart.h ../USB_DEVICE/App/usb_device.h \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h \
- ../USB_DEVICE/Target/usbd_conf.h
+ ../USB_DEVICE/Target/usbd_conf.h ../Core/Inc/gpio.h \
+ C:/Users/amirz/Documents/AeroNU/DPF/Avionics/stm32-avionics/H750VBT6-flight-board-v0/System/scheduler.h \
+ C:/Users/amirz/Documents/AeroNU/DPF/Avionics/stm32-avionics/H750VBT6-flight-board-v0/System/data.h \
+ C:/Users/amirz/Documents/AeroNU/DPF/Avionics/stm32-avionics/H750VBT6-flight-board-v0/Devices/ms5607.h \
+ C:/Users/amirz/Documents/AeroNU/DPF/Avionics/stm32-avionics/H750VBT6-flight-board-v0/System/state.h
 
 ../Core/Inc/main.h:
 
@@ -131,8 +137,34 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h:
 
+../Core/Inc/adc.h:
+
+../Core/Inc/main.h:
+
+../Core/Inc/dma.h:
+
+../Core/Inc/i2c.h:
+
+../Core/Inc/rtc.h:
+
+../Core/Inc/spi.h:
+
+../Core/Inc/tim.h:
+
+../Core/Inc/usart.h:
+
 ../USB_DEVICE/App/usb_device.h:
 
 ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h:
 
 ../USB_DEVICE/Target/usbd_conf.h:
+
+../Core/Inc/gpio.h:
+
+C:/Users/amirz/Documents/AeroNU/DPF/Avionics/stm32-avionics/H750VBT6-flight-board-v0/System/scheduler.h:
+
+C:/Users/amirz/Documents/AeroNU/DPF/Avionics/stm32-avionics/H750VBT6-flight-board-v0/System/data.h:
+
+C:/Users/amirz/Documents/AeroNU/DPF/Avionics/stm32-avionics/H750VBT6-flight-board-v0/Devices/ms5607.h:
+
+C:/Users/amirz/Documents/AeroNU/DPF/Avionics/stm32-avionics/H750VBT6-flight-board-v0/System/state.h:

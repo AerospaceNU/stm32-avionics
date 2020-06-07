@@ -10,17 +10,34 @@ RM := rm -rf
 -include sources.mk
 -include USB_DEVICE/Target/subdir.mk
 -include USB_DEVICE/App/subdir.mk
+-include System/subdir.mk
 -include Middlewares/ST/STM32_USB_Device_Library/Core/Src/subdir.mk
 -include Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/subdir.mk
 -include Drivers/STM32H7xx_HAL_Driver/Src/subdir.mk
+-include Devices/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
 -include subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(strip $(CC_DEPS)),)
+-include $(CC_DEPS)
+endif
+ifneq ($(strip $(C++_DEPS)),)
+-include $(C++_DEPS)
+endif
+ifneq ($(strip $(C_UPPER_DEPS)),)
+-include $(C_UPPER_DEPS)
+endif
+ifneq ($(strip $(CXX_DEPS)),)
+-include $(CXX_DEPS)
+endif
 ifneq ($(strip $(C_DEPS)),)
 -include $(C_DEPS)
+endif
+ifneq ($(strip $(CPP_DEPS)),)
+-include $(CPP_DEPS)
 endif
 endif
 
@@ -45,7 +62,7 @@ all: H750VBT6-flight-board-v0.elf secondary-outputs
 
 # Tool invocations
 H750VBT6-flight-board-v0.elf: $(OBJS) $(USER_OBJS) C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\STM32H750VBTX_FLASH.ld
-	arm-none-eabi-gcc -o "H750VBT6-flight-board-v0.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\STM32H750VBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="H750VBT6-flight-board-v0.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-g++ -o "H750VBT6-flight-board-v0.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\amirz\Documents\AeroNU\DPF\Avionics\stm32-avionics\H750VBT6-flight-board-v0\STM32H750VBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="H750VBT6-flight-board-v0.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

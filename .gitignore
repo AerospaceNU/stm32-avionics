@@ -1,9 +1,10 @@
 # directories
 .metadata/
 RemoteSystemTempFiles/
-H760VBT6-flight-board-v0/Debug/
-H760VBT6-flight-board-v0/.settings/
-H760VBT6-flight-board-v0/.metadata/
+H750VBT6-flight-board-v0/Debug/
+H750VBT6-flight-board-v0/.settings/
+H750VBT6-flight-board-v0/.metadata/
+H750VBT6-flight-board-v0/RemoteSystemTempFiles/
 
 
 # files
