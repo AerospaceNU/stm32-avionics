@@ -1,14 +1,11 @@
 #include "scheduler.h"
-/*
-extern I2C_HandleTypeDef hi2c1;
-extern I2C_HandleTypeDef hi2c4;
-extern SPI_HandleTypeDef hspi1;
 
-extern BNO055Ctrl_t bno_1;
-extern BNO055Ctrl_t bno_2;
-extern MS5607Ctrl_t ms5607_1;
+extern SPI_HandleTypeDef hspi1;
+/*
 extern MS5607Ctrl_t ms5607_2;
 */
+extern MS5607Ctrl_t ms5607_1;
+
 Scheduler::Scheduler(void)
 {
 
@@ -30,17 +27,22 @@ void Scheduler::run(void)
     /* initialize sensors */
     /* lsm9ds1 IMU */
 
-    /* ms5607 barometer *//*
+    /* ms5607 barometer */
+    /* these configs are not correct for the final
+     * this will be on SPI 3 and the CS will be PA15
+     */
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
     ms5607_1.spiconfig.hspi = hspi1;
-    ms5607_1.spiconfig.port = GPIOD;
-    ms5607_1.spiconfig.pin = GPIO_PIN_14;
+    ms5607_1.spiconfig.port = GPIOC;
+    ms5607_1.spiconfig.pin = GPIO_PIN_5;
     MS5607_init(&ms5607_1);
 
+    /*
     ms5607_2.spiconfig.hspi = hspi1;
     ms5607_2.spiconfig.port = GPIOD;
     ms5607_2.spiconfig.pin = GPIO_PIN_15;
     MS5607_init(&ms5607_2);
-     */
+    */
 
     /* setup for scheduler */
     State state1 = State(&(this->data));

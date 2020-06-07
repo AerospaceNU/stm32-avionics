@@ -1,10 +1,9 @@
 #include "state.h"
 /*
-extern BNO055Ctrl_t bno_1;
-extern BNO055Ctrl_t bno_2;
-extern MS5607Ctrl_t ms5607_1;
 extern MS5607Ctrl_t ms5607_2;
 */
+extern MS5607Ctrl_t ms5607_1;
+
 State::State(Data *data)
 {
     this->data = data;
@@ -47,6 +46,8 @@ void State::general(void)
 
     /* read data from sensors */
 	HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
-	debugprintf("Toggle GPIO\r\n");
+	MS5607_get_data(&ms5607_1);
+
+	debugprintf("Atmospheric Pressure: %f Pa\t Temperature %f C\r\n", ms5607_1.altData.baro, ms5607_1.altData.temp);
 
 }

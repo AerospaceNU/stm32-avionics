@@ -32,8 +32,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "scheduler.h"
 #include "usbd_cdc_if.h"
+#include "scheduler.h"
+
 
 /* USER CODE END Includes */
 
@@ -73,6 +74,9 @@ void SystemClock_Config(void);
  * LED 2 -> PE9
  *
  */
+
+/* sensor structs */
+MS5607Ctrl_t ms5607_1;
 
 /* USER CODE END 0 */
 
@@ -123,12 +127,28 @@ int main(void)
 
   /* turn off LED 1 */
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_SET);
 
   /* Initialize scheduler */
   Scheduler scheduler = Scheduler();
 
   /* Delay after init */
   HAL_Delay(1000);
+
+  uint8_t txBuff[2];
+  uint8_t rxBuff[2];
+
+  txBuff[0] = (1<<7)|0x0f;
+
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_RESET);
+  HAL_SPI_TransmitReceive(&hspi1, txBuff, rxBuff, 2, 100000);
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_SET);
+
+  txBuff[0] = (1<<7)|0x0f;
+
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1, GPIO_PIN_RESET);
+	HAL_SPI_TransmitReceive(&hspi1, txBuff, rxBuff, 2, 100000);
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1, GPIO_PIN_SET);
 
   /* run scheduler, this function should never return */
   scheduler.run();
