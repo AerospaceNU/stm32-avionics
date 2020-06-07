@@ -43,6 +43,7 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl) {
     uint8_t rxBuffer[3];
     uint8_t txBuffer[3];
 
+    // TODO move the PROM read to init and remove from polling read
     for (int i = 0; i < 6; i++)
     {
 	    txBuffer[0] = promRead[i];

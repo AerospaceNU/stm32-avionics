@@ -26,6 +26,10 @@ void Scheduler::run(void)
 
     /* initialize sensors */
     /* lsm9ds1 IMU */
+    /* this config is not correct AV 1 should run on SPI 3
+     * Mag CS      -> PD0
+     * Acc/Gyro CS -> PD1
+     */
 
     /* ms5607 barometer */
     /* these configs are not correct for the final
