@@ -76,7 +76,14 @@ void SystemClock_Config(void);
  */
 
 /* sensor structs */
+/* IMUs */
+LSM9DS1Ctrl_t lsm9ds1_1;
+
+/* barometers */
 MS5607Ctrl_t ms5607_1;
+
+/* high g accelerometers */
+H3LIS331DLCtrl_t h3lis_1;
 
 /* USER CODE END 0 */
 
@@ -122,7 +129,7 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM8_Init();
   MX_UART5_Init();
-  MX_USB_DEVICE_Init();
+  //MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
 
   /* turn off LED 1 */

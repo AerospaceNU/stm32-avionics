@@ -3,7 +3,11 @@
 
 #include "data.h"
 #include "state.h"
+
 #include "ms5607.h"
+#include "LSM9DS1.h"
+#include "H3LIS331DL.h"
+
 #include "i2c.h"
 #include "spi.h"
 #include "gpio.h"
