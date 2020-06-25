@@ -8,7 +8,7 @@
 #include "main.h"
 #include "SPIDriver.h"
 
-uint8_t SPI_ReadRegister(SPICtrl_t* sensor, uint8_t reg) {
+uint8_t SPI_ReadRegister(SPICtrld_t* sensor, uint8_t reg) {
 	uint8_t rxBuff[2] = {0};
 	uint8_t txBuff[2] = {0};
 	txBuff[0] = reg;
@@ -27,7 +27,7 @@ uint8_t SPI_ReadRegister(SPICtrl_t* sensor, uint8_t reg) {
 	return rxBuff[1];
 }
 
-void SPI_WriteRegister(SPICtrl_t* sensor, uint8_t reg, uint8_t val) {
+void SPI_WriteRegister(SPICtrld_t* sensor, uint8_t reg, uint8_t val) {
 	uint8_t txBuff[2];
 	txBuff[0] = reg;
 	txBuff[1] = val;

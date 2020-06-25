@@ -18,10 +18,10 @@ typedef struct SPICtrl_s{
 	SPI_HandleTypeDef* hspi;
 	GPIO_TypeDef* port;
 	uint16_t pin;
-}SPICtrl_t;
+}SPICtrld_t;
 
-uint8_t SPI_ReadRegister(SPICtrl_t* sensor, uint8_t reg);
-void SPI_WriteRegister(SPICtrl_t* sensor, uint8_t reg, uint8_t val);
+uint8_t SPI_ReadRegister(SPICtrld_t* sensor, uint8_t reg);
+void SPI_WriteRegister(SPICtrld_t* sensor, uint8_t reg, uint8_t val);
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,7 @@ extern "C" {
 #endif
 
 #include "main.h"
+#include "SPIDriver.h"
 
 static const uint8_t HIGH_G_ACC_ADDR = 0x19 << 1;
 static const uint8_t REG_WHO_AM_I = 0x0F;
@@ -49,7 +50,7 @@ typedef struct data_s{
 }data_t;
 
 typedef struct H3LIS331DLCtrl_s{
-    SPICtrl_t H3LIS331DLSPI;
+    SPICtrld_t H3LIS331DLSPI;
     raw_data_t rawVal;
     data_t val;
 }H3LIS331DLCtrl_t;

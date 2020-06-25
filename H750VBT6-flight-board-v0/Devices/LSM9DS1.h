@@ -13,6 +13,7 @@ extern "C" {
 #endif
 
 #include "main.h"
+#include "SPIDriver.h"
 
 // Accelerometer-Gyroscope Registers
 static const uint8_t REG_WHO_AM_I_AG = 0x0F;
@@ -69,7 +70,7 @@ typedef struct LSM9DS1_data_s{
 }LSM9DS1_data_t;
 
 typedef struct AG_LSM9DS1Ctrl_s{
-    SPICtrl_t LSM9DS1SPI;
+    SPICtrld_t LSM9DS1SPI;
     LSM9DS1_raw_data_t aRawVal;
     LSM9DS1_raw_data_t gRawVal;
     LSM9DS1_data_t aVal;
@@ -79,7 +80,7 @@ typedef struct AG_LSM9DS1Ctrl_s{
 }AG_LSM9DS1Ctrl_t;
 
 typedef struct M_LSM9DS1Ctrl_s{
-    SPICtrl_t LSM9DS1SPI;
+    SPICtrld_t LSM9DS1SPI;
     LSM9DS1_raw_data_t mRawVal;
     LSM9DS1_data_t mVal;
 }M_LSM9DS1Ctrl_t;

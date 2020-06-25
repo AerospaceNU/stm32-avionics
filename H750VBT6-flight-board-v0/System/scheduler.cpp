@@ -35,10 +35,10 @@ void Scheduler::run(void)
      * Acc/Gyro CS -> PD1
      */
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0 | GPIO_PIN_1, GPIO_PIN_SET);
-    lsm9ds1_1.ag.LSM9DS1SPI.hspi = hspi1;
+    lsm9ds1_1.ag.LSM9DS1SPI.hspi = &hspi1;
     lsm9ds1_1.ag.LSM9DS1SPI.port = GPIOD;
     lsm9ds1_1.ag.LSM9DS1SPI.pin = GPIO_PIN_1;
-    lsm9ds1_1.m.LSM9DS1SPI.hspi = hspi1;
+    lsm9ds1_1.m.LSM9DS1SPI.hspi = &hspi1;
     lsm9ds1_1.m.LSM9DS1SPI.port = GPIOD;
     lsm9ds1_1.m.LSM9DS1SPI.pin = GPIO_PIN_0;
     LSM9DS1_init(&lsm9ds1_1);
@@ -66,7 +66,7 @@ void Scheduler::run(void)
      * High G CS -> PD2
      */
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
-    h3lis_1.H3LIS331DLSPI.hspi = hspi1;
+    h3lis_1.H3LIS331DLSPI.hspi = &hspi1;
     h3lis_1.H3LIS331DLSPI.port = GPIOD;
     h3lis_1.H3LIS331DLSPI.pin = GPIO_PIN_2;
     H3LIS331DL_init(&h3lis_1);
