@@ -8,9 +8,7 @@ H750VBT6-flight-board-v0/RemoteSystemTempFiles/
 
 
 # files
-.cproject
 .mxproject
-.project
 
 # build files
 *.map
