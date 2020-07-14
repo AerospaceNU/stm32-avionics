@@ -1,6 +1,7 @@
 #include "scheduler.h"
 
-extern SPI_HandleTypeDef hspi1;
+extern SPI_HandleTypeDef hspi3;
+extern SPI_HandleTypeDef hspi6;
 
 extern LSM9DS1Ctrl_t lsm9ds1_1;
 extern LSM9DS1Ctrl_t lsm9ds1_2;

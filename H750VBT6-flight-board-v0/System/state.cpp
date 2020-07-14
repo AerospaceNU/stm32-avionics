@@ -1,6 +1,5 @@
 #include "state.h"
 
-
 extern LSM9DS1Ctrl_t lsm9ds1_1;
 extern LSM9DS1Ctrl_t lsm9ds1_2;
 

@@ -14,7 +14,7 @@ First, pull this git repository using the following command from a directory of 
 
 Next, open STM32 Cube IDE. If you do not have Cube you can install it from this [link](https://www.st.com/en/development-tools/stm32cubeide.html). The default installation options should work. 
 
-When opening the IDE set your workspace to the `H750VBT6-flight-board-v0` directory.
+When opening the IDE set your workspace to the `stm32-avionics` directory.
 
 Once the workspace is open, create a new project from an .ioc file. To do this navigate to `File -> New -> STM32 Project From STM32CubeMX .ioc File`. This should open an `.ioc` file. Saving this file will regenerate sources.
 
