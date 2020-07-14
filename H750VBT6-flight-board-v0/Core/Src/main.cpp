@@ -78,9 +78,11 @@ void SystemClock_Config(void);
 /* sensor structs */
 /* IMUs */
 LSM9DS1Ctrl_t lsm9ds1_1;
+LSM9DS1Ctrl_t lsm9ds1_2;
 
 /* barometers */
 MS5607Ctrl_t ms5607_1;
+MS5607Ctrl_t ms5607_2;
 
 /* high g accelerometers */
 H3LIS331DLCtrl_t h3lis_1;

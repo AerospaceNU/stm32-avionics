@@ -1,10 +1,11 @@
 #include "state.h"
-/*
-extern MS5607Ctrl_t ms5607_2;
-*/
+
+
 extern LSM9DS1Ctrl_t lsm9ds1_1;
+extern LSM9DS1Ctrl_t lsm9ds1_2;
 
 extern MS5607Ctrl_t ms5607_1;
+extern MS5607Ctrl_t ms5607_2;
 
 extern H3LIS331DLCtrl_t h3lis_1;
 
@@ -53,6 +54,9 @@ void State::general(void)
 	MS5607_get_data(&ms5607_1);
 	LSM9DS1_get_data_raw(&lsm9ds1_1);
 	H3LIS331DL_get_data_raw(&h3lis_1);
+
+	MS5607_get_data(&ms5607_2);
+	LSM9DS1_get_data_raw(&lsm9ds1_2);
 
 	//debugprintf("Atmospheric Pressure: %f Pa\t Temperature %f C\r\n", ms5607_1.altData.baro, ms5607_1.altData.temp);
 
