@@ -5,7 +5,6 @@
  *      Author: John
  */
 
-#include "SPIDRiver.h"
 #include "H3LIS331DL.h"
 
 uint8_t whoAmI(H3LIS331DLCtrl_t* sensor) {
@@ -18,6 +17,9 @@ uint8_t readCtrl1(H3LIS331DLCtrl_t* sensor) {
 
 void H3LIS331DL_init(H3LIS331DLCtrl_t* sensor) {
 	SPI_WriteRegister(&sensor->H3LIS331DLSPI, REG_CTRL1, PWR_MODE_ON | DATA_RATE_100HZ | Z_AXIS_ENABLE | Y_AXIS_ENABLE | X_AXIS_ENABLE);
+	H3LIS331DL_get_gain(sensor);
+	H3LIS331DL_get_adj(sensor);
+
 }
 
 void H3LIS331DL_get_data_raw(H3LIS331DLCtrl_t* sensor) {
@@ -37,4 +39,28 @@ void H3LIS331DL_get_data_raw(H3LIS331DLCtrl_t* sensor) {
 
 void H3LIS331DL_get_data(H3LIS331DLCtrl_t* sensor) {
 	H3LIS331DL_get_data_raw(sensor);
+	sensor->val.x = (sensor->gain * sensor->rawVal.x) - sensor->adjVal.x;
+	sensor->val.y = (sensor->gain * sensor->rawVal.y) - sensor->adjVal.y;
+	sensor->val.z = (sensor->gain * sensor->rawVal.z) - sensor->adjVal.z;
+}
+
+void H3LIS331DL_get_adj(H3LIS331DLCtrl_t* sensor) {
+	int sampleCount = 100;
+	int adjx = 0;
+	int adjy = 0;
+	int adjz = 0;
+	for (int i = 0; i < sampleCount; i++) {
+		H3LIS331DL_get_data_raw(sensor);
+		adjx += sensor->rawVal.x;
+		adjy += sensor->rawVal.y;
+		adjz += sensor->rawVal.z;
+		HAL_Delay(5);
+	}
+	sensor->adjVal.x = (adjx / sampleCount) * sensor->gain;
+	sensor->adjVal.y = (adjy / sampleCount) * sensor->gain;
+	sensor->adjVal.z = (adjz / sampleCount) * sensor->gain - 9.80665;
+}
+
+void H3LIS331DL_get_gain(H3LIS331DLCtrl_t* sensor) {
+	sensor->gain = 0.02942;
 }

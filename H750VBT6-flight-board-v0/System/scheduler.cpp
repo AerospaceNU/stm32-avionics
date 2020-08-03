@@ -92,7 +92,7 @@ void Scheduler::run(void)
     h3lis_1.H3LIS331DLSPI.pin = GPIO_PIN_2;
     H3LIS331DL_init(&h3lis_1);
 
-    /* flash init */
+    /* flash init *//*
     flash_init();
     read_info();
 
@@ -103,7 +103,7 @@ void Scheduler::run(void)
     erase_256k(location);
     //erase_all();
     write(location, memWrite, 6);
-    read(location, memRead, 6);
+    read(location, memRead, 6);*/
 
 
     /* setup for scheduler */
@@ -117,7 +117,7 @@ void Scheduler::run(void)
     while(1)
     {
         /* rate limiting code for 1 Hz */
-        while((HAL_GetTick() - lastTime) < SCHEDULER_1HZ_RATE);
+        while((HAL_GetTick() - lastTime) < SCHEDULER_100HZ_RATE);
         lastTime = HAL_GetTick();
 
         /* scheduler main loop */

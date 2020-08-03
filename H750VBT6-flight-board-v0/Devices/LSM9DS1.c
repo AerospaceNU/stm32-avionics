@@ -5,7 +5,6 @@
  *      Author: John
  */
 
-#include "SPIDriver.h"
 #include "LSM9DS1.h"
 
 uint8_t AG_whoAmI(AG_LSM9DS1Ctrl_t* sensor) {
@@ -17,25 +16,20 @@ uint8_t M_whoAmI(M_LSM9DS1Ctrl_t* sensor) {
 }
 
 void LSM9DS1_init(LSM9DS1Ctrl_t* sensor) {
-	//There are a lot of freaking ways to configure this sensor, I just kinda picked values at random
-	//and wrote to the bare minimum number of registers to get it working.
-
-	// Initialize Magnetometer
-	SPI_WriteRegister(&sensor->m.LSM9DS1SPI, CTRL_REG1_M, 0x30 << 1);
-	SPI_WriteRegister(&sensor->m.LSM9DS1SPI, CTRL_REG2_M, 0x00 << 1);
-	SPI_WriteRegister(&sensor->m.LSM9DS1SPI, CTRL_REG3_M, 0x04 << 1);
-	SPI_WriteRegister(&sensor->m.LSM9DS1SPI, CTRL_REG4_M, 0x04 << 1);
-	SPI_WriteRegister(&sensor->m.LSM9DS1SPI, CTRL_REG5_M, 0x00 << 1);
+	// Initialize Gyroscope
+	SPI_WriteRegister(&sensor->ag.LSM9DS1SPI, CTRL_REG1_G, ODR_G_238 | sensor->ag.gFs | BW_G_1);
 
 	// Initialize Accelerometer
-	SPI_WriteRegister(&sensor->ag.LSM9DS1SPI, CTRL_REG5_XL, 0x38);
-	SPI_WriteRegister(&sensor->ag.LSM9DS1SPI, CTRL_REG6_XL, 0x80);
-	SPI_WriteRegister(&sensor->ag.LSM9DS1SPI, CTRL_REG7_XL, 0x00);
+	SPI_WriteRegister(&sensor->ag.LSM9DS1SPI, CTRL_REG6_XL, ODR_XL_50 | sensor->ag.aFs);
 
-	// Initialize Gyroscope
-	SPI_WriteRegister(&sensor->ag.LSM9DS1SPI, CTRL_REG1_G, 0x60);
-	SPI_WriteRegister(&sensor->ag.LSM9DS1SPI, CTRL_REG2_G, 0x00);
-	SPI_WriteRegister(&sensor->ag.LSM9DS1SPI, CTRL_REG3_G, 0x00);
+	// Initialize Magnetometer
+	SPI_WriteRegister(&sensor->m.LSM9DS1SPI, CTRL_REG3_M, I2C_DISABLE_M_0 | SIM_M_0 | MD_M_CC);
+	SPI_WriteRegister(&sensor->m.LSM9DS1SPI, CTRL_REG1_M, OM_M_MP | DO_M_5);
+	SPI_WriteRegister(&sensor->m.LSM9DS1SPI, CTRL_REG2_M, sensor->m.mFs);
+	SPI_WriteRegister(&sensor->m.LSM9DS1SPI, CTRL_REG4_M, OMZ_M_MP);
+
+	LSM9DS1_calcRes(sensor);
+	LSM9DS1_get_adj(sensor);
 }
 
 void LSM9DS1_get_data_raw (LSM9DS1Ctrl_t* sensor) {
@@ -81,5 +75,93 @@ void LSM9DS1_get_data_raw (LSM9DS1Ctrl_t* sensor) {
 }
 
 void LSM9DS1_get_data (LSM9DS1Ctrl_t* sensor) {
+	LSM9DS1_get_data_raw(sensor);
+	sensor->ag.aVal.x = (sensor->ag.aRes * sensor->ag.aRawVal.x) - sensor->ag.aAdj.x;
+	sensor->ag.aVal.y = (sensor->ag.aRes * sensor->ag.aRawVal.y) - sensor->ag.aAdj.y;
+	sensor->ag.aVal.z = ((sensor->ag.aRes * sensor->ag.aRawVal.z) - sensor->ag.aAdj.z);
 
+	sensor->ag.gVal.x = (sensor->ag.gRes * sensor->ag.gRawVal.x) - sensor->ag.gAdj.x;
+	sensor->ag.gVal.y = (sensor->ag.gRes * sensor->ag.gRawVal.y) - sensor->ag.gAdj.y;
+	sensor->ag.gVal.z = (sensor->ag.gRes * sensor->ag.gRawVal.z) - sensor->ag.gAdj.z;
+
+	sensor->m.mVal.x = (sensor->m.mRes * sensor->m.mRawVal.x) - sensor->m.mAdj.x;
+	sensor->m.mVal.y = (sensor->m.mRes * sensor->m.mRawVal.y) - sensor->m.mAdj.y;
+	sensor->m.mVal.z = (sensor->m.mRes * sensor->m.mRawVal.z) - sensor->m.mAdj.z;
+}
+void LSM9DS1_get_adj(LSM9DS1Ctrl_t* sensor) {
+	int sampleCount = 100;
+	int aAdjX = 0;
+	int aAdjY = 0;
+	int aAdjZ = 0;
+	int gAdjX = 0;
+	int gAdjY = 0;
+	int gAdjZ = 0;
+	int mAdjX = 0;
+	int mAdjY = 0;
+	int mAdjZ = 0;
+	for (int i = 0; i < sampleCount; i++) {
+		LSM9DS1_get_data_raw(sensor);
+		aAdjX += sensor->ag.aRawVal.x;
+		aAdjY += sensor->ag.aRawVal.y;
+		aAdjZ += sensor->ag.aRawVal.z;
+		gAdjX += sensor->ag.gRawVal.x;
+		gAdjY += sensor->ag.gRawVal.y;
+		gAdjZ += sensor->ag.gRawVal.z;
+		mAdjX += sensor->m.mRawVal.x;
+		mAdjY += sensor->m.mRawVal.y;
+		mAdjZ += sensor->m.mRawVal.z;
+		HAL_Delay(5);
+	}
+	sensor->ag.aAdj.x = (aAdjX / sampleCount) * sensor->ag.aRes;
+	sensor->ag.aAdj.y = (aAdjY / sampleCount) * sensor->ag.aRes;
+	sensor->ag.aAdj.z = (aAdjZ / sampleCount) * sensor->ag.aRes - G_TO_MPS;
+	sensor->ag.gAdj.x = (gAdjX / sampleCount) * sensor->ag.gRes;
+	sensor->ag.gAdj.y = (gAdjY / sampleCount) * sensor->ag.gRes;
+	sensor->ag.gAdj.z = (gAdjZ / sampleCount) * sensor->ag.gRes;
+	sensor->m.mAdj.x = (mAdjX / sampleCount) * sensor->m.mRes;
+	sensor->m.mAdj.y = (mAdjY / sampleCount) * sensor->m.mRes;
+	sensor->m.mAdj.z = (mAdjZ / sampleCount) * sensor->m.mRes;
+}
+
+void LSM9DS1_calcRes(LSM9DS1Ctrl_t* sensor) {
+	switch (sensor->ag.aFs) {
+		case 0 << 3:
+			sensor->ag.aRes = SENSITIVITY_ACCELEROMETER_2;
+			break;
+		case 2 << 3:
+			sensor->ag.aRes = SENSITIVITY_ACCELEROMETER_4;
+			break;
+		case 3 << 3:
+			sensor->ag.aRes = SENSITIVITY_ACCELEROMETER_8;
+			break;
+		case 1 << 3:
+			sensor->ag.aRes = SENSITIVITY_ACCELEROMETER_16;
+			break;
+	}
+
+	switch (sensor->ag.gFs) {
+		case 0 << 3:
+			sensor->ag.gRes = SENSITIVITY_GYROSCOPE_245;
+			break;
+		case 1 << 3:
+			sensor->ag.gRes = SENSITIVITY_GYROSCOPE_500;
+			break;
+		case 3 << 3:
+			sensor->ag.gRes = SENSITIVITY_GYROSCOPE_2000;
+			break;
+	}
+	switch (sensor->m.mFs) {
+		case 0 << 5:
+			sensor->m.mRes = SENSITIVITY_MAGNETOMETER_4;
+			break;
+		case 1 << 5:
+			sensor->m.mRes = SENSITIVITY_MAGNETOMETER_8;
+			break;
+		case 2 << 5:
+			sensor->m.mRes = SENSITIVITY_MAGNETOMETER_12;
+			break;
+		case 3 << 5:
+			sensor->m.mRes = SENSITIVITY_MAGNETOMETER_16;
+			break;
+	}
 }

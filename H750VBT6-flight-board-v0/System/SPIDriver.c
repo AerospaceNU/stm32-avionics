@@ -18,8 +18,6 @@ uint8_t SPI_ReadRegister(SPICtrld_t* sensor, uint8_t reg) {
 
 	HAL_SPI_TransmitReceive(sensor->hspi, txBuff, rxBuff, 2, HAL_MAX_DELAY);
 
-	HAL_Delay(10);
-
 	// bring CS pin high
 	HAL_GPIO_WritePin(sensor->port, sensor->pin, 1);
 
@@ -38,8 +36,6 @@ void SPI_WriteRegister(SPICtrld_t* sensor, uint8_t reg, uint8_t val) {
 	// send the device the register you want to read:
 	// send a value to write
 	HAL_SPI_Transmit(sensor->hspi, txBuff, 2, HAL_MAX_DELAY);
-
-	HAL_Delay(50);
 
 	// bring CS pin high
 	HAL_GPIO_WritePin(sensor->port, sensor->pin, 1);

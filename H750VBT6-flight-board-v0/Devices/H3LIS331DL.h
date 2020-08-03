@@ -51,6 +51,8 @@ typedef struct data_s{
 
 typedef struct H3LIS331DLCtrl_s{
     SPICtrld_t H3LIS331DLSPI;
+    data_t adjVal;
+    double gain;
     raw_data_t rawVal;
     data_t val;
 }H3LIS331DLCtrl_t;
@@ -60,6 +62,8 @@ uint8_t readCtrl1(H3LIS331DLCtrl_t* sensor);
 void H3LIS331DL_init(H3LIS331DLCtrl_t* sensor);
 void H3LIS331DL_get_data_raw(H3LIS331DLCtrl_t* sensor);
 void H3LIS331DL_get_data(H3LIS331DLCtrl_t* sensor);
+void H3LIS331DL_get_adj(H3LIS331DLCtrl_t* sensor);
+void H3LIS331DL_get_gain(H3LIS331DLCtrl_t* sensor);
 
 #ifdef __cplusplus
 }

@@ -51,11 +51,11 @@ void State::general(void)
     /* read data from sensors */
 	HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
 	MS5607_get_data(&ms5607_1);
-	LSM9DS1_get_data_raw(&lsm9ds1_1);
-	H3LIS331DL_get_data_raw(&h3lis_1);
+	LSM9DS1_get_data(&lsm9ds1_1);
+	H3LIS331DL_get_data(&h3lis_1);
 
 	MS5607_get_data(&ms5607_2);
-	LSM9DS1_get_data_raw(&lsm9ds1_2);
+	LSM9DS1_get_data(&lsm9ds1_2);
 
 	//debugprintf("Atmospheric Pressure: %f Pa\t Temperature %f C\r\n", ms5607_1.altData.baro, ms5607_1.altData.temp);
 
