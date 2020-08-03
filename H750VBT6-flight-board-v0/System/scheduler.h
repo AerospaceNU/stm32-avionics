@@ -8,6 +8,8 @@
 #include "LSM9DS1.h"
 #include "H3LIS331DL.h"
 
+#include "S25FLx.h"
+
 #include "i2c.h"
 #include "spi.h"
 #include "gpio.h"
