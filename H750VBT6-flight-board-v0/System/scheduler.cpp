@@ -92,10 +92,11 @@ void Scheduler::run(void)
     h3lis_1.H3LIS331DLSPI.pin = GPIO_PIN_2;
     H3LIS331DL_init(&h3lis_1);
 
-    /* flash init *//*
+    /* flash init */
     flash_init();
     read_info();
 
+    /*
     uint32_t location = 783;
     uint8_t memWrite[] = {0x01, 0x93, 0x04, 0x03, 0x37, 0x12};
     uint8_t memRead[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -103,7 +104,8 @@ void Scheduler::run(void)
     erase_256k(location);
     //erase_all();
     write(location, memWrite, 6);
-    read(location, memRead, 6);*/
+    read(location, memRead, 6);
+    */
 
 
     /* setup for scheduler */
@@ -114,15 +116,29 @@ void Scheduler::run(void)
 
     uint32_t lastTime = HAL_GetTick();
 
+    volatile uint32_t t = 0;
+    volatile uint32_t t_last = 0;
+    volatile uint32_t dt = 0;
+    uint8_t i = 0;
+
     while(1)
     {
         /* rate limiting code for 1 Hz */
-        while((HAL_GetTick() - lastTime) < SCHEDULER_100HZ_RATE);
+        while((HAL_GetTick() - lastTime) < SCHEDULER_20HZ_RATE);
         lastTime = HAL_GetTick();
 
         /* scheduler main loop */
         state = states[state].run();
         
+        i++;
+
+        if(i == 100){
+        	i = 0;
+        	t = HAL_GetTick();
+        	dt = t - t_last;
+        	t_last = HAL_GetTick();
+        }
+
     }
 
 }

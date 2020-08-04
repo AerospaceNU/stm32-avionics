@@ -16,12 +16,11 @@ extern "C"{
 #define WRDI        0x04    /* Write Disable */
 #define RDSR        0x05    /* Read Status Register */
 #define WRSR        0x01    /* Write Status Register */
-#define READ        0x03    /* Read Data Bytes  */
-#define FAST_READ   0x0b    /* Read Data Bytes at Higher Speed //Not used as as the 328 isn't fast enough  */
-#define PP          0x02    /* Page Program  */
-#define SE          0x20    /* Sector Erase (4k)  */
-#define BE          0x20    /* Block Erase (64k)  */
-#define CE          0xc7    /* Erase entire chip  */
+#define READ        0x13    /* Read Data Bytes  */
+#define FAST_READ   0x0C    /* Read Data Bytes at Higher Speed //Not used as as the 328 isn't fast enough  */
+#define PP          0x12    /* Page Program  */
+#define SE          0xDC    /* Sector Erase (256k)  */
+#define CE          0xC7    /* Erase entire chip  */
 #define DP          0xb9    /* Deep Power-down  */
 #define RES         0xab    /* Release Power-down, return Device ID */
 #define RDID        0x9F      /* Read Manufacture ID, memory type ID, capacity ID */
@@ -30,7 +29,7 @@ void flash_init();
 void read_info();
 void write(unsigned long loc, uint8_t* array, unsigned long length);
 void read(unsigned long loc, uint8_t* array, unsigned long length);
-void erase_256k(unsigned long loc);
+void erase_sector(unsigned long loc);
 void erase_all();
 void waitforit();
 
