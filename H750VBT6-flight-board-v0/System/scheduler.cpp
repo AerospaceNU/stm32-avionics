@@ -92,22 +92,6 @@ void Scheduler::run(void)
     h3lis_1.H3LIS331DLSPI.pin = GPIO_PIN_2;
     H3LIS331DL_init(&h3lis_1);
 
-    /* flash init */
-    flash_init();
-    read_info();
-
-    /*
-    uint32_t location = 783;
-    uint8_t memWrite[] = {0x01, 0x93, 0x04, 0x03, 0x37, 0x12};
-    uint8_t memRead[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
-    erase_256k(location);
-    //erase_all();
-    write(location, memWrite, 6);
-    read(location, memRead, 6);
-    */
-
-
     /* setup for scheduler */
     State state1 = State(&(this->data));
     State state2 = State(&(this->data));
