@@ -1,4 +1,5 @@
 #include "scheduler.h"
+#include "data_log.h"
 
 extern SPI_HandleTypeDef hspi3;
 extern SPI_HandleTypeDef hspi6;
@@ -91,6 +92,13 @@ void Scheduler::run(void)
     h3lis_1.H3LIS331DLSPI.port = GPIOD;
     h3lis_1.H3LIS331DLSPI.pin = GPIO_PIN_2;
     H3LIS331DL_init(&h3lis_1);
+
+    /* data log initialization
+     *
+     * Parameters passed in are for S25FLx flash
+     */
+    data_log_init(&hspi1, GPIOC, GPIO_PIN_5);
+    // data_log_init(&hspi3, GPIOA, GPIO_PIN_15);
 
     /* setup for scheduler */
     State state1 = State(&(this->data));

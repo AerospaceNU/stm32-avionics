@@ -57,6 +57,8 @@ void State::general(void)
 	MS5607_get_data(&ms5607_2);
 	LSM9DS1_get_data(&lsm9ds1_2);
 
+	data_log_write(&lsm9ds1_1, &lsm9ds1_2, &h3lis_1, &ms5607_1, &ms5607_2);
+
 	//debugprintf("Atmospheric Pressure: %f Pa\t Temperature %f C\r\n", ms5607_1.altData.baro, ms5607_1.altData.temp);
 
 }
