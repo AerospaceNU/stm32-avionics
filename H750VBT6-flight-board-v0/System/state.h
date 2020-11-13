@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "data.h"
+#include "data_log.h"
 #include "serialPrint.h"
 
 #include "ms5607.h"

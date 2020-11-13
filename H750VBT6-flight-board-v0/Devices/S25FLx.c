@@ -1,440 +1,291 @@
 /*
- * S25FLx.c
- *
- *  Created on: Jun 28, 2020
- *      Author: ben helfrich
- *
- *      adapted from https://github.com/BleepLabs/S25FLx/blob/master/S25FLx.cpp
+ * S25FLx2.c
  */
 
+#include <string.h>
+#include <S25FLx.h>
+#include "hal_callbacks.h"
 
-#include "stm32h7xx_hal.h"
-#include "S25FLx.h"
+// Commands
+#define WRITE_ENABLE_CMD		0x06
+#define WRITE_DISABLE_CMD		0x04
+#define READ_STAT_REG_CMD		0x05
+#define READ_DATA_CMD			0x13
+#define PAGE_PROGRAM_CMD		0x12
+#define SECTOR_ERASE_CMD		0xDC
+#define CHIP_ERASE_CMD			0xC7
 
-uint8_t chip_info[3];
+// Timeouts
+#define SPI_TX_RX_TIMEOUT_MS	100 // For short transmit-receives that don't require DMA
 
-unsigned long prev;
+// Flash properties
+#define PAGE_SIZE_BYTES			256
+#define SECTOR_SIZE_BYTES		262144
 
-//A great little tool for printing a byte as binary without it chopping off the leading zeros.
-//from http://forum.arduino.cc/index.php/topic,46320.0.html
-
-extern SPI_HandleTypeDef hspi1;
-
-void flash_init(){
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, SET);
+static void cs_pull(const S25FLXCtrl_t *s25flx, GPIO_PinState direction) {
+	HAL_GPIO_WritePin(s25flx->csPort, s25flx->csPin, direction);
 }
 
-uint8_t flash_SPI_transceive(uint8_t *txBuf, uint8_t *rxBuf){
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, RESET);
-	HAL_SPI_TransmitReceive(&hspi1, txBuf, rxBuf, 2, HAL_MAX_DELAY);
-	while(HAL_SPI_GetState(&hspi1) != HAL_SPI_STATE_READY);
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, SET);
-	return 0;
+static bool write_disable(S25FLXCtrl_t *s25flx) {
+	cs_pull(s25flx, GPIO_PIN_RESET);
+	uint8_t tx = WRITE_DISABLE_CMD;
+	// Write-disable command is too short to require DMA
+	bool bSuccess = HAL_SPI_Transmit(s25flx->hspi, &tx, 1, SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
+	while(HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY);
+	cs_pull(s25flx, GPIO_PIN_SET);
+	return bSuccess;
 }
 
-uint8_t flash_SPI_transmit(uint8_t *txBuf, uint8_t *rxBuf){
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, RESET);
-	HAL_SPI_TransmitReceive(&hspi1, txBuf, rxBuf, 0x01, HAL_MAX_DELAY);
-	while(HAL_SPI_GetState(&hspi1) != HAL_SPI_STATE_READY);
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, SET);
-	return 0;
+static bool write_enable(S25FLXCtrl_t *s25flx) {
+	cs_pull(s25flx, GPIO_PIN_RESET);
+	uint8_t tx = WRITE_ENABLE_CMD;
+	// Write-enable command is too short to require DMA
+	bool bSuccess = HAL_SPI_Transmit(s25flx->hspi, &tx, 1, SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
+	while(HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY);
+	cs_pull(s25flx, GPIO_PIN_SET);
+	return bSuccess;
 }
 
-uint8_t flash_SPI_transceive_ncs(uint8_t *txBuf, uint8_t *rxBuf){
-	HAL_SPI_TransmitReceive(&hspi1, txBuf, rxBuf, 0x01, 50);
-	while(HAL_SPI_GetState(&hspi1) != HAL_SPI_STATE_READY);
-
-	return 0;
+static void check_write_in_progress(S25FLXCtrl_t *s25flx) {
+	cs_pull(s25flx, GPIO_PIN_RESET);
+	uint8_t tx[] = {READ_STAT_REG_CMD, 0};
+	uint8_t rx[] = {0, 0};
+	// Read status register once
+	bool bSuccess = HAL_SPI_TransmitReceive(s25flx->hspi, tx, rx, 2, SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
+	while(HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY);
+	if (bSuccess)
+		s25flx->bWIP = ((rx[1] & 0x01) == 0x01); // Write in progress is LSB of status register (1 = busy, 0 = not busy)
+	else
+		s25flx->bWIP = true; // If status register can't be read, assume the worst-case scenario: flash is busy
+	cs_pull(s25flx, GPIO_PIN_SET);
 }
 
-void csl(){
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, RESET);
+#ifdef USE_S25FLx_DMA
+static void spi_TxCpltCallback(void *s25flx) {
+	// Input must be void to use this function as a callback, but this is assumed to be a S25FLXCtrl_t type
+	S25FLXCtrl_t *ps25flx = (S25FLXCtrl_t *) s25flx;
+	ps25flx->bTxComplete = true;
+	// There is no instance where a complete DMA TX alone would not be followed by a CS pull high to end a command.
+	// Therefore, it makes sense to do that here instead of making higher-level code responsible to call some cleanup function
+	cs_pull(s25flx, GPIO_PIN_SET);
 }
 
-void csh(){
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, SET);
+static void spi_RxCpltCallback(void *s25flx) {
+	// Input must be void to use this function as a callback, but this is assumed to be a S25FLXCtrl_t type
+	S25FLXCtrl_t *ps25flx = (S25FLXCtrl_t *) s25flx;
+	ps25flx->bRxComplete = true;
+	// There is no instance where a complete DMA RX would not be followed by a CS pull high to end a command.
+	// Therefore, it makes sense to do that here instead of making higher-level code responsible to call some cleanup function.
+	cs_pull(s25flx, GPIO_PIN_SET);
+}
+#endif
+
+void S25FLX_init(S25FLXCtrl_t *s25flx, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csPort, uint16_t csPin, uint32_t flashSizeBytes) {
+
+	// Set struct properties
+	s25flx->hspi = hspi;
+	s25flx->csPort = csPort;
+	s25flx->csPin = csPin;
+	s25flx->flashSizeBytes = flashSizeBytes;
+	s25flx->bWIP = false;
+#ifdef USE_S25FLx_DMA
+	s25flx->bRxComplete = true;
+	s25flx->bTxComplete = true;
+
+	// Register callbacks for HAL SPI transmit-receive completions
+	register_HAL_SPI_TxCpltCallback(s25flx->hspi, spi_TxCpltCallback, s25flx);
+	register_HAL_SPI_TxRxCpltCallback(s25flx->hspi, spi_RxCpltCallback, s25flx);
+#endif
+
+	// Ensure CS is pulled high
+	HAL_GPIO_WritePin(s25flx->csPort, s25flx->csPin, GPIO_PIN_SET);
 }
 
-//read and return the status register.
-uint8_t stat(){                            //check status register
-	uint8_t rxBuf[] = {0x00, 0x00};
-	uint8_t txBuf[] = {RDSR, 0x00};
+bool S25FLX_read_start(S25FLXCtrl_t *s25flx, uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
 
-	flash_SPI_transceive(txBuf, rxBuf);
+	// Check for valid parameters
+	if (startLoc + numBytes > s25flx->flashSizeBytes ||
+			pData == NULL ||
+			s25flx->bWIP
+#ifdef USE_S25FLx_DMA
+			|| !s25flx->bRxComplete
+#endif
+		)
+		return false;
 
-	return rxBuf[1];
+	// Transmit read command and location
+	cs_pull(s25flx, GPIO_PIN_RESET);
+	uint8_t txBuf1[5] = {READ_DATA_CMD, startLoc >> 24, startLoc >> 16, startLoc >> 8, startLoc & 0xFF};
+	// No need to transmit 5-byte read command with DMA since it should occur in very short period of time
+	if (HAL_SPI_Transmit(s25flx->hspi, txBuf1, 5, SPI_TX_RX_TIMEOUT_MS) != HAL_OK) {
+		cs_pull(s25flx, GPIO_PIN_SET);
+		return false;
+	}
+	while(HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY);
+
+	// Read into given buffer pData
+	uint8_t txBuf2[numBytes];
+	memset(txBuf2, 0, numBytes);
+#ifdef USE_S25FLx_DMA
+	s25flx->bRxComplete = false;
+	if (HAL_SPI_TransmitReceive_DMA(s25flx->hspi, txBuf2, pData, numBytes) != HAL_OK) {
+		s25flx->bRxComplete = true;
+#else
+	if (HAL_SPI_TransmitReceive(s25flx->hspi, txBuf2, pData, numBytes, SPI_TX_RX_TIMEOUT_MS) != HAL_OK) {
+#endif
+		cs_pull(s25flx, GPIO_PIN_SET);
+		return false;
+	}
+	while(HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY);
+
+#ifndef USE_S25FLx_DMA
+	// Pull CS high if not using DMA because read is complete
+	cs_pull(s25flx, GPIO_PIN_SET);
+#endif
+	// If using DMA, don't pull CS high because transmit-receive still needs to occur on hardware communication end
+	// CS should be pulled high when receive is complete
+
+	return true;
 }
 
-// use between each communication to make sure S25FLxx is ready to go.
-void waitforit(){
-	uint8_t s=stat();
-	while ((s & 0x01)==0x01){    //check if WIP bit is 1
+bool S25FLX_write_start(S25FLXCtrl_t *s25flx, uint32_t startLoc, uint32_t numBytes, uint8_t *data) {
 
-		/*if ((millis()-prev)>1000){
-			prev=millis();
-		}*/
-		HAL_Delay(50);
+	// Only allows writing to 1 page at a time
 
-		s=stat();
+	// Check for valid parameters
+	if (startLoc + numBytes > s25flx->flashSizeBytes ||
+			startLoc / PAGE_SIZE_BYTES != (startLoc + numBytes) / PAGE_SIZE_BYTES ||
+			data == NULL ||
+			s25flx->bWIP
+#ifdef USE_S25FLx_DMA
+			|| !s25flx->bRxComplete
+#endif
+			)
+		return false;
+
+	// Assume data is erased beforehand.
+	// This is up to higher-level code to manage since writing over existing data won't cause an error.
+
+	// Enable writing to flash
+	if (!write_enable(s25flx))
+		return false;
+
+	// Set up data transfer
+	s25flx->bWIP = true; // Assume write is in progress for flash until status register reads otherwise
+#ifdef USE_S25FLx_DMA
+	s25flx->bTxComplete = false; // Assume DMA transmission hasn't been completed until callback has been called
+#endif
+	cs_pull(s25flx, GPIO_PIN_RESET);
+
+	// Fill in TX buffer
+	uint8_t txBuf[numBytes + 5];
+	txBuf[0] = PAGE_PROGRAM_CMD;
+	for (int i = 1; i < 5; i++) {
+		txBuf[i] = (startLoc >> (8 * (4 - i))) & 0xFF;
+	}
+	memcpy(txBuf + 5, data, numBytes);
+
+	// Perform transmit
+#ifdef USE_S25FLx_DMA
+	if (HAL_SPI_Transmit_DMA(s25flx->hspi, txBuf, numBytes + 5) != HAL_OK) {
+		s25flx->bTxComplete = true;
+#else
+	if (HAL_SPI_Transmit(s25flx->hspi, txBuf, numBytes + 5, SPI_TX_RX_TIMEOUT_MS) != HAL_OK) {
+#endif
+		s25flx->bWIP = false;
+		cs_pull(s25flx, GPIO_PIN_SET);
+		write_disable(s25flx);
+		return false;
+	}
+	while(HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY);
+
+#ifndef USE_S25FLx_DMA
+	// Pull CS high if not using DMA because write transmission is complete
+	cs_pull(s25flx, GPIO_PIN_SET);
+#endif
+	// If using DMA, don't pull CS high since transmit of data still needs to occur on hardware end
+	// CS should be pulled high when transmit is complete (before write is complete though
+
+	return true;
+}
+
+bool S25FLX_erase_sector_start(S25FLXCtrl_t *s25flx, uint32_t sectorNum) {
+
+	// Check for valid parameters
+	if (sectorNum * SECTOR_SIZE_BYTES >= s25flx->flashSizeBytes)
+		return false;
+
+	// Enable writing to flash (also necessary for erasing)
+	if (!write_enable(s25flx))
+		return false;
+
+	// Prep erase command
+	s25flx->bWIP = true; // Assume write (erase counts, too) is in progress for flash until status reg reads otherwise
+	cs_pull(s25flx, GPIO_PIN_RESET);
+
+	// Fill in TX buffer
+	uint8_t txBuf[5];
+	txBuf[0] = SECTOR_ERASE_CMD;
+	for (int i = 1; i < 5; i++) {
+		txBuf[i] = ((sectorNum * SECTOR_SIZE_BYTES) >> (8 * (4 - i))) & 0xFF;
 	}
 
-}
-
-
-// Must be done to allow erasing or writing
-void write_enable(){
-	uint8_t rxBuf;
-	uint8_t txBuf = WREN;
-
-	flash_SPI_transmit(&txBuf, &rxBuf);
-
-	waitforit();
-
-}
-
-
-// Erase an entire 4k sector the location is in.
-// For example "erase_4k(300);" will erase everything from 0-3999.
-//
-// All erase commands take time. No other actions can be preformed
-// while the chip is errasing except for reading the register
-// NOT SUPPORTED
-void erase_4k(unsigned long loc){
-
-	waitforit();
-	write_enable();
-
-	uint8_t rxBuf;
-	uint8_t txBuf = 0x20;
-
-	csl();
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf= (loc>>16);
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf = (loc>>8);
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf = (loc & 0xFF);
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	csh();
-
-	waitforit();
-}
-
-// Errase an entire 64_k sector the location is in.
-// For example erase4k(530000) will erase everything from 524543 to 589823.
-// NOT SUPPORTED
-void erase_64k(unsigned long loc){
-
-	waitforit();
-	write_enable();
-
-	uint8_t rxBuf;
-	uint8_t txBuf = 0x20;
-	csl();
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf= (loc>>16);
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf = (loc>>8);
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf = (loc & 0xFF);
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	csh();
-	waitforit();
-}
-
-// Erase an entire 256_k sector the location is in.
-void erase_sector(unsigned long loc){
-
-	waitforit();
-	write_enable();
-
-	uint8_t rxBuf;
-	uint8_t txBuf = 0xD8;
-	csl();
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf= (loc>>16);
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf = (loc>>8);
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf = (loc & 0xFF);
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	csh();
-	waitforit();
-}
-
-//errases all the memory. Can take several seconds.
-void erase_all(){
-	uint8_t rxBuf;
-	uint8_t txBuf = CE;
-
-	waitforit();
-	write_enable();
-
-	flash_SPI_transmit(&txBuf, &rxBuf);
-
-	waitforit();
-
-}
-
-
-
-
-// Read data from the flash chip. There is no limit "length". The entire memory can be read with one command.
-//read_S25(starting location, array, number of bytes);
-void read(unsigned long loc, uint8_t* array, unsigned long length){
-
-	uint8_t rxBuf;
-	uint8_t txBuf = READ;
-
-	csl();
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf = (loc>>16);
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf = (loc>>8);
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf = (loc & 0xff);
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-
-
-	for (int i=0; i<length+1;i++){
-		txBuf = 0x00;
-		flash_SPI_transceive_ncs(&txBuf, &rxBuf);  //send the data
-		array[i] = rxBuf;
-
+	// Perform transmit. Transmit is short enough where DMA doesn't speed things up
+	if (HAL_SPI_Transmit(s25flx->hspi, txBuf, 5, SPI_TX_RX_TIMEOUT_MS) != HAL_OK) {
+		cs_pull(s25flx, GPIO_PIN_SET);
+		write_disable(s25flx);
+		s25flx->bWIP = false;
+		return false;
 	}
-	csh();
+	while(HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY);
+
+	// Latch the erase command so it starts
+	cs_pull(s25flx, GPIO_PIN_SET);
+
+	return true;
 }
 
-// Programs up to 256 bytes of data to flash chip. Data must be erased first. You cannot overwrite.
-// Only one continuous page (256 Bytes) can be programmed at once so there's some
-// sorcery going on here to make it not wrap around.
-// It's most efficient to only program one page so if you're going for speed make sure your
-// location %=0 (for example location=256, length=255.) or your length is less that the bytes remain
-// in the page (location =120 , length= 135)
+bool S25FLX_erase_chip_start(S25FLXCtrl_t *s25flx) {
 
+	// Enable writing to flash (also necessary for erasing)
+	if (!write_enable(s25flx))
+		return false;
 
-//write_S25(starting location, array, number of bytes);
-void write(unsigned long loc, uint8_t* array, unsigned long length){
-
-	uint8_t rxBuf;
-	uint8_t txBuf;
-
-
-
-	if (length>255){
-		unsigned long reps=length>>8;
-		unsigned long length1;
-		unsigned long array_count;
-		unsigned long first_length;
-		unsigned remainer0=length-(256*reps);
-		unsigned long locb=loc;
-
-		for (int i=0; i<(reps+2);i++){
-
-			if (i==0){
-
-				length1=256-(locb & 0xff);
-				first_length=length1;
-				if (length1==0){i++;}
-				array_count=0;
-			}
-
-			if (i>0 && i<(reps+1)){
-				locb= first_length+loc+(256*(i-1));;
-
-				array_count=first_length+(256*(i-1));
-				length1=255;
-
-			}
-			if (i==(reps+1)){
-				locb+=(256);
-				array_count+=256;
-				length1=remainer0;
-				if (remainer0==0){break;}
-
-			}
-
-
-
-			write_enable();
-			waitforit();
-
-			csl();
-			txBuf=PP;
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			txBuf = (locb>>16);
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			txBuf = (locb>>8);
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			txBuf = (locb & 0xFF);
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-
-			for (unsigned long i=array_count; i<(length1+array_count+1) ; i++){
-				txBuf = array[i];
-				flash_SPI_transceive_ncs(&txBuf, &rxBuf);  //send the data
-			}
-
-			csh();
-			waitforit();
-
-
-
-		}
+	// Perform full erase command. Short enough to avoid DMA
+	s25flx->bWIP = true; // Assume write (erase counts, too) is in progress for flash until status reg reads otherwise
+	cs_pull(s25flx, GPIO_PIN_RESET);
+	uint8_t txByte = CHIP_ERASE_CMD;
+	if (HAL_SPI_Transmit(s25flx->hspi, &txByte, 1, SPI_TX_RX_TIMEOUT_MS) != HAL_OK) {
+		cs_pull(s25flx, GPIO_PIN_SET);
+		write_disable(s25flx);
+		s25flx->bWIP = false;
+		return false;
 	}
+	while(HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY);
 
-	if (length<=255){
-		if (((loc & 0xff)!=0) | ((loc & 0xff)<length)){
-			uint8_t remainer = loc & 0xff;
-			uint8_t length1 =256-remainer;
-			//uint8_t length2 = length-length1;
-			unsigned long page1_loc = loc;
-			unsigned long page2_loc = loc+length1;
+	// Latch the full erase command so it starts
+	cs_pull(s25flx, GPIO_PIN_SET);
 
-			write_enable();
-			waitforit();
-
-
-			csl();
-			txBuf=PP;
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			txBuf = (page1_loc>>16);
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			txBuf = (page1_loc>>8);
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			txBuf = (page1_loc & 0xFF);
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-
-			for (int i=0; i<length+1;i++){
-				txBuf = array[i];
-				flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-
-			}
-			csh();
-
-			waitforit();
-			write_enable();
-
-			waitforit();
-
-
-			csl();
-			txBuf=PP;
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			txBuf = (page2_loc>>16);
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			txBuf = (page2_loc>>8);
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			txBuf = (page2_loc & 0xFF);
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-
-			for (int i=length1; i<length+1;i++){
-				txBuf = array[i];
-				flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-
-			}
-			csh();
-
-			waitforit();
-
-		}
-
-
-
-		else{
-
-
-			write_enable(); // Must be done before writing can commence. Erase clears it.
-			waitforit();
-
-			csl();
-			txBuf=PP;
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			txBuf = (loc>>16);
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			txBuf = (loc>>8);
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			txBuf = (loc & 0xFF);
-			flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-
-			/*digitalWriteFast(cs,LOW);
-			SPI.transfer(PP);
-			SPI.transfer(loc>>16);
-			SPI.transfer(loc>>8);
-			SPI.transfer(loc & 0xff);*/
-
-			for (int i=0; i<length+1;i++){
-				txBuf = array[i];
-				flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-			}
-
-			csh();
-			waitforit();
-		}
-	}
+	return true;
 }
 
+#ifdef USE_S25FLx_DMA
+bool S25FLX_is_read_complete(const S25FLXCtrl_t *s25flx) {
+	return s25flx->bRxComplete;
+}
+#endif
 
-//Used in conjuture with the write protect pin to protect blocks.
-//For example on the S25FL216K sending "write_reg(B00001000);" will protect 2 blocks, 30 and 31.
-//See the datasheet for more. http://www.mouser.com/ds/2/380/S25FL216K_00-6756.pdf
-void write_reg(uint8_t w){
-
-	uint8_t rxBuf;
-	uint8_t txBuf;
-
-	csl();
-	txBuf=WRSR;
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf = w;
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	csh();
-
-	/*digitalWriteFast(cs,LOW);
-	SPI.transfer(WRSR);
-	SPI.transfer(w);
-	digitalWriteFast(cs,HIGH);*/
+bool S25FLX_is_write_complete(S25FLXCtrl_t *s25flx) {
+	check_write_in_progress(s25flx);
+	if (s25flx->bWIP) {
+		HAL_Delay(1);
+	}
+	// This delay is here because checking write in progress too quickly causes issues
+	// There should be a way to check if ready instead of delaying, but no solution has been found yet
+	return !s25flx->bWIP;
 }
 
-void read_info(){
-
-	uint8_t txBuff[] = {0x9f, 0x00, 0x00, 0x00};
-	uint8_t rxBuff[4];
-
-	csl();
-	//txBuf=0x9F;
-	/*flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	txBuf = 0;
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	chip_info[0] = rxBuf; //mfg id
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	chip_info[1] = rxBuf; //mem type
-	flash_SPI_transceive_ncs(&txBuf, &rxBuf);
-	chip_info[2] = rxBuf; //capacity*/
-	HAL_SPI_TransmitReceive(&hspi1, txBuff, rxBuff, 4, 500);
-	csh();
-
-
-
-	/*digitalWriteFast(cs,LOW);
-	SPI.transfer(0x9F);
-	//  SPI.transfer(0);
-	byte m=  SPI.transfer(0);
-	byte t = SPI.transfer(0);
-	byte c = SPI.transfer(0);
-	digitalWriteFast(cs,HIGH);*/
-
-
-	/*while (c==0){
-		Serial.println("Cannot read S25FL. Check wiring");
-	}
-
-	Serial.print("Manufacturer ID: ");
-	Serial.print(m);
-	Serial.print("     Memory type: ");
-	Serial.print(t);
-	Serial.print("     Capacity: ");
-	Serial.println(c);
-	Serial.println();
-	waitforit();*/
-
+bool S25FLX_is_erase_complete(S25FLXCtrl_t *s25flx) {
+	// Same functionality as write, but different public function name is clearer for programmers at higher levels
+	return S25FLX_is_write_complete(s25flx);
 }
