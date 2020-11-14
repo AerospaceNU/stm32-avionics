@@ -55,7 +55,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+extern USBD_HandleTypeDef hUsbDeviceFS;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -131,7 +131,7 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM8_Init();
   MX_UART5_Init();
-  //MX_USB_DEVICE_Init();
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
 
   /* turn off LED 1 */
@@ -143,9 +143,15 @@ int main(void)
   /* Delay after init */
   HAL_Delay(1000);
 
-  /* run scheduler, this function should never return */
-  scheduler.run();
+  /* check to see if a USB is connected */
+  if(hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED){
+	  /* run USB terminal app */
+	  scheduler.terminal();
+  }else{
+	  /* run scheduler, this function should never return */
+	  scheduler.run();
 
+  }
   /* USER CODE END 2 */
  
  

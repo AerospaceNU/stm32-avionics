@@ -30,6 +30,8 @@ class Scheduler{
 
         void run(void);
 
+        void terminal(void);
+
 };
 
 #endif

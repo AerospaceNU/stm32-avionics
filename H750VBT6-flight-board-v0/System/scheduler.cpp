@@ -134,3 +134,19 @@ void Scheduler::run(void)
     }
 
 }
+
+void Scheduler::terminal()
+{
+
+	uint32_t lastTime = 0;
+
+	while(1)
+	{
+		/* rate limiting code for 1 Hz */
+		while((HAL_GetTick() - lastTime) < SCHEDULER_1HZ_RATE);
+		lastTime = HAL_GetTick();
+
+		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
+
+	}
+}
