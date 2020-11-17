@@ -12,11 +12,15 @@ First, pull this git repository using the following command from a directory of 
 
 **Note:** you must have git installed. You can install git bash [here](https://gitforwindows.org/).
 
-Next, open STM32 Cube IDE. If you do not have Cube you can install it from this [link](https://www.st.com/en/development-tools/stm32cubeide.html). The default installation options should work. 
+Next, open STM32 Cube IDE. If you do not have Cube you can install it from this [link](https://www.st.com/en/development-tools/stm32cubeide.html). The default installation options should work.
 
-When opening the IDE set your workspace to the `stm32-avionics` directory.
+When opening the IDE, you can use the default workspace. Using the cloned directory may cause problems.
 
-Once the workspace is open, create a new project from an .ioc file. To do this navigate to `File -> New -> STM32 Project From STM32CubeMX .ioc File`. This should open an `.ioc` file. Saving this file will regenerate sources.
+Once the IDE is open, you can import the project. Navigate to `File -> Import -> General -> Existing Projects into Workspace`. Browse for the `H750VBT6-flight-board-v0` folder in `stm32-avionics`. Make sure `Search for nested projects` is checked and that none of the other options are checked. The code should build at this point by clicking on the hammer icon.
+
+## Running Code Using Debug
+
+To run code in debug mode, click on the bug symbol drop down. Click on `H750VBT6-flight-board-v0 Debug`. If it doesn't show up, click on `Debug Configurations...` and find it. The code should load onto the board.
 
 ## Correcting Regenerated Sources
 
@@ -31,6 +35,8 @@ There is also an uncorrected bug in the USB driver when interfacing with Windows
 This correction will allow Windows computers to connect to the board over USB as a Virtual COM device. This issue is not present on Linux computers, however this change should always be made when rebuilding sources for cross-platform compatibility.
 
 ## Configuring the Build
+
+Ignore this section if software was installed using the Installing Software section above. This is useful information for creating new projects but unnecessary once the project is already created.
 
 After all of the sources are configured correctly, the build system has to be configured. The source files have to be added to the include paths and the build path.
 
