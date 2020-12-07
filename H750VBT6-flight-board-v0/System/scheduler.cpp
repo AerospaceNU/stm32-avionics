@@ -1,5 +1,6 @@
 #include "scheduler.h"
 #include "data_log.h"
+#include "serial_interface.c"
 
 extern SPI_HandleTypeDef hspi3;
 extern SPI_HandleTypeDef hspi6;
@@ -149,4 +150,8 @@ void Scheduler::terminal()
 		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
 
 	}
+
+	uint8_t *pdata;
+	uint32_t maxBytes = 50; // Change this to what maxBytes should be
+	sendLog(maxBytes, pdata); // Send the log number that is received
 }
