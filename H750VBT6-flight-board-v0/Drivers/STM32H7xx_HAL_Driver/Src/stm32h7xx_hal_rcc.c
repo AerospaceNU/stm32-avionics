@@ -228,9 +228,8 @@ HAL_StatusTypeDef HAL_RCC_DeInit(void)
   /* Reset CFGR register */
   CLEAR_REG(RCC->CFGR);
 
-  /* Update the SystemCoreClock and SystemD2Clock global variables */
+  /* Update the SystemCoreClock global variable */
   SystemCoreClock = HSI_VALUE;
-  SystemD2Clock = HSI_VALUE;
 
   /* Adapt Systick interrupt period */
   if(HAL_InitTick(uwTickPrio) != HAL_OK)
@@ -860,7 +859,7 @@ __weak HAL_StatusTypeDef HAL_RCC_OscConfig(RCC_OscInitTypeDef  *RCC_OscInitStruc
   *         contains the configuration information for the RCC peripheral.
   * @param  FLatency: FLASH Latency, this parameter depend on device selected
   *
-  * @note   The SystemCoreClock CMSIS variable is used to store System Core Clock Frequency
+  * @note   The SystemCoreClock CMSIS variable is used to store System Clock Frequency
   *         and updated by HAL_InitTick() function called within this function
   *
   * @note   The HSI is used (enabled by hardware) as system clock source after
@@ -883,7 +882,6 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
 {
   HAL_StatusTypeDef halstatus;
   uint32_t tickstart;
-  uint32_t common_system_clock;
 
    /* Check Null pointer */
   if(RCC_ClkInitStruct == NULL)
@@ -1176,23 +1174,10 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
 
   /* Update the SystemCoreClock global variable */
 #if defined(RCC_D1CFGR_D1CPRE)
-  common_system_clock = HAL_RCC_GetSysClockFreq() >> ((D1CorePrescTable[(RCC->D1CFGR & RCC_D1CFGR_D1CPRE)>> RCC_D1CFGR_D1CPRE_Pos]) & 0x1FU);
+  SystemCoreClock = HAL_RCC_GetSysClockFreq() >> ((D1CorePrescTable[(RCC->D1CFGR & RCC_D1CFGR_D1CPRE)>> RCC_D1CFGR_D1CPRE_Pos]) & 0x1FU);
 #else
-  common_system_clock = HAL_RCC_GetSysClockFreq() >> ((D1CorePrescTable[(RCC->CDCFGR1 & RCC_CDCFGR1_CDCPRE)>> RCC_CDCFGR1_CDCPRE_Pos]) & 0x1FU);
+  SystemCoreClock = HAL_RCC_GetSysClockFreq() >> ((D1CorePrescTable[(RCC->CDCFGR1 & RCC_CDCFGR1_CDCPRE)>> RCC_CDCFGR1_CDCPRE_Pos]) & 0x1FU);
 #endif
-
-#if defined(RCC_D1CFGR_HPRE)
-  SystemD2Clock = (common_system_clock >> ((D1CorePrescTable[(RCC->D1CFGR & RCC_D1CFGR_HPRE)>> RCC_D1CFGR_HPRE_Pos]) & 0x1FU));
-#else
-  SystemD2Clock = (common_system_clock >> ((D1CorePrescTable[(RCC->CDCFGR1 & RCC_CDCFGR1_HPRE)>> RCC_CDCFGR1_HPRE_Pos]) & 0x1FU));
-#endif
-
-#if defined(DUAL_CORE) && defined(CORE_CM4)
-  SystemCoreClock = SystemD2Clock;
-#else
-  SystemCoreClock = common_system_clock;
-#endif /* DUAL_CORE && CORE_CM4 */
-
   /* Configure the source of time base considering new system clocks settings*/
   halstatus = HAL_InitTick (uwTickPrio);
 
@@ -1444,26 +1429,11 @@ uint32_t HAL_RCC_GetSysClockFreq(void)
   */
 uint32_t HAL_RCC_GetHCLKFreq(void)
 {
-uint32_t common_system_clock;
-
-#if defined(RCC_D1CFGR_D1CPRE)
-  common_system_clock = HAL_RCC_GetSysClockFreq() >> (D1CorePrescTable[(RCC->D1CFGR & RCC_D1CFGR_D1CPRE)>> RCC_D1CFGR_D1CPRE_Pos] & 0x1FU);
-#else
-  common_system_clock = HAL_RCC_GetSysClockFreq() >> (D1CorePrescTable[(RCC->CDCFGR1 & RCC_CDCFGR1_CDCPRE)>> RCC_CDCFGR1_CDCPRE_Pos] & 0x1FU);
-#endif
-
 #if defined(RCC_D1CFGR_HPRE)
-  SystemD2Clock = (common_system_clock >> ((D1CorePrescTable[(RCC->D1CFGR & RCC_D1CFGR_HPRE)>> RCC_D1CFGR_HPRE_Pos]) & 0x1FU));
+  SystemD2Clock = (HAL_RCCEx_GetD1SysClockFreq() >> ((D1CorePrescTable[(RCC->D1CFGR & RCC_D1CFGR_HPRE)>> RCC_D1CFGR_HPRE_Pos]) & 0x1FU));
 #else
-  SystemD2Clock = (common_system_clock >> ((D1CorePrescTable[(RCC->CDCFGR1 & RCC_CDCFGR1_HPRE)>> RCC_CDCFGR1_HPRE_Pos]) & 0x1FU));
+  SystemD2Clock = (HAL_RCCEx_GetD1SysClockFreq() >> ((D1CorePrescTable[(RCC->CDCFGR1 & RCC_CDCFGR1_HPRE)>> RCC_CDCFGR1_HPRE_Pos]) & 0x1FU));
 #endif
-
-#if defined(DUAL_CORE) && defined(CORE_CM4)
-  SystemCoreClock = SystemD2Clock;
-#else
-  SystemCoreClock = common_system_clock;
-#endif /* DUAL_CORE && CORE_CM4 */
-
   return SystemD2Clock;
 }
 
@@ -1481,7 +1451,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
   return (HAL_RCC_GetHCLKFreq() >> ((D1CorePrescTable[(RCC->D2CFGR & RCC_D2CFGR_D2PPRE1)>> RCC_D2CFGR_D2PPRE1_Pos]) & 0x1FU));
 #else
  /* Get HCLK source and Compute PCLK1 frequency ---------------------------*/
-  return (HAL_RCC_GetHCLKFreq() >> ((D1CorePrescTable[(RCC->CDCFGR2 & RCC_CDCFGR2_CDPPRE1)>> RCC_CDCFGR2_CDPPRE1_Pos]) & 0x1FU));
+  return (HAL_RCC_GetHCLKFreq() >> D1CorePrescTable[(RCC->CDCFGR2 & RCC_CDCFGR2_CDPPRE1)>> POSITION_VAL(RCC_CDCFGR2_CDPPRE1_0)]);
 #endif
 }
 

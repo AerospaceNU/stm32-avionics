@@ -101,10 +101,6 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 #if defined(DUAL_CORE)
-/** @defgroup HSEM_Private_Constants  HSEM Private Constants
-  * @{
-  */
-
 #ifndef HSEM_R_MASTERID
 #define HSEM_R_MASTERID HSEM_R_COREID
 #endif
@@ -116,10 +112,6 @@
 #ifndef HSEM_CR_MASTERID
 #define HSEM_CR_MASTERID HSEM_CR_COREID
 #endif
-
-/**
-  * @}
-  */  
 #endif /* DUAL_CORE */
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/

@@ -40,7 +40,6 @@
 /* USER CODE END INCLUDE */
 
 /** @addtogroup USBD_OTG_DRIVER
-  * @brief Driver for Usb device.
   * @{
   */
 

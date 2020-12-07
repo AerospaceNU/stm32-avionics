@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file    rtc.c
-  * @brief   This file provides code for the configuration
-  *          of the RTC instances.
+  * File Name          : RTC.c
+  * Description        : This file provides code for the configuration
+  *                      of the RTC instances.
   ******************************************************************************
   * @attention
   *
@@ -30,7 +30,7 @@ RTC_HandleTypeDef hrtc;
 void MX_RTC_Init(void)
 {
 
-  /** Initialize RTC Only
+  /** Initialize RTC Only 
   */
   hrtc.Instance = RTC;
   hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
@@ -77,7 +77,7 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef* rtcHandle)
 
   /* USER CODE END RTC_MspDeInit 1 */
   }
-}
+} 
 
 /* USER CODE BEGIN 1 */
 
