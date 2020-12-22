@@ -12,6 +12,11 @@ extern MS5607Ctrl_t ms5607_1;
 
 extern H3LIS331DLCtrl_t h3lis_1;
 
+extern ServoCtrl_t servo1;
+extern ServoCtrl_t servo2;
+extern ServoCtrl_t servo3;
+extern ServoCtrl_t servo4;
+
 Scheduler::Scheduler(void)
 {
 
@@ -99,6 +104,16 @@ void Scheduler::run(void)
      */
     data_log_init(&hspi1, GPIOC, GPIO_PIN_5);
     // data_log_init(&hspi3, GPIOA, GPIO_PIN_15);
+
+    /* Servo initialization
+     *
+     * TODO: minPulseMS and maxPulseMS will need a method of tuning based on servo (currently 0.75-2.25)
+     * TODO: Initial angles need to be determined
+     */
+    servoInit(&servo1, &htim8, TIM_CHANNEL_1, 20, 0.75, 2.25, -90, 90, 0);
+    servoInit(&servo2, &htim8, TIM_CHANNEL_2, 20, 0.75, 2.25, -90, 90, 0);
+    servoInit(&servo3, &htim8, TIM_CHANNEL_3, 20, 0.75, 2.25, -90, 90, 0);
+    servoInit(&servo4, &htim8, TIM_CHANNEL_4, 20, 0.75, 2.25, -90, 90, 0);
 
     /* setup for scheduler */
     State state1 = State(&(this->data));

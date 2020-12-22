@@ -7,10 +7,12 @@
 #include "ms5607.h"
 #include "LSM9DS1.h"
 #include "H3LIS331DL.h"
+#include "servo.h"
 
 #include "i2c.h"
 #include "spi.h"
 #include "gpio.h"
+#include "tim.h"
 
 #include <cstdint>
 

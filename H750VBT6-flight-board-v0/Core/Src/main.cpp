@@ -87,6 +87,12 @@ MS5607Ctrl_t ms5607_2;
 /* high g accelerometers */
 H3LIS331DLCtrl_t h3lis_1;
 
+/* servos */
+ServoCtrl_t servo1;
+ServoCtrl_t servo2;
+ServoCtrl_t servo3;
+ServoCtrl_t servo4;
+
 /* USER CODE END 0 */
 
 /**
