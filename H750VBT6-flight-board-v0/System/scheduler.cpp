@@ -17,6 +17,8 @@ extern ServoCtrl_t servo2;
 extern ServoCtrl_t servo3;
 extern ServoCtrl_t servo4;
 
+extern BuzzerCtrl_t buzzer;
+
 Scheduler::Scheduler(void)
 {
 
@@ -114,6 +116,12 @@ void Scheduler::run(void)
     servoInit(&servo2, &htim8, TIM_CHANNEL_2, 20, 0.75, 2.25, -90, 90, 0);
     servoInit(&servo3, &htim8, TIM_CHANNEL_3, 20, 0.75, 2.25, -90, 90, 0);
     servoInit(&servo4, &htim8, TIM_CHANNEL_4, 20, 0.75, 2.25, -90, 90, 0);
+
+    /*
+     * Buzzer initialization
+     * htim8 -> Channel 1
+     */
+    buzzerInit(&buzzer, &htim1, TIM_CHANNEL_1, 500);
 
     /* setup for scheduler */
     State state1 = State(&(this->data));

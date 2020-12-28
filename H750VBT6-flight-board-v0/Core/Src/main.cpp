@@ -93,6 +93,9 @@ ServoCtrl_t servo2;
 ServoCtrl_t servo3;
 ServoCtrl_t servo4;
 
+/* buzzers */
+BuzzerCtrl_t buzzer;
+
 /* USER CODE END 0 */
 
 /**
