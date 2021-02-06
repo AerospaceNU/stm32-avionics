@@ -1,176 +1,181 @@
 #include "scheduler.h"
-#include "data_log.h"
-#include "buzzer_song.h"
+#include "state_cli_calibrate.h"
+#include "state_cli_choose_flight.h"
+#include "state_cli_config.h"
+#include "state_cli_erase_flash.h"
+#include "state_cli_help.h"
+#include "state_cli_main.h"
+#include "state_cli_offload.h"
+#include "state_coast_ascent.h"
+#include "state_drogue_descent_n.h"
+#include "state_initialize.h"
+#include "state_main_descent.h"
+#include "state_post_flight.h"
+#include "state_powered_ascent.h"
+#include "state_pre_flight.h"
+#include "state_shutdown.h"
+#include "stm32h7xx_hal.h"
 
-extern SPI_HandleTypeDef hspi3;
-extern SPI_HandleTypeDef hspi6;
+void Scheduler::run(void) {
 
-extern LSM9DS1Ctrl_t lsm9ds1_1;
-extern LSM9DS1Ctrl_t lsm9ds1_2;
+    /* Create all necessary states initially and store in list */
+	CliCalibrateState cliCalibrate = CliCalibrateState(StateId::CliCalibrate, 20);
+	CliChooseFlightState cliChooseFlight = CliChooseFlightState(StateId::CliChooseFlight, 20);
+	CliConfigState cliConfig = CliConfigState(StateId::CliConfig, 20);
+	CliEraseFlashState cliEraseFlash = CliEraseFlashState(StateId::CliEraseFlash, 20);
+	CliHelpState cliHelp = CliHelpState(StateId::CliHelp, 20);
+	CliMainState cliMain = CliMainState(StateId::CliMain, 20);
+	CliOffloadState cliOffload = CliOffloadState(StateId::CliOffload, 20);
+	CoastAscentState coastAscent = CoastAscentState(StateId::CoastAscent, 20);
+	DrogueDescentNState drogueDescentN = DrogueDescentNState(StateId::DrogueDescentN, 20);
+	InitializeState initialize = InitializeState(StateId::Initialize, 20);
+	MainDescentState mainDescent = MainDescentState(StateId::MainDescent, 20);
+	PostFlightState postFlight = PostFlightState(StateId::PostFlight, 20);
+	PoweredAscentState poweredAscent = PoweredAscentState(StateId::PoweredAscent, 20);
+	PreFlightState preFlight = PreFlightState(StateId::PreFlight, 20);
+	ShutdownState shutdown = ShutdownState(StateId::Shutdown, 20);
 
-extern MS5607Ctrl_t ms5607_2;
-extern MS5607Ctrl_t ms5607_1;
+	State* states[] = {&cliCalibrate, &cliChooseFlight, &cliConfig, &cliEraseFlash, &cliHelp,
+			&cliMain, &cliOffload, &coastAscent, &drogueDescentN, &initialize, &mainDescent,
+			&postFlight, &poweredAscent, &preFlight, &shutdown};
 
-extern H3LIS331DLCtrl_t h3lis_1;
+	// Initialize the current and next states
+	pCurrentState_ = nullptr;
+    State* pNextState = &initialize;
 
-extern ServoCtrl_t servo1;
-extern ServoCtrl_t servo2;
-extern ServoCtrl_t servo3;
-extern ServoCtrl_t servo4;
+    // Helper functions throughout infinite loop
+    uint32_t lastTime_ = HAL_GetTick();
+    EndCondition_t endCondition = NoChange;
 
-extern BuzzerCtrl_t buzzer;
+    // Keep running scheduler forever
+    while(1) {
 
-Scheduler::Scheduler(void)
-{
+        // Limit rate scheduler runs at
+    	if (pCurrentState_)
+    		while((HAL_GetTick() - lastTime_) < pCurrentState_->getPeriodMS());
+        lastTime_ = HAL_GetTick();
 
-    /* initialize data structure */
-    this->data = Data();
-
-}
-
-void Scheduler::run(void)
-{
-
-    typedef enum{
-        STATE1 = 0,
-        STATE2
-    }state_e;
-
-    State::state_t state = STATE1;
-
-    /* initialize sensors */
-    /* lsm9ds1 IMU */
-    /* LSM9DS1 1
-     * SPI 3
-     * Mag CS      -> PD0
-     * Acc/Gyro CS -> PD1
-     */
-    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0 | GPIO_PIN_1, GPIO_PIN_SET);
-    lsm9ds1_1.ag.LSM9DS1SPI.hspi = &hspi3;
-    lsm9ds1_1.ag.LSM9DS1SPI.port = GPIOD;
-    lsm9ds1_1.ag.LSM9DS1SPI.pin = GPIO_PIN_1;
-    lsm9ds1_1.m.LSM9DS1SPI.hspi = &hspi3;
-    lsm9ds1_1.m.LSM9DS1SPI.port = GPIOD;
-    lsm9ds1_1.m.LSM9DS1SPI.pin = GPIO_PIN_0;
-    LSM9DS1_init(&lsm9ds1_1);
-
-    /* LSM9DS1 1
-	 * SPI 6
-	 * Mag CS      -> PE0
-	 * Acc/Gyro CS -> PE1
-	 */
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0 | GPIO_PIN_1, GPIO_PIN_SET);
-	lsm9ds1_2.ag.LSM9DS1SPI.hspi = &hspi6;
-	lsm9ds1_2.ag.LSM9DS1SPI.port = GPIOE;
-	lsm9ds1_2.ag.LSM9DS1SPI.pin = GPIO_PIN_1;
-	lsm9ds1_2.m.LSM9DS1SPI.hspi = &hspi6;
-	lsm9ds1_2.m.LSM9DS1SPI.port = GPIOE;
-	lsm9ds1_2.m.LSM9DS1SPI.pin = GPIO_PIN_0;
-	LSM9DS1_init(&lsm9ds1_2);
-
-    /* ms5607 barometer */
-    /* ms5607 1
-     * SPI3
-     * CS -> PA15
-     */
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
-    ms5607_1.spiconfig.hspi = hspi3;
-    ms5607_1.spiconfig.port = GPIOA;
-    ms5607_1.spiconfig.pin = GPIO_PIN_15;
-    MS5607_init(&ms5607_1);
-
-    /*
-     * ms5607 2
-     * SPI6
-     * CS -> PE2
-     */
-    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2, GPIO_PIN_SET);
-    ms5607_2.spiconfig.hspi = hspi6;
-    ms5607_2.spiconfig.port = GPIOE;
-    ms5607_2.spiconfig.pin = GPIO_PIN_2;
-    MS5607_init(&ms5607_2);
-
-    /* H3LIS331DL High G Accelerometer */
-    /* these configs are not correct for the final
-     * this will be on SPI 3
-     * High G CS -> PD2
-     */
-    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
-    h3lis_1.H3LIS331DLSPI.hspi = &hspi3;
-    h3lis_1.H3LIS331DLSPI.port = GPIOD;
-    h3lis_1.H3LIS331DLSPI.pin = GPIO_PIN_2;
-    H3LIS331DL_init(&h3lis_1);
-
-    /* data log initialization
-     *
-     * Parameters passed in are for S25FLx flash
-     */
-    data_log_init(&hspi1, GPIOC, GPIO_PIN_5);
-    // data_log_init(&hspi3, GPIOA, GPIO_PIN_15);
-
-    /* Servo initialization
-     *
-     * TODO: minPulseMS and maxPulseMS will need a method of tuning based on servo (currently 0.75-2.25)
-     * TODO: Initial angles need to be determined
-     */
-    servoInit(&servo1, &htim8, TIM_CHANNEL_1, 20, 0.75, 2.25, -90, 90, 0);
-    servoInit(&servo2, &htim8, TIM_CHANNEL_2, 20, 0.75, 2.25, -90, 90, 0);
-    servoInit(&servo3, &htim8, TIM_CHANNEL_3, 20, 0.75, 2.25, -90, 90, 0);
-    servoInit(&servo4, &htim8, TIM_CHANNEL_4, 20, 0.75, 2.25, -90, 90, 0);
-
-    /*
-     * Buzzer initialization
-     * htim8 -> Channel 1
-     */
-    buzzerInit(&buzzer, &htim1, TIM_CHANNEL_1, 500);
-
-    /* setup for scheduler */
-    State state1 = State(&(this->data));
-    State state2 = State(&(this->data));
-
-    State states[] = {state1, state2};
-
-    uint32_t lastTime = HAL_GetTick();
-
-    volatile uint32_t t = 0;
-    volatile uint32_t t_last = 0;
-    volatile uint32_t dt = 0;
-    uint8_t i = 0;
-
-    while(1)
-    {
-        /* rate limiting code for 1 Hz */
-        while((HAL_GetTick() - lastTime) < SCHEDULER_20HZ_RATE);
-        lastTime = HAL_GetTick();
-
-        /* scheduler main loop */
-        state = states[state].run();
-        
-        i++;
-
-        if(i == 100){
-        	i = 0;
-        	t = HAL_GetTick();
-        	dt = t - t_last;
-        	t_last = HAL_GetTick();
+        // Cleanup current state and initialize next state if changing states
+        if (pNextState != pCurrentState_) {
+        	if (pCurrentState_) pCurrentState_->cleanup();
+        	if (pNextState) pNextState->init();
+        	pCurrentState_ = pNextState;
         }
 
+        // Run the current state
+        if (pCurrentState_) endCondition = pCurrentState_->run();
+
+        // Find and set the next state
+        StateId nextState = getNextState(endCondition);
+        for (State* state : states) {
+        	if (state->getID() == nextState) {
+        		pNextState = state;
+        		break;
+        	}
+        }
     }
 
 }
 
-void Scheduler::terminal()
-{
-
-	uint32_t lastTime = 0;
-
-	while(1)
-	{
-		/* rate limiting code for 1 Hz */
-		while((HAL_GetTick() - lastTime) < SCHEDULER_1HZ_RATE);
-		lastTime = HAL_GetTick();
-
-		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
-
+Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
+	// Return the current state if there's no change
+	if (endCondition == EndCondition_t::NoChange) {
+		return static_cast<Scheduler::StateId>(pCurrentState_->getID());
 	}
+	// Look for next state based on current state and end condition
+	switch(pCurrentState_->getID()) {
+	case StateId::CliCalibrate:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::CliChooseFlight:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::CliConfig:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::CliEraseFlash:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::CliHelp:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::CliMain:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::CliOffload:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::CoastAscent:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::DrogueDescentN:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::Initialize:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::MainDescent:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::PostFlight:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::PoweredAscent:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::PreFlight:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	case StateId::Shutdown:
+		switch(endCondition) {
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+	return StateId::UNKNOWN;
 }
