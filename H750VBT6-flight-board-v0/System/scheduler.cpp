@@ -1,3 +1,4 @@
+#include "hardware_manager.h"
 #include "scheduler.h"
 #include "state_cli_calibrate.h"
 #include "state_cli_choose_flight.h"
@@ -44,7 +45,7 @@ void Scheduler::run(void) {
     State* pNextState = &initialize;
 
     // Helper functions throughout infinite loop
-    uint32_t lastTime_ = HAL_GetTick();
+    uint32_t lastTime_ = HM_Millis();
     EndCondition_t endCondition = NoChange;
 
     // Keep running scheduler forever
@@ -52,8 +53,8 @@ void Scheduler::run(void) {
 
         // Limit rate scheduler runs at
     	if (pCurrentState_)
-    		while((HAL_GetTick() - lastTime_) < pCurrentState_->getPeriodMS());
-        lastTime_ = HAL_GetTick();
+    		while((HM_Millis() - lastTime_) < pCurrentState_->getPeriodMS());
+        lastTime_ = HM_Millis();
 
         // Cleanup current state and initialize next state if changing states
         if (pNextState != pCurrentState_) {
