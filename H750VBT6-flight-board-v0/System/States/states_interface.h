@@ -8,7 +8,8 @@ extern "C"{
 #include <cstdint>
 
 typedef enum {
-	NoChange
+	NoChange,
+	UsbConnect
 } EndCondition_t;
 
 class State {
