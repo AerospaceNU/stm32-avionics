@@ -12,7 +12,9 @@ extern "C"{
 #include <stdint.h>
 #include "hardware_manager.h"
 
-void data_log_init();
+uint32_t data_log_get_last_flight_num();
+
+void data_log_assign_flight();
 
 void data_log_write(SensorData_t* sensorData, uint8_t state);
 

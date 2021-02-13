@@ -7,11 +7,11 @@
 #include <string.h>
 #include "stm32h7xx_hal.h"
 
-#define BOARD_VERSION 		0x01
+#define BOARD_VERSION 		0x00
 #define BOARD_ID 			0x01
 #define SOFTWARE_VERSION 	0x01
 
-static uint32_t flightNum;
+static uint32_t flightNum = 0;
 static uint32_t curSectorNum;
 static uint32_t curWriteAddress;
 
@@ -41,9 +41,9 @@ static LogData logPacket;
 
 static const uint8_t kLogDataSize = sizeof(LogData);
 
-void data_log_init() {
+uint32_t data_log_get_last_flight_num() {
 
-	uint32_t waitStartMS = 0;
+	uint32_t lastFlightNum = 0;
 
 	uint8_t rxBuffVersions[2] = {0};
 	HM_FlashReadStart(0, 2, rxBuffVersions);
@@ -52,16 +52,7 @@ void data_log_init() {
 	uint8_t softwareVersion = rxBuffVersions[1];
 
 	if (boardVersion != BOARD_VERSION || boardID != BOARD_ID || softwareVersion != SOFTWARE_VERSION) {
-		// Erase sector since metadata indicates the versions are not the expected
-		HM_FlashEraseSectorStart(0);
-		waitStartMS = HM_Millis();
-		while (!HM_FlashIsEraseComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS);
-		// Write board version, id, and software version
-		uint8_t txBuffVersions[] = {BOARD_VERSION << 4 | BOARD_ID, SOFTWARE_VERSION};
-		HM_FlashWriteStart(0, 2, txBuffVersions);
-		waitStartMS = HM_Millis();
-		while (!HM_FlashIsWriteComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS);
-		flightNum = 1;
+		lastFlightNum = 0;
 		curSectorNum = 1;
 	}
 	else {
@@ -76,11 +67,31 @@ void data_log_init() {
 				flightNumFound = true;
 			}
 			else {
-				flightNum = tempFlightNum;
+				lastFlightNum = tempFlightNum;
 				curSectorNum++;
 			}
 		}
-		flightNum++; // Add 1 to flight number for new flight number (most recent + 1)
+	}
+
+	return lastFlightNum;
+}
+
+void data_log_assign_flight() {
+
+	uint32_t waitStartMS = 0;
+
+	// Assign flight number
+	flightNum = data_log_get_last_flight_num() + 1;
+	if (flightNum == 1) {
+		// Erase sector since metadata indicates the versions are not the expected
+		HM_FlashEraseSectorStart(0);
+		waitStartMS = HM_Millis();
+		while (!HM_FlashIsEraseComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS);
+		// Write board version, id, and software version
+		uint8_t txBuffVersions[] = {BOARD_VERSION << 4 | BOARD_ID, SOFTWARE_VERSION};
+		HM_FlashWriteStart(0, 2, txBuffVersions);
+		waitStartMS = HM_Millis();
+		while (!HM_FlashIsWriteComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS);
 	}
 
 	// Erase sector where flight metadata will go
@@ -102,92 +113,95 @@ void data_log_init() {
 
 void data_log_write(SensorData_t* sensorData, uint8_t state) {
 
-	uint32_t waitStartMS = 0;
+	if (flightNum > 0) {
 
-	logPacket.timestamp_s = sensorData->timestamp_s;
-	logPacket.timestamp_us = sensorData->timestamp_us;
-	logPacket.imu1_accel_x_raw = sensorData->imu1_accel_x_raw;
-	logPacket.imu1_accel_y_raw = sensorData->imu1_accel_y_raw;
-	logPacket.imu1_accel_z_raw = sensorData->imu1_accel_z_raw;
-	logPacket.imu1_gyro_x_raw = sensorData->imu1_gyro_x_raw;
-	logPacket.imu1_gyro_y_raw = sensorData->imu1_gyro_y_raw;
-	logPacket.imu1_gyro_z_raw = sensorData->imu1_gyro_z_raw;
-	logPacket.imu1_mag_x_raw = sensorData->imu1_mag_x_raw;
-	logPacket.imu1_mag_y_raw = sensorData->imu1_mag_y_raw;
-	logPacket.imu1_mag_z_raw = sensorData->imu1_mag_z_raw;
-	logPacket.imu2_accel_x_raw = sensorData->imu2_accel_x_raw;
-	logPacket.imu2_accel_y_raw = sensorData->imu2_accel_y_raw;
-	logPacket.imu2_accel_z_raw = sensorData->imu2_accel_z_raw;
-	logPacket.imu2_gyro_x_raw = sensorData->imu2_gyro_x_raw;
-	logPacket.imu2_gyro_y_raw = sensorData->imu2_gyro_y_raw;
-	logPacket.imu2_gyro_z_raw = sensorData->imu2_gyro_z_raw;
-	logPacket.imu2_mag_x_raw = sensorData->imu2_mag_x_raw;
-	logPacket.imu2_mag_y_raw = sensorData->imu2_mag_y_raw;
-	logPacket.imu2_mag_z_raw = sensorData->imu2_mag_z_raw;
-	logPacket.high_g_accel_x_raw = sensorData->high_g_accel_x_raw;
-	logPacket.high_g_accel_y_raw = sensorData->high_g_accel_y_raw;
-	logPacket.high_g_accel_z_raw = sensorData->high_g_accel_z_raw;
-	logPacket.baro1_pres = sensorData->baro1_pres;
-	logPacket.baro1_temp = sensorData->baro1_temp;
-	logPacket.baro1_alt = sensorData->baro1_alt;
-	logPacket.baro2_pres = sensorData->baro2_pres;
-	logPacket.baro2_temp = sensorData->baro2_temp;
-	logPacket.baro2_alt = sensorData->baro2_alt;
-	logPacket.gps_lat = sensorData->gps_lat;
-	logPacket.gps_long = sensorData->gps_long;
-	logPacket.gps_alt = sensorData->gps_alt;
-	logPacket.battery_voltage = sensorData->battery_voltage;
-	logPacket.pyro_continuity = ((sensorData->pyro1_continuity & 0x01) << 5) |
-						((sensorData->pyro2_continuity & 0x01) << 4) |
-						((sensorData->pyro3_continuity & 0x01) << 3) |
-						((sensorData->pyro4_continuity & 0x01) << 2) |
-						((sensorData->pyro5_continuity & 0x01) << 1) |
-						((sensorData->pyro6_continuity & 0x01));
-	logPacket.heading = sensorData->heading;
-	logPacket.vtg = sensorData->vtg;
-	logPacket.pos_x = sensorData->pos_x;
-	logPacket.pos_y = sensorData->pos_y;
-	logPacket.pos_z = sensorData->pos_z;
-	logPacket.vel_x = sensorData->vel_x;
-	logPacket.vel_y = sensorData->vel_y;
-	logPacket.vel_z = sensorData->vel_z;
-	logPacket.qx = sensorData->qx;
-	logPacket.qy = sensorData->qy;
-	logPacket.qz = sensorData->qz;
-	logPacket.qw = sensorData->qw;
-	logPacket.state = state;
+		uint32_t waitStartMS = 0;
 
-	// Find what pages to write packet on
-	uint32_t second_page_bytes = (curWriteAddress + kLogDataSize) % FLASH_PAGE_SIZE_BYTES;
-	if (second_page_bytes >= kLogDataSize)
-		second_page_bytes = 0;
-	uint32_t first_page_bytes = kLogDataSize - second_page_bytes;
+		logPacket.timestamp_s = sensorData->timestamp_s;
+		logPacket.timestamp_us = sensorData->timestamp_us;
+		logPacket.imu1_accel_x_raw = sensorData->imu1_accel_x_raw;
+		logPacket.imu1_accel_y_raw = sensorData->imu1_accel_y_raw;
+		logPacket.imu1_accel_z_raw = sensorData->imu1_accel_z_raw;
+		logPacket.imu1_gyro_x_raw = sensorData->imu1_gyro_x_raw;
+		logPacket.imu1_gyro_y_raw = sensorData->imu1_gyro_y_raw;
+		logPacket.imu1_gyro_z_raw = sensorData->imu1_gyro_z_raw;
+		logPacket.imu1_mag_x_raw = sensorData->imu1_mag_x_raw;
+		logPacket.imu1_mag_y_raw = sensorData->imu1_mag_y_raw;
+		logPacket.imu1_mag_z_raw = sensorData->imu1_mag_z_raw;
+		logPacket.imu2_accel_x_raw = sensorData->imu2_accel_x_raw;
+		logPacket.imu2_accel_y_raw = sensorData->imu2_accel_y_raw;
+		logPacket.imu2_accel_z_raw = sensorData->imu2_accel_z_raw;
+		logPacket.imu2_gyro_x_raw = sensorData->imu2_gyro_x_raw;
+		logPacket.imu2_gyro_y_raw = sensorData->imu2_gyro_y_raw;
+		logPacket.imu2_gyro_z_raw = sensorData->imu2_gyro_z_raw;
+		logPacket.imu2_mag_x_raw = sensorData->imu2_mag_x_raw;
+		logPacket.imu2_mag_y_raw = sensorData->imu2_mag_y_raw;
+		logPacket.imu2_mag_z_raw = sensorData->imu2_mag_z_raw;
+		logPacket.high_g_accel_x_raw = sensorData->high_g_accel_x_raw;
+		logPacket.high_g_accel_y_raw = sensorData->high_g_accel_y_raw;
+		logPacket.high_g_accel_z_raw = sensorData->high_g_accel_z_raw;
+		logPacket.baro1_pres = sensorData->baro1_pres;
+		logPacket.baro1_temp = sensorData->baro1_temp;
+		logPacket.baro1_alt = sensorData->baro1_alt;
+		logPacket.baro2_pres = sensorData->baro2_pres;
+		logPacket.baro2_temp = sensorData->baro2_temp;
+		logPacket.baro2_alt = sensorData->baro2_alt;
+		logPacket.gps_lat = sensorData->gps_lat;
+		logPacket.gps_long = sensorData->gps_long;
+		logPacket.gps_alt = sensorData->gps_alt;
+		logPacket.battery_voltage = sensorData->battery_voltage;
+		logPacket.pyro_continuity = ((sensorData->pyro1_continuity & 0x01) << 5) |
+							((sensorData->pyro2_continuity & 0x01) << 4) |
+							((sensorData->pyro3_continuity & 0x01) << 3) |
+							((sensorData->pyro4_continuity & 0x01) << 2) |
+							((sensorData->pyro5_continuity & 0x01) << 1) |
+							((sensorData->pyro6_continuity & 0x01));
+		logPacket.heading = sensorData->heading;
+		logPacket.vtg = sensorData->vtg;
+		logPacket.pos_x = sensorData->pos_x;
+		logPacket.pos_y = sensorData->pos_y;
+		logPacket.pos_z = sensorData->pos_z;
+		logPacket.vel_x = sensorData->vel_x;
+		logPacket.vel_y = sensorData->vel_y;
+		logPacket.vel_z = sensorData->vel_z;
+		logPacket.qx = sensorData->qx;
+		logPacket.qy = sensorData->qy;
+		logPacket.qz = sensorData->qz;
+		logPacket.qw = sensorData->qw;
+		logPacket.state = state;
 
-	// Check if a new sector has been entered. If so, record in file system and erase the sector
-	if ((curWriteAddress + kLogDataSize) / FLASH_SECTOR_BYTES > curSectorNum) {
-		curSectorNum++;
-		// Write flight number and sector to metadata
-		uint8_t flightTxBuff[2] = {(flightNum >> 8) & 0xFF, flightNum & 0xFF};
-		HM_FlashWriteStart(curSectorNum * 2, 2, flightTxBuff);
+		// Find what pages to write packet on
+		uint32_t second_page_bytes = (curWriteAddress + kLogDataSize) % FLASH_PAGE_SIZE_BYTES;
+		if (second_page_bytes >= kLogDataSize)
+			second_page_bytes = 0;
+		uint32_t first_page_bytes = kLogDataSize - second_page_bytes;
+
+		// Check if a new sector has been entered. If so, record in file system and erase the sector
+		if ((curWriteAddress + kLogDataSize) / FLASH_SECTOR_BYTES > curSectorNum) {
+			curSectorNum++;
+			// Write flight number and sector to metadata
+			uint8_t flightTxBuff[2] = {(flightNum >> 8) & 0xFF, flightNum & 0xFF};
+			HM_FlashWriteStart(curSectorNum * 2, 2, flightTxBuff);
+			waitStartMS = HM_Millis();
+			while (!HM_FlashIsWriteComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS);
+			// Erase the upcoming sector
+			HM_FlashEraseSectorStart(curSectorNum);
+			waitStartMS = HM_Millis();
+			while (!HM_FlashIsEraseComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS);
+		}
+
+		// Write to first page and, if necessary, second page
+		HM_FlashWriteStart(curWriteAddress, first_page_bytes, (uint8_t*) &logPacket);
 		waitStartMS = HM_Millis();
 		while (!HM_FlashIsWriteComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS);
-		// Erase the upcoming sector
-		HM_FlashEraseSectorStart(curSectorNum);
-		waitStartMS = HM_Millis();
-		while (!HM_FlashIsEraseComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS);
+		if (second_page_bytes > 0) {
+			HM_FlashWriteStart(curWriteAddress + first_page_bytes, second_page_bytes, (uint8_t*) &logPacket + first_page_bytes);
+			waitStartMS = HM_Millis();
+			while (!HM_FlashIsWriteComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS);
+		}
+		// Increment write address to be next address to write to
+		curWriteAddress += kLogDataSize;
 	}
-
-	// Write to first page and, if necessary, second page
-	HM_FlashWriteStart(curWriteAddress, first_page_bytes, (uint8_t*) &logPacket);
-	waitStartMS = HM_Millis();
-	while (!HM_FlashIsWriteComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS);
-	if (second_page_bytes > 0) {
-		HM_FlashWriteStart(curWriteAddress + first_page_bytes, second_page_bytes, (uint8_t*) &logPacket + first_page_bytes);
-		waitStartMS = HM_Millis();
-		while (!HM_FlashIsWriteComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS);
-	}
-	// Increment write address to be next address to write to
-	curWriteAddress += kLogDataSize;
 }
 
 uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata) {
