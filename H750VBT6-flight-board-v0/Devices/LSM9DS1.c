@@ -16,6 +16,10 @@ uint8_t M_whoAmI(M_LSM9DS1Ctrl_t* sensor) {
 }
 
 void LSM9DS1_init(LSM9DS1Ctrl_t* sensor) {
+	// Pull CS High
+	HAL_GPIO_WritePin(sensor->ag.LSM9DS1SPI.port, sensor->ag.LSM9DS1SPI.pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(sensor->m.LSM9DS1SPI.port, sensor->m.LSM9DS1SPI.pin, GPIO_PIN_SET);
+
 	// Initialize Gyroscope
 	SPI_WriteRegister(&sensor->ag.LSM9DS1SPI, CTRL_REG1_G, ODR_G_238 | sensor->ag.gFs | BW_G_1);
 

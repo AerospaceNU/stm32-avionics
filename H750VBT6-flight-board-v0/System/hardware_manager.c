@@ -53,8 +53,6 @@ static bool bPyroContinuitySampling = true;
 void HM_HardwareInit() {
 
 	/* LSM9DS1 IMU 1 */
-	HAL_GPIO_WritePin(IMU1_AG_CS_PORT, IMU1_AG_CS_PIN, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(IMU1_M_CS_PORT, IMU1_M_CS_PIN, GPIO_PIN_SET);
 	lsm9ds1_1.ag.LSM9DS1SPI.hspi = IMU1_AG_HSPI;
 	lsm9ds1_1.ag.LSM9DS1SPI.port = IMU1_AG_CS_PORT;
 	lsm9ds1_1.ag.LSM9DS1SPI.pin = IMU1_AG_CS_PIN;
@@ -64,8 +62,6 @@ void HM_HardwareInit() {
 	LSM9DS1_init(&lsm9ds1_1);
 
 	/* LSM9DS1 IMU 2 */
-	HAL_GPIO_WritePin(IMU2_AG_CS_PORT, IMU2_AG_CS_PIN, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(IMU2_M_CS_PORT, IMU2_M_CS_PIN, GPIO_PIN_SET);
 	lsm9ds1_2.ag.LSM9DS1SPI.hspi = IMU2_AG_HSPI;
 	lsm9ds1_2.ag.LSM9DS1SPI.port = IMU2_AG_CS_PORT;
 	lsm9ds1_2.ag.LSM9DS1SPI.pin = IMU2_AG_CS_PIN;
@@ -75,21 +71,18 @@ void HM_HardwareInit() {
 	LSM9DS1_init(&lsm9ds1_2);
 
 	/* MS5607 Barometer 1 */
-	HAL_GPIO_WritePin(BARO1_CS_PORT, BARO1_CS_PIN, GPIO_PIN_SET);
 	ms5607_1.spiconfig.hspi = BARO1_HSPI;
 	ms5607_1.spiconfig.port = BARO1_CS_PORT;
 	ms5607_1.spiconfig.pin = BARO1_CS_PIN;
 	MS5607_init(&ms5607_1);
 
 	/* MS5607 Barometer 2 */
-	HAL_GPIO_WritePin(BARO2_CS_PORT, BARO2_CS_PIN, GPIO_PIN_SET);
 	ms5607_2.spiconfig.hspi = BARO2_HSPI;
 	ms5607_2.spiconfig.port = BARO2_CS_PORT;
 	ms5607_2.spiconfig.pin = BARO2_CS_PIN;
 	MS5607_init(&ms5607_2);
 
 	/* H3LIS331DL High G Accelerometer */
-	HAL_GPIO_WritePin(HIGH_G_CS_PORT, HIGH_G_CS_PIN, GPIO_PIN_SET);
 	h3lis_1.H3LIS331DLSPI.hspi = HIGH_G_HSPI;
 	h3lis_1.H3LIS331DLSPI.port = HIGH_G_CS_PORT;
 	h3lis_1.H3LIS331DLSPI.pin = HIGH_G_CS_PIN;
