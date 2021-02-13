@@ -52,96 +52,67 @@ static bool bPyroContinuitySampling = true;
 
 void HM_HardwareInit() {
 
-	/* lsm9ds1 IMU */
-	/* LSM9DS1 1
-	 * SPI 3
-	 * Mag CS      -> PD0
-	 * Acc/Gyro CS -> PD1
-	 */
-	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0 | GPIO_PIN_1, GPIO_PIN_SET);
-	lsm9ds1_1.ag.LSM9DS1SPI.hspi = &hspi3;
-	lsm9ds1_1.ag.LSM9DS1SPI.port = GPIOD;
-	lsm9ds1_1.ag.LSM9DS1SPI.pin = GPIO_PIN_1;
-	lsm9ds1_1.m.LSM9DS1SPI.hspi = &hspi3;
-	lsm9ds1_1.m.LSM9DS1SPI.port = GPIOD;
-	lsm9ds1_1.m.LSM9DS1SPI.pin = GPIO_PIN_0;
+	/* LSM9DS1 IMU 1 */
+	HAL_GPIO_WritePin(IMU1_AG_CS_PORT, IMU1_AG_CS_PIN, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(IMU1_M_CS_PORT, IMU1_M_CS_PIN, GPIO_PIN_SET);
+	lsm9ds1_1.ag.LSM9DS1SPI.hspi = IMU1_AG_HSPI;
+	lsm9ds1_1.ag.LSM9DS1SPI.port = IMU1_AG_CS_PORT;
+	lsm9ds1_1.ag.LSM9DS1SPI.pin = IMU1_AG_CS_PIN;
+	lsm9ds1_1.m.LSM9DS1SPI.hspi = IMU1_M_HSPI;
+	lsm9ds1_1.m.LSM9DS1SPI.port = IMU1_M_CS_PORT;
+	lsm9ds1_1.m.LSM9DS1SPI.pin = IMU1_M_CS_PIN;
 	LSM9DS1_init(&lsm9ds1_1);
 
-	/* LSM9DS1 1
-	 * SPI 6
-	 * Mag CS      -> PE0
-	 * Acc/Gyro CS -> PE1
-	 */
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0 | GPIO_PIN_1, GPIO_PIN_SET);
-	lsm9ds1_2.ag.LSM9DS1SPI.hspi = &hspi6;
-	lsm9ds1_2.ag.LSM9DS1SPI.port = GPIOE;
-	lsm9ds1_2.ag.LSM9DS1SPI.pin = GPIO_PIN_1;
-	lsm9ds1_2.m.LSM9DS1SPI.hspi = &hspi6;
-	lsm9ds1_2.m.LSM9DS1SPI.port = GPIOE;
-	lsm9ds1_2.m.LSM9DS1SPI.pin = GPIO_PIN_0;
+	/* LSM9DS1 IMU 2 */
+	HAL_GPIO_WritePin(IMU2_AG_CS_PORT, IMU2_AG_CS_PIN, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(IMU2_M_CS_PORT, IMU2_M_CS_PIN, GPIO_PIN_SET);
+	lsm9ds1_2.ag.LSM9DS1SPI.hspi = IMU2_AG_HSPI;
+	lsm9ds1_2.ag.LSM9DS1SPI.port = IMU2_AG_CS_PORT;
+	lsm9ds1_2.ag.LSM9DS1SPI.pin = IMU2_AG_CS_PIN;
+	lsm9ds1_2.m.LSM9DS1SPI.hspi = IMU2_M_HSPI;
+	lsm9ds1_2.m.LSM9DS1SPI.port = IMU2_M_CS_PORT;
+	lsm9ds1_2.m.LSM9DS1SPI.pin = IMU2_M_CS_PIN;
 	LSM9DS1_init(&lsm9ds1_2);
 
-	/* ms5607 barometer */
-	/* ms5607 1
-	 * SPI3
-	 * CS -> PA15
-	 */
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
-	ms5607_1.spiconfig.hspi = hspi3;
-	ms5607_1.spiconfig.port = GPIOA;
-	ms5607_1.spiconfig.pin = GPIO_PIN_15;
+	/* MS5607 Barometer 1 */
+	HAL_GPIO_WritePin(BARO1_CS_PORT, BARO1_CS_PIN, GPIO_PIN_SET);
+	ms5607_1.spiconfig.hspi = *(BARO1_HSPI);
+	ms5607_1.spiconfig.port = BARO1_CS_PORT;
+	ms5607_1.spiconfig.pin = BARO1_CS_PIN;
 	MS5607_init(&ms5607_1);
 
-	/*
-	 * ms5607 2
-	 * SPI6
-	 * CS -> PE2
-	 */
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2, GPIO_PIN_SET);
-	ms5607_2.spiconfig.hspi = hspi6;
-	ms5607_2.spiconfig.port = GPIOE;
-	ms5607_2.spiconfig.pin = GPIO_PIN_2;
+	/* MS5607 Barometer 2 */
+	HAL_GPIO_WritePin(BARO2_CS_PORT, BARO2_CS_PIN, GPIO_PIN_SET);
+	ms5607_2.spiconfig.hspi = *(BARO2_HSPI);
+	ms5607_2.spiconfig.port = BARO2_CS_PORT;
+	ms5607_2.spiconfig.pin = BARO2_CS_PIN;
 	MS5607_init(&ms5607_2);
 
 	/* H3LIS331DL High G Accelerometer */
-	/* these configs are not correct for the final
-	 * this will be on SPI 3
-	 * High G CS -> PD2
-	 */
-	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
-	h3lis_1.H3LIS331DLSPI.hspi = &hspi3;
-	h3lis_1.H3LIS331DLSPI.port = GPIOD;
-	h3lis_1.H3LIS331DLSPI.pin = GPIO_PIN_2;
+	HAL_GPIO_WritePin(HIGH_G_CS_PORT, HIGH_G_CS_PIN, GPIO_PIN_SET);
+	h3lis_1.H3LIS331DLSPI.hspi = HIGH_G_HSPI;
+	h3lis_1.H3LIS331DLSPI.port = HIGH_G_CS_PORT;
+	h3lis_1.H3LIS331DLSPI.pin = HIGH_G_CS_PIN;
 	H3LIS331DL_init(&h3lis_1);
 
-	/* Servo initialization
+	/* Servos 1-4
 	 *
 	 * TODO: minPulseMS and maxPulseMS will need a method of tuning based on servo (currently 0.75-2.25)
 	 * TODO: Initial angles need to be determined
 	 */
-	servoInit(&servo1, &htim8, TIM_CHANNEL_1, 20, 0.75, 2.25, -90, 90, 0);
-	servoInit(&servo2, &htim8, TIM_CHANNEL_2, 20, 0.75, 2.25, -90, 90, 0);
-	servoInit(&servo3, &htim8, TIM_CHANNEL_3, 20, 0.75, 2.25, -90, 90, 0);
-	servoInit(&servo4, &htim8, TIM_CHANNEL_4, 20, 0.75, 2.25, -90, 90, 0);
+	servoInit(&servo1, SERVO1_HTIM, SERVO1_CHANNEL, 20, 0.75, 2.25, -90, 90, 0);
+	servoInit(&servo2, SERVO2_HTIM, SERVO2_CHANNEL, 20, 0.75, 2.25, -90, 90, 0);
+	servoInit(&servo3, SERVO3_HTIM, SERVO3_CHANNEL, 20, 0.75, 2.25, -90, 90, 0);
+	servoInit(&servo4, SERVO4_HTIM, SERVO4_CHANNEL, 20, 0.75, 2.25, -90, 90, 0);
 
-	/*
-	 * Buzzer initialization
-	 * htim1 -> Channel 1
-	 */
-	buzzerInit(&buzzer, &htim1, TIM_CHANNEL_1, 500);
+	/* Buzzer */
+	buzzerInit(&buzzer, BUZZER_HTIM, BUZZER_CHANNEL, 500);
 
-	/*
-	 * Flash initialization
-	 * hspi1 -> PC5 OR
-	 * hspi3 -> PA15
-	 */
-	S25FLX_init(&s25flx1, &hspi1, GPIOC, GPIO_PIN_5, FLASH_SIZE_BYTES);
+	/* Flash */
+	S25FLX_init(&s25flx1, FLASH_HSPI, FLASH_CS_PORT, FLASH_CS_PIN, FLASH_SIZE_BYTES);
 
-	/*
-	 * LED initialization
-	 * Turn off LED 1
-	 */
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);
+	/* LED 1 */
+	HAL_GPIO_WritePin(LED1_PORT, LED1_PIN, GPIO_PIN_RESET);
 }
 
 uint32_t HM_Millis() {
@@ -215,7 +186,7 @@ void HM_ServoSetAngle(int servoNum, float degrees) {
 void HM_LedSet(int ledNum, bool set) {
 	switch(ledNum) {
 	case 1:
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, set);
+		HAL_GPIO_WritePin(LED1_PORT, LED1_PIN, set);
 		break;
 	default:
 		break;
@@ -225,7 +196,7 @@ void HM_LedSet(int ledNum, bool set) {
 void HM_LedToggle(int ledNum) {
 	switch(ledNum) {
 	case 1:
-		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
+		HAL_GPIO_TogglePin(LED1_PORT, LED1_PIN);
 		break;
 	default:
 		break;
