@@ -11,7 +11,7 @@ extern "C" {
 
 
 typedef struct {
-	SPI_HandleTypeDef hspi;
+	SPI_HandleTypeDef* hspi;
 	GPIO_TypeDef* port;
 	uint16_t pin;
 } SPICtrl_t;

@@ -76,14 +76,14 @@ void HM_HardwareInit() {
 
 	/* MS5607 Barometer 1 */
 	HAL_GPIO_WritePin(BARO1_CS_PORT, BARO1_CS_PIN, GPIO_PIN_SET);
-	ms5607_1.spiconfig.hspi = *(BARO1_HSPI);
+	ms5607_1.spiconfig.hspi = BARO1_HSPI;
 	ms5607_1.spiconfig.port = BARO1_CS_PORT;
 	ms5607_1.spiconfig.pin = BARO1_CS_PIN;
 	MS5607_init(&ms5607_1);
 
 	/* MS5607 Barometer 2 */
 	HAL_GPIO_WritePin(BARO2_CS_PORT, BARO2_CS_PIN, GPIO_PIN_SET);
-	ms5607_2.spiconfig.hspi = *(BARO2_HSPI);
+	ms5607_2.spiconfig.hspi = BARO2_HSPI;
 	ms5607_2.spiconfig.port = BARO2_CS_PORT;
 	ms5607_2.spiconfig.pin = BARO2_CS_PIN;
 	MS5607_init(&ms5607_2);
