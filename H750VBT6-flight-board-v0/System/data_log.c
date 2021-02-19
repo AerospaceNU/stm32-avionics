@@ -122,6 +122,11 @@ void data_log_write(LSM9DS1Ctrl_t *imu1_data, LSM9DS1Ctrl_t *imu2_data, H3LIS331
 	uint32_t waitStartMS = 0;
 
 	// TODO: Add timestamp data to packet (bytes 0-7)
+	uint32_t timestamp_ms = HAL_GetTick();
+	logPacket[0] = (timestamp_ms >> 24) & 0xFF;
+	logPacket[1] = (timestamp_ms >> 16) & 0xFF;
+	logPacket[2] = (timestamp_ms >> 8) & 0xFF;
+	logPacket[3] = timestamp_ms & 0xFF;
 
 	// Add IMU1 data to packet (bytes 8-25)
 	logPacket[8] = (imu1_data->ag.aRawVal.x >> 8) & 0xFF;
