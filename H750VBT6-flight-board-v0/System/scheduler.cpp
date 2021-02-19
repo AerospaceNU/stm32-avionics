@@ -1,5 +1,6 @@
 #include "scheduler.h"
 #include "data_log.h"
+#include "buzzer_song.h"
 
 extern SPI_HandleTypeDef hspi3;
 extern SPI_HandleTypeDef hspi6;

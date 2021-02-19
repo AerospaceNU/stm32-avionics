@@ -8,6 +8,7 @@
 #include "data_log.h"
 #include "serialPrint.h"
 
+#include "buzzer_song.h"
 #include "ms5607.h"
 #include "LSM9DS1.h"
 #include "H3LIS331DL.h"

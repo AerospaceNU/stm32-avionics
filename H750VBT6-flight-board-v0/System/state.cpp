@@ -10,6 +10,8 @@ extern H3LIS331DLCtrl_t h3lis_1;
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 
+extern BuzzerCtrl_t buzzer;
+
 State::State(Data *data)
 {
     this->data = data;
@@ -68,6 +70,10 @@ void State::general(void)
 		bUsbInserted_ = hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED;
 	}
 	else if (!bUsbRemoved_) {
-		bUsbRemoved_ = hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED;
+		if (hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED) {
+			bUsbRemoved_ = true;
+		} else {
+			buzzerSong(&buzzer);
+		}
 	}
 }
