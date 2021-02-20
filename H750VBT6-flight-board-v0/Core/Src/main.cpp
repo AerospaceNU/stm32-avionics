@@ -152,15 +152,17 @@ int main(void)
   /* Delay after init */
   HAL_Delay(1000);
 
-  /* check to see if a USB is connected */
-  if(hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED){
-	  /* run USB terminal app */
-	  scheduler.terminal();
-  }else{
-	  /* run scheduler, this function should never return */
-	  scheduler.run();
+  // Don't check for USB here so we don't risk entering a non-flight state
+  scheduler.run();
 
-  }
+//  /* check to see if a USB is connected */
+//  if(hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED){
+//	  /* run USB terminal app */
+//	  scheduler.terminal();
+//  }else{
+//	  /* run scheduler, this function should never return */
+//	  scheduler.run();
+//  }
   /* USER CODE END 2 */
  
  

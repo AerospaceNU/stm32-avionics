@@ -8,6 +8,10 @@ extern MS5607Ctrl_t ms5607_2;
 
 extern H3LIS331DLCtrl_t h3lis_1;
 
+extern USBD_HandleTypeDef hUsbDeviceFS;
+
+extern BuzzerCtrl_t buzzer;
+
 State::State(Data *data)
 {
     this->data = data;
@@ -47,18 +51,29 @@ State::state_t State::state_specific(void)
  */
 void State::general(void)
 {
+	// Only run sensor collection & logging if the USB has been inserted then removed
+	if (bUsbInserted_ && bUsbRemoved_) {
+		/* read data from sensors */
+		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
+		MS5607_get_data(&ms5607_1);
+		LSM9DS1_get_data(&lsm9ds1_1);
+		H3LIS331DL_get_data(&h3lis_1);
 
-    /* read data from sensors */
-	HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
-	MS5607_get_data(&ms5607_1);
-	LSM9DS1_get_data(&lsm9ds1_1);
-	H3LIS331DL_get_data(&h3lis_1);
+		MS5607_get_data(&ms5607_2);
+		LSM9DS1_get_data(&lsm9ds1_2);
 
-	MS5607_get_data(&ms5607_2);
-	LSM9DS1_get_data(&lsm9ds1_2);
+		data_log_write(&lsm9ds1_1, &lsm9ds1_2, &h3lis_1, &ms5607_1, &ms5607_2);
 
-	data_log_write(&lsm9ds1_1, &lsm9ds1_2, &h3lis_1, &ms5607_1, &ms5607_2);
-
-	//debugprintf("Atmospheric Pressure: %f Pa\t Temperature %f C\r\n", ms5607_1.altData.baro, ms5607_1.altData.temp);
-
+		//debugprintf("Atmospheric Pressure: %f Pa\t Temperature %f C\r\n", ms5607_1.altData.baro, ms5607_1.altData.temp);
+	}
+	else if (!bUsbInserted_) {
+		bUsbInserted_ = hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED;
+	}
+	else if (!bUsbRemoved_) {
+		if (hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED) {
+			bUsbRemoved_ = true;
+		} else {
+			buzzerSong(&buzzer);
+		}
+	}
 }
