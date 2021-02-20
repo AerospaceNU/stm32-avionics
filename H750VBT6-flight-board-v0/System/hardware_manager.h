@@ -11,7 +11,7 @@ extern "C"{
 /* Useful defines for files that need to know some info about hardware it works with */
 #define FLASH_SECTOR_BYTES 		0x40000
 #define FLIGHT_METADATA_PAGES 	2
-#define FLASH_SIZE_BYTES 		0x40000000
+#define FLASH_SIZE_BYTES 		0x4000000
 #define FLASH_PAGE_SIZE_BYTES	0x200
 #define FLASH_TIMEOUT_MS 		500
 
