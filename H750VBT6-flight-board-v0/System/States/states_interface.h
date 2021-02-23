@@ -9,6 +9,7 @@ extern "C"{
 
 typedef enum {
 	NoChange,
+	MotorBurnout,
 	UsbConnect
 } EndCondition_t;
 

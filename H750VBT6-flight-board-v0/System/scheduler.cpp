@@ -161,6 +161,8 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		break;
 	case StateId::PoweredAscent:
 		switch(endCondition) {
+		case EndCondition_t::MotorBurnout:
+			return StateId::CoastAscent;
 		default:
 			break;
 		}
