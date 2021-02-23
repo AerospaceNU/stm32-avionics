@@ -111,7 +111,7 @@ void data_log_assign_flight() {
 	curWriteAddress = curSectorNum * FLASH_SECTOR_BYTES + FLIGHT_METADATA_PAGES * FLASH_PAGE_SIZE_BYTES;
 }
 
-void data_log_write(SensorData_t* sensorData, uint8_t state) {
+void data_log_write(SensorData_t* sensorData, FilterData_t* filterData, uint8_t state) {
 
 	if (flightNum > 0) {
 
@@ -156,18 +156,18 @@ void data_log_write(SensorData_t* sensorData, uint8_t state) {
 							((sensorData->pyro4_continuity & 0x01) << 2) |
 							((sensorData->pyro5_continuity & 0x01) << 1) |
 							((sensorData->pyro6_continuity & 0x01));
-		logPacket.heading = sensorData->heading;
-		logPacket.vtg = sensorData->vtg;
-		logPacket.pos_x = sensorData->pos_x;
-		logPacket.pos_y = sensorData->pos_y;
-		logPacket.pos_z = sensorData->pos_z;
-		logPacket.vel_x = sensorData->vel_x;
-		logPacket.vel_y = sensorData->vel_y;
-		logPacket.vel_z = sensorData->vel_z;
-		logPacket.qx = sensorData->qx;
-		logPacket.qy = sensorData->qy;
-		logPacket.qz = sensorData->qz;
-		logPacket.qw = sensorData->qw;
+		logPacket.heading = filterData->heading;
+		logPacket.vtg = filterData->vtg;
+		logPacket.pos_x = filterData->pos_x;
+		logPacket.pos_y = filterData->pos_y;
+		logPacket.pos_z = filterData->pos_z;
+		logPacket.vel_x = filterData->vel_x;
+		logPacket.vel_y = filterData->vel_y;
+		logPacket.vel_z = filterData->vel_z;
+		logPacket.qx = filterData->qx;
+		logPacket.qy = filterData->qy;
+		logPacket.qz = filterData->qz;
+		logPacket.qw = filterData->qw;
 		logPacket.state = state;
 
 		// Find what pages to write packet on

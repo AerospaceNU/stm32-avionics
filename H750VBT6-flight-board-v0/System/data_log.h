@@ -11,12 +11,13 @@ extern "C"{
 
 #include <stdint.h>
 #include "hardware_manager.h"
+#include "filters.h"
 
 uint32_t data_log_get_last_flight_num();
 
 void data_log_assign_flight();
 
-void data_log_write(SensorData_t* sensorData, uint8_t state);
+void data_log_write(SensorData_t* sensorData, FilterData_t* filterData, uint8_t state);
 
 uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata);
 

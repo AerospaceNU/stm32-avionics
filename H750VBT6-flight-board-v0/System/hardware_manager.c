@@ -328,9 +328,6 @@ void HM_ReadSensorData() {
 
 	// Timestamp data
 	// TODO: Implement timer data
-
-	// Filtered data
-	// TODO: Get results of filtering from other files and implement
 }
 
 SensorData_t* HM_GetSensorData() {

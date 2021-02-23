@@ -76,18 +76,6 @@ typedef struct {
 	bool pyro4_continuity;
 	bool pyro5_continuity;
 	bool pyro6_continuity;
-	double heading;
-	double vtg;
-	double pos_x;
-	double pos_y;
-	double pos_z;
-	double vel_x;
-	double vel_y;
-	double vel_z;
-	double qx;
-	double qy;
-	double qz;
-	double qw;
 } SensorData_t;
 
 void HM_HardwareInit();
