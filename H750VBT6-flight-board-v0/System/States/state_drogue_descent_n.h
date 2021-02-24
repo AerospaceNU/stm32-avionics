@@ -19,6 +19,9 @@ class DrogueDescentNState : public State {
 		EndCondition_t run(void) override;
 
 		void cleanup(void) override;
+
+	private:
+		uint8_t completeDrogueCuts_ = 0;
 };
 
 #ifdef __cplusplus

@@ -137,6 +137,8 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		break;
 	case StateId::DrogueDescentN:
 		switch(endCondition) {
+		case EndCondition_t::MainCutAltitude:
+			return StateId::MainDescent;
 		default:
 			break;
 		}

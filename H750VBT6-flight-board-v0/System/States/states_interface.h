@@ -10,6 +10,7 @@ extern "C"{
 typedef enum {
 	NoChange,
 	Apogee,
+	MainCutAltitude,
 	MotorBurnout,
 	UsbConnect
 } EndCondition_t;
