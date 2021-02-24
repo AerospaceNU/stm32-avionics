@@ -129,6 +129,8 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		break;
 	case StateId::CoastAscent:
 		switch(endCondition) {
+		case EndCondition_t::Apogee:
+			return StateId::DrogueDescentN;
 		default:
 			break;
 		}
