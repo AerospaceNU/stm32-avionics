@@ -161,6 +161,8 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		break;
 	case StateId::PostFlight:
 		switch(endCondition) {
+		case EndCondition_t::UsbConnect:
+			return StateId::CliMain;
 		default:
 			break;
 		}
