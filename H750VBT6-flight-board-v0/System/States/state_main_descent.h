@@ -19,6 +19,9 @@ class MainDescentState : public State {
 		EndCondition_t run(void) override;
 
 		void cleanup(void) override;
+
+	private:
+		static constexpr double kTouchdownVelocityThreshold = 0; // TODO: Figure out velocity threshold
 };
 
 #ifdef __cplusplus

@@ -12,6 +12,7 @@ typedef enum {
 	Apogee,
 	MainCutAltitude,
 	MotorBurnout,
+	Touchdown,
 	UsbConnect
 } EndCondition_t;
 

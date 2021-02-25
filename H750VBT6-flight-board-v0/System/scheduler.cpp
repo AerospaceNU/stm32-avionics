@@ -153,6 +153,8 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		break;
 	case StateId::MainDescent:
 		switch(endCondition) {
+		case EndCondition_t::Touchdown:
+			return StateId::PostFlight;
 		default:
 			break;
 		}
