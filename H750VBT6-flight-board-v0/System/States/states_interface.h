@@ -10,6 +10,7 @@ extern "C"{
 typedef enum {
 	NoChange,
 	Apogee,
+	Launch,
 	MainCutAltitude,
 	MotorBurnout,
 	Touchdown,

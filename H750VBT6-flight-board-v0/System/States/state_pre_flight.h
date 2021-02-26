@@ -7,6 +7,9 @@ extern "C"{
 
 #include "states_interface.h"
 
+#include "filters.h"
+#include "hardware_manager.h"
+
 class PreFlightState : public State {
 
 	public:
@@ -19,6 +22,17 @@ class PreFlightState : public State {
 		EndCondition_t run(void) override;
 
 		void cleanup(void) override;
+
+	private:
+		static constexpr int kBufferSize = 10;
+		SensorData_t sensorDataBuffer[kBufferSize];
+		FilterData_t filterDataBuffer[kBufferSize];
+		int bufferCounter = 0;
+
+		// TODO: What are vel and accel thresholds?
+		static constexpr double kLaunchAccelThreshold = 0;
+		static constexpr double kLaunchVelThreshold = 0;
+
 };
 
 #ifdef __cplusplus

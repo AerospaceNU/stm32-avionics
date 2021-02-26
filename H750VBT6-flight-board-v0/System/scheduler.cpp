@@ -177,6 +177,10 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		break;
 	case StateId::PreFlight:
 		switch(endCondition) {
+		case EndCondition_t::Launch:
+			return StateId::PoweredAscent;
+		case EndCondition_t::UsbConnect:
+			return StateId::CliMain;
 		default:
 			break;
 		}
