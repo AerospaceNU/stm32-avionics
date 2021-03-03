@@ -4,7 +4,7 @@
 
 #include "servo.h"
 
-bool servoInit(ServoCtrl_t *servo, TIM_HandleTypeDef *htim, uint32_t channel, uint32_t periodMS, float minPulseMS, float maxPulseMS, float minAngle, float maxAngle, float initAngle) {
+bool servoInit(ServoCtrl_t *servo, TIM_HandleTypeDef *htim, uint32_t channel, uint32_t periodMS, float minPulseMS, float maxPulseMS, float minAngle, float maxAngle) {
 
 	// Set servo struct values
 	servo->htim = htim;
@@ -25,8 +25,8 @@ bool servoInit(ServoCtrl_t *servo, TIM_HandleTypeDef *htim, uint32_t channel, ui
 	if (HAL_TIM_PWM_Init(htim) != HAL_OK)
 		return false;
 
-	// Set the initial angle
-	servoSetAngle(servo, initAngle);
+	// Set the initial pulse to 0 so servo doesn't move
+	__HAL_TIM_SET_COMPARE(servo->htim, servo->channel, 0);
 
 	// Start PWM generation
 	HAL_TIM_PWM_Start(htim, channel);
