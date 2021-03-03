@@ -48,7 +48,53 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
+#define IMU1_AG_HSPI		&hspi3
+#define IMU1_AG_CS_PORT 	GPIOD
+#define IMU1_AG_CS_PIN		GPIO_PIN_1
+#define IMU1_M_HSPI			&hspi3
+#define IMU1_M_CS_PORT 		GPIOD
+#define IMU1_M_CS_PIN		GPIO_PIN_0
 
+#define IMU2_AG_HSPI		&hspi6
+#define IMU2_AG_CS_PORT 	GPIOE
+#define IMU2_AG_CS_PIN		GPIO_PIN_1
+#define IMU2_M_HSPI			&hspi6
+#define IMU2_M_CS_PORT 		GPIOE
+#define IMU2_M_CS_PIN		GPIO_PIN_0
+
+#define BARO1_HSPI			&hspi3
+#define BARO1_CS_PORT		GPIOA
+#define BARO1_CS_PIN		GPIO_PIN_15
+
+#define BARO2_HSPI			&hspi6
+#define BARO2_CS_PORT		GPIOE
+#define BARO2_CS_PIN		GPIO_PIN_2
+
+#define HIGH_G_HSPI			&hspi3
+#define HIGH_G_CS_PORT		GPIOD
+#define HIGH_G_CS_PIN		GPIO_PIN_2
+
+#define SERVO1_HTIM			&htim8
+#define SERVO1_CHANNEL		TIM_CHANNEL_1
+
+#define SERVO2_HTIM			&htim8
+#define SERVO2_CHANNEL		TIM_CHANNEL_2
+
+#define SERVO3_HTIM			&htim8
+#define SERVO3_CHANNEL		TIM_CHANNEL_3
+
+#define SERVO4_HTIM			&htim8
+#define SERVO4_CHANNEL		TIM_CHANNEL_4
+
+#define BUZZER_HTIM			&htim1
+#define BUZZER_CHANNEL		TIM_CHANNEL_1
+
+#define FLASH_HSPI			&hspi1
+#define FLASH_CS_PORT		GPIOC
+#define FLASH_CS_PIN		GPIO_PIN_5
+
+#define LED1_PORT			GPIOE
+#define LED1_PIN			GPIO_PIN_8
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/

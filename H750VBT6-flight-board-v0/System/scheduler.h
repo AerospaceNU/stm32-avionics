@@ -1,40 +1,46 @@
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
 
-#include "data.h"
-#include "state.h"
+#ifdef __cplusplus
+extern "C"{
+#endif
 
-#include "ms5607.h"
-#include "LSM9DS1.h"
-#include "H3LIS331DL.h"
-#include "servo.h"
-#include "buzzer.h"
+#include "states_interface.h"
 
-#include "i2c.h"
-#include "spi.h"
-#include "gpio.h"
-#include "tim.h"
-
-#include <cstdint>
-
-#define SCHEDULER_1HZ_RATE		(1000)
-#define SCHEDULER_10HZ_RATE		(100)
-#define SCHEDULER_20HZ_RATE		(50)
-#define SCHEDULER_25HZ_RATE		(40)
-#define SCHEDULER_100HZ_RATE	(10)
-
-class Scheduler{
+class Scheduler {
 
     public:
-
-        Data data;
-
-        Scheduler(void);
-
+		Scheduler() = default;
         void run(void);
 
-        void terminal(void);
+    private:
+        typedef enum StateId {
+			CliCalibrate = 0,
+			CliChooseFlight,
+			CliConfig,
+			CliEraseFlash,
+			CliHelp,
+			CliMain,
+			CliOffload,
+			CoastAscent,
+			DrogueDescentN,
+			Initialize,
+			MainDescent,
+			PostFlight,
+			PoweredAscent,
+			PreFlight,
+			Shutdown,
+			NUM_STATES,
+			UNKNOWN
+		} StateId;
 
+        StateId getNextState(EndCondition_t endCondition);
+
+        State* pCurrentState_ = nullptr;
 };
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* SCHEDULER_H_ */

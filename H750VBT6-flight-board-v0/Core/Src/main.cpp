@@ -32,7 +32,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "usbd_cdc_if.h"
 #include "scheduler.h"
 
 
@@ -55,7 +54,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-extern USBD_HandleTypeDef hUsbDeviceFS;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,35 +65,6 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-/* Pin Name References
- *
- * LEDs
- * LED 1 -> PE8
- * LED 2 -> PE9
- *
- */
-
-/* sensor structs */
-/* IMUs */
-LSM9DS1Ctrl_t lsm9ds1_1;
-LSM9DS1Ctrl_t lsm9ds1_2;
-
-/* barometers */
-MS5607Ctrl_t ms5607_1;
-MS5607Ctrl_t ms5607_2;
-
-/* high g accelerometers */
-H3LIS331DLCtrl_t h3lis_1;
-
-/* servos */
-ServoCtrl_t servo1;
-ServoCtrl_t servo2;
-ServoCtrl_t servo3;
-ServoCtrl_t servo4;
-
-/* buzzers */
-BuzzerCtrl_t buzzer;
 
 /* USER CODE END 0 */
 
@@ -112,7 +82,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-   HAL_Init();
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -143,26 +113,11 @@ int main(void)
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
 
-  /* turn off LED 1 */
-  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);
-
   /* Initialize scheduler */
   Scheduler scheduler = Scheduler();
 
-  /* Delay after init */
-  HAL_Delay(1000);
-
-  // Don't check for USB here so we don't risk entering a non-flight state
+  /* Scheduler will never return. NO CODE SHOULD COME AFTER THIS IN THIS FILE */
   scheduler.run();
-
-//  /* check to see if a USB is connected */
-//  if(hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED){
-//	  /* run USB terminal app */
-//	  scheduler.terminal();
-//  }else{
-//	  /* run scheduler, this function should never return */
-//	  scheduler.run();
-//  }
   /* USER CODE END 2 */
  
  

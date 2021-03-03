@@ -16,6 +16,7 @@ uint8_t readCtrl1(H3LIS331DLCtrl_t* sensor) {
 }
 
 void H3LIS331DL_init(H3LIS331DLCtrl_t* sensor) {
+	HAL_GPIO_WritePin(sensor->H3LIS331DLSPI.port, sensor->H3LIS331DLSPI.pin, GPIO_PIN_SET);
 	SPI_WriteRegister(&sensor->H3LIS331DLSPI, REG_CTRL1, PWR_MODE_ON | DATA_RATE_100HZ | Z_AXIS_ENABLE | Y_AXIS_ENABLE | X_AXIS_ENABLE);
 	H3LIS331DL_get_gain(sensor);
 	H3LIS331DL_get_adj(sensor);
