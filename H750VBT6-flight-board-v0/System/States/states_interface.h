@@ -14,7 +14,8 @@ typedef enum {
 	MainCutAltitude,
 	MotorBurnout,
 	Touchdown,
-	UsbConnect
+	UsbConnect,
+	UsbDisconnect
 } EndCondition_t;
 
 class State {

@@ -117,6 +117,8 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		break;
 	case StateId::CliMain:
 		switch(endCondition) {
+		case EndCondition_t::UsbDisconnect:
+			return StateId::PreFlight;
 		default:
 			break;
 		}
