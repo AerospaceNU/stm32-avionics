@@ -117,6 +117,8 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		break;
 	case StateId::CliMain:
 		switch(endCondition) {
+		case EndCondition_t::UsbDisconnect:
+			return StateId::PreFlight;
 		default:
 			break;
 		}
@@ -129,12 +131,16 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		break;
 	case StateId::CoastAscent:
 		switch(endCondition) {
+		case EndCondition_t::Apogee:
+			return StateId::DrogueDescentN;
 		default:
 			break;
 		}
 		break;
 	case StateId::DrogueDescentN:
 		switch(endCondition) {
+		case EndCondition_t::MainCutAltitude:
+			return StateId::MainDescent;
 		default:
 			break;
 		}
@@ -149,24 +155,34 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		break;
 	case StateId::MainDescent:
 		switch(endCondition) {
+		case EndCondition_t::Touchdown:
+			return StateId::PostFlight;
 		default:
 			break;
 		}
 		break;
 	case StateId::PostFlight:
 		switch(endCondition) {
+		case EndCondition_t::UsbConnect:
+			return StateId::CliMain;
 		default:
 			break;
 		}
 		break;
 	case StateId::PoweredAscent:
 		switch(endCondition) {
+		case EndCondition_t::MotorBurnout:
+			return StateId::CoastAscent;
 		default:
 			break;
 		}
 		break;
 	case StateId::PreFlight:
 		switch(endCondition) {
+		case EndCondition_t::Launch:
+			return StateId::PoweredAscent;
+		case EndCondition_t::UsbConnect:
+			return StateId::CliMain;
 		default:
 			break;
 		}

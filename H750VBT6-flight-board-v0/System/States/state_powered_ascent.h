@@ -19,6 +19,9 @@ class PoweredAscentState : public State {
 		EndCondition_t run(void) override;
 
 		void cleanup(void) override;
+
+	private:
+		static constexpr int kMotorBurnoutJerkThreshold = 0; // TODO: Find this value
 };
 
 #ifdef __cplusplus

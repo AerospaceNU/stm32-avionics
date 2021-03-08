@@ -9,7 +9,13 @@ extern "C"{
 
 typedef enum {
 	NoChange,
-	UsbConnect
+	Apogee,
+	Launch,
+	MainCutAltitude,
+	MotorBurnout,
+	Touchdown,
+	UsbConnect,
+	UsbDisconnect
 } EndCondition_t;
 
 class State {

@@ -20,6 +20,12 @@ typedef struct {
 	double vel_x;
 	double vel_y;
 	double vel_z;
+	double acc_x;
+	double acc_y;
+	double acc_z;
+	double jerk_x;
+	double jerk_y;
+	double jerk_z;
 	double qx;
 	double qy;
 	double qz;
