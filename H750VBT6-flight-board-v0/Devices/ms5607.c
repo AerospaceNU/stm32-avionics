@@ -1,5 +1,7 @@
 #include "ms5607.h"
 
+static uint16_t promVals[6];
+
 /*
  * Initializes MS5607 temperature and pressure sensor
  * with specific MS5607Ctrl_t configuration
@@ -17,6 +19,18 @@ void MS5607_init(MS5607Ctrl_t *altCtrl) {
 
 	// Pull CS High
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
+
+    // PROM read
+    uint8_t rxBuffer[3];
+    uint8_t txBuffer[3];
+	uint8_t promRead[6] = {0xA2, 0xA4, 0xA6, 0xA8, 0xAA, 0xAC};
+	for (int i = 0; i < 6; i++) {
+	    txBuffer[0] = promRead[i];
+        HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_RESET);
+    	HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, txBuffer, rxBuffer, 3, 100000);
+	    HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
+	    promVals[i] = rxBuffer[1] << 8 | rxBuffer[2];
+    }
 }
 
 /**
@@ -34,24 +48,7 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl) {
 	uint8_t convertD1_512 = 0x42;
 	uint8_t convertD2_512 = 0x52;
 
-	uint8_t promRead[6] = {0xA2, 0xA4, 0xA6, 0xA8, 0xAA, 0xAC};
-
 	uint8_t read = 0x00;
-
-    uint16_t memLoc[6];
-
-    uint8_t rxBuffer[3];
-    uint8_t txBuffer[3];
-
-    // TODO move the PROM read to init and remove from polling read
-    for (int i = 0; i < 6; i++)
-    {
-	    txBuffer[0] = promRead[i];
-        HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_RESET);
-    	HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, txBuffer, rxBuffer, 3, 100000);
-	    HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
-	    memLoc[i] = rxBuffer[1] << 8 | rxBuffer[2];
-    }
 
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(altCtrl->spiconfig.hspi, &convertD1_512, 1, 1000000);
@@ -75,10 +72,10 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl) {
 	uint32_t D2 = (tempStore[1] << 16 | tempStore[2] << 8 | tempStore[3]);
 
 
-	int32_t dT = D2 - ((int32_t)(memLoc[4]) << 8);
-	volatile int64_t Temp = 2000 + (((int64_t) (memLoc[5]) * dT) >> 23);
-	volatile int64_t OFF = ((int64_t) (memLoc[1]) << 17) + (((int64_t)(memLoc[3]) * dT) >> 6);
-	volatile int64_t SENS = ((int64_t) (memLoc[0]) << 16) + (((int64_t) (memLoc[2]) * dT) >> 7);
+	int32_t dT = D2 - ((int32_t)(promVals[4]) << 8);
+	volatile int64_t Temp = 2000 + (((int64_t) (promVals[5]) * dT) >> 23);
+	volatile int64_t OFF = ((int64_t) (promVals[1]) << 17) + (((int64_t)(promVals[3]) * dT) >> 6);
+	volatile int64_t SENS = ((int64_t) (promVals[0]) << 16) + (((int64_t) (promVals[2]) * dT) >> 7);
 	volatile int64_t P = ((D1*((SENS >> 21)) - OFF) >> 15);
 
 	volatile double Tfinal = Temp / 100.0;
