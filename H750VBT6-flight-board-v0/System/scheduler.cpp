@@ -55,6 +55,8 @@ void Scheduler::run(void) {
     	if (pCurrentState_)
     		while((HM_Millis() - lastTime_) < pCurrentState_->getPeriodMS());
         lastTime_ = HM_Millis();
+        // Visually show how fast scheduler is running using LED
+        HM_LedToggle(1);
 
         // Cleanup current state and initialize next state if changing states
         if (pNextState != pCurrentState_) {
