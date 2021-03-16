@@ -241,46 +241,46 @@ void HM_ReadSensorData() {
 	if (bImu1Sampling) {
 		LSM9DS1_get_data(&lsm9ds1_1);
 		sensorData.imu1_accel_x_raw = lsm9ds1_1.ag.aRawVal.x;
-		sensorData.imu1_accel_x_raw = lsm9ds1_1.ag.aRawVal.y;
-		sensorData.imu1_accel_x_raw = lsm9ds1_1.ag.aRawVal.z;
+		sensorData.imu1_accel_y_raw = lsm9ds1_1.ag.aRawVal.y;
+		sensorData.imu1_accel_z_raw = lsm9ds1_1.ag.aRawVal.z;
 		sensorData.imu1_accel_x = lsm9ds1_1.ag.aVal.x;
-		sensorData.imu1_accel_x = lsm9ds1_1.ag.aVal.y;
-		sensorData.imu1_accel_x = lsm9ds1_1.ag.aVal.z;
+		sensorData.imu1_accel_y = lsm9ds1_1.ag.aVal.y;
+		sensorData.imu1_accel_z = lsm9ds1_1.ag.aVal.z;
 		sensorData.imu1_gyro_x_raw = lsm9ds1_1.ag.gRawVal.x;
-		sensorData.imu1_gyro_x_raw = lsm9ds1_1.ag.gRawVal.y;
-		sensorData.imu1_gyro_x_raw = lsm9ds1_1.ag.gRawVal.z;
+		sensorData.imu1_gyro_y_raw = lsm9ds1_1.ag.gRawVal.y;
+		sensorData.imu1_gyro_z_raw = lsm9ds1_1.ag.gRawVal.z;
 		sensorData.imu1_gyro_x = lsm9ds1_1.ag.gVal.x;
-		sensorData.imu1_gyro_x = lsm9ds1_1.ag.gVal.y;
-		sensorData.imu1_gyro_x = lsm9ds1_1.ag.gVal.z;
+		sensorData.imu1_gyro_y = lsm9ds1_1.ag.gVal.y;
+		sensorData.imu1_gyro_z = lsm9ds1_1.ag.gVal.z;
 		sensorData.imu1_mag_x_raw = lsm9ds1_1.m.mRawVal.x;
-		sensorData.imu1_mag_x_raw = lsm9ds1_1.m.mRawVal.y;
-		sensorData.imu1_mag_x_raw = lsm9ds1_1.m.mRawVal.z;
+		sensorData.imu1_mag_y_raw = lsm9ds1_1.m.mRawVal.y;
+		sensorData.imu1_mag_z_raw = lsm9ds1_1.m.mRawVal.z;
 		sensorData.imu1_mag_x = lsm9ds1_1.m.mVal.x;
-		sensorData.imu1_mag_x = lsm9ds1_1.m.mVal.y;
-		sensorData.imu1_mag_x = lsm9ds1_1.m.mVal.z;
+		sensorData.imu1_mag_y = lsm9ds1_1.m.mVal.y;
+		sensorData.imu1_mag_z = lsm9ds1_1.m.mVal.z;
 	}
 
 	// IMU 2 data
 	if (bImu2Sampling) {
 		LSM9DS1_get_data(&lsm9ds1_2);
-		sensorData.imu1_accel_x_raw = lsm9ds1_2.ag.aRawVal.x;
-		sensorData.imu1_accel_x_raw = lsm9ds1_2.ag.aRawVal.y;
-		sensorData.imu1_accel_x_raw = lsm9ds1_2.ag.aRawVal.z;
-		sensorData.imu1_accel_x = lsm9ds1_2.ag.aVal.x;
-		sensorData.imu1_accel_x = lsm9ds1_2.ag.aVal.y;
-		sensorData.imu1_accel_x = lsm9ds1_2.ag.aVal.z;
-		sensorData.imu1_gyro_x_raw = lsm9ds1_2.ag.gRawVal.x;
-		sensorData.imu1_gyro_x_raw = lsm9ds1_2.ag.gRawVal.y;
-		sensorData.imu1_gyro_x_raw = lsm9ds1_2.ag.gRawVal.z;
-		sensorData.imu1_gyro_x = lsm9ds1_2.ag.gVal.x;
-		sensorData.imu1_gyro_x = lsm9ds1_2.ag.gVal.y;
-		sensorData.imu1_gyro_x = lsm9ds1_2.ag.gVal.z;
-		sensorData.imu1_mag_x_raw = lsm9ds1_2.m.mRawVal.x;
-		sensorData.imu1_mag_x_raw = lsm9ds1_2.m.mRawVal.y;
-		sensorData.imu1_mag_x_raw = lsm9ds1_2.m.mRawVal.z;
-		sensorData.imu1_mag_x = lsm9ds1_2.m.mVal.x;
-		sensorData.imu1_mag_x = lsm9ds1_2.m.mVal.y;
-		sensorData.imu1_mag_x = lsm9ds1_2.m.mVal.z;
+		sensorData.imu2_accel_x_raw = lsm9ds1_2.ag.aRawVal.x;
+		sensorData.imu2_accel_y_raw = lsm9ds1_2.ag.aRawVal.y;
+		sensorData.imu2_accel_z_raw = lsm9ds1_2.ag.aRawVal.z;
+		sensorData.imu2_accel_x = lsm9ds1_2.ag.aVal.x;
+		sensorData.imu2_accel_y = lsm9ds1_2.ag.aVal.y;
+		sensorData.imu2_accel_z = lsm9ds1_2.ag.aVal.z;
+		sensorData.imu2_gyro_x_raw = lsm9ds1_2.ag.gRawVal.x;
+		sensorData.imu2_gyro_y_raw = lsm9ds1_2.ag.gRawVal.y;
+		sensorData.imu2_gyro_z_raw = lsm9ds1_2.ag.gRawVal.z;
+		sensorData.imu2_gyro_x = lsm9ds1_2.ag.gVal.x;
+		sensorData.imu2_gyro_y = lsm9ds1_2.ag.gVal.y;
+		sensorData.imu2_gyro_z = lsm9ds1_2.ag.gVal.z;
+		sensorData.imu2_mag_x_raw = lsm9ds1_2.m.mRawVal.x;
+		sensorData.imu2_mag_y_raw = lsm9ds1_2.m.mRawVal.y;
+		sensorData.imu2_mag_z_raw = lsm9ds1_2.m.mRawVal.z;
+		sensorData.imu2_mag_x = lsm9ds1_2.m.mVal.x;
+		sensorData.imu2_mag_y = lsm9ds1_2.m.mVal.y;
+		sensorData.imu2_mag_z = lsm9ds1_2.m.mVal.z;
 	}
 
 	// High G Accelerometer data
