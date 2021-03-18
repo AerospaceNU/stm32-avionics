@@ -413,6 +413,7 @@ void HM_ReadSensorData() {
 
 	// Timestamp data
 	// TODO: Implement timer data
+	sensorData.timestamp_s = HM_Millis();
 }
 
 SensorData_t* HM_GetSensorData() {

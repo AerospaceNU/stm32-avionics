@@ -4,7 +4,8 @@
 #include "hardware_manager.h"
 
 void CliMainState::init() {
-
+	HM_BuzzerSetFrequency(1000);
+	HM_BuzzerStart();
 }
 
 EndCondition_t CliMainState::run() {
@@ -17,7 +18,7 @@ EndCondition_t CliMainState::run() {
 }
 
 void CliMainState::cleanup() {
-
+	HM_BuzzerStop();
 }
 
 
