@@ -8,6 +8,7 @@ extern "C"{
 #include <stdbool.h>
 #include <stdint.h>
 
+
 /* Useful defines for files that need to know some info about hardware it works with */
 #define FLASH_SECTOR_BYTES 		0x40000
 #define FLIGHT_METADATA_PAGES 	2
@@ -15,6 +16,10 @@ extern "C"{
 #define FLASH_PAGE_SIZE_BYTES	0x200
 #define FLASH_TIMEOUT_MS 		500
 #define PYRO_CONTINUITY_THRESHOLD 3
+
+#define FIX_PACKET_SIZE 		8
+
+
 
 typedef struct {
 	uint32_t timestamp_s;

@@ -9,9 +9,13 @@
 #include "adc_device.h"
 #include "S25FLx.h"
 #include "usbd_cdc_if.h"
+#include "cc1120.h"
+#include "GPS.h"
 
 #include "adc.h"
 #include "tim.h"
+#include "usart.h"
+#include "dma.h"
 
 /* IMUs */
 static LSM9DS1Ctrl_t lsm9ds1_1;
@@ -40,6 +44,14 @@ static AdcCtrl_t adcPyro[6];
 
 /* Flash memory */
 static S25FLXCtrl_t s25flx1;
+
+/* GPS */
+
+static GPSCtrl_t gps;
+
+/* Radio */
+
+static CC1120Ctrl_t cc1120;
 
 /* USB device */
 extern USBD_HandleTypeDef hUsbDeviceFS;
@@ -122,6 +134,30 @@ void HM_HardwareInit() {
 
 	/* Flash */
 	S25FLX_init(&s25flx1, FLASH_HSPI, FLASH_CS_PORT, FLASH_CS_PIN, FLASH_SIZE_BYTES);
+
+	/* GPS */
+
+	gps.gps_uart = GPS_HUART;
+	//gps.gpa_dma_rx = GPS_HDMA;
+	gps_init(&gps);
+
+	/* Radio */
+
+	cc1120.radhspi = RADIO_HSPI;
+	cc1120.CS_port = RADIO_CS_PORT;
+	cc1120.CS_pin = RADIO_CS_PIN;
+	cc1120.RST_port = RADIO_RST_PORT;
+	cc1120.RST_pin = RADIO_RST_PIN;
+	cc1120.RDY_port = RADIO_RDY_PORT;
+	cc1120.RDY_pin = RADIO_RDY_PIN;
+	cc1120.GP0_port = RADIO_GP0_PORT;
+	cc1120.GP0_pin = RADIO_GP0_PIN;
+	cc1120.GP2_port = RADIO_GP2_PORT;
+	cc1120.GP2_pin = RADIO_GP2_PIN;
+	cc1120.GP3_port = RADIO_GP3_PORT;
+	cc1120.GP3_pin = RADIO_GP3_PIN;
+
+	cc1120_init(&cc1120);
 
 	/* LED 1 */
 	HAL_GPIO_WritePin(LED1_PORT, LED1_PIN, GPIO_PIN_RESET);
