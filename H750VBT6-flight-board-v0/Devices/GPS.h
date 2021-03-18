@@ -1,6 +1,7 @@
 #include "minmea.h"
 #include "string.h"
 #include "stm32h7xx_hal.h"
+#include "hardware_manager.h"
 
 
 
@@ -29,13 +30,17 @@ typedef struct GPSCtrl_s{
     int num_sats;
     char status;
 
-    char rx_buff[4096];
+    char rx_buff[GPS_RX_BUF_SIZE];
 
 
 }GPSCtrl_t;
 
 void parseString(GPSCtrl_t* gps, char line[]);
 
-void usart_process_data(GPSCtrl_t* gps, char* buff, int len);
+//void usart_process_data(GPSCtrl_t* gps,char* buff, int len);
+
+void usart_process_half_data(void* gps);
+void usart_process_data(void* gps);
+
 
 void gps_init(GPSCtrl_t* gps);

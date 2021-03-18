@@ -2,7 +2,7 @@
 
 #include "minmea.h"
 #include "string.h"
-
+#include "hal_callbacks.h"
 
 char line[2048];
 
@@ -110,7 +110,13 @@ void parseString(GPSCtrl_t* gps, char line[]) {
 		    	}
 }
 
-void usart_process_data(GPSCtrl_t* gps, char* buff, int len) {
+void usart_process_half_data(void* gps) {
+
+	GPSCtrl_t *pgps = (GPSCtrl_t *) gps;
+
+	char* buff = &pgps->rx_buff[0];
+	int len = GPS_RX_BUF_HALF;
+
 	for(int i = 0; i < len; i++) {
 		if(buff[i] == '\r') {
 			strncat(line, "\n", 1);
@@ -122,6 +128,41 @@ void usart_process_data(GPSCtrl_t* gps, char* buff, int len) {
 	}
 }
 
+void usart_process_data(void* gps) {
+
+	GPSCtrl_t *pgps = (GPSCtrl_t *) gps;
+	char* buff = &pgps->rx_buff[GPS_RX_BUF_HALF];
+
+	int len = GPS_RX_BUF_HALF;
+
+	for(int i = 0; i < len; i++) {
+		if(buff[i] == '\r') {
+			strncat(line, "\n", 1);
+			parseString(gps, line);
+			strcpy(line,"");
+		} else {
+			strncat(line,&buff[i],1);
+		}
+	}
+}
+
+/*void usart_process_data(GPSCtrl_t* gps, char* buff, int len) {
+	for(int i = 0; i < len; i++) {
+		if(buff[i] == '\r') {
+			strncat(line, "\n", 1);
+			parseString(gps, line);
+			strcpy(line,"");
+		} else {
+			strncat(line,&buff[i],1);
+		}
+	}
+}*/
+
 void gps_init(GPSCtrl_t* gps) {
 	HAL_UART_Receive_DMA(gps->gps_uart, (unsigned char*)gps->rx_buff, 4096);
+
+	//void (*ush)(GPSCtrl_t) = &fun;
+
+	register_HAL_UART_RxHalfCpltCallback(gps->gps_uart, usart_process_half_data, gps);
+	register_HAL_UART_RxCpltCallback(gps->gps_uart, usart_process_data, gps);
 }

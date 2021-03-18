@@ -367,9 +367,26 @@ void HM_ReadSensorData() {
 	}
 
 	// GPS data
-	// TODO: Implement GPS data
+	// TODO: Poll GPS status to determine if data is good
 	if (bGpsSampling) {
-
+		sensorData.gps_lat = gps.latitude;
+		sensorData.gps_long = gps.longitude;
+		sensorData.gps_alt = gps.altitude;
+		sensorData.gps_speed = gps.speed;
+		sensorData.gps_course = gps.course;
+		sensorData.gps_latitude_deviation = gps.latitude_deviation;
+		sensorData.gps_longitude_deviation = gps.longitude_deviation;
+		sensorData.gps_altitude_deviation = gps.altitude_deviation;
+		sensorData.gps_speed_kph = gps.speed_kph;
+		sensorData.gps_speed_knots = gps.speed_knots;
+		sensorData.gps_seconds = gps.seconds;
+		sensorData.gps_minutes = gps.minutes;
+		sensorData.gps_hours = gps.hours;
+		sensorData.gps_day = gps.day;
+		sensorData.gps_month = gps.month;
+		sensorData.gps_year = gps.year;
+		sensorData.gps_num_sats = gps.num_sats;
+		sensorData.gps_status = gps.status;
 	}
 
 	// ADC data

@@ -17,8 +17,11 @@ extern "C"{
 #define FLASH_TIMEOUT_MS 		500
 #define PYRO_CONTINUITY_THRESHOLD 3
 
+//TODO determine fixed packet size for transmission
 #define FIX_PACKET_SIZE 		8
 
+#define GPS_RX_BUF_SIZE			4096
+#define GPS_RX_BUF_HALF			2048
 
 
 typedef struct {
@@ -72,9 +75,26 @@ typedef struct {
 	double baro2_pres;
 	double baro2_temp;
 	double baro2_alt;
-	double gps_lat;
-	double gps_long;
-	double gps_alt;
+
+	float gps_lat;
+	float gps_long;
+	float gps_alt;
+	float gps_speed;
+	float gps_course;
+	float gps_latitude_deviation;
+	float gps_longitude_deviation;
+	float gps_altitude_deviation;
+	float gps_speed_kph;
+	float gps_speed_knots;
+	int gps_seconds;
+	int gps_minutes;
+	int gps_hours;
+	int gps_day;
+	int gps_month;
+	int gps_year;
+	int gps_num_sats;
+	char gps_status;
+
 	double battery_voltage;
 	bool pyro_continuity[6];
 } SensorData_t;

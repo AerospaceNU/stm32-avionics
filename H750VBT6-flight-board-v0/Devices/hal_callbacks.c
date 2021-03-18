@@ -76,6 +76,42 @@ void register_HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi, void (*callback)
 	numSpiCallbacksRegistered++;
 }
 
+void register_HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart, void (*callback)(void *), void *userData) {
+
+	// See if handle already has callback registered to it
+	for (int i = 0; i < numUartCallbacksRegistered; i++) {
+		if (uartCallbacks[i].huart == huart) {
+			uartCallbacks[i].rxHalfCallback = callback;
+			uartCallbacks[i].rxHalfCallbackUserData = userData;
+			return; // No need to keep going if handle already found to be registered
+		}
+	}
+
+	// If reached, handle hasn't been registered, so create a new association
+	uartCallbacks[numUartCallbacksRegistered].huart = huart;
+	uartCallbacks[numUartCallbacksRegistered].rxHalfCallback = callback;
+	uartCallbacks[numUartCallbacksRegistered].rxHalfCallbackUserData = userData;
+	numUartCallbacksRegistered++;
+}
+
+void register_HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart, void (*callback)(void *), void *userData) {
+
+	// See if handle already has callback registered to it
+	for (int i = 0; i < numUartCallbacksRegistered; i++) {
+		if (uartCallbacks[i].huart == huart) {
+			uartCallbacks[i].rxCallback = callback;
+			uartCallbacks[i].rxCallbackUserData = userData;
+			return; // No need to keep going if handle already found to be registered
+		}
+	}
+
+	// If reached, handle hasn't been registered, so create a new association
+	uartCallbacks[numUartCallbacksRegistered].huart = huart;
+	uartCallbacks[numUartCallbacksRegistered].rxCallback = callback;
+	uartCallbacks[numUartCallbacksRegistered].rxCallbackUserData = userData;
+	numUartCallbacksRegistered++;
+}
+
 void register_HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc, void(*callback)(void *), void *userData) {
 
 	// See if handle already has callback registered to it
@@ -130,7 +166,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 	}
 }
 
-//TODO Link gps driver with these callbacks -- see commented out function
+
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
 	for (int i = 0; i < numUartCallbacksRegistered; i++) {
