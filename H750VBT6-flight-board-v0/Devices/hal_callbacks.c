@@ -6,6 +6,7 @@
 #include "hal_callbacks.h"
 
 #define MAX_SPI_HANDLES	6	// SPI 1-6
+#define MAX_ADC_HANDLES 3   // ADC 1-3
 
 typedef struct {
 	SPI_HandleTypeDef *hspi;
@@ -15,8 +16,16 @@ typedef struct {
 	void *txRxCallbackUserData;
 } SPICallbackProperty_t;
 
+typedef struct {
+	ADC_HandleTypeDef *hadc;
+	void (*convCallback)(void *);
+	void *convCallbackUserData;
+} ADCCallbackProperty_t;
+
 static SPICallbackProperty_t spiCallbacks[MAX_SPI_HANDLES];
-static uint8_t numSpiCallbacksRegistered = 0;
+static int numSpiCallbacksRegistered = 0;
+static ADCCallbackProperty_t adcCallbacks[MAX_ADC_HANDLES];
+static int numAdcCallbacksRegistered = 0;
 
 void register_HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi, void (*callback)(void *), void *userData) {
 
@@ -54,6 +63,24 @@ void register_HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi, void (*callback)
 	numSpiCallbacksRegistered++;
 }
 
+void register_HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc, void(*callback)(void *), void *userData) {
+
+	// See if handle already has callback registered to it
+	for (int i = 0; i < numAdcCallbacksRegistered; i++) {
+		if (adcCallbacks[i].hadc == hadc) {
+			adcCallbacks[i].convCallback = callback;
+			adcCallbacks[i].convCallbackUserData = userData;
+			return; // No need to keep going if handle already found to be registered
+		}
+	}
+
+	// If reached, handle hasn't been registered, so create a new association
+	adcCallbacks[numAdcCallbacksRegistered].hadc = hadc;
+	adcCallbacks[numAdcCallbacksRegistered].convCallback = callback;
+	adcCallbacks[numAdcCallbacksRegistered].convCallbackUserData = userData;
+	numAdcCallbacksRegistered++;
+}
+
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {
 
 	for (int i = 0; i < numSpiCallbacksRegistered; i++) {
@@ -78,6 +105,14 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 	}
 }
 
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 
-
-
+	for (int i = 0; i < numAdcCallbacksRegistered; i++) {
+		if (adcCallbacks[i].hadc == hadc) {
+			if (adcCallbacks[i].convCallback != NULL) {
+				adcCallbacks[i].convCallback(adcCallbacks[i].convCallbackUserData);
+			}
+			return; // No need to keep searching if callback was found
+		}
+	}
+}

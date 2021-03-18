@@ -6,9 +6,11 @@
 #include "H3LIS331DL.h"
 #include "servo.h"
 #include "buzzer.h"
+#include "adc_device.h"
 #include "S25FLx.h"
 #include "usbd_cdc_if.h"
 
+#include "adc.h"
 #include "tim.h"
 
 /* IMUs */
@@ -30,6 +32,11 @@ static ServoCtrl_t servo4;
 
 /* Buzzers */
 static BuzzerCtrl_t buzzer;
+
+/* ADCs */
+static AdcCtrl_t adcBatteryVoltage;
+static AdcCtrl_t adcCurrent;
+static AdcCtrl_t adcPyro[6];
 
 /* Flash memory */
 static S25FLXCtrl_t s25flx1;
@@ -99,6 +106,19 @@ void HM_HardwareInit() {
 
 	/* Buzzer */
 	buzzerInit(&buzzer, BUZZER_HTIM, BUZZER_CHANNEL, 500);
+
+	/* ADCs */
+    // Battery voltage - 0 min, 15.52 max (127k/27k*3.3V)
+    // Pyros - 0 min, 15.52 max (127k/27k*3.3V)
+    static const float voltageDividerMax = 3.3 * (110.0 / 10.0); // 3.3 * 110.0 / 10.0 for FCB 1
+    adcInit(&adcBatteryVoltage, &hadc3, 1, 0, voltageDividerMax, true);
+    adcInit(&adcCurrent, &hadc1, 1, -12.53, 19.50, true); // -12.5 to 17.5 for FCB 1
+    adcInit(&adcPyro[0], &hadc2, 1, 0, voltageDividerMax, true);
+    adcInit(&adcPyro[1], &hadc2, 4, 0, voltageDividerMax, true);
+    adcInit(&adcPyro[2], &hadc2, 3, 0, voltageDividerMax, true);
+    adcInit(&adcPyro[3], &hadc2, 2, 0, voltageDividerMax, true);
+    adcInit(&adcPyro[4], &hadc1, 3, 0, voltageDividerMax, true);
+    adcInit(&adcPyro[5], &hadc1, 2, 0, voltageDividerMax, true);
 
 	/* Flash */
 	S25FLX_init(&s25flx1, FLASH_HSPI, FLASH_CS_PORT, FLASH_CS_PIN, FLASH_SIZE_BYTES);
@@ -317,12 +337,22 @@ void HM_ReadSensorData() {
 	}
 
 	// ADC data
-	// TODO: Implement ADC data
+	float adcVal = 0;
 	if (bBatteryVoltageSampling) {
-
+		adcStartSingleRead(&adcBatteryVoltage);
+		if (adcGetValue(&adcBatteryVoltage, &adcVal, 5))
+			sensorData.battery_voltage = (double) adcVal;
+		else
+			sensorData.battery_voltage = 0;
 	}
 	if (bPyroContinuitySampling) {
-
+		for (int i = 0; i < sizeof(sensorData.pyro_continuity) / sizeof(bool); i++) {
+			adcStartSingleRead(&adcPyro[i]);
+			if (adcGetValue(&adcPyro[i], &adcVal, 5))
+				sensorData.pyro_continuity[i] = adcVal > PYRO_CONTINUITY_THRESHOLD;
+			else
+				sensorData.pyro_continuity[i] = false;
+		}
 	}
 
 	// Timestamp data

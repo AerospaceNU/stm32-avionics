@@ -14,6 +14,7 @@ extern "C"{
 #define FLASH_SIZE_BYTES 		0x4000000
 #define FLASH_PAGE_SIZE_BYTES	0x200
 #define FLASH_TIMEOUT_MS 		500
+#define PYRO_CONTINUITY_THRESHOLD 3
 
 typedef struct {
 	uint32_t timestamp_s;
@@ -70,12 +71,7 @@ typedef struct {
 	double gps_long;
 	double gps_alt;
 	double battery_voltage;
-	bool pyro1_continuity;
-	bool pyro2_continuity;
-	bool pyro3_continuity;
-	bool pyro4_continuity;
-	bool pyro5_continuity;
-	bool pyro6_continuity;
+	bool pyro_continuity[6];
 } SensorData_t;
 
 void HM_HardwareInit();
