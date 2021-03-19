@@ -31,6 +31,17 @@ class State {
 		int getID() { return id_; }
 
 		/**
+		 * @brief Gets the current value of the run counter
+		 * @return Run counter value
+		 */
+		uint32_t getRunCounter() { return run_counter_; };
+
+		/**
+		 * @brief Increments value of the run counter by 1
+		 */
+		void incrementRunCounter() { run_counter_ += 1; }
+
+		/**
 		 * @brief Actions that occur on initialization of state
 		 */
         virtual void init(void);
@@ -54,6 +65,7 @@ class State {
     private:
         int id_;
         int period_ms_;
+        uint32_t run_counter_ = 0;
 };
 
 #ifdef __cplusplus
