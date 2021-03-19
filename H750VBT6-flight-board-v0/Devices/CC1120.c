@@ -184,10 +184,12 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 
 
 		//calibrate the radio
-	manualCalibration(radio);
+	if (!manualCalibration(radio))
+		return false;
 
 	cc1120ForceIdle(radio);
 
+	radio->initialized = true;
 	return true;
 
 }
@@ -198,14 +200,11 @@ uint8_t trx8BitRegAccess(CC1120Ctrl_t* radio, uint8_t accessType, uint8_t addrBy
 	uint8_t txBuf = (accessType | addrByte);
 
 	HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, RESET); //Pull CS LOW
-	while (HAL_GPIO_ReadPin(radio->RDY_port, radio->RDY_pin) == 1)
+	uint32_t startMS = HAL_GetTick();
+	while (HAL_GPIO_ReadPin(radio->RDY_port, radio->RDY_pin) == 1 && HAL_GetTick() - startMS < 1000)
 		; //Wait for SO to go low
 
 	HAL_SPI_TransmitReceive(radio->radhspi, &txBuf, &readValue, 0x01, HAL_MAX_DELAY);
-
-	while (HAL_SPI_GetState(radio->radhspi) != HAL_SPI_STATE_READY)
-		;//Wait until done
-
 
 	trxReadWriteBurstSingle(radio, (accessType | addrByte), pData, len); //write the data
 
@@ -223,7 +222,8 @@ uint8_t trx16BitRegAccess(CC1120Ctrl_t* radio, uint8_t accessType, uint8_t extAd
 
 	//Pull CS LOW
 	HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, RESET);
-	while (HAL_GPIO_ReadPin(radio->RDY_port, radio->RDY_pin) == 1)
+	uint32_t startMS = HAL_GetTick();
+	while (HAL_GPIO_ReadPin(radio->RDY_port, radio->RDY_pin) == 1 && HAL_GetTick() - startMS < 1000)
 		;
 	//Wait for SO to go low
 	//while(TRXEM_PORT_IN & TRXEM_SPI_MISO_PIN);
@@ -231,13 +231,8 @@ uint8_t trx16BitRegAccess(CC1120Ctrl_t* radio, uint8_t accessType, uint8_t extAd
 	//Write (accessType|addrByte)
 	//store the chip status
 	HAL_SPI_TransmitReceive(radio->radhspi, &txBuf, &readValue, 1, HAL_MAX_DELAY);
-	//Wait until done
-	while (HAL_SPI_GetState(radio->radhspi) != HAL_SPI_STATE_READY)
-		;
 
 	HAL_SPI_Transmit(radio->radhspi, &regAddr, 1, HAL_MAX_DELAY);
-	while (HAL_SPI_GetState(radio->radhspi) != HAL_SPI_STATE_READY)
-		;
 
 	//write the data
 	trxReadWriteBurstSingle(radio, accessType | extAddr, pData, len);
@@ -253,14 +248,12 @@ uint8_t trxSpiCmdStrobe(CC1120Ctrl_t* radio, uint8_t cmd) {
 	uint8_t rc;
 
 	HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, RESET);
-	while (HAL_GPIO_ReadPin(radio->RDY_port, radio->RDY_pin) == 1)
+	uint32_t startMS = HAL_GetTick();
+	while (HAL_GPIO_ReadPin(radio->RDY_port, radio->RDY_pin) == 1 && HAL_GetTick() - startMS < 1000)
 		;
 	//Wait for SO to go low
 
 	HAL_SPI_TransmitReceive(radio->radhspi, &cmd, &rc, 1, HAL_MAX_DELAY);
-
-	while (HAL_SPI_GetState(radio->radhspi) != HAL_SPI_STATE_READY)
-		;
 
 	HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, SET);
 
@@ -280,29 +273,21 @@ static void trxReadWriteBurstSingle(CC1120Ctrl_t* radio, uint8_t addr, uint8_t *
 
 				HAL_SPI_TransmitReceive(radio->radhspi, &pushByte, pData, 1,
 						HAL_MAX_DELAY);
-				while (HAL_SPI_GetState(radio->radhspi) != HAL_SPI_STATE_READY)
-					;
 				pData++;
 			}
 
 		} else {
 			HAL_SPI_TransmitReceive(radio->radhspi, &pushByte, pData, 1, HAL_MAX_DELAY);
-			while (HAL_SPI_GetState(radio->radhspi) != HAL_SPI_STATE_READY)
-				;
 		}
 	} else { // if writing to radio registers
 		if (addr & RADIO_BURST_ACCESS) {
 			for (i = 0; i < len; i++) { //push in data
 				HAL_SPI_TransmitReceive(radio->radhspi, pData, &rxdump, 1,
 						HAL_MAX_DELAY);
-				while (HAL_SPI_GetState(radio->radhspi) != HAL_SPI_STATE_READY)
-					;
 				pData++;
 			}
 		} else {
 			HAL_SPI_TransmitReceive(radio->radhspi, pData, &rxdump, 1, HAL_MAX_DELAY);
-			while (HAL_SPI_GetState(radio->radhspi) != HAL_SPI_STATE_READY)
-				;
 		}
 	}
 
@@ -434,7 +419,7 @@ bool cc1120ForceIdle(CC1120Ctrl_t* radio){
 #define FS_VCO2_INDEX 0
 #define FS_VCO4_INDEX 1
 #define FS_CHP_INDEX 2
-void manualCalibration(CC1120Ctrl_t* radio) {
+bool manualCalibration(CC1120Ctrl_t* radio) {
 
 	uint8_t original_fs_cal2;
 	uint8_t calResults_for_vcdac_start_high[3];
@@ -457,9 +442,12 @@ void manualCalibration(CC1120Ctrl_t* radio) {
 	//   (radio back in IDLE state)
 	trxSpiCmdStrobe(radio, CC112X_SCAL);
 
+	uint32_t startMS = HAL_GetTick();
 	do {
 		cc1120SpiReadReg(radio, CC112X_MARCSTATE, &marcstate, 1);
-	} while (marcstate != 0x41);
+	} while (marcstate != 0x41 && HAL_GetTick() - startMS < 5000);
+	if (marcstate != 0x41)
+		return false;
 
 	// 4) Read FS_VCO2, FS_VCO4 and FS_CHP register obtained with
 	//    high VCDAC_START value
@@ -482,9 +470,12 @@ void manualCalibration(CC1120Ctrl_t* radio) {
 	//   (radio back in IDLE state)
 	trxSpiCmdStrobe(radio, CC112X_SCAL);
 
+	startMS = HAL_GetTick();
 	do {
 		cc1120SpiReadReg(radio, CC112X_MARCSTATE, &marcstate, 1);
-	} while (marcstate != 0x41);
+	} while (marcstate != 0x41 && HAL_GetTick() - startMS < 5000);
+	if (marcstate != 0x41)
+		return false;
 
 	// 8) Read FS_VCO2, FS_VCO4 and FS_CHP register obtained
 	//    with mid VCDAC_START value
@@ -513,6 +504,8 @@ void manualCalibration(CC1120Ctrl_t* radio) {
 		writeByte = calResults_for_vcdac_start_mid[FS_CHP_INDEX];
 		cc1120SpiWriteReg(radio, CC112X_FS_CHP, &writeByte, 1);
 	}
+
+	return true;
 }
 
 
@@ -521,6 +514,10 @@ uint8_t waiting_watchdog = 0;
 
 
 void cc1120State(CC1120Ctrl_t* radio){
+	// Don't let anything happen if radio isn't initialized
+	if (!radio->initialized)
+		return;
+
 	uint8_t status;
 
 
@@ -642,9 +639,10 @@ bool cc1120_startRX(CC1120Ctrl_t* radio){
 	uint8_t readByte;
 	 trxSpiCmdStrobe(radio, CC112X_SRX);
 	 //make sure we actually switch into rx
+	uint32_t startMS = HAL_GetTick();
 	do {
 		cc1120SpiReadReg(radio, CC112X_MARCSTATE, &readByte, 1);
-	} while (readByte != 0x6D);
+	} while (readByte != 0x6D && HAL_GetTick() - startMS < 1000);
 
 	return true;
 }

@@ -43,7 +43,7 @@ typedef struct CC1120Ctrl_s{
 	uint8_t RSSI;
 	uint8_t CRC_LQI;
 
-
+	bool initialized;
 }CC1120Ctrl_t;
 
 
@@ -320,7 +320,7 @@ uint8_t cc1120GetTxStatus(CC1120Ctrl_t* radio);
 uint8_t cc1120GetRxStatus(CC1120Ctrl_t* radio);
 //static void trxReadWriteBurstSingle(uint8_t addr, uint8_t  *pData, uint16_t len);
 bool cc1120_init(CC1120Ctrl_t* radio);
-void manualCalibration(CC1120Ctrl_t* radio);
+bool manualCalibration(CC1120Ctrl_t* radio);
 bool cc1120ForceIdle(CC1120Ctrl_t* radio);
 void cc1120State(CC1120Ctrl_t* radio);
 bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t payloadLength);

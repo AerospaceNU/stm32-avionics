@@ -155,6 +155,7 @@ void HM_HardwareInit() {
 	cc1120.GP3_port = RADIO_GP3_PORT;
 	cc1120.GP3_pin = RADIO_GP3_PIN;
 	cc1120.payloadSize = payloadSize;
+	cc1120.initialized = false;
 	cc1120_init(&cc1120);
 
 	/* LED 1 */
