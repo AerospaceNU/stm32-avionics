@@ -5,10 +5,9 @@
 #include <stdint.h>
 #include "hal_callbacks.h"
 
-
 #define MAX_SPI_HANDLES	6	// SPI 1-6
 #define MAX_ADC_HANDLES 3   // ADC 1-3
-#define MAX_UART_HANDLES 5 // UART 1-5
+#define MAX_UART_HANDLES 5  // UART 1-5
 
 typedef struct {
 	SPI_HandleTypeDef *hspi;
@@ -38,7 +37,6 @@ static ADCCallbackProperty_t adcCallbacks[MAX_ADC_HANDLES];
 static int numAdcCallbacksRegistered = 0;
 static UARTCallbackProperty_t uartCallbacks[MAX_UART_HANDLES];
 static int numUartCallbacksRegistered = 0;
-
 
 void register_HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi, void (*callback)(void *), void *userData) {
 
@@ -166,7 +164,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 	}
 }
 
-
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
 	for (int i = 0; i < numUartCallbacksRegistered; i++) {
@@ -178,7 +175,6 @@ void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 			return; // No need to keep searching if callback was found
 		}
 	}
-	//usart_process_data(&gps, &gps.rx_buff[0], 2048);
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
@@ -193,6 +189,5 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			return; // No need to keep searching if callback was found
 		}
 	}
-	//usart_process_data(&gps, &gps.rx_buff[2048], 2048);
 }
 

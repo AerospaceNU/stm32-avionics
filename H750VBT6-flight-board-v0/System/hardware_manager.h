@@ -8,7 +8,6 @@ extern "C"{
 #include <stdbool.h>
 #include <stdint.h>
 
-
 /* Useful defines for files that need to know some info about hardware it works with */
 #define FLASH_SECTOR_BYTES 		0x40000
 #define FLIGHT_METADATA_PAGES 	2
@@ -18,11 +17,7 @@ extern "C"{
 #define PYRO_CONTINUITY_THRESHOLD 3
 
 //TODO determine fixed packet size for transmission
-#define FIX_PACKET_SIZE 		8
-
-#define GPS_RX_BUF_SIZE			4096
-#define GPS_RX_BUF_HALF			2048
-
+#define RADIO_PACKET_SIZE 		8
 
 typedef struct {
 	uint32_t timestamp_s;
@@ -75,7 +70,6 @@ typedef struct {
 	double baro2_pres;
 	double baro2_temp;
 	double baro2_alt;
-
 	float gps_lat;
 	float gps_long;
 	float gps_alt;
@@ -94,7 +88,6 @@ typedef struct {
 	int gps_year;
 	int gps_num_sats;
 	char gps_status;
-
 	double battery_voltage;
 	bool pyro_continuity[6];
 } SensorData_t;

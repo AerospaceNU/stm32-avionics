@@ -46,11 +46,9 @@ static AdcCtrl_t adcPyro[6];
 static S25FLXCtrl_t s25flx1;
 
 /* GPS */
-
 static GPSCtrl_t gps;
 
 /* Radio */
-
 static CC1120Ctrl_t cc1120;
 
 /* USB device */
@@ -136,13 +134,10 @@ void HM_HardwareInit() {
 	S25FLX_init(&s25flx1, FLASH_HSPI, FLASH_CS_PORT, FLASH_CS_PIN, FLASH_SIZE_BYTES);
 
 	/* GPS */
-
 	gps.gps_uart = GPS_HUART;
-	//gps.gpa_dma_rx = GPS_HDMA;
 	gps_init(&gps);
 
 	/* Radio */
-
 	cc1120.radhspi = RADIO_HSPI;
 	cc1120.CS_port = RADIO_CS_PORT;
 	cc1120.CS_pin = RADIO_CS_PIN;
@@ -156,7 +151,6 @@ void HM_HardwareInit() {
 	cc1120.GP2_pin = RADIO_GP2_PIN;
 	cc1120.GP3_port = RADIO_GP3_PORT;
 	cc1120.GP3_pin = RADIO_GP3_PIN;
-
 	cc1120_init(&cc1120);
 
 	/* LED 1 */

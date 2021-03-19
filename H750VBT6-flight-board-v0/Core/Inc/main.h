@@ -97,7 +97,6 @@ extern "C" {
 #define LED1_PIN			GPIO_PIN_8
 
 #define GPS_HUART			&huart5
-//#define GPS_HDMA			&hdma_uart5_rx
 
 #define RADIO_HSPI			&hspi4
 #define RADIO_CS_PORT		GPIOE

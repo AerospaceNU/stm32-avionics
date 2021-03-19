@@ -76,7 +76,7 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 
 	uint8_t agc_cfg1 = SMARTRF_SETTING_AGC_CFG1;			cc1120SpiWriteReg(radio, CC112X_AGC_CFG1, &agc_cfg1, 0x01);
 	uint8_t agc_cfg0 = SMARTRF_SETTING_AGC_CFG0;			cc1120SpiWriteReg(radio, CC112X_AGC_CFG0, &agc_cfg0, 0x01);
-	uint8_t fifo_cfg = SMARTRF_SETTING_FIFO_CFG & (FIX_PACKET_SIZE-1);			cc1120SpiWriteReg(radio, CC112X_FIFO_CFG, &fifo_cfg, 0x01);
+	uint8_t fifo_cfg = SMARTRF_SETTING_FIFO_CFG & (RADIO_PACKET_SIZE-1);			cc1120SpiWriteReg(radio, CC112X_FIFO_CFG, &fifo_cfg, 0x01);
 
 	//cc1120SpiWriteReg(CC112X_DEV_ADDR, 0xxx, 0x01);
 	//cc1120SpiWriteReg(CC112X_SETTLING_CFG, 0xxx, 0x01);
@@ -99,7 +99,7 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 
 	uint8_t pa_cfg0 = SMARTRF_SETTING_PA_CFG0;				cc1120SpiWriteReg(radio, CC112X_PA_CFG0, &pa_cfg0, 0x01);
 	//uint8_t pkt_len = SMARTRF_SETTING_PKT_LEN;				cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len, 0x01);
-	uint8_t pkt_len = FIX_PACKET_SIZE;				cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len, 0x01);
+	uint8_t pkt_len = RADIO_PACKET_SIZE;				cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len, 0x01);
 
 
 	/* Extended Configuration Registers */
@@ -525,13 +525,13 @@ void cc1120State(CC1120Ctrl_t* radio, uint8_t *packetRX, uint8_t *packetToTX, ui
 
 
 
-	uint8_t blank[FIX_PACKET_SIZE] = {0};
+	uint8_t blank[RADIO_PACKET_SIZE] = {0};
 
 
 	cc1120_hasReceivedPacket(radio, packetRX, RSSI, CRC_LQI);
 
 	if(memcmp( packetToTX, blank, sizeof(blank)) != 0){
-		cc1120_transmitPacket(radio, packetToTX, FIX_PACKET_SIZE);
+		cc1120_transmitPacket(radio, packetToTX, RADIO_PACKET_SIZE);
 	}
 
 	status = trxSpiCmdStrobe(radio, CC112X_SNOP);
@@ -620,7 +620,7 @@ bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio, uint8_t * rxBuf, uint8_t * RS
 		  } else {
 
 			  // Read n bytes from RX FIFO
-			  cc1120SpiReadRxFifo(radio, rxBuf, FIX_PACKET_SIZE);
+			  cc1120SpiReadRxFifo(radio, rxBuf, RADIO_PACKET_SIZE);
 			  cc1120SpiReadRxFifo(radio, RSSI, 1);
 			  cc1120SpiReadRxFifo(radio, CRC_LQI, 1);
 
