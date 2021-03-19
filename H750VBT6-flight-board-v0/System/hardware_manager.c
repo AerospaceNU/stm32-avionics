@@ -17,6 +17,8 @@
 #include "usart.h"
 #include "dma.h"
 
+#include "data_transmission.h"
+
 /* IMUs */
 static LSM9DS1Ctrl_t lsm9ds1_1;
 static LSM9DS1Ctrl_t lsm9ds1_2;
@@ -50,6 +52,7 @@ static GPSCtrl_t gps;
 
 /* Radio */
 static CC1120Ctrl_t cc1120;
+static const uint8_t payloadSize = sizeof(TransmitData_t);
 
 /* USB device */
 extern USBD_HandleTypeDef hUsbDeviceFS;
@@ -151,7 +154,7 @@ void HM_HardwareInit() {
 	cc1120.GP2_pin = RADIO_GP2_PIN;
 	cc1120.GP3_port = RADIO_GP3_PORT;
 	cc1120.GP3_pin = RADIO_GP3_PIN;
-	cc1120.payloadSize = RADIO_PAYLOAD_SIZE;
+	cc1120.payloadSize = payloadSize;
 	cc1120_init(&cc1120);
 
 	/* LED 1 */
@@ -247,7 +250,10 @@ void HM_LedToggle(int ledNum) {
 }
 
 bool HM_RadioSend(const uint8_t *data, uint32_t numBytes) {
-
+	for (uint32_t i = 0; i < numBytes; i += payloadSize) {
+		memcpy(cc1120.packetToTX, data, payloadSize);
+		cc1120State(&cc1120);
+	}
 	return false;
 }
 

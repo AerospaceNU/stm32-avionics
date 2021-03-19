@@ -16,9 +16,6 @@ extern "C"{
 #define FLASH_TIMEOUT_MS 		500
 #define PYRO_CONTINUITY_THRESHOLD 3
 
-//TODO determine fixed packet size for transmission
-#define RADIO_PAYLOAD_SIZE 		8
-
 typedef struct {
 	uint32_t timestamp_s;
 	uint32_t timestamp_us;
