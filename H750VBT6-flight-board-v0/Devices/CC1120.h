@@ -20,7 +20,6 @@ extern "C" {
 #include <stdbool.h>
 
 
-
 typedef struct CC1120Ctrl_s{
 
     SPI_HandleTypeDef* radhspi;
@@ -36,6 +35,14 @@ typedef struct CC1120Ctrl_s{
     uint16_t GP2_pin;
     GPIO_TypeDef *GP3_port;
     uint16_t GP3_pin;
+
+    uint8_t payloadSize;
+
+    uint8_t packetRX[128];
+	uint8_t packetToTX[128];
+	uint8_t RSSI;
+	uint8_t CRC_LQI;
+
 
 }CC1120Ctrl_t;
 
@@ -315,10 +322,10 @@ uint8_t cc1120GetRxStatus(CC1120Ctrl_t* radio);
 bool cc1120_init(CC1120Ctrl_t* radio);
 void manualCalibration(CC1120Ctrl_t* radio);
 bool cc1120ForceIdle(CC1120Ctrl_t* radio);
-void cc1120State(CC1120Ctrl_t* radio, uint8_t *packetRX, uint8_t *packetToTX, uint8_t * RSSI, uint8_t * CRC_LQI);
+void cc1120State(CC1120Ctrl_t* radio);
 bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t payloadLength);
 bool cc1120_startRX(CC1120Ctrl_t* radio);
-bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio, uint8_t * rxBuf, uint8_t * RSSI, uint8_t * CRC_LQI);
+bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio);
 
 
 void packetSemaphoreClear();

@@ -17,7 +17,7 @@ extern "C"{
 #define PYRO_CONTINUITY_THRESHOLD 3
 
 //TODO determine fixed packet size for transmission
-#define RADIO_PACKET_SIZE 		8
+#define RADIO_PAYLOAD_SIZE 		8
 
 typedef struct {
 	uint32_t timestamp_s;

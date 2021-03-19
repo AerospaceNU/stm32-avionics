@@ -151,6 +151,7 @@ void HM_HardwareInit() {
 	cc1120.GP2_pin = RADIO_GP2_PIN;
 	cc1120.GP3_port = RADIO_GP3_PORT;
 	cc1120.GP3_pin = RADIO_GP3_PIN;
+	cc1120.payloadSize = RADIO_PAYLOAD_SIZE;
 	cc1120_init(&cc1120);
 
 	/* LED 1 */
@@ -246,6 +247,7 @@ void HM_LedToggle(int ledNum) {
 }
 
 bool HM_RadioSend(const uint8_t *data, uint32_t numBytes) {
+
 	return false;
 }
 

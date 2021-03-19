@@ -76,7 +76,7 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 
 	uint8_t agc_cfg1 = SMARTRF_SETTING_AGC_CFG1;			cc1120SpiWriteReg(radio, CC112X_AGC_CFG1, &agc_cfg1, 0x01);
 	uint8_t agc_cfg0 = SMARTRF_SETTING_AGC_CFG0;			cc1120SpiWriteReg(radio, CC112X_AGC_CFG0, &agc_cfg0, 0x01);
-	uint8_t fifo_cfg = SMARTRF_SETTING_FIFO_CFG & (RADIO_PACKET_SIZE-1);			cc1120SpiWriteReg(radio, CC112X_FIFO_CFG, &fifo_cfg, 0x01);
+	uint8_t fifo_cfg = SMARTRF_SETTING_FIFO_CFG & (radio->payloadSize-1);			cc1120SpiWriteReg(radio, CC112X_FIFO_CFG, &fifo_cfg, 0x01);
 
 	//cc1120SpiWriteReg(CC112X_DEV_ADDR, 0xxx, 0x01);
 	//cc1120SpiWriteReg(CC112X_SETTLING_CFG, 0xxx, 0x01);
@@ -99,7 +99,7 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 
 	uint8_t pa_cfg0 = SMARTRF_SETTING_PA_CFG0;				cc1120SpiWriteReg(radio, CC112X_PA_CFG0, &pa_cfg0, 0x01);
 	//uint8_t pkt_len = SMARTRF_SETTING_PKT_LEN;				cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len, 0x01);
-	uint8_t pkt_len = RADIO_PACKET_SIZE;				cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len, 0x01);
+	uint8_t pkt_len = radio->payloadSize;				cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len, 0x01);
 
 
 	/* Extended Configuration Registers */
@@ -520,18 +520,17 @@ uint8_t waiting_watchdog = 0;
 
 
 
-void cc1120State(CC1120Ctrl_t* radio, uint8_t *packetRX, uint8_t *packetToTX, uint8_t * RSSI, uint8_t * CRC_LQI){
+void cc1120State(CC1120Ctrl_t* radio){
 	uint8_t status;
 
 
+	uint8_t blank[128] = {0};
 
-	uint8_t blank[RADIO_PACKET_SIZE] = {0};
 
+	cc1120_hasReceivedPacket(radio);
 
-	cc1120_hasReceivedPacket(radio, packetRX, RSSI, CRC_LQI);
-
-	if(memcmp( packetToTX, blank, sizeof(blank)) != 0){
-		cc1120_transmitPacket(radio, packetToTX, RADIO_PACKET_SIZE);
+	if(memcmp(radio->packetToTX, blank, radio->payloadSize) != 0){
+		cc1120_transmitPacket(radio, radio->packetToTX, radio->payloadSize);
 	}
 
 	status = trxSpiCmdStrobe(radio, CC112X_SNOP);
@@ -597,7 +596,7 @@ bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t paylo
 	return true;
 }
 
-bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio, uint8_t * rxBuf, uint8_t * RSSI, uint8_t * CRC_LQI){
+bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio){
 	uint8_t rxbytes = 0x00;
 
 	// Read number of bytes in RX FIFO
@@ -620,9 +619,9 @@ bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio, uint8_t * rxBuf, uint8_t * RS
 		  } else {
 
 			  // Read n bytes from RX FIFO
-			  cc1120SpiReadRxFifo(radio, rxBuf, RADIO_PACKET_SIZE);
-			  cc1120SpiReadRxFifo(radio, RSSI, 1);
-			  cc1120SpiReadRxFifo(radio, CRC_LQI, 1);
+			  cc1120SpiReadRxFifo(radio, radio->packetRX, radio->payloadSize);
+			  cc1120SpiReadRxFifo(radio, &radio->RSSI, 1);
+			  cc1120SpiReadRxFifo(radio, &radio->CRC_LQI, 1);
 
 			  return true;
 			  // Check CRC ok (CRC_OK: bit7 in second status byte)
