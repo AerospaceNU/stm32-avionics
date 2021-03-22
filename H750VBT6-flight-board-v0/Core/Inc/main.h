@@ -95,6 +95,23 @@ extern "C" {
 
 #define LED1_PORT			GPIOE
 #define LED1_PIN			GPIO_PIN_8
+
+#define GPS_HUART			&huart5
+
+#define RADIO_HSPI			&hspi4
+#define RADIO_CS_PORT		GPIOE
+#define RADIO_CS_PIN		GPIO_PIN_11
+#define RADIO_RST_PORT		GPIOB
+#define RADIO_RST_PIN		GPIO_PIN_15
+#define RADIO_RDY_PORT		GPIOE
+#define RADIO_RDY_PIN		GPIO_PIN_13
+#define RADIO_GP0_PORT		GPIOE
+#define RADIO_GP0_PIN		GPIO_PIN_15
+#define RADIO_GP2_PORT		GPIOB
+#define RADIO_GP2_PIN		GPIO_PIN_10
+#define RADIO_GP3_PORT		GPIOB
+#define RADIO_GP3_PIN		GPIO_PIN_11
+
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/

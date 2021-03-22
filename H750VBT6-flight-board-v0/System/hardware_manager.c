@@ -9,9 +9,15 @@
 #include "adc_device.h"
 #include "S25FLx.h"
 #include "usbd_cdc_if.h"
+#include "cc1120.h"
+#include "GPS.h"
 
 #include "adc.h"
 #include "tim.h"
+#include "usart.h"
+#include "dma.h"
+
+#include "data_transmission.h"
 
 /* IMUs */
 static LSM9DS1Ctrl_t lsm9ds1_1;
@@ -40,6 +46,13 @@ static AdcCtrl_t adcPyro[6];
 
 /* Flash memory */
 static S25FLXCtrl_t s25flx1;
+
+/* GPS */
+static GPSCtrl_t gps;
+
+/* Radio */
+static CC1120Ctrl_t cc1120;
+static const uint8_t payloadSize = sizeof(TransmitData_t);
 
 /* USB device */
 extern USBD_HandleTypeDef hUsbDeviceFS;
@@ -122,6 +135,28 @@ void HM_HardwareInit() {
 
 	/* Flash */
 	S25FLX_init(&s25flx1, FLASH_HSPI, FLASH_CS_PORT, FLASH_CS_PIN, FLASH_SIZE_BYTES);
+
+	/* GPS */
+	gps.gps_uart = GPS_HUART;
+	gps_init(&gps);
+
+	/* Radio */
+	cc1120.radhspi = RADIO_HSPI;
+	cc1120.CS_port = RADIO_CS_PORT;
+	cc1120.CS_pin = RADIO_CS_PIN;
+	cc1120.RST_port = RADIO_RST_PORT;
+	cc1120.RST_pin = RADIO_RST_PIN;
+	cc1120.RDY_port = RADIO_RDY_PORT;
+	cc1120.RDY_pin = RADIO_RDY_PIN;
+	cc1120.GP0_port = RADIO_GP0_PORT;
+	cc1120.GP0_pin = RADIO_GP0_PIN;
+	cc1120.GP2_port = RADIO_GP2_PORT;
+	cc1120.GP2_pin = RADIO_GP2_PIN;
+	cc1120.GP3_port = RADIO_GP3_PORT;
+	cc1120.GP3_pin = RADIO_GP3_PIN;
+	cc1120.payloadSize = payloadSize;
+	cc1120.initialized = false;
+	cc1120_init(&cc1120);
 
 	/* LED 1 */
 	HAL_GPIO_WritePin(LED1_PORT, LED1_PIN, GPIO_PIN_RESET);
@@ -216,6 +251,10 @@ void HM_LedToggle(int ledNum) {
 }
 
 bool HM_RadioSend(const uint8_t *data, uint32_t numBytes) {
+	for (uint32_t i = 0; i < numBytes; i += payloadSize) {
+		memcpy(cc1120.packetToTX, data, payloadSize);
+		cc1120State(&cc1120);
+	}
 	return false;
 }
 
@@ -331,9 +370,26 @@ void HM_ReadSensorData() {
 	}
 
 	// GPS data
-	// TODO: Implement GPS data
+	// TODO: Poll GPS status to determine if data is good
 	if (bGpsSampling) {
-
+		sensorData.gps_lat = gps.latitude;
+		sensorData.gps_long = gps.longitude;
+		sensorData.gps_alt = gps.altitude;
+		sensorData.gps_speed = gps.speed;
+		sensorData.gps_course = gps.course;
+		sensorData.gps_latitude_deviation = gps.latitude_deviation;
+		sensorData.gps_longitude_deviation = gps.longitude_deviation;
+		sensorData.gps_altitude_deviation = gps.altitude_deviation;
+		sensorData.gps_speed_kph = gps.speed_kph;
+		sensorData.gps_speed_knots = gps.speed_knots;
+		sensorData.gps_seconds = gps.seconds;
+		sensorData.gps_minutes = gps.minutes;
+		sensorData.gps_hours = gps.hours;
+		sensorData.gps_day = gps.day;
+		sensorData.gps_month = gps.month;
+		sensorData.gps_year = gps.year;
+		sensorData.gps_num_sats = gps.num_sats;
+		sensorData.gps_status = gps.status;
 	}
 
 	// ADC data

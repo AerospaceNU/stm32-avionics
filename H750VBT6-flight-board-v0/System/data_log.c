@@ -27,7 +27,7 @@ typedef struct __attribute__((__packed__)) LogData {
 	int16_t  high_g_accel_x_raw,high_g_accel_y_raw,	high_g_accel_z_raw;
 	double   baro1_temp,		baro1_pres,			baro1_alt;
 	double   baro2_temp,		baro2_pres,			baro2_alt;
-	double	 gps_lat,			gps_long,			gps_alt;
+	float	 gps_lat,			gps_long,			gps_alt;
 	double   battery_voltage;
 	uint8_t  pyro_continuity;
 	double	 heading,			vtg;
