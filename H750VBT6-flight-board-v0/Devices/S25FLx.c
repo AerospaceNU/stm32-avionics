@@ -19,7 +19,7 @@
 #define SPI_TX_RX_TIMEOUT_MS	100 // For short transmit-receives that don't require DMA
 
 // Flash properties
-#define PAGE_SIZE_BYTES			256
+#define PAGE_SIZE_BYTES			512
 #define SECTOR_SIZE_BYTES		262144
 
 static void cs_pull(const S25FLXCtrl_t *s25flx, GPIO_PinState direction) {
@@ -154,7 +154,7 @@ bool S25FLX_write_start(S25FLXCtrl_t *s25flx, uint32_t startLoc, uint32_t numByt
 
 	// Check for valid parameters
 	if (startLoc + numBytes > s25flx->flashSizeBytes ||
-			startLoc / PAGE_SIZE_BYTES != (startLoc + numBytes) / PAGE_SIZE_BYTES ||
+			startLoc / PAGE_SIZE_BYTES != (startLoc + numBytes - 1) / PAGE_SIZE_BYTES ||
 			data == NULL ||
 			s25flx->bWIP
 #ifdef USE_S25FLx_DMA
