@@ -1,4 +1,5 @@
 
+#include <buzzer_heartbeat.h>
 #include "state_pre_flight.h"
 
 #include <string.h>
@@ -6,7 +7,6 @@
 #include "data_transmission.h"
 #include "filters.h"
 #include "hardware_manager.h"
-#include "buzzerHeartbeat.h"
 
 void PreFlightState::init() {
 	data_log_assign_flight();

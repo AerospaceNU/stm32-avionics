@@ -6,10 +6,6 @@
 extern "C"{
 #endif
 
-static int last_time = 0;
-
-static int count = 0;
-
 void buzzerHeartbeat();
 
 #ifdef __cplusplus
