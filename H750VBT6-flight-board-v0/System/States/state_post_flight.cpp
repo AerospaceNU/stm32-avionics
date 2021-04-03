@@ -4,12 +4,14 @@
 #include "data_transmission.h"
 #include "filters.h"
 #include "hardware_manager.h"
+#include "buzzerHeartbeat.h"
 
 void PostFlightState::init() {
 	// Empty
 }
 
 EndCondition_t PostFlightState::run() {
+	buzzerHeartbeat();
 	// Collect and transmit data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();

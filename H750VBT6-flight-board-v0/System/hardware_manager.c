@@ -119,6 +119,7 @@ void HM_HardwareInit() {
 
 	/* Buzzer */
 	buzzerInit(&buzzer, BUZZER_HTIM, BUZZER_CHANNEL, 500);
+	HM_BuzzerSetFrequency(600);
 
 	/* ADCs */
     // Battery voltage - 0 min, 15.52 max (127k/27k*3.3V)

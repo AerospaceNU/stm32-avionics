@@ -6,12 +6,14 @@
 #include "data_transmission.h"
 #include "filters.h"
 #include "hardware_manager.h"
+#include "buzzerHeartbeat.h"
 
 void PreFlightState::init() {
 	data_log_assign_flight();
 }
 
 EndCondition_t PreFlightState::run() {
+	buzzerHeartbeat();
 	// Collect, and filter data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
