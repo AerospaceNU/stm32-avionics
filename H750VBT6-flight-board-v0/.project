@@ -32,4 +32,16 @@
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>com.st.stm32cube.ide.mcu.MCUCubeIdeServicesRevAev2ProjectNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>Devices</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Devices</locationURI>
+		</link>
+		<link>
+			<name>System</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/System</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
