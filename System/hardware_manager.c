@@ -41,8 +41,10 @@ static ServoCtrl_t servo4;
 static BuzzerCtrl_t buzzer;
 
 /* ADCs */
+#if (FCB_VERSION <= 0)
 static AdcCtrl_t adcBatteryVoltage;
 static AdcCtrl_t adcCurrent;
+#endif /* FCB_VERSION */
 static AdcCtrl_t adcPyro[6];
 
 /* Flash memory */
@@ -76,6 +78,7 @@ bool hardwareStatus[NUM_HARDWARE];
 
 void HM_HardwareInit() {
 
+
 	/* LSM9DS1 IMU 1 */
 	lsm9ds1_1.ag.LSM9DS1SPI.hspi = IMU1_AG_HSPI;
 	lsm9ds1_1.ag.LSM9DS1SPI.port = IMU1_AG_CS_GPIO_Port;
@@ -88,6 +91,7 @@ void HM_HardwareInit() {
 	lsm9ds1_1.m.mFs = FS_M_8;
 	LSM9DS1_init(&lsm9ds1_1);
 
+#if (FCB_VERSION <= 0)
 	/* LSM9DS1 IMU 2 */
 	lsm9ds1_2.ag.LSM9DS1SPI.hspi = IMU2_AG_HSPI;
 	lsm9ds1_2.ag.LSM9DS1SPI.port = IMU2_AG_CS_GPIO_Port;
@@ -99,6 +103,9 @@ void HM_HardwareInit() {
 	lsm9ds1_2.ag.gFs = FS_G_500;
 	lsm9ds1_2.m.mFs = FS_M_8;
 	LSM9DS1_init(&lsm9ds1_2);
+#else
+	/* ICM20948 IMU 2 */
+#endif /* FCB_VERSION */
 
 	/* MS5607 Barometer 1 */
 	ms5607_1.spiconfig.hspi = BARO1_HSPI;
@@ -131,17 +138,19 @@ void HM_HardwareInit() {
 	buzzerInit(&buzzer, BUZZER_HTIM, BUZZER_CHANNEL, 500);
 
 	/* ADCs */
-    // Battery voltage - 0 min, 15.52 max (127k/27k*3.3V)
-    // Pyros - 0 min, 15.52 max (127k/27k*3.3V)
-    static const float voltageDividerMax = 3.3 * (110.0 / 10.0); // 3.3 * 110.0 / 10.0 for FCB 1
-    adcInit(&adcBatteryVoltage, &hadc3, 1, 0, voltageDividerMax, true);
-    adcInit(&adcCurrent, &hadc1, 1, -12.53, 19.50, true); // -12.5 to 17.5 for FCB 1
-    adcInit(&adcPyro[0], &hadc2, 1, 0, voltageDividerMax, true);
-    adcInit(&adcPyro[1], &hadc2, 4, 0, voltageDividerMax, true);
-    adcInit(&adcPyro[2], &hadc2, 3, 0, voltageDividerMax, true);
-    adcInit(&adcPyro[3], &hadc2, 2, 0, voltageDividerMax, true);
-    adcInit(&adcPyro[4], &hadc1, 3, 0, voltageDividerMax, true);
-    adcInit(&adcPyro[5], &hadc1, 2, 0, voltageDividerMax, true);
+    // Battery voltage - 0 min, 36.3 max (110k/10k*3.3V)
+    // Pyros - 0 min, 36.3 max (110k/10k*3.3V)
+    static const float voltageDividerMax = 3.3 * (110.0 / 10.0);
+#if (FCB_VERSION <= 0)
+    adcInit(&adcBatteryVoltage, VBAT_ADC, VBAT_ADC_RANK, 0, voltageDividerMax, true);
+    adcInit(&adcCurrent, CURRENT_ADC, CURRENT_ADC_RANK, -12.5, 17.5, true);
+#endif /* FCB_VERSION */
+    adcInit(&adcPyro[0], PYRO1_ADC, PYRO1_ADC_RANK, 0, voltageDividerMax, true);
+    adcInit(&adcPyro[1], PYRO2_ADC, PYRO2_ADC_RANK, 0, voltageDividerMax, true);
+    adcInit(&adcPyro[2], PYRO3_ADC, PYRO3_ADC_RANK, 0, voltageDividerMax, true);
+    adcInit(&adcPyro[3], PYRO4_ADC, PYRO4_ADC_RANK, 0, voltageDividerMax, true);
+    adcInit(&adcPyro[4], PYRO5_ADC, PYRO5_ADC_RANK, 0, voltageDividerMax, true);
+    adcInit(&adcPyro[5], PYRO6_ADC, PYRO6_ADC_RANK, 0, voltageDividerMax, true);
 
 	/* Flash */
 	S25FLX_init(&s25flx1, FLASH_HSPI, FLASH_CS_GPIO_Port, FLASH_CS_Pin, FLASH_SIZE_BYTES);
@@ -411,11 +420,15 @@ void HM_ReadSensorData() {
 	// ADC data
 	float adcVal = 0;
 	if (bBatteryVoltageSampling) {
+#if (FCB_VERSION <= 0)
 		adcStartSingleRead(&adcBatteryVoltage);
 		if (adcGetValue(&adcBatteryVoltage, &adcVal, 5))
 			sensorData.battery_voltage = (double) adcVal;
 		else
 			sensorData.battery_voltage = 0;
+#else
+		// TODO: Battery voltage from external ADC
+#endif /* FCB_VERSION */
 	}
 	if (bPyroContinuitySampling) {
 		for (int i = 0; i < sizeof(sensorData.pyro_continuity) / sizeof(bool); i++) {

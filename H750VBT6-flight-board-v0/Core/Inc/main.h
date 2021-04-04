@@ -169,6 +169,30 @@ void Error_Handler(void);
 #define RADIO_HSPI			&hspi4
 #define RADIO_RDY_GPIO_Port GPIOE
 #define RADIO_RDY_Pin		GPIO_PIN_13
+
+#define VBAT_ADC			&hadc3
+#define VBAT_ADC_RANK		1
+
+#define CURRENT_ADC			&hadc1
+#define CURRENT_ADC_RANK	1
+
+#define PYRO1_ADC			&hadc2
+#define PYRO1_ADC_RANK		1
+
+#define PYRO2_ADC			&hadc2
+#define PYRO2_ADC_RANK		4
+
+#define PYRO3_ADC			&hadc2
+#define PYRO3_ADC_RANK		3
+
+#define PYRO4_ADC			&hadc2
+#define PYRO4_ADC_RANK		2
+
+#define PYRO5_ADC			&hadc1
+#define PYRO5_ADC_RANK		3
+
+#define PYRO6_ADC			&hadc1
+#define PYRO6_ADC_RANK		2
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -1,13 +1,8 @@
 # directories
-.metadata/
-RemoteSystemTempFiles/
-H750VBT6-flight-board-v0/Build/
-H750VBT6-flight-board-v0/.settings/
-H750VBT6-flight-board-v0/.metadata/
-H750VBT6-flight-board-v0/RemoteSystemTempFiles/
-H750VBT6-flight-board-v0/Build/
-
-
+*Build/
+*.settings/
+*.metadata/
+*RemoteSystemTempFiles/
 
 # files
 .mxproject

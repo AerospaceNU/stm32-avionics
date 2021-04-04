@@ -7,7 +7,7 @@
 #include <string.h>
 #include "stm32h7xx_hal.h"
 
-#define BOARD_VERSION 		0x00
+#define BOARD_VERSION 		FCB_VERSION
 #define BOARD_ID 			0x01
 #define SOFTWARE_VERSION 	0x01
 
