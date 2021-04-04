@@ -78,24 +78,23 @@ void HM_HardwareInit() {
 
 	/* LSM9DS1 IMU 1 */
 	lsm9ds1_1.ag.LSM9DS1SPI.hspi = IMU1_AG_HSPI;
-	lsm9ds1_1.ag.LSM9DS1SPI.port = IMU1_AG_CS_PORT;
-	lsm9ds1_1.ag.LSM9DS1SPI.pin = IMU1_AG_CS_PIN;
+	lsm9ds1_1.ag.LSM9DS1SPI.port = IMU1_AG_CS_GPIO_Port;
+	lsm9ds1_1.ag.LSM9DS1SPI.pin = IMU1_AG_CS_Pin;
 	lsm9ds1_1.m.LSM9DS1SPI.hspi = IMU1_M_HSPI;
-	lsm9ds1_1.m.LSM9DS1SPI.port = IMU1_M_CS_PORT;
-	lsm9ds1_1.m.LSM9DS1SPI.pin = IMU1_M_CS_PIN;
+	lsm9ds1_1.m.LSM9DS1SPI.port = IMU1_M_CS_GPIO_Port;
+	lsm9ds1_1.m.LSM9DS1SPI.pin = IMU1_M_CS_Pin;
 	lsm9ds1_1.ag.aFs = FS_XL_16;
 	lsm9ds1_1.ag.gFs = FS_G_500;
 	lsm9ds1_1.m.mFs = FS_M_8;
-
 	LSM9DS1_init(&lsm9ds1_1);
 
 	/* LSM9DS1 IMU 2 */
 	lsm9ds1_2.ag.LSM9DS1SPI.hspi = IMU2_AG_HSPI;
-	lsm9ds1_2.ag.LSM9DS1SPI.port = IMU2_AG_CS_PORT;
-	lsm9ds1_2.ag.LSM9DS1SPI.pin = IMU2_AG_CS_PIN;
+	lsm9ds1_2.ag.LSM9DS1SPI.port = IMU2_AG_CS_GPIO_Port;
+	lsm9ds1_2.ag.LSM9DS1SPI.pin = IMU2_AG_CS_Pin;
 	lsm9ds1_2.m.LSM9DS1SPI.hspi = IMU2_M_HSPI;
-	lsm9ds1_2.m.LSM9DS1SPI.port = IMU2_M_CS_PORT;
-	lsm9ds1_2.m.LSM9DS1SPI.pin = IMU2_M_CS_PIN;
+	lsm9ds1_2.m.LSM9DS1SPI.port = IMU2_M_CS_GPIO_Port;
+	lsm9ds1_2.m.LSM9DS1SPI.pin = IMU2_M_CS_Pin;
 	lsm9ds1_2.ag.aFs = FS_XL_16;
 	lsm9ds1_2.ag.gFs = FS_G_500;
 	lsm9ds1_2.m.mFs = FS_M_8;
@@ -103,20 +102,20 @@ void HM_HardwareInit() {
 
 	/* MS5607 Barometer 1 */
 	ms5607_1.spiconfig.hspi = BARO1_HSPI;
-	ms5607_1.spiconfig.port = BARO1_CS_PORT;
-	ms5607_1.spiconfig.pin = BARO1_CS_PIN;
+	ms5607_1.spiconfig.port = BARO1_CS_GPIO_Port;
+	ms5607_1.spiconfig.pin = BARO1_CS_Pin;
 	MS5607_init(&ms5607_1);
 
 	/* MS5607 Barometer 2 */
 	ms5607_2.spiconfig.hspi = BARO2_HSPI;
-	ms5607_2.spiconfig.port = BARO2_CS_PORT;
-	ms5607_2.spiconfig.pin = BARO2_CS_PIN;
+	ms5607_2.spiconfig.port = BARO2_CS_GPIO_Port;
+	ms5607_2.spiconfig.pin = BARO2_CS_Pin;
 	MS5607_init(&ms5607_2);
 
 	/* H3LIS331DL High G Accelerometer */
 	h3lis_1.H3LIS331DLSPI.hspi = HIGH_G_HSPI;
-	h3lis_1.H3LIS331DLSPI.port = HIGH_G_CS_PORT;
-	h3lis_1.H3LIS331DLSPI.pin = HIGH_G_CS_PIN;
+	h3lis_1.H3LIS331DLSPI.port = HIGH_G_CS_GPIO_Port;
+	h3lis_1.H3LIS331DLSPI.pin = HIGH_G_CS_Pin;
 	H3LIS331DL_init(&h3lis_1);
 
 	/* Servos 1-4
@@ -145,7 +144,7 @@ void HM_HardwareInit() {
     adcInit(&adcPyro[5], &hadc1, 2, 0, voltageDividerMax, true);
 
 	/* Flash */
-	S25FLX_init(&s25flx1, FLASH_HSPI, FLASH_CS_PORT, FLASH_CS_PIN, FLASH_SIZE_BYTES);
+	S25FLX_init(&s25flx1, FLASH_HSPI, FLASH_CS_GPIO_Port, FLASH_CS_Pin, FLASH_SIZE_BYTES);
 
 	/* GPS */
 	gps.gps_uart = GPS_HUART;
@@ -153,23 +152,23 @@ void HM_HardwareInit() {
 
 	/* Radio */
 	cc1120.radhspi = RADIO_HSPI;
-	cc1120.CS_port = RADIO_CS_PORT;
-	cc1120.CS_pin = RADIO_CS_PIN;
-	cc1120.RST_port = RADIO_RST_PORT;
-	cc1120.RST_pin = RADIO_RST_PIN;
-	cc1120.RDY_port = RADIO_RDY_PORT;
-	cc1120.RDY_pin = RADIO_RDY_PIN;
-	cc1120.GP0_port = RADIO_GP0_PORT;
-	cc1120.GP0_pin = RADIO_GP0_PIN;
-	cc1120.GP2_port = RADIO_GP2_PORT;
-	cc1120.GP2_pin = RADIO_GP2_PIN;
-	cc1120.GP3_port = RADIO_GP3_PORT;
-	cc1120.GP3_pin = RADIO_GP3_PIN;
+	cc1120.CS_port = RADIO_CS_GPIO_Port;
+	cc1120.CS_pin = RADIO_CS_Pin;
+	cc1120.RST_port = RADIO_RST_GPIO_Port;
+	cc1120.RST_pin = RADIO_RST_Pin;
+	cc1120.RDY_port = RADIO_RDY_GPIO_Port;
+	cc1120.RDY_pin = RADIO_RDY_Pin;
+	cc1120.GP0_port = RADIO_GP0_GPIO_Port;
+	cc1120.GP0_pin = RADIO_GP0_Pin;
+	cc1120.GP2_port = RADIO_GP2_GPIO_Port;
+	cc1120.GP2_pin = RADIO_GP2_Pin;
+	cc1120.GP3_port = RADIO_GP3_GPIO_Port;
+	cc1120.GP3_pin = RADIO_GP3_Pin;
 	cc1120.payloadSize = payloadSize;
 	cc1120.initialized = false;
 
 	/* LED 1 */
-	HAL_GPIO_WritePin(LED1_PORT, LED1_PIN, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
 
 	/* Checking if inits are successful (inits that don't return a boolean are assumed true) */
 	hardwareStatus[CC1120] = cc1120_init(&cc1120);
@@ -251,7 +250,7 @@ void HM_ServoSetAngle(int servoNum, float degrees) {
 void HM_LedSet(int ledNum, bool set) {
 	switch(ledNum) {
 	case 1:
-		HAL_GPIO_WritePin(LED1_PORT, LED1_PIN, set);
+		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, set);
 		break;
 	default:
 		break;
@@ -261,7 +260,7 @@ void HM_LedSet(int ledNum, bool set) {
 void HM_LedToggle(int ledNum) {
 	switch(ledNum) {
 	case 1:
-		HAL_GPIO_TogglePin(LED1_PORT, LED1_PIN);
+		HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
 		break;
 	default:
 		break;
