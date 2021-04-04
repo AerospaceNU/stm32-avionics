@@ -2,7 +2,7 @@
 #include <buzzer_heartbeat.h>
 #include "hardware_manager.h"
 
-uint32_t last_time = 0;
+static uint32_t last_time = 0;
 bool isOn;
 
 //Alternates the buzzer between on and off states if a certain period of time has passed (500ms)
