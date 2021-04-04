@@ -1,4 +1,5 @@
 
+#include <buzzer_heartbeat.h>
 #include "state_pre_flight.h"
 
 #include <string.h>
@@ -12,6 +13,7 @@ void PreFlightState::init() {
 }
 
 EndCondition_t PreFlightState::run() {
+	buzzerHeartbeat();
 	// Collect, and filter data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();

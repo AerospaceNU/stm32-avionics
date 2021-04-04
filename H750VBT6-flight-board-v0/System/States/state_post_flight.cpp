@@ -1,4 +1,5 @@
 
+#include <buzzer_heartbeat.h>
 #include "state_post_flight.h"
 
 #include "data_transmission.h"
@@ -10,6 +11,7 @@ void PostFlightState::init() {
 }
 
 EndCondition_t PostFlightState::run() {
+	buzzerHeartbeat();
 	// Collect and transmit data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
