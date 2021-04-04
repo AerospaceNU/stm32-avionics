@@ -3,7 +3,7 @@
 #include "hardware_manager.h"
 
 static uint32_t last_time = 0;
-bool isOn;
+static bool isOn;
 
 //Alternates the buzzer between on and off states if a certain period of time has passed (500ms)
 void buzzerHeartbeat(){
