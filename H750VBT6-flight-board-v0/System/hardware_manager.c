@@ -79,6 +79,10 @@ void HM_HardwareInit() {
 	lsm9ds1_1.m.LSM9DS1SPI.hspi = IMU1_M_HSPI;
 	lsm9ds1_1.m.LSM9DS1SPI.port = IMU1_M_CS_PORT;
 	lsm9ds1_1.m.LSM9DS1SPI.pin = IMU1_M_CS_PIN;
+	lsm9ds1_1.ag.aFs = FS_XL_16;
+	lsm9ds1_1.ag.gFs = FS_G_500;
+	lsm9ds1_1.m.mFs = FS_M_8;
+
 	LSM9DS1_init(&lsm9ds1_1);
 
 	/* LSM9DS1 IMU 2 */
@@ -88,6 +92,9 @@ void HM_HardwareInit() {
 	lsm9ds1_2.m.LSM9DS1SPI.hspi = IMU2_M_HSPI;
 	lsm9ds1_2.m.LSM9DS1SPI.port = IMU2_M_CS_PORT;
 	lsm9ds1_2.m.LSM9DS1SPI.pin = IMU2_M_CS_PIN;
+	lsm9ds1_2.ag.aFs = FS_XL_16;
+	lsm9ds1_2.ag.gFs = FS_G_500;
+	lsm9ds1_2.m.mFs = FS_M_8;
 	LSM9DS1_init(&lsm9ds1_2);
 
 	/* MS5607 Barometer 1 */
