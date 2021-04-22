@@ -422,7 +422,8 @@ void HM_ReadSensorData() {
 
 
 	// Timestamp data
-	// TODO: Implement timer data
+	// TODO: Make sensor data timestamp get time from PPS-updated timer
+	sensorData.timestamp_s = HM_Millis();
 }
 
 SensorData_t* HM_GetSensorData() {
