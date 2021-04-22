@@ -16,7 +16,7 @@ extern "C"{
 #define FLASH_TIMEOUT_MS 		500
 #define PYRO_CONTINUITY_THRESHOLD 3
 
-
+/* Booleans used to return the status of devices (inits that do not return a boolean are assumed to be true) */
 static bool cc1120Status;
 static bool IMU1Status = true;
 static bool IMU2Status = true;
