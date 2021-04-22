@@ -16,6 +16,14 @@ extern "C"{
 #define FLASH_TIMEOUT_MS 		500
 #define PYRO_CONTINUITY_THRESHOLD 3
 
+
+static bool cc1120Status;
+static bool IMU1Status = true;
+static bool IMU2Status = true;
+static bool barometer1Status = true;
+static bool barometer2Status = true;
+static bool high_G_AccelerometerStatus = true;
+
 typedef struct {
 	uint32_t timestamp_s;
 	uint32_t timestamp_us;
