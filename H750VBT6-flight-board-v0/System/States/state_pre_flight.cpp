@@ -14,6 +14,7 @@ void PreFlightState::init() {
 }
 
 EndCondition_t PreFlightState::run() {
+	//Play through buzzerReport once and then run buzzerHeartbeat repeatedly
 	if (reportCount < 300){
 		buzzerReport();
 		reportCount++;

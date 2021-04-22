@@ -7,7 +7,7 @@ static uint32_t curState = 0;
 static uint32_t n = 0;
 
 
-//Alternates the buzzer between on and off states if a certain period of time has passed (500ms)
+//Plays a different frequency for each init in hardware_manager given that it returns true. If an init returns false, its tone will not play.)
 void buzzerReport(){
         if ((HM_Millis() - last_time) > 500) {
             last_time = HM_Millis();
