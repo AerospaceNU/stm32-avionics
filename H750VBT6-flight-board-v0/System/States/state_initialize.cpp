@@ -3,7 +3,6 @@
 
 #include "hardware_manager.h"
 
-
 void InitializeState::init() {
 	HM_HardwareInit();
 }
