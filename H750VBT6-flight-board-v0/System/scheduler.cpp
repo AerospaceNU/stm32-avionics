@@ -120,7 +120,7 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 	case StateId::CliMain:
 		switch(endCondition) {
 		case EndCondition_t::UsbDisconnect:
-			return StateId::PreFlight;
+			return StateId::CoastAscent; // ONLY for flight test
 		default:
 			break;
 		}
