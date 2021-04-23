@@ -447,16 +447,19 @@ void cc1120State(CC1120Ctrl_t* radio){
 
 bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t payloadLength){
 
-	//uint8_t dataLength;
+	uint8_t packetLength;
 
-	/*dataLength = payloadLength+1;
+	packetLength = payloadLength+1;
 
-	if (dataLength > MAX_PACKET_SIZE){
+	if (packetLength > MAX_PACKET_SIZE){
 		return false;
 	}
 
+	if (SMARTRF_SETTING_PKT_CFG0 == 0x20){
+		cc1120SpiWriteTxFifo(radio, &payloadLength, 1);
+	}
 
-	cc1120SpiWriteTxFifo(radio, &payloadLength, 1);*/
+
 	cc1120SpiWriteTxFifo(radio, payload, payloadLength);
 
 	uint8_t status;
