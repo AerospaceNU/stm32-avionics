@@ -2,11 +2,12 @@
 #include "string.h"
 #include "stm32h7xx_hal.h"
 #include "hardware_manager.h"
+#include "stdbool.h"
 
 #define GPS_RX_BUF_SIZE			4096
 #define GPS_RX_BUF_HALF			2048
 
-typedef struct GPSCtrl_t {
+typedef struct GPSCtrl_s{
 
     UART_HandleTypeDef* gps_uart;
     DMA_HandleTypeDef* gpa_dma_rx;
@@ -30,12 +31,22 @@ typedef struct GPSCtrl_t {
     int num_sats;
     char status;
 
-    char rx_buff[GPS_RX_BUF_SIZE];
-} GPSCtrl_t;
+    char rx_buff[4096];
+    char line[2048];
 
-void parseString(GPSCtrl_t* gps);
+    int place;
 
-void usart_process_half_data(void* gps);
-void usart_process_data(void* gps);
+    bool data_available;
+    bool half;
+
+
+}GPSCtrl_t;
+
+void parseString(GPSCtrl_t* gps, char line[]);
+
+void gps_process_data(GPSCtrl_t* gps);
 
 void gps_init(GPSCtrl_t* gps);
+
+bool gps_new_data(GPSCtrl_t *gps);
+
