@@ -20,6 +20,7 @@ extern "C" {
 #include <stdbool.h>
 
 
+
 typedef struct CC1120Ctrl_s{
 
     SPI_HandleTypeDef* radhspi;
@@ -36,6 +37,10 @@ typedef struct CC1120Ctrl_s{
     GPIO_TypeDef *GP3_port;
     uint16_t GP3_pin;
 
+    //0x00 is fixed packet size, payload determined by payloadSize
+    //0x20 is variable packet size, payload determined by payloadSize, packetSize is payloadSize +1
+    uint8_t packetCfg;
+
     uint8_t payloadSize;
 
     uint8_t packetRX[128];
@@ -43,8 +48,13 @@ typedef struct CC1120Ctrl_s{
 	uint8_t RSSI;
 	uint8_t CRC_LQI;
 
+	uint8_t band;
+
+	float frequencyHz;
+
 	bool initialized;
 }CC1120Ctrl_t;
+
 
 
 
@@ -53,7 +63,31 @@ typedef struct CC1120Ctrl_s{
  * CONSTANTS
  */
 
+
+
+
+#define CC1120_OSC_FREQ 32000000//32 MHz
+#define CC1200_OSC_FREQ 40000000
+
+#define BAND_820_960MHz 	0x2
+#define BAND_410_480MHz		 0x4
+#define BAND_273_320MHz 		0x6
+#define BAND_205_240MHz		 0x8
+#define BAND_164_192MHz		 0xA
+#define BAND_136_160MHz 		0xB
+
+/* user config values */
+
+#define FS_CFG_FS_LOCK_EN 4
+#define FS_CFG_FSD_BANDSELECT 0
+#define FIX_PACKET_SIZE		8
+#define MAX_PACKET_SIZE		128
+
+
 /* configuration registers */
+
+
+
 #define CC112X_IOCFG3                   0x0000
 #define CC112X_IOCFG2                   0x0001
 #define CC112X_IOCFG1                   0x0002
@@ -326,6 +360,7 @@ void cc1120State(CC1120Ctrl_t* radio);
 bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t payloadLength);
 bool cc1120_startRX(CC1120Ctrl_t* radio);
 bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio);
+bool cc1120_setFrequency(CC1120Ctrl_t* radio);
 
 
 void packetSemaphoreClear();
