@@ -455,7 +455,7 @@ bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t paylo
 		return false;
 	}
 
-	if (SMARTRF_SETTING_PKT_CFG0 == 0x20){
+	if (radio->payloadSize==0xFF){
 		cc1120SpiWriteTxFifo(radio, &payloadLength, 1);
 	}
 
