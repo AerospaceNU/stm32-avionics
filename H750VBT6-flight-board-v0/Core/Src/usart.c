@@ -32,7 +32,7 @@ void MX_UART5_Init(void)
 {
 
   huart5.Instance = UART5;
-  huart5.Init.BaudRate = 115200;
+  huart5.Init.BaudRate = 9600;
   huart5.Init.WordLength = UART_WORDLENGTH_8B;
   huart5.Init.StopBits = UART_STOPBITS_1;
   huart5.Init.Parity = UART_PARITY_NONE;
@@ -72,11 +72,11 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
   /* USER CODE END UART5_MspInit 0 */
     /* UART5 clock enable */
     __HAL_RCC_UART5_CLK_ENABLE();
-  
+
     __HAL_RCC_GPIOB_CLK_ENABLE();
-    /**UART5 GPIO Configuration    
+    /**UART5 GPIO Configuration
     PB12     ------> UART5_RX
-    PB13     ------> UART5_TX 
+    PB13     ------> UART5_TX
     */
     GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -104,6 +104,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 
     __HAL_LINKDMA(uartHandle,hdmarx,hdma_uart5_rx);
 
+    /* UART5 interrupt Init */
+    HAL_NVIC_SetPriority(UART5_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(UART5_IRQn);
   /* USER CODE BEGIN UART5_MspInit 1 */
 
   /* USER CODE END UART5_MspInit 1 */
@@ -120,20 +123,23 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
   /* USER CODE END UART5_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_UART5_CLK_DISABLE();
-  
-    /**UART5 GPIO Configuration    
+
+    /**UART5 GPIO Configuration
     PB12     ------> UART5_RX
-    PB13     ------> UART5_TX 
+    PB13     ------> UART5_TX
     */
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_12|GPIO_PIN_13);
 
     /* UART5 DMA DeInit */
     HAL_DMA_DeInit(uartHandle->hdmarx);
+
+    /* UART5 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(UART5_IRQn);
   /* USER CODE BEGIN UART5_MspDeInit 1 */
 
   /* USER CODE END UART5_MspDeInit 1 */
   }
-} 
+}
 
 /* USER CODE BEGIN 1 */
 

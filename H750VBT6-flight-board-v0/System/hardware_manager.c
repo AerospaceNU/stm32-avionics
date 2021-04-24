@@ -379,6 +379,7 @@ void HM_ReadSensorData() {
 	// GPS data
 	// TODO: Poll GPS status to determine if data is good
 	if (bGpsSampling) {
+		gps_new_data(&gps);
 		sensorData.gps_lat = gps.latitude;
 		sensorData.gps_long = gps.longitude;
 		sensorData.gps_alt = gps.altitude;
@@ -417,6 +418,8 @@ void HM_ReadSensorData() {
 				sensorData.pyro_continuity[i] = false;
 		}
 	}
+
+
 
 	// Timestamp data
 	// TODO: Implement timer data

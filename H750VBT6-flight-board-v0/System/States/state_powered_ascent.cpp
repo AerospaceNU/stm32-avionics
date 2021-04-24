@@ -12,6 +12,9 @@ void PoweredAscentState::init() {
 EndCondition_t PoweredAscentState::run() {
 	// Collect, filter, and log all sensor data
 	HM_ReadSensorData();
+
+
+
 	SensorData_t* sensorData = HM_GetSensorData();
 	applyFilterData(sensorData);
 	FilterData_t* filterData = getFilteredData();

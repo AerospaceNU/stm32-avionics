@@ -39,9 +39,9 @@ extern TIM_HandleTypeDef htim8;
 
 void MX_TIM1_Init(void);
 void MX_TIM8_Init(void);
-                        
+
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
-                                        
+
 /* USER CODE BEGIN Prototypes */
 
 /* USER CODE END Prototypes */

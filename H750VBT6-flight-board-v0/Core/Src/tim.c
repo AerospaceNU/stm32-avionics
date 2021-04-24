@@ -184,8 +184,8 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
 
   /* USER CODE END TIM1_MspPostInit 0 */
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    /**TIM1 GPIO Configuration    
-    PA8     ------> TIM1_CH1 
+    /**TIM1 GPIO Configuration
+    PA8     ------> TIM1_CH1
     */
     GPIO_InitStruct.Pin = GPIO_PIN_8;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -203,13 +203,13 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
   /* USER CODE BEGIN TIM8_MspPostInit 0 */
 
   /* USER CODE END TIM8_MspPostInit 0 */
-  
+
     __HAL_RCC_GPIOC_CLK_ENABLE();
-    /**TIM8 GPIO Configuration    
+    /**TIM8 GPIO Configuration
     PC6     ------> TIM8_CH1
     PC7     ------> TIM8_CH2
     PC8     ------> TIM8_CH3
-    PC9     ------> TIM8_CH4 
+    PC9     ------> TIM8_CH4
     */
     GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -250,7 +250,7 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* tim_pwmHandle)
 
   /* USER CODE END TIM8_MspDeInit 1 */
   }
-} 
+}
 
 /* USER CODE BEGIN 1 */
 
