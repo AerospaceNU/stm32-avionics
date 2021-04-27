@@ -72,11 +72,11 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
   /* USER CODE END UART5_MspInit 0 */
     /* UART5 clock enable */
     __HAL_RCC_UART5_CLK_ENABLE();
-
+  
     __HAL_RCC_GPIOB_CLK_ENABLE();
-    /**UART5 GPIO Configuration
+    /**UART5 GPIO Configuration    
     PB12     ------> UART5_RX
-    PB13     ------> UART5_TX
+    PB13     ------> UART5_TX 
     */
     GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -123,10 +123,10 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
   /* USER CODE END UART5_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_UART5_CLK_DISABLE();
-
-    /**UART5 GPIO Configuration
+  
+    /**UART5 GPIO Configuration    
     PB12     ------> UART5_RX
-    PB13     ------> UART5_TX
+    PB13     ------> UART5_TX 
     */
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_12|GPIO_PIN_13);
 
@@ -139,7 +139,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 
   /* USER CODE END UART5_MspDeInit 1 */
   }
-}
+} 
 
 /* USER CODE BEGIN 1 */
 
