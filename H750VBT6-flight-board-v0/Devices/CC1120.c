@@ -6,9 +6,9 @@
  */
 
 #include <CC1120.h>
+#include <smartrf_CC1120_cfg_1_2kbps_50k.h>
 #include "stdint.h"
 #include "stm32h7xx_hal.h"
-#include "smartrf_CC1120_cfg.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -18,11 +18,21 @@ static void trxReadWriteBurstSingle(CC1120Ctrl_t* radio, uint8_t addr, uint8_t *
 
 
 extern SPI_HandleTypeDef hspi4;
-//#define FIX_PACKET_SIZE	8
-#define MAX_PACKET_SIZE		128
 
 
+const float twoToThe16 = 65536.0;
+//const float twoToThe20 = 1048576.0;
+//const float twoToThe21 = 2097152.0;
+//const float twoToThe22 = 4194304.0;
+//const float twoToThe38 = 274877906944.0;
+//const float twoToThe39 = 549755813888.0;
 
+
+//const size_t maxValue3Bits = 8 - 1;
+//const size_t maxValue4Bits = 16 - 1;
+//const size_t maxValue8Bits = 256 - 1;
+//const size_t maxValue20Bits = 1048576 - 1;
+const size_t maxValue24Bits = 16777216 - 1;
 
 bool cc1120_init(CC1120Ctrl_t* radio) {
 
@@ -35,153 +45,25 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 	HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, SET);
 	HAL_Delay(50);
 
-	//IO CONFIGURATIONS
-	uint8_t iocfg3 = SMARTRF_SETTING_IOCFG3;	cc1120SpiWriteReg(radio, CC112X_IOCFG3, &iocfg3, 0x01);
-	uint8_t iocfg2 = SMARTRF_SETTING_IOCFG2;	cc1120SpiWriteReg(radio, CC112X_IOCFG2, &iocfg2, 0x01);
-	uint8_t iocfg1 = SMARTRF_SETTING_IOCFG1;	cc1120SpiWriteReg(radio, CC112X_IOCFG1, &iocfg1, 0x01);
-	uint8_t iocfg0 = SMARTRF_SETTING_IOCFG0;	cc1120SpiWriteReg(radio, CC112X_IOCFG0, &iocfg0, 0x01);
+	uint8_t writeByte;
+	for(uint16_t i = 0; i < (sizeof(preferredSettings)/sizeof(registerSetting_t)); i++) {
+	        writeByte = preferredSettings[i].data;
+	        cc1120SpiWriteReg(radio, preferredSettings[i].addr, &writeByte, 1);
+	}
 
-	//uint8_t sync3 = SMARTRF_SETTING_SYNC3;		cc1120SpiWriteReg(CC112X_SYNC3, sync3, 0x01);
-	//uint8_t sync2 = SMARTRF_SETTING_SYNC2;		cc1120SpiWriteReg(CC112X_SYNC2, sync2, 0x01);
-	//uint8_t sync1 = SMARTRF_SETTING_SYNC1;		cc1120SpiWriteReg(CC112X_SYNC1, sync1, 0x01);
-	//uint8_t sync0 = SMARTRF_SETTING_SYNC0;		cc1120SpiWriteReg(CC112X_SYNC0, sync0, 0x01);
+	uint8_t pkt_len = 0xFF;
+	uint8_t pkt_cfg0 = 0x20;
+	if (radio->payloadSize == 0xFF){
+		pkt_len = 0xFF;
+		pkt_cfg0 = 0x20;
+	}else{
+		pkt_len = radio->payloadSize;
+		pkt_cfg0 = 0x00;
+	}
+	cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len, 0x01);
+	cc1120SpiWriteReg(radio, CC112X_PKT_CFG0, &pkt_cfg0, 0x01);
 
-	uint8_t sync_cfg1 = SMARTRF_SETTING_SYNC_CFG1;	cc1120SpiWriteReg(radio,  CC112X_SYNC_CFG1, &sync_cfg1, 0x01);
-	//uint8_t sync_cfg0 = SMARTRF_SETTING_SYNC_CFG0;	c1120SpiWriteReg(radio,  CC112X_SYNC_CFG0, &sync_cfg1, 0x01);
-
-	uint8_t deviation_m = SMARTRF_SETTING_DEVIATION_M;		cc1120SpiWriteReg(radio, CC112X_DEVIATION_M, &deviation_m, 0x01);
-	uint8_t modcfg_dev_e = SMARTRF_SETTING_MODCFG_DEV_E;	cc1120SpiWriteReg(radio, CC112X_MODCFG_DEV_E, &modcfg_dev_e, 0x01);
-	uint8_t dcfilt_cfg = SMARTRF_SETTING_DCFILT_CFG;		cc1120SpiWriteReg(radio, CC112X_DCFILT_CFG, &dcfilt_cfg, 0x01);
-
-	uint8_t preamble_cfg1 = SMARTRF_SETTING_PREAMBLE_CFG1;	cc1120SpiWriteReg(radio, CC112X_PREAMBLE_CFG1, &preamble_cfg1, 0x01);
-	//uint8_t preamble_cfg0 = SMARTRF_SETTING_PREAMBLE_CFG0;	cc1120SpiWriteReg(radio, CC112X_PREAMBLE_CFG0, &preamble_cfg0, 0x01);
-
-	uint8_t freq_if_cfg = SMARTRF_SETTING_FREQ_IF_CFG;		cc1120SpiWriteReg(radio, CC112X_FREQ_IF_CFG, &freq_if_cfg, 0x01);
-	uint8_t iqic = SMARTRF_SETTING_IQIC;					cc1120SpiWriteReg(radio, CC112X_IQIC, &iqic, 0x01);
-	uint8_t chan_bw = SMARTRF_SETTING_CHAN_BW;				cc1120SpiWriteReg(radio, CC112X_CHAN_BW, &chan_bw, 0x01);
-
-	//uint8_t mdmcfg1 = SMARTRF_SETTING_MDMCFG1;				cc1120SpiWriteReg(radio, CC112X_MDMCFG1, &mdmcfg1, 0x01);
-	uint8_t mdmcfg0 = SMARTRF_SETTING_MDMCFG0;				cc1120SpiWriteReg(radio, CC112X_MDMCFG0, &mdmcfg0, 0x01);
-
-	uint8_t symbol_rate_2 = SMARTRF_SETTING_SYMBOL_RATE2;	cc1120SpiWriteReg(radio, CC112X_SYMBOL_RATE2, &symbol_rate_2, 0x01);
-	uint8_t symbol_rate_1 = SMARTRF_SETTING_SYMBOL_RATE1;	cc1120SpiWriteReg(radio, CC112X_SYMBOL_RATE1, &symbol_rate_1, 0x01);
-	uint8_t symbol_rate_0 = SMARTRF_SETTING_SYMBOL_RATE0;	cc1120SpiWriteReg(radio, CC112X_SYMBOL_RATE0, &symbol_rate_0, 0x01);
-
-	uint8_t agc_ref = SMARTRF_SETTING_AGC_REF;				cc1120SpiWriteReg(radio, CC112X_AGC_REF, &agc_ref, 0x01);
-	uint8_t agc_cs_thr = SMARTRF_SETTING_AGC_CS_THR;		cc1120SpiWriteReg(radio, CC112X_AGC_CS_THR, &agc_cs_thr, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_AGC_GAIN_ADJUST, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_AGC_CFG3, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_AGC_CFG2, 0xxx, 0x01);
-
-	uint8_t agc_cfg1 = SMARTRF_SETTING_AGC_CFG1;			cc1120SpiWriteReg(radio, CC112X_AGC_CFG1, &agc_cfg1, 0x01);
-	uint8_t agc_cfg0 = SMARTRF_SETTING_AGC_CFG0;			cc1120SpiWriteReg(radio, CC112X_AGC_CFG0, &agc_cfg0, 0x01);
-	uint8_t fifo_cfg = SMARTRF_SETTING_FIFO_CFG & (radio->payloadSize-1);			cc1120SpiWriteReg(radio, CC112X_FIFO_CFG, &fifo_cfg, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_DEV_ADDR, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_SETTLING_CFG, 0xxx, 0x01);
-
-	uint8_t fs_cfg = SMARTRF_SETTING_FS_CFG;				cc1120SpiWriteReg(radio, CC112X_FS_CFG, &fs_cfg, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_WOR_CFG1, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_WOR_CFG0, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_WOR_EVENT0_MSB, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_WOR_EVENT0_LSB, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_PKT_CFG2, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_PKT_CFG1, 0xxx, 0x01);
-
-	uint8_t pkt_cfg0 = SMARTRF_SETTING_PKT_CFG0;			cc1120SpiWriteReg(radio, CC112X_PKT_CFG0, &pkt_cfg0, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_RFEND_CFG1 , 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_RFEND_CFG0 , 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_PA_CFG2 , 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_PA_CFG1 , 0xxx, 0x01);
-
-	uint8_t pa_cfg0 = SMARTRF_SETTING_PA_CFG0;				cc1120SpiWriteReg(radio, CC112X_PA_CFG0, &pa_cfg0, 0x01);
-	//uint8_t pkt_len = SMARTRF_SETTING_PKT_LEN;				cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len, 0x01);
-	uint8_t pkt_len = radio->payloadSize;				cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len, 0x01);
-
-
-	/* Extended Configuration Registers */
-
-	uint8_t if_mix_cfg = SMARTRF_SETTING_IF_MIX_CFG;		cc1120SpiWriteReg(radio, CC112X_IF_MIX_CFG, &if_mix_cfg, 0x01);
-
-	//uint8_t freqoff_cfg = 0x22;		cc1120SpiWriteReg(CC112X_FREQOFF_CFG, &freqoff_cfg, 0x01);
-
-	uint8_t toc_cfg = SMARTRF_SETTING_TOC_CFG;				cc1120SpiWriteReg(radio, CC112X_TOC_CFG, &toc_cfg, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_MARC_SPARE, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_ECG_CFG, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_CFM_DATA_CFG, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_EXT_CTRL, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_RCCAL_FINE, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_RCCAL_COARSE, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_RCCAL_OFFSET, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_FREQOFF1, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_FREQOFF0, 0xxx, 0x01);
-
-	uint8_t freq2 = SMARTRF_SETTING_FREQ2;					cc1120SpiWriteReg(radio, CC112X_FREQ2, &freq2, 0x01);
-	uint8_t freq1 = SMARTRF_SETTING_FREQ1;					cc1120SpiWriteReg(radio, CC112X_FREQ1, &freq1, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_FREQ0, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_IF_ADC2, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_IF_ADC1, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_IF_ADC0, 0xxx, 0x01);
-
-	uint8_t fs_dig1 = SMARTRF_SETTING_FS_DIG1;				cc1120SpiWriteReg(radio, CC112X_FS_DIG1, &fs_dig1, 0x01);
-	uint8_t fs_dig0 = SMARTRF_SETTING_FS_DIG0;				cc1120SpiWriteReg(radio, CC112X_FS_DIG0, &fs_dig0, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_FS_CAL3, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_FS_CAL2, 0xxx, 0x01);
-
-	uint8_t fs_cal1 = SMARTRF_SETTING_FS_CAL1;				cc1120SpiWriteReg(radio, CC112X_FS_CAL1, &fs_cal1, 0x01);
-	uint8_t fs_cal0 = SMARTRF_SETTING_FS_CAL0;				cc1120SpiWriteReg(radio, CC112X_FS_CAL0, &fs_cal0, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_FS_CHP, 0xxx, 0x01);
-
-	uint8_t fs_divtwo = SMARTRF_SETTING_FS_DIVTWO;			cc1120SpiWriteReg(radio, CC112X_FS_DIVTWO, &fs_divtwo, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_FS_DSM1, 0xxx, 0x01);
-
-	uint8_t fs_dsm0 = SMARTRF_SETTING_FS_DSM0;				cc1120SpiWriteReg(radio, CC112X_FS_DSM0, &fs_dsm0, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_FS_DVC1, 0xxx, 0x01);
-
-	uint8_t fs_dvc0 = SMARTRF_SETTING_FS_DVC0;				cc1120SpiWriteReg(radio, CC112X_FS_DVC0, &fs_dvc0, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_FS_LBI, 0xxx, 0x01);
-
-	uint8_t fs_pfd = SMARTRF_SETTING_FS_PFD;					cc1120SpiWriteReg(radio, CC112X_FS_PFD, &fs_pfd, 0x01);
-	uint8_t fs_pre = SMARTRF_SETTING_FS_PRE;					cc1120SpiWriteReg(radio, CC112X_FS_PRE, &fs_pre, 0x01);
-	uint8_t fs_reg_div_cml = SMARTRF_SETTING_FS_REG_DIV_CML;	cc1120SpiWriteReg(radio, CC112X_FS_REG_DIV_CML, &fs_reg_div_cml, 0x01);
-	uint8_t fs_spare = SMARTRF_SETTING_FS_SPARE;				cc1120SpiWriteReg(radio, CC112X_FS_SPARE, &fs_spare, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_FS_VCO4, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_FS_VCO3, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_FS_VCO2, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_FS_VCO1, 0xxx, 0x01);
-
-	uint8_t fs_vco0 = SMARTRF_SETTING_FS_VCO0;				cc1120SpiWriteReg(radio, CC112X_FS_VCO0, &fs_vco0, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_GBIAS6, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_GBIAS5, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_GBIAS4, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_GBIAS3, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_GBIAS2, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_GBIAS1, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_GBIAS0, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_IFAMP, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_LNA, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_RXMIX, 0xxx, 0x01);
-
-	uint8_t xosc5 = SMARTRF_SETTING_XOSC5;					cc1120SpiWriteReg(radio, CC112X_XOSC5, &xosc5, 0x01);
-
-	//cc1120SpiWriteReg(CC112X_XOSC4, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_XOSC3, 0xxx, 0x01);
-	//cc1120SpiWriteReg(CC112X_XOSC2, 0xxx, 0x01);
-
-	uint8_t xosc1 = SMARTRF_SETTING_XOSC1;					cc1120SpiWriteReg(radio, CC112X_XOSC1, &xosc1, 0x01);
-
+	//cc1120_setFrequency(radio);
 
 		//calibrate the radio
 	if (!manualCalibration(radio))
@@ -565,16 +447,19 @@ void cc1120State(CC1120Ctrl_t* radio){
 
 bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t payloadLength){
 
-	//uint8_t dataLength;
+	uint8_t packetLength;
 
-	/*dataLength = payloadLength+1;
+	packetLength = payloadLength+1;
 
-	if (dataLength > MAX_PACKET_SIZE){
+	if (packetLength > MAX_PACKET_SIZE){
 		return false;
 	}
 
+	if (radio->payloadSize==0xFF){
+		cc1120SpiWriteTxFifo(radio, &payloadLength, 1);
+	}
 
-	cc1120SpiWriteTxFifo(radio, &payloadLength, 1);*/
+
 	cc1120SpiWriteTxFifo(radio, payload, payloadLength);
 
 	uint8_t status;
@@ -595,6 +480,7 @@ bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t paylo
 
 bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio){
 	uint8_t rxbytes = 0x00;
+	uint8_t rxBuffer[128] = {0};
 
 	// Read number of bytes in RX FIFO
 	cc1120SpiReadReg(radio, CC112X_NUM_RXBYTES, &rxbytes, 1);
@@ -613,23 +499,34 @@ bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio){
 			  // Flush RX FIFO
 			  trxSpiCmdStrobe(radio, CC112X_SFRX);
 			  return false;
-		  } else {
+		  }
 
-			  // Read n bytes from RX FIFO
+		  // Read n bytes from RX FIFO
+		  //cc1120SpiReadReg(raido, CC112X_RXFIRST)
+
+		  if (SMARTRF_SETTING_PKT_CFG0 == 0x20){
+			  cc1120SpiReadRxFifo(radio, rxBuffer, rxbytes);
+			  memcpy(radio->packetRX, rxBuffer, rxbytes-2);
+			  radio->RSSI = rxBuffer[rxbytes-2];
+			  radio->CRC_LQI = rxBuffer[rxbytes-1];
+		  }else{
 			  cc1120SpiReadRxFifo(radio, radio->packetRX, radio->payloadSize);
 			  cc1120SpiReadRxFifo(radio, &radio->RSSI, 1);
 			  cc1120SpiReadRxFifo(radio, &radio->CRC_LQI, 1);
-
-			  return true;
-			  // Check CRC ok (CRC_OK: bit7 in second status byte)
-			  // This assumes status bytes are appended in RX_FIFO
-			  // (PKT_CFG1.APPEND_STATUS = 1)
-			  // If CRC is disabled the CRC_OK field will read 1
-			  /*if(rxBuffer[rxbytes - 1] & 0x80) {
-				  //RingBuffer_Write(&radio->buf.RXbuf, rxBuffer, pktLen);
-				  return true;
-			  }*/
 		  }
+
+
+
+		  return true;
+		  // Check CRC ok (CRC_OK: bit7 in second status byte)
+		  // This assumes status bytes are appended in RX_FIFO
+		  // (PKT_CFG1.APPEND_STATUS = 1)
+		  // If CRC is disabled the CRC_OK field will read 1
+		  /*if(rxBuffer[rxbytes - 1] & 0x80) {
+			  //RingBuffer_Write(&radio->buf.RXbuf, rxBuffer, pktLen);
+			  return true;
+		  }*/
+
 	}
 
 	return false;
@@ -646,3 +543,138 @@ bool cc1120_startRX(CC1120Ctrl_t* radio){
 
 	return true;
 }
+
+
+
+//function courtesy of USC
+//run before self-cal!
+bool cc1120_setFrequency(CC1120Ctrl_t* radio)
+{
+
+    // these are only generated by SmartRF studio.
+
+
+	//uint8_t adc1 = 0xEE; cc1120SpiWriteReg(radio, CC112X_IF_ADC1,0xEE,1);
+	//uint8_t adc0 = 0x10; cc1120SpiWriteReg(radio, CC112X_IF_ADC0,0x10,1);
+
+	uint8_t dig1 = SMARTRF_SETTING_FS_DIG1; cc1120SpiWriteReg(radio, CC112X_FS_DIG1,&dig1,1);
+	uint8_t dig0 = SMARTRF_SETTING_FS_DIG0; cc1120SpiWriteReg(radio, CC112X_FS_DIG0,&dig0,1);
+
+	uint8_t cal1 = SMARTRF_SETTING_FS_CAL1; cc1120SpiWriteReg(radio, CC112X_FS_CAL1,&cal1,1);
+	uint8_t cal0 = SMARTRF_SETTING_FS_CAL0; cc1120SpiWriteReg(radio, CC112X_FS_CAL0,&cal0,1);
+
+	uint8_t divtwo = SMARTRF_SETTING_FS_DIVTWO; cc1120SpiWriteReg(radio, CC112X_FS_DIVTWO,&divtwo,1);
+
+	uint8_t dsm0 = SMARTRF_SETTING_FS_DSM0; cc1120SpiWriteReg(radio, CC112X_FS_DSM0,&dsm0,1);
+
+	//uint8_t dvc1 = 0xFF; cc1120SpiWriteReg(radio, CC112X_FS_DVC1,&dvc1,1);
+	uint8_t dvc0 = SMARTRF_SETTING_FS_DVC0; cc1120SpiWriteReg(radio, CC112X_FS_DVC0,&dvc0,1);
+
+	uint8_t pfd = SMARTRF_SETTING_FS_PFD; cc1120SpiWriteReg(radio, CC112X_FS_PFD,&pfd,1);
+	uint8_t pre = SMARTRF_SETTING_FS_PRE; cc1120SpiWriteReg(radio, CC112X_FS_PRE,&pre,1);
+
+	uint8_t reg_div_cml = SMARTRF_SETTING_FS_REG_DIV_CML; cc1120SpiWriteReg(radio, CC112X_FS_REG_DIV_CML,&reg_div_cml,1);
+
+	uint8_t spare = SMARTRF_SETTING_FS_SPARE; cc1120SpiWriteReg(radio, CC112X_FS_SPARE,&spare,1);
+
+	uint8_t vco0 = SMARTRF_SETTING_FS_VCO0; cc1120SpiWriteReg(radio, CC112X_FS_VCO0,&vco0,1);
+
+	uint8_t xosc5 = SMARTRF_SETTING_XOSC5; cc1120SpiWriteReg(radio, CC112X_XOSC5,&xosc5,1);
+	uint8_t xosc1 = SMARTRF_SETTING_XOSC1; cc1120SpiWriteReg(radio, CC112X_XOSC1,&xosc1,1);
+
+	//uint8_t ifamp = 0x03; cc1120SpiWriteReg(radio, CC112X_IFAMP,&ifamp,1);
+
+	//cc1120 errata eliminates need for this operation
+
+    /*if(radio->band == BAND_820_960MHz)
+    {
+    	cc1120SpiWriteReg(radio, CC112X_FS_DIG0,0x55,1);
+    	cc1120SpiWriteReg(radio, CC112X_FS_DVC0,0x17,1);
+    	cc1120SpiWriteReg(radio, CC112X_IFAMP,0x09,1);
+    }
+    else if(radio->band == BAND_410_480MHz || radio->band == BAND_164_192MHz)
+    {
+    	cc1120SpiWriteReg(radio, CC112X_FS_DIG0,0x5F,1);
+    	cc1120SpiWriteReg(radio, CC112X_FS_DVC0,0x17,1);
+    	cc1120SpiWriteReg(radio, CC112X_IFAMP,0x0D,1);
+    }
+    else
+    {
+    	//not public info for other bands
+    	cc1120SpiWriteReg(radio, CC112X_FS_DIG0,0x50,1);
+    	cc1120SpiWriteReg(radio, CC112X_FS_DVC0,0x0F,1);
+    	cc1120SpiWriteReg(radio, CC112X_IFAMP,0x0D,1);
+    }*/
+
+    // convert band to LO Divider value.
+    // Most of the bands just multiply the register value by 2, but nooo, not BAND_136_160MHz.
+    uint8_t loDividerValue;
+    if(radio->band == BAND_136_160MHz)
+    {
+        loDividerValue = 24;
+    }
+    else
+    {
+        loDividerValue = (radio->band) * 2;
+    }
+
+    // program band (also enable FS out of lock detector, which is useful for testing)
+    uint8_t fs_cfg = (1 << FS_CFG_FS_LOCK_EN) | ((radio->band) << FS_CFG_FSD_BANDSELECT);
+    cc1120SpiWriteReg(radio, CC112X_FS_CFG, &fs_cfg, 1);
+
+    // equation derived from user guide section 9.12
+    float exactFreqValue = (twoToThe16 * radio->frequencyHz * (float)loDividerValue) / CC1120_OSC_FREQ;
+
+    if (maxValue24Bits < exactFreqValue){
+    	exactFreqValue = maxValue24Bits;
+    }
+
+    uint32_t actualFreqValue = (uint32_t)(exactFreqValue);
+
+    // program frequency registers
+
+    uint8_t freq2 = (uint8_t)((actualFreqValue >> 16) & 0xFF);
+    uint8_t freq1 = (uint8_t)((actualFreqValue >> 8) & 0xFF);
+    uint8_t freq0 = (uint8_t)((actualFreqValue & 0xFF));
+
+    cc1120SpiWriteReg(radio, CC112X_FREQ2, &freq2, 1);
+    cc1120SpiWriteReg(radio, CC112X_FREQ1, &freq1, 1);
+    cc1120SpiWriteReg(radio, CC112X_FREQ0, &freq0, 1);
+
+/*#if CC1200_DEBUG
+    debugStream->printf("Setting radio frequency, requested %.00f Hz, setting FREQ = 0x%" PRIx32 "\n",
+                        frequencyHz, actualFreqValue);
+
+    // sanity check: calculate actual frequency
+    float actualFrequency = (static_cast<float>(actualFreqValue) * CC1200_OSC_FREQ) / (twoToThe16 * static_cast<float>(loDividerValue));
+
+    debugStream->printf("This yields an actual frequency of %.00f Hz\n", actualFrequency);
+#endif*/
+    return true;
+}
+
+bool cc1120_startContinuousTX(CC1120Ctrl_t *radio){
+	uint8_t preamble_cfg1 = 0x00; 	cc1120SpiWriteReg(radio, CC112X_PREAMBLE_CFG1, &preamble_cfg1, 1);
+	uint8_t mdmcfg1 = 0x06;			cc1120SpiWriteReg(radio, CC112X_MDMCFG1, &mdmcfg1, 1);
+	uint8_t pkt_cfg2 = 0x05;		cc1120SpiWriteReg(radio, CC112X_PKT_CFG2, &pkt_cfg2, 1);
+	uint8_t pkt_cfg1 = 0x00;		cc1120SpiWriteReg(radio, CC112X_PKT_CFG1, &pkt_cfg1, 1);
+	uint8_t pkt_len = 0x03;			cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len, 1);
+	uint8_t cfm_data_cfg = 0x01;	cc1120SpiWriteReg(radio, CC112X_CFM_DATA_CFG, &cfm_data_cfg, 1);
+
+	trxSpiCmdStrobe(radio, CC112X_STX);
+
+	return true;
+}
+
+bool cc1120_stopContinuousTX(CC1120Ctrl_t *radio){
+	uint8_t preamble_cfg1_def = 0x14;	cc1120SpiWriteReg(radio, CC112X_PREAMBLE_CFG1, &preamble_cfg1_def, 1);
+	uint8_t mdmcfg1_def = 0x46;			cc1120SpiWriteReg(radio, CC112X_MDMCFG1, &mdmcfg1_def, 1);
+	uint8_t pkt_cfg2_def = 0x05;		cc1120SpiWriteReg(radio, CC112X_PKT_CFG2, &pkt_cfg2_def, 1);
+	uint8_t pkt_cfg1_def = 0x00;		cc1120SpiWriteReg(radio, CC112X_PKT_CFG1, &pkt_cfg1_def, 1);
+	uint8_t pkt_len_def = 0xFF;			cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len_def, 1);
+	uint8_t cfm_data_cfg_def = 0x00;	cc1120SpiWriteReg(radio, CC112X_CFM_DATA_CFG, &cfm_data_cfg_def, 1);
+
+	trxSpiCmdStrobe(radio, CC112X_SIDLE);
+	return true;
+}
+

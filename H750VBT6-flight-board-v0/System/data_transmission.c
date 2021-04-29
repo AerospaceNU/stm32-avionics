@@ -12,6 +12,7 @@ void transmitData(SensorData_t* sensorData, FilterData_t* filterData, uint8_t st
 	transmitPacket.gps_lat = sensorData->gps_lat;
 	transmitPacket.gps_long = sensorData->gps_long;
 	transmitPacket.gps_alt = sensorData->gps_alt;
+	transmitPacket.baro_pres = (sensorData->baro1_pres + sensorData->baro1_pres) / 2;
 	transmitPacket.battery_voltage = sensorData->battery_voltage;
 	transmitPacket.pyro_continuity = 0;
 	for (int i = 0; i < sizeof(sensorData->pyro_continuity); i++) {

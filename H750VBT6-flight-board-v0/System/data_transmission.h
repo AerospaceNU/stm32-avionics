@@ -14,6 +14,7 @@ extern "C"{
 
 typedef struct __attribute__((__packed__)) {
 	float	 gps_lat,			gps_long,			gps_alt;
+	float 	 baro_pres;
 	double 	 battery_voltage;
 	uint8_t  pyro_continuity;
 	uint8_t  state;
