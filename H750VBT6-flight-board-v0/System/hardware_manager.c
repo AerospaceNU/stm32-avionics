@@ -163,7 +163,7 @@ void HM_HardwareInit() {
 	cc1120.GP3_pin = RADIO_GP3_PIN;
 	cc1120.payloadSize = payloadSize;
 	cc1120.initialized = false;
-	cc1120_init(&cc1120);
+	cc1120Status = cc1120_init(&cc1120);
 
 	/* LED 1 */
 	HAL_GPIO_WritePin(LED1_PORT, LED1_PIN, GPIO_PIN_RESET);
@@ -379,6 +379,7 @@ void HM_ReadSensorData() {
 	// GPS data
 	// TODO: Poll GPS status to determine if data is good
 	if (bGpsSampling) {
+		gps_new_data(&gps);
 		sensorData.gps_lat = gps.latitude;
 		sensorData.gps_long = gps.longitude;
 		sensorData.gps_alt = gps.altitude;
@@ -418,8 +419,11 @@ void HM_ReadSensorData() {
 		}
 	}
 
+
+
 	// Timestamp data
-	// TODO: Implement timer data
+	// TODO: Make sensor data timestamp get time from PPS-updated timer
+	sensorData.timestamp_s = HM_Millis();
 }
 
 SensorData_t* HM_GetSensorData() {
