@@ -16,14 +16,6 @@ extern "C"{
 #define FLASH_TIMEOUT_MS 		500
 #define PYRO_CONTINUITY_THRESHOLD 3
 
-/* Booleans used to return the status of devices (inits that do not return a boolean are assumed to be true) */
-static bool cc1120Status;
-static bool IMU1Status = true;
-static bool IMU2Status = true;
-static bool barometer1Status = true;
-static bool barometer2Status = true;
-static bool high_G_AccelerometerStatus = true;
-
 typedef struct {
 	uint32_t timestamp_s;
 	uint32_t timestamp_us;
@@ -96,6 +88,14 @@ typedef struct {
 	double battery_voltage;
 	bool pyro_continuity[6];
 } SensorData_t;
+
+static bool cc1120Status;
+static bool IMU1Status = true;
+static bool IMU2Status = true;
+static bool barometer1Status = true;
+static bool barometer2Status = true;
+static bool high_G_AccelerometerStatus = true;
+static bool *hardwareStatus[] = {&cc1120Status, &IMU1Status, &IMU2Status, &barometer1Status, &barometer2Status, &high_G_AccelerometerStatus};
 
 void HM_HardwareInit();
 

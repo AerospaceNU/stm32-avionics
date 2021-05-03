@@ -163,7 +163,7 @@ void HM_HardwareInit() {
 	cc1120.GP3_pin = RADIO_GP3_PIN;
 	cc1120.payloadSize = payloadSize;
 	cc1120.initialized = false;
-	cc1120_init(&cc1120);
+	cc1120Status = cc1120_init(&cc1120);
 
 	/* LED 1 */
 	HAL_GPIO_WritePin(LED1_PORT, LED1_PIN, GPIO_PIN_RESET);

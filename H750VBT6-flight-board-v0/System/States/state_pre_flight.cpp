@@ -14,13 +14,15 @@ void PreFlightState::init() {
 }
 
 EndCondition_t PreFlightState::run() {
+
 	//Play through buzzerReport once and then run buzzerHeartbeat repeatedly
-	if (reportCount < 300){
+	if (reportCount < 350){
 		buzzerReport();
 		reportCount++;
 	} else{
 		buzzerHeartbeat();
 	}
+
 	// Collect, and filter data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
