@@ -89,6 +89,7 @@ typedef struct {
 	bool pyro_continuity[6];
 } SensorData_t;
 
+/* Boolean values for peripherals. Currently only the radio returns its only boolean, so the others are assumed to be true. */
 static bool cc1120Status;
 static bool IMU1Status = true;
 static bool IMU2Status = true;
