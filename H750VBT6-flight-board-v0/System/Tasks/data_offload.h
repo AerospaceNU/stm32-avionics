@@ -8,6 +8,8 @@ extern "C"{
 
 	bool dataOffload();
 
+	void dataOffloadSetFlightID();
+
 #ifdef __cplusplus
 }
 #endif
