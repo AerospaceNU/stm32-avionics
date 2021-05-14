@@ -63,6 +63,8 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 	cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len, 0x01);
 	cc1120SpiWriteReg(radio, CC112X_PKT_CFG0, &pkt_cfg0, 0x01);
 
+	cc1120SpiWriteReg(radio, CC112X_FIFO_CFG, &radio->payloadSize, 0x01);
+
 	//cc1120_setFrequency(radio);
 
 		//calibrate the radio
