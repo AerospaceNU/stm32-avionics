@@ -49,8 +49,8 @@ typedef struct
 #define SMARTRF_SETTING_AGC_CFG0         0xCF //Automatic Gain Control Configuration Reg. 0
 #define SMARTRF_SETTING_FIFO_CFG         0x00 //FIFO Configuration
 #define SMARTRF_SETTING_FS_CFG           0x14 //Frequency Synthesizer Configuration
-#define SMARTRF_SETTING_PKT_CFG0         0x20 //Packet Configuration Reg. 0
-#define SMARTRF_SETTING_PKT_LEN          0xFF //Packet Length Configuration
+#define SMARTRF_SETTING_PKT_CFG0         0x00 //Packet Configuration Reg. 0
+#define SMARTRF_SETTING_PKT_LEN          0x26 //Packet Length Configuration
 #define SMARTRF_SETTING_IF_MIX_CFG       0x00 //IF Mix Configuration
 #define SMARTRF_SETTING_FREQOFF_CFG      0x22 //Frequency Offset Correction Configuration
 #define SMARTRF_SETTING_FREQ2            0x6C //Frequency Configuration [23:16]
@@ -87,8 +87,8 @@ static const registerSetting_t preferredSettings[]=
   {CC112X_AGC_CFG0,          0xCF},
   {CC112X_FIFO_CFG,          0x00},
   {CC112X_FS_CFG,            0x14},
-  {CC112X_PKT_CFG0,          0x20},
-  {CC112X_PKT_LEN,           0xFF},
+  {CC112X_PKT_CFG0,          0x00},
+  {CC112X_PKT_LEN,           0x26},
   {CC112X_IF_MIX_CFG,        0x00},
   {CC112X_FREQOFF_CFG,       0x22},
   {CC112X_FREQ2,             0x6C},
