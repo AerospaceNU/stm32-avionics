@@ -4,7 +4,6 @@
 #include "data_log.h"
 #include  "hardware_manager.h"
 
-static uint32_t last_time = 0;
 static bool readComplete_ = false;
 static uint32_t flightID = 0;
 uint8_t flashBuf_[2049];
@@ -24,6 +23,6 @@ bool dataOffload(){
 		return readComplete_;
 }
 
-void dataOffloadSetFLightID(){
-	flightID = data_log_get_last_flight_num();
+void userSetFlightID(int userFlightID){
+	flightID = userFlightID;
 }

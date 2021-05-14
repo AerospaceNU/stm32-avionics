@@ -15,7 +15,8 @@ typedef enum {
 	MotorBurnout,
 	Touchdown,
 	UsbConnect,
-	UsbDisconnect
+	UsbDisconnect,
+	CliCommandComplete
 } EndCondition_t;
 
 class State {

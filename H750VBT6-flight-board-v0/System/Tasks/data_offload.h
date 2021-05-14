@@ -8,7 +8,7 @@ extern "C"{
 
 	bool dataOffload();
 
-	void dataOffloadSetFlightID();
+	void userSetFlightID(int userFlightID);
 
 #ifdef __cplusplus
 }
