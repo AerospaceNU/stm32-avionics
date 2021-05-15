@@ -5,7 +5,6 @@
 extern "C"{
 #endif
 
-	static int reportCount = 0;
 	void buzzerReport();
 
 #ifdef __cplusplus

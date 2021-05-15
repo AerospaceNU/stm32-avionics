@@ -6,7 +6,6 @@
 #include "data_transmission.h"
 #include "filters.h"
 #include "hardware_manager.h"
-#include "buzzer_heartbeat.h"
 #include "buzzer_report_scheme.h"
 
 void PreFlightState::init() {
@@ -15,13 +14,8 @@ void PreFlightState::init() {
 
 EndCondition_t PreFlightState::run() {
 
-	//Play through buzzerReport once and then run buzzerHeartbeat repeatedly
-	if (reportCount < 350){
-		buzzerReport();
-		reportCount++;
-	} else{
-		buzzerHeartbeat();
-	}
+	// Produce a tone for each functioning peripheral
+	buzzerReport();
 
 	// Collect, and filter data
 	HM_ReadSensorData();

@@ -89,14 +89,15 @@ typedef struct {
 	bool pyro_continuity[6];
 } SensorData_t;
 
-/* Boolean values for peripherals. Currently only the radio returns its only boolean, so the others are assumed to be true. */
-static bool cc1120Status;
-static bool IMU1Status = true;
-static bool IMU2Status = true;
-static bool barometer1Status = true;
-static bool barometer2Status = true;
-static bool high_G_AccelerometerStatus = true;
-static bool *hardwareStatus[] = {&cc1120Status, &IMU1Status, &IMU2Status, &barometer1Status, &barometer2Status, &high_G_AccelerometerStatus};
+typedef enum hardware_t{
+	CC1120 = 0,
+	IMU1,
+	IMU2,
+	barometer1,
+	barometer2,
+	high_G_Accelerometer,
+	NUM_HARDWARE
+} hardware_t;
 
 void HM_HardwareInit();
 
