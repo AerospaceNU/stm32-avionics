@@ -6,8 +6,9 @@ static uint16_t promVals[6];
  * Initializes MS5607 temperature and pressure sensor
  * with specific MS5607Ctrl_t configuration
  */
-void MS5607_init(MS5607Ctrl_t *altCtrl) {
+bool MS5607_init(MS5607Ctrl_t *altCtrl) {
 
+	bool success = true;
 	uint8_t init = 0x1E; // Initialization hex command for MS5607
 
 	// Pull CS Low
@@ -30,7 +31,11 @@ void MS5607_init(MS5607Ctrl_t *altCtrl) {
     	HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, txBuffer, rxBuffer, 3, 100000);
 	    HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
 	    promVals[i] = rxBuffer[1] << 8 | rxBuffer[2];
+	    if (promVals[i] == 0xFF || promVals[i] == 0x00) {
+	    	success = false;
+	    }
     }
+	return success;
 }
 
 /**

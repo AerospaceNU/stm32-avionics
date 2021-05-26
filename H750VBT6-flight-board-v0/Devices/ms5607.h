@@ -6,6 +6,7 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
 #include "spi.h"
 #include "gpio.h"
 
@@ -28,7 +29,7 @@ typedef struct MS5607Ctrl_s{
 	AltData_t altData;
 } MS5607Ctrl_t;
 
-void MS5607_init(MS5607Ctrl_t *altCtrl);
+bool MS5607_init(MS5607Ctrl_t *altCtrl);
 void MS5607_get_data(MS5607Ctrl_t *altCtrl);
 
 #ifdef __cplusplus
