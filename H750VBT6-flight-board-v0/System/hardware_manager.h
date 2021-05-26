@@ -63,10 +63,8 @@ typedef struct {
 	double high_g_accel_z;
 	double baro1_pres;
 	double baro1_temp;
-	double baro1_alt;
 	double baro2_pres;
 	double baro2_temp;
-	double baro2_alt;
 	float gps_lat;
 	float gps_long;
 	float gps_alt;
