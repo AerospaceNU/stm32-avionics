@@ -25,8 +25,8 @@ typedef struct __attribute__((__packed__)) LogData {
 	int16_t  imu2_gyro_x_raw, 	imu2_gyro_y_raw, 	imu2_gyro_z_raw;
 	int16_t  imu2_mag_x_raw,	imu2_mag_y_raw,		imu2_mag_z_raw;
 	int16_t  high_g_accel_x_raw,high_g_accel_y_raw,	high_g_accel_z_raw;
-	double   baro1_temp,		baro1_pres,			baro1_alt;
-	double   baro2_temp,		baro2_pres,			baro2_alt;
+	double   baro1_temp,		baro1_pres;
+	double   baro2_temp,		baro2_pres;
 	float	 gps_lat,			gps_long,			gps_alt;
 	double   battery_voltage;
 	uint8_t  pyro_continuity;
@@ -142,10 +142,8 @@ void data_log_write(SensorData_t* sensorData, FilterData_t* filterData, uint8_t 
 		logPacket.high_g_accel_z_raw = sensorData->high_g_accel_z_raw;
 		logPacket.baro1_pres = sensorData->baro1_pres;
 		logPacket.baro1_temp = sensorData->baro1_temp;
-		logPacket.baro1_alt = sensorData->baro1_alt;
 		logPacket.baro2_pres = sensorData->baro2_pres;
 		logPacket.baro2_temp = sensorData->baro2_temp;
-		logPacket.baro2_alt = sensorData->baro2_alt;
 		logPacket.gps_lat = sensorData->gps_lat;
 		logPacket.gps_long = sensorData->gps_long;
 		logPacket.gps_alt = sensorData->gps_alt;

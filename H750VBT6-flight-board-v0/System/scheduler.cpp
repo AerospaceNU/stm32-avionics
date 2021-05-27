@@ -20,21 +20,22 @@
 void Scheduler::run(void) {
 
     /* Create all necessary states initially and store in list */
-	CliCalibrateState cliCalibrate = CliCalibrateState(StateId::CliCalibrate, 20);
-	CliChooseFlightState cliChooseFlight = CliChooseFlightState(StateId::CliChooseFlight, 20);
-	CliConfigState cliConfig = CliConfigState(StateId::CliConfig, 20);
-	CliEraseFlashState cliEraseFlash = CliEraseFlashState(StateId::CliEraseFlash, 20);
-	CliHelpState cliHelp = CliHelpState(StateId::CliHelp, 20);
-	CliMainState cliMain = CliMainState(StateId::CliMain, 20);
-	CliOffloadState cliOffload = CliOffloadState(StateId::CliOffload, 20);
-	CoastAscentState coastAscent = CoastAscentState(StateId::CoastAscent, 20);
-	DrogueDescentNState drogueDescentN = DrogueDescentNState(StateId::DrogueDescentN, 20);
-	InitializeState initialize = InitializeState(StateId::Initialize, 20);
-	MainDescentState mainDescent = MainDescentState(StateId::MainDescent, 20);
-	PostFlightState postFlight = PostFlightState(StateId::PostFlight, 20);
-	PoweredAscentState poweredAscent = PoweredAscentState(StateId::PoweredAscent, 20);
-	PreFlightState preFlight = PreFlightState(StateId::PreFlight, 20);
-	ShutdownState shutdown = ShutdownState(StateId::Shutdown, 20);
+	uint32_t defaultPeriod = 15;
+	CliCalibrateState cliCalibrate = CliCalibrateState(StateId::CliCalibrate, defaultPeriod);
+	CliChooseFlightState cliChooseFlight = CliChooseFlightState(StateId::CliChooseFlight, defaultPeriod);
+	CliConfigState cliConfig = CliConfigState(StateId::CliConfig, defaultPeriod);
+	CliEraseFlashState cliEraseFlash = CliEraseFlashState(StateId::CliEraseFlash, defaultPeriod);
+	CliHelpState cliHelp = CliHelpState(StateId::CliHelp, defaultPeriod);
+	CliMainState cliMain = CliMainState(StateId::CliMain, defaultPeriod);
+	CliOffloadState cliOffload = CliOffloadState(StateId::CliOffload, defaultPeriod);
+	CoastAscentState coastAscent = CoastAscentState(StateId::CoastAscent, defaultPeriod);
+	DrogueDescentNState drogueDescentN = DrogueDescentNState(StateId::DrogueDescentN, defaultPeriod);
+	InitializeState initialize = InitializeState(StateId::Initialize, defaultPeriod);
+	MainDescentState mainDescent = MainDescentState(StateId::MainDescent, defaultPeriod);
+	PostFlightState postFlight = PostFlightState(StateId::PostFlight, defaultPeriod);
+	PoweredAscentState poweredAscent = PoweredAscentState(StateId::PoweredAscent, defaultPeriod);
+	PreFlightState preFlight = PreFlightState(StateId::PreFlight, defaultPeriod);
+	ShutdownState shutdown = ShutdownState(StateId::Shutdown, defaultPeriod);
 
 	State* states[] = {&cliCalibrate, &cliChooseFlight, &cliConfig, &cliEraseFlash, &cliHelp,
 			&cliMain, &cliOffload, &coastAscent, &drogueDescentN, &initialize, &mainDescent,

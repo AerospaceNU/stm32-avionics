@@ -6,8 +6,9 @@ static uint16_t promVals[6];
  * Initializes MS5607 temperature and pressure sensor
  * with specific MS5607Ctrl_t configuration
  */
-void MS5607_init(MS5607Ctrl_t *altCtrl) {
+bool MS5607_init(MS5607Ctrl_t *altCtrl) {
 
+	bool success = true;
 	uint8_t init = 0x1E; // Initialization hex command for MS5607
 
 	// Pull CS Low
@@ -30,7 +31,11 @@ void MS5607_init(MS5607Ctrl_t *altCtrl) {
     	HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, txBuffer, rxBuffer, 3, 100000);
 	    HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
 	    promVals[i] = rxBuffer[1] << 8 | rxBuffer[2];
+	    if (promVals[i] == 0xFF || promVals[i] == 0x00) {
+	    	success = false;
+	    }
     }
+	return success;
 }
 
 /**
@@ -44,28 +49,28 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl) {
 	uint8_t presStore[4];
 	uint8_t tempStore[4];
 
-	// The commands to 
+	// The commands to request D1 and D2 conversions
 	uint8_t convertD1_512 = 0x42;
 	uint8_t convertD2_512 = 0x52;
 
 	uint8_t read = 0x00;
 
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(altCtrl->spiconfig.hspi, &convertD1_512, 1, 1000000);
-	HAL_Delay(9);
+	HAL_SPI_Transmit(altCtrl->spiconfig.hspi, &convertD1_512, 1, 1000);
+	HAL_Delay(OSR_512);
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
 
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_RESET);
-	HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, &read, presStore, 4, 1000000);
+	HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, &read, presStore, 4, 1000);
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
 
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(altCtrl->spiconfig.hspi, &convertD2_512, 1, 1000000);
-	HAL_Delay(9);
+	HAL_SPI_Transmit(altCtrl->spiconfig.hspi, &convertD2_512, 1, 1000);
+	HAL_Delay(OSR_512);
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
 
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_RESET);
-	HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, &read, tempStore, 4, 1000000);
+	HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, &read, tempStore, 4, 1000);
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
 
 	uint32_t D1 = (presStore[1] << 16 | presStore[2] << 8 | presStore[3]);
@@ -83,4 +88,3 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl) {
 	volatile double Pfinal = P / 101325.0;
 	altCtrl->altData.baro = Pfinal;
 }
-

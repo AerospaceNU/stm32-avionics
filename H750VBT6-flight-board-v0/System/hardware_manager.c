@@ -365,7 +365,6 @@ void HM_ReadSensorData() {
 		MS5607_get_data(&ms5607_1);
 		sensorData.baro1_pres = ms5607_1.altData.baro;
 		sensorData.baro1_temp = ms5607_1.altData.temp;
-		sensorData.baro1_alt = ms5607_1.altData.alt;
 	}
 
 	// Baro 2 data
@@ -373,7 +372,6 @@ void HM_ReadSensorData() {
 		MS5607_get_data(&ms5607_2);
 		sensorData.baro2_pres = ms5607_2.altData.baro;
 		sensorData.baro2_temp = ms5607_2.altData.temp;
-		sensorData.baro2_alt = ms5607_2.altData.alt;
 	}
 
 	// GPS data
