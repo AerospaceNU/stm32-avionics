@@ -290,6 +290,16 @@ bool HM_UsbIsConnected() {
 	return hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED;
 }
 
+bool HM_UsbSend(const uint8_t* data, uint32_t numBytes) {
+	// TODO: Implement HM_UsbSend
+	return false;
+}
+
+bool HM_BluetoothSend(const uint8_t* data, uint32_t numBytes) {
+	// TODO: Implement HM_BluetoothSend
+	return false;
+}
+
 void HM_SetImu1Sampling(bool enable) {
 	bImu1Sampling = enable;
 }

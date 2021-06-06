@@ -128,6 +128,10 @@ bool HM_RadioSend(const uint8_t *data, uint32_t numBytes);
 
 /* USB functions */
 bool HM_UsbIsConnected();
+bool HM_UsbSend(const uint8_t* data, uint32_t numBytes);
+
+/* Bluetooth functions */
+bool HM_BluetoothSend(const uint8_t* data, uint32_t numBytes);
 
 /* Sensor functions */
 
