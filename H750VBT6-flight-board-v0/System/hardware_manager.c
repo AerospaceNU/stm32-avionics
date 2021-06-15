@@ -175,9 +175,9 @@ void HM_HardwareInit() {
 	hardwareStatus[CC1120] = cc1120_init(&cc1120);
 	hardwareStatus[IMU1] = true;
 	hardwareStatus[IMU2] = true;
-	hardwareStatus[barometer1] = true;
-	hardwareStatus[barometer2] = true;
-	hardwareStatus[high_G_Accelerometer] = true;
+	hardwareStatus[BAROMETER1] = true;
+	hardwareStatus[BAROMETER2] = true;
+	hardwareStatus[HIGH_G_ACCELEROMETER] = true;
 }
 
 uint32_t HM_Millis() {

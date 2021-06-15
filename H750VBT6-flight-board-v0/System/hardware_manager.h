@@ -93,9 +93,9 @@ typedef enum hardware_t{
 	CC1120 = 0,
 	IMU1,
 	IMU2,
-	barometer1,
-	barometer2,
-	high_G_Accelerometer,
+	BAROMETER1,
+	BAROMETER2,
+	HIGH_G_ACCELEROMETER,
 	NUM_HARDWARE
 } hardware_t;
 

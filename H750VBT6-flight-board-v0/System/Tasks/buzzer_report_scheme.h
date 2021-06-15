@@ -5,7 +5,7 @@
 extern "C"{
 #endif
 
-	void buzzerReport();
+void buzzerReport();
 
 #ifdef __cplusplus
 }

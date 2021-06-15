@@ -2,7 +2,7 @@
 #include "buzzer_report_scheme.h"
 #include "hardware_manager.h"
 
-static uint32_t last_time = HM_Millis();
+static uint32_t last_time = 0;
 static uint32_t curState = 0;
 extern bool hardwareStatus[NUM_HARDWARE];
 
@@ -14,16 +14,13 @@ void buzzerReport(){
             if (curState >= NUM_HARDWARE){
             	curState = 0;
             }
+            HM_BuzzerSetFrequency(500 + curState*50);
 
-            if (curState < NUM_HARDWARE){
-            	HM_BuzzerSetFrequency(500 + curState*50);
-
-            	if (hardwareStatus[curState] == true){
-            		HM_BuzzerStart();
-            	} else {
-            		HM_BuzzerStop();
-            	}
-            	curState++;
+            if (hardwareStatus[curState] == true){
+            	HM_BuzzerStart();
+            } else {
+            	HM_BuzzerStop();
             }
+            curState++;
         }
 }
