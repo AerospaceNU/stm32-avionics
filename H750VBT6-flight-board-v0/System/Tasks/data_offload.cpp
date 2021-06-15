@@ -25,4 +25,5 @@ bool dataOffload(){
 
 void userSetFlightID(int userFlightID){
 	flightID = userFlightID;
+	readComplete_ = false;
 }
