@@ -18,6 +18,7 @@
 #include "dma.h"
 
 #include "data_transmission.h"
+#include <stdbool.h>
 
 /* IMUs */
 static LSM9DS1Ctrl_t lsm9ds1_1;
@@ -69,6 +70,9 @@ static bool bBaro2Sampling = true;
 static bool bGpsSampling = true;
 static bool bBatteryVoltageSampling = true;
 static bool bPyroContinuitySampling = true;
+
+/* Array of hardware status states */
+bool hardwareStatus[NUM_HARDWARE];
 
 void HM_HardwareInit() {
 
@@ -163,10 +167,17 @@ void HM_HardwareInit() {
 	cc1120.GP3_pin = RADIO_GP3_PIN;
 	cc1120.payloadSize = payloadSize;
 	cc1120.initialized = false;
-	cc1120_init(&cc1120);
 
 	/* LED 1 */
 	HAL_GPIO_WritePin(LED1_PORT, LED1_PIN, GPIO_PIN_RESET);
+
+	/* Checking if inits are successful (inits that don't return a boolean are assumed true) */
+	hardwareStatus[CC1120] = cc1120_init(&cc1120);
+	hardwareStatus[IMU1] = true;
+	hardwareStatus[IMU2] = true;
+	hardwareStatus[BAROMETER1] = true;
+	hardwareStatus[BAROMETER2] = true;
+	hardwareStatus[HIGH_G_ACCELEROMETER] = true;
 }
 
 uint32_t HM_Millis() {

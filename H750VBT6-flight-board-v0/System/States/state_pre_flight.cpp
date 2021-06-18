@@ -1,5 +1,4 @@
 
-#include <buzzer_heartbeat.h>
 #include "state_pre_flight.h"
 
 #include <string.h>
@@ -7,13 +6,17 @@
 #include "data_transmission.h"
 #include "filters.h"
 #include "hardware_manager.h"
+#include "buzzer_report_scheme.h"
 
 void PreFlightState::init() {
 	data_log_assign_flight();
 }
 
 EndCondition_t PreFlightState::run() {
-	buzzerHeartbeat();
+
+	// Produce a tone for each functioning peripheral
+	buzzerReport();
+
 	// Collect, and filter data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();

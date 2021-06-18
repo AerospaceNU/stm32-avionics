@@ -87,6 +87,16 @@ typedef struct {
 	bool pyro_continuity[6];
 } SensorData_t;
 
+typedef enum hardware_t{
+	CC1120 = 0,
+	IMU1,
+	IMU2,
+	BAROMETER1,
+	BAROMETER2,
+	HIGH_G_ACCELEROMETER,
+	NUM_HARDWARE
+} hardware_t;
+
 void HM_HardwareInit();
 
 /* Microcontroller timer functions */
