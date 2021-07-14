@@ -29,9 +29,10 @@ class PreFlightState : public State {
 		FilterData_t filterDataBuffer[kBufferSize];
 		int bufferCounter = 0;
 
-		// TODO: What are vel and accel thresholds?
-		static constexpr double kLaunchAccelThreshold = 0;
-		static constexpr double kLaunchVelThreshold = 0;
+		static constexpr double kLaunchAccelThreshold = 20.0; // m/s**2
+		static constexpr double kLaunchPosZDiffThreshold = 1.0; // m
+
+		double minPosZ = 1000000;
 
 };
 

@@ -23,9 +23,6 @@ typedef struct {
 	double acc_x;
 	double acc_y;
 	double acc_z;
-	double jerk_x;
-	double jerk_y;
-	double jerk_z;
 	double qx;
 	double qy;
 	double qz;
@@ -35,12 +32,18 @@ typedef struct {
 /**
  * @brief Applies filters based on current sensor data
  */
-void applyFilterData(SensorData_t* curSensorVals);
+void filterApplyData(SensorData_t* curSensorVals);
+
+/**
+ * @brief Sets reference pressure used for converting pressure to altitude
+ * @param pres: Must be same unit as sensor data pressure
+ */
+void filterSetPressureRef(double pres);
 
 /**
  * @brief Returns most recent filtered data
  */
-FilterData_t* getFilteredData();
+FilterData_t* filterGetData();
 
 #ifdef __cplusplus
 }

@@ -121,7 +121,7 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 	case StateId::CliMain:
 		switch(endCondition) {
 		case EndCondition_t::UsbDisconnect:
-			return StateId::CoastAscent; // TEMP: Will be PreFlight once launch detect works
+			return StateId::PreFlight;
 		default:
 			break;
 		}

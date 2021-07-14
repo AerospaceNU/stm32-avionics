@@ -9,19 +9,29 @@
 
 void MainDescentState::init() {
 	// TODO: Deploy main parachute
+	touchdownResetTime = HM_Millis();
 }
 
 EndCondition_t MainDescentState::run() {
-	// Collect, filter, log, and transmit all sensor data
+	// Collect, filter, and log all sensor data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
-	applyFilterData(sensorData);
-	FilterData_t* filterData = getFilteredData();
+	filterApplyData(sensorData);
+	FilterData_t* filterData = filterGetData();
 	data_log_write(sensorData, filterData, this->getID());
-	transmitData(sensorData, filterData, this->getID());
 
-	// Detect touchdown by looking for low vertical speed
-	if (fabs(filterData->vel_z) < kTouchdownVelocityThreshold) {
+	// Transmit at 1/100th rate
+	if (this->getRunCounter() % 100 == 0)
+		transmitData(sensorData, filterData, this->getID());
+	this->incrementRunCounter();
+
+	// Reset touchdown counting if outside acceleration threshold
+	if (fabs(filterData->acc_z) > kTouchdownZAccelMagThreshold) {
+		touchdownResetTime = HM_Millis();
+	}
+
+	// Detect touchdown if reset detection hasn't triggered for given amount of time
+	if (HM_Millis() - touchdownResetTime > kTouchdownNoAccelTime) {
 		return EndCondition_t::Touchdown;
 	}
 	return EndCondition_t::NoChange;
