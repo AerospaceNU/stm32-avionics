@@ -25,7 +25,6 @@ EndCondition_t DrogueDescentNState::run() {
 	// Transmit at 1/100th rate
 	if (this->getRunCounter() % 100 == 0)
 		transmitData(sensorData, filterData, this->getID());
-	this->incrementRunCounter();
 
 	// Detect if next drogue cut altitude has been reached
 	if (completeDrogueCuts_ < CliConfigState::getConfigs()->drogueCuts) {

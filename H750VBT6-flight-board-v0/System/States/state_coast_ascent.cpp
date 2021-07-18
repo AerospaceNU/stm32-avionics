@@ -22,7 +22,6 @@ EndCondition_t CoastAscentState::run() {
 	// Transmit at 1/100th rate
 	if (this->getRunCounter() % 100 == 0)
 		transmitData(sensorData, filterData, this->getID());
-	this->incrementRunCounter();
 
 	// Detect if new maximum Z position has been reached and record the time
 	if (filterData->pos_z > maxPosZ) {

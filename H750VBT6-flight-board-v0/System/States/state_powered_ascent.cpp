@@ -21,7 +21,6 @@ EndCondition_t PoweredAscentState::run() {
 	// Transmit at 1/100th rate
 	if (this->getRunCounter() % 100 == 0)
 		transmitData(sensorData, filterData, this->getID());
-	this->incrementRunCounter();
 
 	maxAccelZ = filterData->acc_z > maxAccelZ ? filterData->acc_z : maxAccelZ;
 

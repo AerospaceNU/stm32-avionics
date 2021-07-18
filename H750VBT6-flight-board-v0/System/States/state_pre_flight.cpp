@@ -33,7 +33,6 @@ EndCondition_t PreFlightState::run() {
 	if (this->getRunCounter() % 100 == 0) {
 		transmitData(sensorData, filterData, this->getID());
 	}
-	this->incrementRunCounter();
 
 	// Log at normal rate until launch detect is proven. TODO: Log when buffer is reset
 	data_log_write(sensorData, filterData, this->getID());

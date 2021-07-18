@@ -67,7 +67,7 @@ void Scheduler::run(void) {
         }
 
         // Run the current state
-        if (pCurrentState_) endCondition = pCurrentState_->run();
+        if (pCurrentState_) endCondition = pCurrentState_->run_state();
 
         // Find and set the next state
         StateId nextState = getNextState(endCondition);

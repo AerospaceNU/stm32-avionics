@@ -23,7 +23,6 @@ EndCondition_t MainDescentState::run() {
 	// Transmit at 1/100th rate
 	if (this->getRunCounter() % 100 == 0)
 		transmitData(sensorData, filterData, this->getID());
-	this->incrementRunCounter();
 
 	// Reset touchdown counting if outside acceleration threshold
 	if (fabs(filterData->acc_z) > kTouchdownZAccelMagThreshold) {
