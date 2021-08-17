@@ -67,7 +67,7 @@ void Scheduler::run(void) {
         }
 
         // Run the current state
-        if (pCurrentState_) endCondition = pCurrentState_->run();
+        if (pCurrentState_) endCondition = pCurrentState_->run_state();
 
         // Find and set the next state
         StateId nextState = getNextState(endCondition);
@@ -121,7 +121,7 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 	case StateId::CliMain:
 		switch(endCondition) {
 		case EndCondition_t::UsbDisconnect:
-			return StateId::CoastAscent; // TEMP: Will be PreFlight once launch detect works
+			return StateId::PreFlight;
 		default:
 			break;
 		}

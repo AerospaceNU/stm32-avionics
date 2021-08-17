@@ -10,6 +10,10 @@
 
 void PreFlightState::init() {
 	data_log_assign_flight();
+	minPosZ = 1000000; // Reset min position each new time pre-flight is reached
+	// Set filter pressure reference to current pressure
+	HM_ReadSensorData();
+	filterSetPressureRef((HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
 }
 
 EndCondition_t PreFlightState::run() {
@@ -21,25 +25,38 @@ EndCondition_t PreFlightState::run() {
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
 	memcpy(&sensorDataBuffer[bufferCounter], sensorData, sizeof(SensorData_t));
-	applyFilterData(sensorData);
-	FilterData_t* filterData = getFilteredData();
+	filterApplyData(sensorData);
+	FilterData_t* filterData = filterGetData();
 	memcpy(&filterDataBuffer[bufferCounter], filterData, sizeof(FilterData_t));
 
-	// Log and transmit at 1/10th rate
-	if (bufferCounter == 0) {
-		data_log_write(sensorData, filterData, this->getID());
+	// Transmit at 1/100th rate
+	if (this->getRunCounter() % 100 == 0) {
 		transmitData(sensorData, filterData, this->getID());
 	}
 
-	// Increment buffer
+	// Log at normal rate until launch detect is proven. TODO: Log when buffer is reset
+	data_log_write(sensorData, filterData, this->getID());
+	if (bufferCounter == 0) {
+		// data_log_write(sensorData, filterData, this->getID());
+	}
+
+	// Increment and reset data buffer
 	bufferCounter++;
 	if (bufferCounter == kBufferSize)
 		bufferCounter = 0;
 
-	// Detect launch by looking for velocity and accel thresholds
-	if (filterData->acc_z > kLaunchAccelThreshold && filterData->vel_z > kLaunchVelThreshold) {
+	// Look to see if new minimum Z position has been reached
+	if (filterData->pos_z < minPosZ) {
+		minPosZ = filterData->pos_z;
+		// Set pressure reference here because pressure may have "settled" after a bit
+		filterSetPressureRef((sensorData->baro1_pres + sensorData->baro2_pres) / 2);
+	}
+
+	// Detect launch by looking for accel and z position difference thresholds
+	if (filterData->acc_z > kLaunchAccelThreshold && filterData->pos_z - minPosZ > kLaunchPosZDiffThreshold) {
 		return EndCondition_t::Launch;
 	}
+
 	// Detect if USB was plugged back in
 	if (HM_UsbIsConnected()) {
 		return EndCondition_t::UsbConnect;

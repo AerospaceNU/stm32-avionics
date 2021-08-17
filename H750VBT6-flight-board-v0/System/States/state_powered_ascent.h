@@ -21,7 +21,9 @@ class PoweredAscentState : public State {
 		void cleanup(void) override;
 
 	private:
-		static constexpr int kMotorBurnoutJerkThreshold = 0; // TODO: Find this value
+		static constexpr double kMotorBurnoutZAccelDiffThreshold = 20.0; // m/s^2
+
+		double maxAccelZ = 0;
 };
 
 #ifdef __cplusplus

@@ -11,12 +11,17 @@ void PostFlightState::init() {
 }
 
 EndCondition_t PostFlightState::run() {
+	// Run buzzer heartbeat
 	buzzerHeartbeat();
+
 	// Collect and transmit data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
-	FilterData_t* filterData = getFilteredData();
-	transmitData(sensorData, filterData, this->getID());
+	FilterData_t* filterData = filterGetData();
+
+	// Transmit at 1/100th rate
+	if (this->getRunCounter() % 100 == 0)
+		transmitData(sensorData, filterData, this->getID());
 
 	// Detect if USB has been plugged in
 	if (HM_UsbIsConnected()) {

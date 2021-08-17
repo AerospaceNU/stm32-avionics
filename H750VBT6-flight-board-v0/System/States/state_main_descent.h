@@ -21,7 +21,10 @@ class MainDescentState : public State {
 		void cleanup(void) override;
 
 	private:
-		static constexpr double kTouchdownVelocityThreshold = 0; // TODO: Figure out velocity threshold
+		static constexpr double kTouchdownZAccelMagThreshold = 1.0; // m/s^2
+		static constexpr double kTouchdownNoAccelTime = 1000.0; // ms
+
+		double touchdownResetTime = 0; // Time when touchdown detection had to reset due to being outside threshold
 };
 
 #ifdef __cplusplus

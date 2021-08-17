@@ -24,6 +24,8 @@ class CliConfigState : public State {
 			uint8_t drogueCuts; // Excludes initial separation and main descent
 			double drogueCutAltitudesM[4];
 			double mainCutAltitudeM;
+			double groundElevationM;
+			double groundTemperatureC;
 		};
 
 		static const Configs_t* getConfigs();

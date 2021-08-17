@@ -15,13 +15,16 @@ void DrogueDescentNState::init() {
 EndCondition_t DrogueDescentNState::run() {
 	// TODO: How to detect separation
 
-	// Collect, filter, log, and transmit all data
+	// Collect, filter, and log all data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
-	applyFilterData(sensorData);
-	FilterData_t* filterData = getFilteredData();
+	filterApplyData(sensorData);
+	FilterData_t* filterData = filterGetData();
 	data_log_write(sensorData, filterData, this->getID());
-	transmitData(sensorData, filterData, this->getID());
+
+	// Transmit at 1/100th rate
+	if (this->getRunCounter() % 100 == 0)
+		transmitData(sensorData, filterData, this->getID());
 
 	// Detect if next drogue cut altitude has been reached
 	if (completeDrogueCuts_ < CliConfigState::getConfigs()->drogueCuts) {
