@@ -43,7 +43,7 @@ void Scheduler::run(void) {
 
 	// Initialize the current and next states
 	pCurrentState_ = nullptr;
-    State* pNextState = &initialize;
+    State* pNextState = &preFlight;
 
     // Helper functions throughout infinite loop
     uint32_t lastTime_ = HM_Millis();
