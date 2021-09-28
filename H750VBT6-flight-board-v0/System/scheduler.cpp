@@ -43,7 +43,7 @@ void Scheduler::run(void) {
 
 	// Initialize the current and next states
 	pCurrentState_ = nullptr;
-    State* pNextState = &preFlight;
+    State* pNextState = &initialize;
 
     // Helper functions throughout infinite loop
     uint32_t lastTime_ = HM_Millis();
@@ -149,12 +149,8 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		}
 		break;
 	case StateId::Initialize:
-		switch(endCondition) {
-		case EndCondition_t::UsbConnect:
-			return StateId::CliMain;
-		default:
-			break;
-		}
+		return StateId::PreFlight;
+
 		break;
 	case StateId::MainDescent:
 		switch(endCondition) {
