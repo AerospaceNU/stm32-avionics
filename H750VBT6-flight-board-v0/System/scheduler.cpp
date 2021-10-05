@@ -149,8 +149,14 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		}
 		break;
 	case StateId::Initialize:
-		return StateId::PreFlight;
-
+		switch(endCondition) {
+		case EndCondition_t::UsbConnect:
+			return StateId::CliMain;
+		case EndCondition_t::UsbDisconnect:
+			return StateId::PreFlight;
+		default:
+			break;
+		}
 		break;
 	case StateId::MainDescent:
 		switch(endCondition) {
