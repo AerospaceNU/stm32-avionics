@@ -11,7 +11,7 @@ EndCondition_t InitializeState::run() {
 	if (HM_UsbIsConnected()) {
 		return EndCondition_t::UsbConnect;
 	}
-	return EndCondition_t::NoChange;
+	return EndCondition_t::UsbDisconnect;
 }
 
 void InitializeState::cleanup() {

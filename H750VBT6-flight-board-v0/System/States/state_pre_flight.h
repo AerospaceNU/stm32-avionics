@@ -24,7 +24,7 @@ class PreFlightState : public State {
 		void cleanup(void) override;
 
 	private:
-		static constexpr int kBufferSize = 10;
+		static constexpr int kBufferSize = 7;
 		SensorData_t sensorDataBuffer[kBufferSize];
 		FilterData_t filterDataBuffer[kBufferSize];
 		int bufferCounter = 0;

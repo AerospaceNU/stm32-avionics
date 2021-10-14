@@ -16,7 +16,7 @@ static double presRef = 1013; // mbar
 
 static void filterAccels(SensorData_t* curSensorVals) {
 	// For now, just worry about z accel. Take accelerometer value, converting , and averaging
-	filterData.acc_z = (curSensorVals->imu1_accel_y + curSensorVals->imu2_accel_y) / 2;
+	filterData.acc_z = abs((curSensorVals->imu1_accel_y + curSensorVals->imu2_accel_y) / 2);
 }
 
 static void filterPositionZ(SensorData_t* curSensorVals) {

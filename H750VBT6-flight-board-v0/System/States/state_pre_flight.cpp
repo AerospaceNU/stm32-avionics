@@ -9,6 +9,7 @@
 #include "buzzer_report_scheme.h"
 
 void PreFlightState::init() {
+
 	data_log_assign_flight();
 	minPosZ = 1000000; // Reset min position each new time pre-flight is reached
 	// Set filter pressure reference to current pressure
@@ -35,9 +36,9 @@ EndCondition_t PreFlightState::run() {
 	}
 
 	// Log at normal rate until launch detect is proven. TODO: Log when buffer is reset
-	data_log_write(sensorData, filterData, this->getID());
+	//data_log_write(sensorData, filterData, this->getID());
 	if (bufferCounter == 0) {
-		// data_log_write(sensorData, filterData, this->getID());
+		data_log_write(sensorData, filterData, this->getID());
 	}
 
 	// Increment and reset data buffer

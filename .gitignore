@@ -18,5 +18,6 @@ H750VBT6-flight-board-v0/Build/
 *.bin
 *.list
 *.so
+*.su
 *.o
 *.d
