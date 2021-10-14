@@ -269,10 +269,10 @@ void HM_LedToggle(int ledNum) {
 }
 
 bool HM_RadioSend(const uint8_t *data, uint32_t numBytes) {
-	//for (uint32_t i = 0; i < numBytes; i += payloadSize) {
-	//	memcpy(cc1120.packetToTX, data, payloadSize);
-	//	cc1120State(&cc1120);
-	//}
+	for (uint32_t i = 0; i < numBytes; i += payloadSize) {
+		memcpy(cc1120.packetToTX, data, payloadSize);
+		cc1120State(&cc1120);
+	}
 	return false;
 }
 
