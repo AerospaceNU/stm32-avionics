@@ -77,11 +77,10 @@ uint32_t data_log_get_last_flight_num() {
 }
 
 double data_log_get_stored_ground_pressure() {
-	flightNum = data_log_get_last_flight_num();
-
-	uint8_t metadataRxBuff[8];
-	HM_FlashReadStart(curSectorNum * FLASH_SECTOR_BYTES, 8, metadataRxBuff);
-	return *(double*)&metadataRxBuff;
+	flightNum = data_log_get_last_flight_num(); // Load the previous flight number and sector
+	uint8_t metadataRxBuff[8]; // Create a buffer of 8 bytes for the double
+	HM_FlashReadStart(curSectorNum * FLASH_SECTOR_BYTES, 8, metadataRxBuff); // Read the metadata
+	return *(double*)&metadataRxBuff; // Cast the buffer as a double and return
 }
 
 void data_log_assign_flight() {
@@ -121,9 +120,9 @@ void data_log_assign_flight() {
 
 void data_log_write_pressure_metadata(double groundPressure) {
 	if (flightNum > 0) {
-		uint32_t metadataWriteAddress = curSectorNum * FLASH_SECTOR_BYTES;
+		uint32_t metadataWriteAddress = curSectorNum * FLASH_SECTOR_BYTES; // Metadata is located at the start of the flight sector
 
-		HM_FlashWriteStart(metadataWriteAddress, sizeof(double), (uint8_t*)&groundPressure);
+		HM_FlashWriteStart(metadataWriteAddress, sizeof(double), (uint8_t*)&groundPressure); // Write the pressure to the metadata
 	}
 }
 
