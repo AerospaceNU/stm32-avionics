@@ -2,6 +2,7 @@
 #include <buzzer_heartbeat.h>
 #include "state_post_flight.h"
 
+#include "data_log.h"
 #include "data_transmission.h"
 #include "filters.h"
 #include "hardware_manager.h"
@@ -18,6 +19,10 @@ EndCondition_t PostFlightState::run() {
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
 	FilterData_t* filterData = filterGetData();
+
+	// Log data at 1/10th rate for now in case this state is reached before it is supposed to
+	if (this->getRunCounter() % 10 == 0)
+		data_log_write(sensorData, filterData, this->getID());
 
 	// Transmit at 1/100th rate
 	if (this->getRunCounter() % 100 == 0)
