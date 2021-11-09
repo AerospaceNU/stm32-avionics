@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include "data_log.h"
+#include "state_log.h"
 #include "data_transmission.h"
 #include "filters.h"
 #include "hardware_manager.h"
@@ -10,6 +11,7 @@
 void MainDescentState::init() {
 	// TODO: Deploy main parachute
 	touchdownResetTime = HM_Millis();
+	state_log_write(this->getID());
 }
 
 EndCondition_t MainDescentState::run() {

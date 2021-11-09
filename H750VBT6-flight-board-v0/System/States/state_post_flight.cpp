@@ -3,11 +3,13 @@
 #include "state_post_flight.h"
 
 #include "data_transmission.h"
+#include "state_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
 
 void PostFlightState::init() {
-	// Empty
+	//Write that the flight is completed so that we don't jump back to a flight state
+	state_log_write_complete();
 }
 
 EndCondition_t PostFlightState::run() {

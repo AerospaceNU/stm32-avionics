@@ -76,6 +76,14 @@ uint32_t data_log_get_last_flight_num() {
 	return lastFlightNum;
 }
 
+double data_log_get_stored_ground_pressure() {
+	flightNum = data_log_get_last_flight_num();
+
+	uint8_t metadataRxBuff[8];
+	HM_FlashReadStart(curSectorNum * FLASH_SECTOR_BYTES, 8, metadataRxBuff);
+	return *(double*)&metadataRxBuff;
+}
+
 void data_log_assign_flight() {
 
 	uint32_t waitStartMS = 0;
@@ -109,6 +117,14 @@ void data_log_assign_flight() {
 	HM_FlashReadStart(curSectorNum * 2, 2, flightTxBuff);
 
 	curWriteAddress = curSectorNum * FLASH_SECTOR_BYTES + FLIGHT_METADATA_PAGES * FLASH_PAGE_SIZE_BYTES;
+}
+
+void data_log_write_pressure_metadata(double groundPressure) {
+	if (flightNum > 0) {
+		uint32_t metadataWriteAddress = curSectorNum * FLASH_SECTOR_BYTES;
+
+		HM_FlashWriteStart(metadataWriteAddress, sizeof(double), (uint8_t*)&groundPressure);
+	}
 }
 
 void data_log_write(SensorData_t* sensorData, FilterData_t* filterData, uint8_t state) {

@@ -2,6 +2,7 @@
 #include "state_coast_ascent.h"
 
 #include "data_log.h"
+#include "state_log.h"
 #include "data_transmission.h"
 #include "filters.h"
 #include "hardware_manager.h"
@@ -9,6 +10,7 @@
 void CoastAscentState::init() {
 	maxPosZ = 0;
 	maxPosZTimeHit = HM_Millis();
+	state_log_write(this->getID());
 }
 
 EndCondition_t CoastAscentState::run() {
