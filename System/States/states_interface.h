@@ -23,7 +23,7 @@ class State {
 
     public:
 		State(int id, uint32_t period_ms): id_(id), period_ms_(period_ms) { }
-		virtual ~State() {}
+		~State() = default;
 
 		/**
 		 * @brief Returns given ID of this state so higher level can track State pointers instead of IDs
@@ -59,7 +59,7 @@ class State {
         /**
          * @brief Returns rate state should run as a period in MS
          */
-        virtual uint32_t getPeriodMS(void) { return period_ms_; }
+        uint32_t getPeriodMS(void) { return period_ms_; }
 
     private:
 
@@ -67,7 +67,7 @@ class State {
          * @brief Actions that occur on every loop of state
          * @return End condition of the current loop
          */
-        virtual EndCondition_t run(void);
+        virtual EndCondition_t run(void) = 0;
 
         int id_;
         int period_ms_;
