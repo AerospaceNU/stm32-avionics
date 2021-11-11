@@ -33,6 +33,10 @@ void filterSetPressureRef(double pres) {
 	presRef = pres;
 }
 
+double filterGetPressureRef() {
+	return presRef;
+}
+
 void filterApplyData(SensorData_t* curSensorVals) {
 	filterPositionZ(curSensorVals);
 	filterAccels(curSensorVals);

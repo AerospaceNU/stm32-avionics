@@ -41,6 +41,11 @@ void filterApplyData(SensorData_t* curSensorVals);
 void filterSetPressureRef(double pres);
 
 /**
+ * @brief Returns reference pressure
+ */
+double filterGetPressureRef();
+
+/**
  * @brief Returns most recent filtered data
  */
 FilterData_t* filterGetData();

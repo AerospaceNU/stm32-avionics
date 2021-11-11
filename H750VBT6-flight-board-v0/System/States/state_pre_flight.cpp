@@ -73,9 +73,7 @@ void PreFlightState::cleanup() {
 		data_log_write(&sensorDataBuffer[i], &filterDataBuffer[i], this->getID());
 	}
 	
-	double groundPress = (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2;
-
-	data_log_write_pressure_metadata(groundPress);
+	data_log_write_pressure_metadata(filterGetPressureRef());
 }
 
 
