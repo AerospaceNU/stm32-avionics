@@ -31,7 +31,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "scheduler.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -113,11 +113,6 @@ int main(void)
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
 
-  /* Initialize scheduler */
-  Scheduler scheduler = Scheduler();
-
-  /* Scheduler will never return. NO CODE SHOULD COME AFTER THIS IN THIS FILE */
-  scheduler.run();
   /* USER CODE END 2 */
 
   /* Infinite loop */
