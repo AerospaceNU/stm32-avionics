@@ -53,7 +53,7 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, BARO2_CS_Pin|LED1_Pin|LED2_Pin|BLUETOOTH_CS_Pin 
+  HAL_GPIO_WritePin(GPIOE, BARO2_CS_Pin|LED1_Pin|LED2_Pin|BLUETOOTH_CS_Pin
                           |RADIO_CS_Pin|IMU2_M_CS_Pin|IMU2_AG_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -63,16 +63,16 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(RADIO_RST_GPIO_Port, RADIO_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, FIRE6_Pin|FIRE5_Pin|FIRE4_Pin|FIRE3_Pin 
-                          |FIRE2_Pin|FIRE1_Pin|IMU1_M_CS_Pin|IMU1_AG_CS_Pin 
+  HAL_GPIO_WritePin(GPIOD, FIRE6_Pin|FIRE5_Pin|FIRE4_Pin|FIRE3_Pin
+                          |FIRE2_Pin|FIRE1_Pin|IMU1_M_CS_Pin|IMU1_AG_CS_Pin
                           |HIGH_G_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(BARO1_CS_GPIO_Port, BARO1_CS_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PEPin PEPin PEPin PEPin 
+  /*Configure GPIO pins : PEPin PEPin PEPin PEPin
                            PEPin PEPin PEPin */
-  GPIO_InitStruct.Pin = BARO2_CS_Pin|LED1_Pin|LED2_Pin|BLUETOOTH_CS_Pin 
+  GPIO_InitStruct.Pin = BARO2_CS_Pin|LED1_Pin|LED2_Pin|BLUETOOTH_CS_Pin
                           |RADIO_CS_Pin|IMU2_M_CS_Pin|IMU2_AG_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -105,11 +105,11 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(RADIO_RST_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PDPin PDPin PDPin PDPin 
-                           PDPin PDPin PDPin PDPin 
+  /*Configure GPIO pins : PDPin PDPin PDPin PDPin
+                           PDPin PDPin PDPin PDPin
                            PDPin */
-  GPIO_InitStruct.Pin = FIRE6_Pin|FIRE5_Pin|FIRE4_Pin|FIRE3_Pin 
-                          |FIRE2_Pin|FIRE1_Pin|IMU1_M_CS_Pin|IMU1_AG_CS_Pin 
+  GPIO_InitStruct.Pin = FIRE6_Pin|FIRE5_Pin|FIRE4_Pin|FIRE3_Pin
+                          |FIRE2_Pin|FIRE1_Pin|IMU1_M_CS_Pin|IMU1_AG_CS_Pin
                           |HIGH_G_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
