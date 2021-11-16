@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : I2C.c
-  * Description        : This file provides code for the configuration
-  *                      of the I2C instances.
+  * @file    i2c.c
+  * @brief   This file provides code for the configuration
+  *          of the I2C instances.
   ******************************************************************************
   * @attention
   *
@@ -30,6 +30,13 @@ I2C_HandleTypeDef hi2c2;
 void MX_I2C2_Init(void)
 {
 
+  /* USER CODE BEGIN I2C2_Init 0 */
+
+  /* USER CODE END I2C2_Init 0 */
+
+  /* USER CODE BEGIN I2C2_Init 1 */
+
+  /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
   hi2c2.Init.Timing = 0x307075B1;
   hi2c2.Init.OwnAddress1 = 0;
@@ -43,18 +50,21 @@ void MX_I2C2_Init(void)
   {
     Error_Handler();
   }
-  /** Configure Analogue filter 
+  /** Configure Analogue filter
   */
   if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
   {
     Error_Handler();
   }
-  /** Configure Digital filter 
+  /** Configure Digital filter
   */
   if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN I2C2_Init 2 */
+
+  /* USER CODE END I2C2_Init 2 */
 
 }
 
@@ -62,16 +72,25 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
   if(i2cHandle->Instance==I2C2)
   {
   /* USER CODE BEGIN I2C2_MspInit 0 */
 
   /* USER CODE END I2C2_MspInit 0 */
-  
+  /** Initializes the peripherals clock
+  */
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2C2;
+    PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
     __HAL_RCC_GPIOF_CLK_ENABLE();
-    /**I2C2 GPIO Configuration    
+    /**I2C2 GPIO Configuration
     PF0     ------> I2C2_SDA
-    PF1     ------> I2C2_SCL 
+    PF1     ------> I2C2_SCL
     */
     GPIO_InitStruct.Pin = SENSE_SDA_Pin|SENSE_SCL_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
@@ -98,18 +117,20 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
   /* USER CODE END I2C2_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_I2C2_CLK_DISABLE();
-  
-    /**I2C2 GPIO Configuration    
+
+    /**I2C2 GPIO Configuration
     PF0     ------> I2C2_SDA
-    PF1     ------> I2C2_SCL 
+    PF1     ------> I2C2_SCL
     */
-    HAL_GPIO_DeInit(GPIOF, SENSE_SDA_Pin|SENSE_SCL_Pin);
+    HAL_GPIO_DeInit(SENSE_SDA_GPIO_Port, SENSE_SDA_Pin);
+
+    HAL_GPIO_DeInit(SENSE_SCL_GPIO_Port, SENSE_SCL_Pin);
 
   /* USER CODE BEGIN I2C2_MspDeInit 1 */
 
   /* USER CODE END I2C2_MspDeInit 1 */
   }
-} 
+}
 
 /* USER CODE BEGIN 1 */
 

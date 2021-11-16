@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : gpio.c
-  * Description        : This file provides code for the configuration
-  *                      of all used GPIO pins.
+  * @file    gpio.c
+  * @brief   This file provides code for the configuration
+  *          of all used GPIO pins.
   ******************************************************************************
   * @attention
   *
@@ -19,6 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
+
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
@@ -54,7 +55,7 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, IMU2_CS_Pin|BARO2_CS_Pin|FIRE1_Pin|LED1_Pin 
+  HAL_GPIO_WritePin(GPIOE, IMU2_CS_Pin|BARO2_CS_Pin|FIRE1_Pin|LED1_Pin
                           |LED2_Pin|LED3_Pin|LED4_Pin|LED5_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -64,19 +65,19 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, FLASH_CS_Pin|BARO1_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, FIRE3_Pin|FIRE2_Pin|SERVO_EN_Pin|IMU1_M_CS_Pin 
+  HAL_GPIO_WritePin(GPIOG, FIRE3_Pin|FIRE2_Pin|SERVO_EN_Pin|IMU1_M_CS_Pin
                           |IMU1_AG_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, RADIO_CS_Pin|IMU2_FSYNC_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, RADIO_RST_Pin|HGM_Pin|HIGH_G_INT1_Pin|HIGH_G_INT2_Pin 
+  HAL_GPIO_WritePin(GPIOD, RADIO_RST_Pin|HGM_Pin|HIGH_G_INT1_Pin|HIGH_G_INT2_Pin
                           |HIGH_G_CS_Pin|IMU1_AG_INT2_Pin|IMU1_AG_INT1_Pin|IMU1_M_INT_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PEPin PEPin PEPin PEPin 
+  /*Configure GPIO pins : PEPin PEPin PEPin PEPin
                            PEPin PEPin PEPin PEPin */
-  GPIO_InitStruct.Pin = IMU2_CS_Pin|BARO2_CS_Pin|FIRE1_Pin|LED1_Pin 
+  GPIO_InitStruct.Pin = IMU2_CS_Pin|BARO2_CS_Pin|FIRE1_Pin|LED1_Pin
                           |LED2_Pin|LED3_Pin|LED4_Pin|LED5_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -109,9 +110,9 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PGPin PGPin PGPin PGPin 
+  /*Configure GPIO pins : PGPin PGPin PGPin PGPin
                            PGPin */
-  GPIO_InitStruct.Pin = FIRE3_Pin|FIRE2_Pin|SERVO_EN_Pin|IMU1_M_CS_Pin 
+  GPIO_InitStruct.Pin = FIRE3_Pin|FIRE2_Pin|SERVO_EN_Pin|IMU1_M_CS_Pin
                           |IMU1_AG_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -137,9 +138,9 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PDPin PDPin PDPin PDPin 
+  /*Configure GPIO pins : PDPin PDPin PDPin PDPin
                            PDPin PDPin PDPin PDPin */
-  GPIO_InitStruct.Pin = RADIO_RST_Pin|HGM_Pin|HIGH_G_INT1_Pin|HIGH_G_INT2_Pin 
+  GPIO_InitStruct.Pin = RADIO_RST_Pin|HGM_Pin|HIGH_G_INT1_Pin|HIGH_G_INT2_Pin
                           |HIGH_G_CS_Pin|IMU1_AG_INT2_Pin|IMU1_AG_INT1_Pin|IMU1_M_INT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
