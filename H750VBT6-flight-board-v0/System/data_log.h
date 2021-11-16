@@ -13,13 +13,18 @@ extern "C"{
 #include "hardware_manager.h"
 #include "filters.h"
 
+// Flight metadata shows what data will be logged in what relative location
+typedef struct __attribute__((__packed__)) FlightMetadata {
+	double pressureRef;
+} FlightMetadata;
+
 uint32_t data_log_get_last_flight_num();
 
-double data_log_get_stored_ground_pressure();
+FlightMetadata data_log_get_last_stored_flight_metadata();
 
 void data_log_assign_flight();
 
-void data_log_write_pressure_metadata(double groundPressure);
+void data_log_write_metadata();
 
 void data_log_write(SensorData_t* sensorData, FilterData_t* filterData, uint8_t state);
 
