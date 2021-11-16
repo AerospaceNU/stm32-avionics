@@ -41,8 +41,6 @@ static LogData logPacket;
 
 static const uint8_t kLogDataSize = sizeof(LogData);
 
-static FlightMetadata metadataPacket;
-
 static const uint8_t kFlightMetadataSize = sizeof(FlightMetadata);
 
 uint32_t data_log_get_last_flight_num() {
@@ -84,7 +82,7 @@ FlightMetadata data_log_get_last_stored_flight_metadata() {
 	flightNum = data_log_get_last_flight_num(); // Load the previous flight number and sector
 	uint8_t metadataRxBuff[kFlightMetadataSize]; // Create a buffer of 8 bytes for the double
 	HM_FlashReadStart(curSectorNum * FLASH_SECTOR_BYTES, 8, metadataRxBuff); // Read the metadata
-	metadataPacket = *(FlightMetadata*)&metadataRxBuff;
+	FlightMetadata metadataPacket = *(FlightMetadata*)&metadataRxBuff;
 	return metadataPacket; // Cast the buffer as a double and return
 }
 
@@ -123,11 +121,11 @@ void data_log_assign_flight() {
 	curWriteAddress = curSectorNum * FLASH_SECTOR_BYTES + FLIGHT_METADATA_PAGES * FLASH_PAGE_SIZE_BYTES;
 }
 
-void data_log_write_metadata() {
+void data_log_write_pressure_metadata() {
 	if (flightNum > 0) {
 		uint32_t metadataWriteAddress = curSectorNum * FLASH_SECTOR_BYTES; // Metadata is located at the start of the flight sector
+		FlightMetadata metadataPacket = data_log_get_last_stored_flight_metadata(); // Fetch previous flight metadata as we want to copy it
 		metadataPacket.pressureRef = filterGetPressureRef(); // Find pressure reference from filter
-		// TODO: Add additional information to metadata
 
 		HM_FlashWriteStart(metadataWriteAddress, kFlightMetadataSize, (uint8_t*)&metadataPacket); // Write the metadata packet
 	}

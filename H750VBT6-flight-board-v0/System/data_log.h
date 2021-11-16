@@ -24,7 +24,7 @@ FlightMetadata data_log_get_last_stored_flight_metadata();
 
 void data_log_assign_flight();
 
-void data_log_write_metadata();
+void data_log_write_pressure_metadata();
 
 void data_log_write(SensorData_t* sensorData, FilterData_t* filterData, uint8_t state);
 
