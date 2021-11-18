@@ -21,10 +21,11 @@ class DrogueDescentNState : public State {
 		void cleanup(void) override;
 
 	private:
-		uint8_t completeDrogueCuts_ = 0;
+		static constexpr double kTransitionResetTimeThreshold = 5000; // 5 second transition timer
 
-		int thresholdCounter;
-		int thresholdLimit = 5;
+		double transitionResetTimer;
+
+		uint8_t completeDrogueCuts_ = 0;
 };
 
 #ifdef __cplusplus

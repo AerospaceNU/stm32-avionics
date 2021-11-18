@@ -22,11 +22,10 @@ class PoweredAscentState : public State {
 
 	private:
 		static constexpr double kMotorBurnoutZAccelDiffThreshold = 20.0; // m/s^2
+		static constexpr double kTransitionResetTimeThreshold = 500; // 500 ms transition timer
 
+		double transitionResetTimer;
 		double maxAccelZ = 0;
-
-		int thresholdCounter;
-		int thresholdLimit = 5;
 };
 
 #ifdef __cplusplus

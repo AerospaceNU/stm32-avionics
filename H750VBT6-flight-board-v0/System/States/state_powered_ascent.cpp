@@ -7,7 +7,7 @@
 #include "data_transmission.h"
 
 void PoweredAscentState::init() {
-	thresholdCounter = 0;
+	transitionResetTimer = HM_Millis();
 	maxAccelZ = 0;
 }
 
@@ -27,11 +27,11 @@ EndCondition_t PoweredAscentState::run() {
 
 	// Detect motor burnout if vertical acceleration changes by a certain amount
 	if (maxAccelZ - filterData->acc_z > kMotorBurnoutZAccelDiffThreshold) {
-		if (++thresholdCounter > thresholdLimit) {
+		if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
 			return EndCondition_t::MotorBurnout;
 		}
 	} else {
-		thresholdCounter = 0;
+		transitionResetTimer = HM_Millis();
 	}
 	return EndCondition_t::NoChange;
 }

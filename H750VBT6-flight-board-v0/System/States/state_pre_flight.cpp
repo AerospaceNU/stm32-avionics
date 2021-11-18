@@ -55,11 +55,11 @@ EndCondition_t PreFlightState::run() {
 
 	// Detect launch by looking for accel and z position difference thresholds
 	if (filterData->acc_z > kLaunchAccelThreshold && filterData->pos_z - minPosZ > kLaunchPosZDiffThreshold) {
-		if (++thresholdCounter > thresholdLimit) {
+		if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
 			return EndCondition_t::Launch;
 		}
 	} else {
-		thresholdCounter = 0;
+		transitionResetTimer = HM_Millis();
 	}
 
 	// Detect if USB was plugged back in

@@ -8,7 +8,7 @@
 #include "hardware_manager.h"
 
 void MainDescentState::init() {
-	thresholdCounter = 0
+	transitionResetTimer = HM_Millis();
 	// TODO: Deploy main parachute
 	touchdownResetTime = HM_Millis();
 }
@@ -25,19 +25,16 @@ EndCondition_t MainDescentState::run() {
 	if (this->getRunCounter() % 100 == 0)
 		transmitData(sensorData, filterData, this->getID());
 
-	// Reset touchdown counting if outside acceleration threshold
-	if (fabs(filterData->acc_z) > kTouchdownZAccelMagThreshold) {
-		touchdownResetTime = HM_Millis();
-	}
-
-	// Detect touchdown if reset detection hasn't triggered for given amount of time
-	if (HM_Millis() - touchdownResetTime > kTouchdownNoAccelTime) {
-		if (++thresholdCounter > thresholdLimit) {
+	// Reset touchdown threshold counter if recent change in z position is large enough
+	if (fabs(altitude - filterData->pos_z) > kTouchdownZPosChangeThreshold) {
+		altitude = filterData->pos_z;
+		transitionResetTimer = HM_Millis();
+	} else {
+		if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
 			return EndCondition_t::Touchdown;
 		}
-	} else {
-		thresholdCounter = 0;
 	}
+
 	return EndCondition_t::NoChange;
 }
 

@@ -31,11 +31,11 @@ class PreFlightState : public State {
 
 		static constexpr double kLaunchAccelThreshold = 20.0; // m/s**2
 		static constexpr double kLaunchPosZDiffThreshold = 1.0; // m
+		static constexpr double kTransitionResetTimeThreshold = 500; // 500 ms transition timer
 
+		double transitionResetTimer;
 		double minPosZ = 1000000;
 
-		int thresholdCounter;
-		int thresholdLimit = 5;
 };
 
 #ifdef __cplusplus

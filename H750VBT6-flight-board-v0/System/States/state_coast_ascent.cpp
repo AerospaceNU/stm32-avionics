@@ -7,7 +7,7 @@
 #include "hardware_manager.h"
 
 void CoastAscentState::init() {
-	thresholdCounter = 0
+	transitionResetTimer = HM_Millis();
 	maxPosZ = 0;
 	maxPosZTimeHit = HM_Millis();
 }
@@ -32,12 +32,13 @@ EndCondition_t CoastAscentState::run() {
 
 	// Detect apogee if under max z position for specified amount of time
 	if (filterData->pos_z < maxPosZ && HM_Millis() - maxPosZTimeHit > kTimeUnderApogeeThreshold) {
-		if (++thresholdCounter > thresholdLimit) {
+		if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
 			return EndCondition_t::Apogee;
 		}
 	} else {
-		thresholdCounter = 0;
+		transitionResetTimer = HM_Millis();
 	}
+
 	return EndCondition_t::NoChange;
 }
 
