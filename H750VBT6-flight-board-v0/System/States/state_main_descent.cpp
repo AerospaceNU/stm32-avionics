@@ -10,7 +10,6 @@
 void MainDescentState::init() {
 	transitionResetTimer = HM_Millis();
 	// TODO: Deploy main parachute
-	touchdownResetTime = HM_Millis();
 }
 
 EndCondition_t MainDescentState::run() {
