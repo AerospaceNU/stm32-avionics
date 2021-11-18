@@ -26,7 +26,7 @@ class MainDescentState : public State {
 
 		uint32_t transitionResetTimer;
 
-		double altitude = 0;
+		double altitude;
 };
 
 #ifdef __cplusplus

@@ -9,6 +9,7 @@
 
 void MainDescentState::init() {
 	transitionResetTimer = HM_Millis();
+	altitude = 0;
 	// TODO: Deploy main parachute
 }
 
