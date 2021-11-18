@@ -23,7 +23,7 @@ class DrogueDescentNState : public State {
 	private:
 		uint8_t completeDrogueCuts_ = 0;
 
-		int thresholdCounter = 0;
+		int thresholdCounter;
 		int thresholdLimit = 5;
 };
 

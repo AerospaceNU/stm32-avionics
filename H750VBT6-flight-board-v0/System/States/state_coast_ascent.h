@@ -27,7 +27,7 @@ class CoastAscentState : public State {
 		double maxPosZ = 0;
 		uint32_t maxPosZTimeHit = 0; // What system time was when the max Z position was hit in ms
 
-		int thresholdCounter = 0;
+		int thresholdCounter;
 		int thresholdLimit = 5;
 };
 

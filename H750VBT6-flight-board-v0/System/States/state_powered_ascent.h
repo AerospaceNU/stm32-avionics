@@ -25,7 +25,7 @@ class PoweredAscentState : public State {
 
 		double maxAccelZ = 0;
 
-		int thresholdCounter = 0;
+		int thresholdCounter;
 		int thresholdLimit = 5;
 };
 

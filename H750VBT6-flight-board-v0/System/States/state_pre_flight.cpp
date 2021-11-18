@@ -9,7 +9,7 @@
 #include "buzzer_report_scheme.h"
 
 void PreFlightState::init() {
-
+	thresholdCounter = 0;
 	data_log_assign_flight();
 	minPosZ = 1000000; // Reset min position each new time pre-flight is reached
 	// Set filter pressure reference to current pressure

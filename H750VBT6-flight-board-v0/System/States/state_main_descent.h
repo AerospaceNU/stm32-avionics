@@ -26,7 +26,7 @@ class MainDescentState : public State {
 
 		double touchdownResetTime = 0; // Time when touchdown detection had to reset due to being outside threshold
 
-		int thresholdCounter = 0;
+		int thresholdCounter;
 		int thresholdLimit = 5;
 };
 

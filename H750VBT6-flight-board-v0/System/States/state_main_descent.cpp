@@ -8,6 +8,7 @@
 #include "hardware_manager.h"
 
 void MainDescentState::init() {
+	thresholdCounter = 0
 	// TODO: Deploy main parachute
 	touchdownResetTime = HM_Millis();
 }

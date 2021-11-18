@@ -7,6 +7,7 @@
 #include "hardware_manager.h"
 
 void CoastAscentState::init() {
+	thresholdCounter = 0
 	maxPosZ = 0;
 	maxPosZTimeHit = HM_Millis();
 }

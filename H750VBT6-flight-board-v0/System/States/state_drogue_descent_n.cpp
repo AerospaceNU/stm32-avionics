@@ -8,6 +8,7 @@
 #include "state_cli_config.h"
 
 void DrogueDescentNState::init() {
+	thresholdCounter = 0
 	completeDrogueCuts_ = 0;
 	// TODO: Actuate separation
 }

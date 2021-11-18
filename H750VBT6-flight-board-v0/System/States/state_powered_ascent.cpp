@@ -7,6 +7,7 @@
 #include "data_transmission.h"
 
 void PoweredAscentState::init() {
+	thresholdCounter = 0;
 	maxAccelZ = 0;
 }
 
