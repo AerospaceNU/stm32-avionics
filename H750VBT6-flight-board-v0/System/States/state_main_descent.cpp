@@ -31,7 +31,11 @@ EndCondition_t MainDescentState::run() {
 
 	// Detect touchdown if reset detection hasn't triggered for given amount of time
 	if (HM_Millis() - touchdownResetTime > kTouchdownNoAccelTime) {
-		return EndCondition_t::Touchdown;
+		if (++thresholdCounter > thresholdLimit) {
+			return EndCondition_t::Touchdown;
+		}
+	} else {
+		thresholdCounter = 0;
 	}
 	return EndCondition_t::NoChange;
 }

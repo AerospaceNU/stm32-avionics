@@ -35,7 +35,11 @@ EndCondition_t DrogueDescentNState::run() {
 	}
 	// Detect if main cut altitude has been reached
 	else if (filterData->pos_z < CliConfigState::getConfigs()->mainCutAltitudeM) {
-		return EndCondition_t::MainCutAltitude;
+		if (++thresholdCounter > thresholdLimit) {
+			return EndCondition_t::MainCutAltitude;
+		}
+	} else {
+		thresholdCounter = 0;
 	}
 	return EndCondition_t::NoChange;
 }

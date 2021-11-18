@@ -24,6 +24,9 @@ class PoweredAscentState : public State {
 		static constexpr double kMotorBurnoutZAccelDiffThreshold = 20.0; // m/s^2
 
 		double maxAccelZ = 0;
+
+		int thresholdCounter = 0;
+		int thresholdLimit = 5;
 };
 
 #ifdef __cplusplus

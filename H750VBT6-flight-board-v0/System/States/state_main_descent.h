@@ -25,6 +25,9 @@ class MainDescentState : public State {
 		static constexpr double kTouchdownNoAccelTime = 1000.0; // ms
 
 		double touchdownResetTime = 0; // Time when touchdown detection had to reset due to being outside threshold
+
+		int thresholdCounter = 0;
+		int thresholdLimit = 5;
 };
 
 #ifdef __cplusplus

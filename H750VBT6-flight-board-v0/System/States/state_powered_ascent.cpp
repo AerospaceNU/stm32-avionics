@@ -26,7 +26,11 @@ EndCondition_t PoweredAscentState::run() {
 
 	// Detect motor burnout if vertical acceleration changes by a certain amount
 	if (maxAccelZ - filterData->acc_z > kMotorBurnoutZAccelDiffThreshold) {
-		return EndCondition_t::MotorBurnout;
+		if (++thresholdCounter > thresholdLimit) {
+			return EndCondition_t::MotorBurnout;
+		}
+	} else {
+		thresholdCounter = 0;
 	}
 	return EndCondition_t::NoChange;
 }

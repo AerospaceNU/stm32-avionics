@@ -34,6 +34,8 @@ class PreFlightState : public State {
 
 		double minPosZ = 1000000;
 
+		int thresholdCounter = 0;
+		int thresholdLimit = 5;
 };
 
 #ifdef __cplusplus

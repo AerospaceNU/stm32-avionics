@@ -31,7 +31,11 @@ EndCondition_t CoastAscentState::run() {
 
 	// Detect apogee if under max z position for specified amount of time
 	if (filterData->pos_z < maxPosZ && HM_Millis() - maxPosZTimeHit > kTimeUnderApogeeThreshold) {
-		return EndCondition_t::Apogee;
+		if (++thresholdCounter > thresholdLimit) {
+			return EndCondition_t::Apogee;
+		}
+	} else {
+		thresholdCounter = 0;
 	}
 	return EndCondition_t::NoChange;
 }
