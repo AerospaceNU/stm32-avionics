@@ -21,7 +21,7 @@ class CoastAscentState : public State {
 		void cleanup(void) override;
 
 	private:
-		static constexpr double kTransitionResetTimeThreshold = 500; // 500 ms transition timer
+		static constexpr uint32_t kTransitionResetTimeThreshold = 500; // 500 ms transition timer
 
 		uint32_t transitionResetTimer;
 

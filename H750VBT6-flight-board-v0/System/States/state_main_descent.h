@@ -22,7 +22,7 @@ class MainDescentState : public State {
 
 	private:
 		static constexpr double kTouchdownZPosChangeThreshold = 10; // meters
-		static constexpr double kTransitionResetTimeThreshold = 5000; // 5 second transition timer
+		static constexpr uint32_t kTransitionResetTimeThreshold = 5000; // 5 second transition timer
 
 		uint32_t transitionResetTimer;
 
