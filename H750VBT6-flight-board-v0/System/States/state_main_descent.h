@@ -21,10 +21,12 @@ class MainDescentState : public State {
 		void cleanup(void) override;
 
 	private:
-		static constexpr double kTouchdownZAccelMagThreshold = 1.0; // m/s^2
-		static constexpr double kTouchdownNoAccelTime = 1000.0; // ms
+		static constexpr double kTouchdownZPosChangeThreshold = 10; // meters
+		static constexpr uint32_t kTransitionResetTimeThreshold = 5000; // 5 second transition timer
 
-		double touchdownResetTime = 0; // Time when touchdown detection had to reset due to being outside threshold
+		uint32_t transitionResetTimer;
+
+		double altitude;
 };
 
 #ifdef __cplusplus

@@ -8,6 +8,7 @@
 #include "state_cli_config.h"
 
 void DrogueDescentNState::init() {
+	transitionResetTimer = HM_Millis();
 	completeDrogueCuts_ = 0;
 	// TODO: Actuate separation
 }
@@ -35,7 +36,11 @@ EndCondition_t DrogueDescentNState::run() {
 	}
 	// Detect if main cut altitude has been reached
 	else if (filterData->pos_z < CliConfigState::getConfigs()->mainCutAltitudeM) {
-		return EndCondition_t::MainCutAltitude;
+		if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
+			return EndCondition_t::MainCutAltitude;
+		}
+	} else {
+		transitionResetTimer = HM_Millis();
 	}
 	return EndCondition_t::NoChange;
 }

@@ -9,7 +9,7 @@
 #include "buzzer_report_scheme.h"
 
 void PreFlightState::init() {
-
+	transitionResetTimer = HM_Millis();
 	data_log_assign_flight();
 	minPosZ = 1000000; // Reset min position each new time pre-flight is reached
 	// Set filter pressure reference to current pressure
@@ -55,7 +55,11 @@ EndCondition_t PreFlightState::run() {
 
 	// Detect launch by looking for accel and z position difference thresholds
 	if (filterData->acc_z > kLaunchAccelThreshold && filterData->pos_z - minPosZ > kLaunchPosZDiffThreshold) {
-		return EndCondition_t::Launch;
+		if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
+			return EndCondition_t::Launch;
+		}
+	} else {
+		transitionResetTimer = HM_Millis();
 	}
 
 	// Detect if USB was plugged back in

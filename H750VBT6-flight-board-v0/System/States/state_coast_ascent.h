@@ -21,11 +21,11 @@ class CoastAscentState : public State {
 		void cleanup(void) override;
 
 	private:
-		// Amount of time required for z position to be below the maximum to detect apogee
-		static constexpr uint32_t kTimeUnderApogeeThreshold = 1000; // ms
+		static constexpr uint32_t kTransitionResetTimeThreshold = 500; // 500 ms transition timer
+
+		uint32_t transitionResetTimer;
 
 		double maxPosZ = 0;
-		uint32_t maxPosZTimeHit = 0; // What system time was when the max Z position was hit in ms
 };
 
 #ifdef __cplusplus
