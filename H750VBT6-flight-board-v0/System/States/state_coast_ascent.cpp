@@ -9,7 +9,6 @@
 void CoastAscentState::init() {
 	transitionResetTimer = HM_Millis();
 	maxPosZ = 0;
-	maxPosZTimeHit = HM_Millis();
 }
 
 EndCondition_t CoastAscentState::run() {
@@ -27,11 +26,10 @@ EndCondition_t CoastAscentState::run() {
 	// Detect if new maximum Z position has been reached and record the time
 	if (filterData->pos_z > maxPosZ) {
 		maxPosZ = filterData->pos_z;
-		maxPosZTimeHit = HM_Millis();
 	}
 
 	// Detect apogee if under max z position for specified amount of time
-	if (filterData->pos_z < maxPosZ && HM_Millis() - maxPosZTimeHit > kTimeUnderApogeeThreshold) {
+	if (filterData->pos_z < maxPosZ) {
 		if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
 			return EndCondition_t::Apogee;
 		}

@@ -21,9 +21,9 @@ class DrogueDescentNState : public State {
 		void cleanup(void) override;
 
 	private:
-		static constexpr double kTransitionResetTimeThreshold = 5000; // 5 second transition timer
+		static constexpr double kTransitionResetTimeThreshold = 500; // 500 ms transition timer
 
-		double transitionResetTimer;
+		uint32_t transitionResetTimer;
 
 		uint8_t completeDrogueCuts_ = 0;
 };

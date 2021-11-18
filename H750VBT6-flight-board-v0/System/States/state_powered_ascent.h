@@ -24,7 +24,7 @@ class PoweredAscentState : public State {
 		static constexpr double kMotorBurnoutZAccelDiffThreshold = 20.0; // m/s^2
 		static constexpr double kTransitionResetTimeThreshold = 500; // 500 ms transition timer
 
-		double transitionResetTimer;
+		uint32_t transitionResetTimer;
 		double maxAccelZ = 0;
 };
 
