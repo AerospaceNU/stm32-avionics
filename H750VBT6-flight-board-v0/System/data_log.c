@@ -80,10 +80,10 @@ uint32_t data_log_get_last_flight_num() {
 
 FlightMetadata data_log_get_last_stored_flight_metadata() {
 	flightNum = data_log_get_last_flight_num(); // Load the previous flight number and sector
-	uint8_t metadataRxBuff[kFlightMetadataSize]; // Create a buffer of 8 bytes for the double
+	uint8_t metadataRxBuff[kFlightMetadataSize]; // Create a buffer for the metadata
 	HM_FlashReadStart(curSectorNum * FLASH_SECTOR_BYTES, 8, metadataRxBuff); // Read the metadata
 	FlightMetadata metadataPacket = *(FlightMetadata*)&metadataRxBuff;
-	return metadataPacket; // Cast the buffer as a double and return
+	return metadataPacket; // Cast the buffer as a metadata packet and return
 }
 
 void data_log_assign_flight() {
