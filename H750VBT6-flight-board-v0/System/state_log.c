@@ -2,10 +2,11 @@
  * state_log.c
  */
 #include "state_log.h"
-#include "data_log.h"
 
-static uint32_t stateWriteAddress = 0x08100000; // Static flash location for the state log
-static uint32_t maxFlashAddr = 0x081FFFE0; // Highest write address available on internal flash
+#define STATE_START_ADDRESS  0x00000000; // Starting flash location for the state log, relative to start of internal flash
+
+uint32_t writeAddress = STATE_START_ADDRESS;
+uint32_t readAddress = STATE_START_ADDRESS;
 uint8_t curRead;
 uint8_t prevRead;
 
@@ -23,39 +24,30 @@ void state_log_reload_flight() {
  * @param currentState: int representation of the state id
  */
 void state_log_write(int currentState) {
-	uint8_t stateWriteBuffer[32]; // Buffer to store the 32 bytes that need to be written to the flash
-
-	uint32_t writeAddress = stateWriteAddress;
+	uint8_t stateWriteBuffer[1]; // Buffer to store the byte that needs to be written to flash
+	uint8_t stateReadBuffer[1];
 	while (1) {
-		curRead = *(uint8_t *)writeAddress; // Read from the address
+		internal_flash_read(writeAddress, stateReadBuffer, 1);
+		curRead = stateReadBuffer[0]; // Read from the address
 		if (curRead == 255) { // Find the first empty address
 			break;
 		}
 		writeAddress += 32; // Increase the write address by 32 bytes to account for the flash write size
-		if (writeAddress > maxFlashAddr) {
+		if (writeAddress > MAX_FLASH_ADDRESS) {
 			return; // Return if the address is too high
 		}
 	}
 
-	// If we're at the last write address, write 0xEE to indicate
+	// If we're at the last writeable address, write 0xEE to indicate
 	// that no state should be resumed, because we can't be sure
 	// that the state it would resume is correct
-	if (writeAddress == maxFlashAddr) {
+	if (writeAddress == MAX_FLASH_ADDRESS - 31) {
 		stateWriteBuffer[0] = (uint8_t)(0xEE);
 	} else {
 		stateWriteBuffer[0] = (uint8_t)(currentState); // Otherwise write the state
 	}
 
-	for (int i = 1; i < 32; ++i) {stateWriteBuffer[i] = (uint8_t)0xFF;} // Fill the remaining bytes as 0xFF
-
-	HAL_FLASH_Unlock();
-
-	uint32_t stateDataAddress = (uint32_t)&stateWriteBuffer; // Get address of the start of the buffer
-
-	HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, writeAddress, stateDataAddress); // Write to the flash
-
-	HAL_FLASH_Lock();
-
+	internal_flash_write(writeAddress, stateWriteBuffer, 1);
 }
 
 void state_log_write_complete() {
@@ -67,19 +59,21 @@ void state_log_write_complete() {
  * @return int representing the state id
  */
 int state_log_read() {
-	uint32_t readAddress = stateWriteAddress;
-	prevRead = *(uint8_t *)readAddress;
+	uint8_t stateReadBuffer[1];
+	internal_flash_read(readAddress, stateReadBuffer, 1);
+	prevRead = stateReadBuffer[0];
 
 	if (prevRead == 255) { // If we immediately read 255, the state log is empty, so return -1 for no state to resume
 		return -1;
 	}
 
 	while (1) {
-		curRead = *(uint8_t *)readAddress;
+		internal_flash_read(readAddress, stateReadBuffer, 1);
+		curRead = stateReadBuffer[0];
 		readAddress += 32;
 
 		// If we reach an empty state or are going to read past the last address
-		if (curRead == 255 || readAddress > maxFlashAddr) {
+		if (curRead == 255 || readAddress > MAX_FLASH_ADDRESS) {
 
 			if (curRead == 0xEE) { // Nothing to resume if the last data is 0xEE
 				return -1;

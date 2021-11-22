@@ -10,8 +10,9 @@ extern "C"{
 #endif
 
 #include <stdint.h>
-#include "stm32h7xx_hal.h"
 #include "filters.h"
+#include "data_log.h"
+#include "internal_flash.h"
 
 void state_log_reload_flight();
 
