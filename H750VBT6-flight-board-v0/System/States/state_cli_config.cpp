@@ -3,7 +3,7 @@
 
 static CliConfigState::Configs_t configVals = {
 	0, 	     // drogueCuts
-	0, 	     // drogueCutAltitudesM
+	{0, 0, 0, 0}, 	     // drogueCutAltitudesM
 	1000000, // mainCutAltitude
 	0, 	     // groundElevationM
 	14.85    // groundTemperatureC
