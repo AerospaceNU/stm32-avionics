@@ -139,6 +139,7 @@ In summary: for each iteration of the filter:
 */
 class AltitudeKalman {
 public:
+    AltitudeKalman(double dt);
 
     // Project our state estimate x forward in time by one timestep
     // See above, but this does x_new = Ax_old + Bu
@@ -151,18 +152,12 @@ public:
     // Get the current estimated position/velocity
     const AltitudeKalmanOutput_t GetXhat() const;
 
+    void SetDt(const double dt);
+
 private:
+    // The estimated state of the rocket. We assume we start at (0,0).
     AltitudeKalmanOutput_t xHat = {0, 0};
     
     // TODO should we calculate this every loop?
-    static constexpr double dt = 0.015;
-    // Recreated per dt
-    // pos = pos-old + vt
-    // vel = vel-old
-    double A[4] = {1,dt,0,1}; 
-    // pos = 1/2 dt^2 a
-    // vel = dt * a
-    double B[2] = {0.5 * dt * dt, dt}; 
-    double C[2] = {1,0}; 
-    double D[1] = {0}; 
+    double m_dt = 0.015;
 };
