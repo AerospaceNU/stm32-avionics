@@ -29,10 +29,12 @@ typedef struct {
 	double qw;
 } FilterData_t;
 
+void filterInit(double dt);
+
 /**
  * @brief Applies filters based on current sensor data
  */
-void filterApplyData(SensorData_t* curSensorVals, int id);
+void filterApplyData(SensorData_t* curSensorVals, bool has_past_apogee);
 
 /**
  * @brief Sets reference pressure used for converting pressure to altitude
