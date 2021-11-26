@@ -103,9 +103,9 @@ int main(void)
   MX_SPI1_Init();
   MX_SPI5_Init();
   MX_TIM1_Init();
-  MX_UART8_Init();
   MX_USB_DEVICE_Init();
   MX_RTC_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
 
   /* Initialize scheduler */

@@ -70,6 +70,10 @@ void Error_Handler(void);
 #define SENSE_ALERT_GPIO_Port GPIOF
 #define BLUETOOTH_CS_Pin GPIO_PIN_10
 #define BLUETOOTH_CS_GPIO_Port GPIOF
+#define GPS_TX_Pin GPIO_PIN_0
+#define GPS_TX_GPIO_Port GPIOA
+#define GPS_RX_Pin GPIO_PIN_1
+#define GPS_RX_GPIO_Port GPIOA
 #define GPS_INT_Pin GPIO_PIN_2
 #define GPS_INT_GPIO_Port GPIOA
 #define AIN_PYRO_V_Pin GPIO_PIN_3
@@ -160,10 +164,6 @@ void Error_Handler(void);
 #define IMU2_INT_GPIO_Port GPIOB
 #define IMU2_FSYNC_Pin GPIO_PIN_5
 #define IMU2_FSYNC_GPIO_Port GPIOB
-#define GPS_RX_Pin GPIO_PIN_0
-#define GPS_RX_GPIO_Port GPIOE
-#define GPS_TX_Pin GPIO_PIN_1
-#define GPS_TX_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
 #define IMU1_AG_HSPI		&hspi3
 #define IMU1_M_HSPI			&hspi3
@@ -194,7 +194,7 @@ void Error_Handler(void);
 
 #define FLASH_HSPI			&hspi1
 
-#define GPS_HUART			&huart8
+#define GPS_HUART			&huart4
 
 #define RADIO_HSPI			&hspi2
 #define RADIO_RDY_GPIO_Port GPIOB
