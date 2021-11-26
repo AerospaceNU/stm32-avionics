@@ -12,7 +12,7 @@ First, pull this git repository using the following command from a directory of 
 
 **Note:** you must have git installed. You can install git bash [here](https://gitforwindows.org/).
 
-Next, open STM32 Cube IDE. If you do not have Cube you can install it from this [link](https://www.st.com/en/development-tools/stm32cubeide.html). Please download version 1.3.0 for compatibility with our code. The default installation options should work.
+Next, open STM32 Cube IDE. If you do not have Cube you can install it from this [link](https://www.st.com/en/development-tools/stm32cubeide.html). Please download version 1.7.0 for compatibility with our code. The default installation options should work.
 
 When opening the IDE, you can use the default workspace. Using the cloned directory may cause problems.
 
@@ -50,7 +50,8 @@ Read this to understand how the code is set up. We will start with important fol
 - Contains third-party tools, such as ST USB Device library. Folders may be generated or imported.
 
 ## Other Important Files
-- ioc: Configuration GUI to generate code for the Core folder. This is where all settings for peripherals should be changed.
+- ioc: Defines configuration GUI to generate code for the Core folder. This is where all settings for peripherals should be changed.
+- cproject: Configuration file for all code-related settings. This consists of includes, source folders, compiler options, build configurations, and more.
 
 # Additional Helpful Info
 
@@ -58,13 +59,7 @@ Read this to understand how the code is set up. We will start with important fol
 
 The following corrections must be applied any time the source files are rebuilt due to a change in the `.ioc` file.
 
-When the sources are rebuilt, there are a few issues created in the sources. The first problem is because our project is a C++ project, but CubeMX generates only C sources. For this reason, the `main.c` file must be deleted.
-
-There is also an uncorrected bug in the USB driver when interfacing with Windows devices. Open `Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c` and on line 510 include the following line of code:
-
-`memset(pdev->pClassData,0,sizeof(USBD_CDC_HandleTypeDef));`
-
-This correction will allow Windows computers to connect to the board over USB as a Virtual COM device. This issue is not present on Linux computers, however this change should always be made when rebuilding sources for cross-platform compatibility.
+When the sources are rebuilt, there is one issue created in the sources. Our project is a C++ project, but CubeMX generates only C sources. For this reason, the `main.c` file must be deleted.
 
 ## Configuring the Build
 
