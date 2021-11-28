@@ -25,8 +25,12 @@ typedef struct __attribute__((__packed__)) ICM20948_RawData_t {
     int16_t gyro_y_raw;
     int16_t gyro_z_raw;
     int16_t temp_raw;
+    int16_t mag_x_raw;
+    int16_t mag_y_raw;
+    int16_t mag_z_raw;
+    uint8_t magStat1, magStat2;
 } ICM20948_RawData_t;
-#define RAW_DATA_SIZE = sizeof(ICM20948_RAWData_t);
+#define RAW_DATA_SIZE 14+9
 
 // Accelerometer fullscale
 typedef enum {
@@ -106,8 +110,11 @@ typedef struct {
 
 typedef struct {
 	SPICtrld_t spiconfig;
+	ICM20948_RawData_t rawData;
 	ICM20948Data_t imuData;
     uint8_t last_bank;
+    ICM_20948_ACCEL_CONFIG_t accel_config;
+    ICM_20948_GYRO_CONFIG_t gyro_config
 } ICM20948Ctrl_t;
 
 bool ICM20948_is_connected(ICM20948Ctrl_t* sensor);
