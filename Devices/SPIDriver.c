@@ -50,7 +50,7 @@ bool SPI_ReadArray(SPICtrld_t* sensor, uint8_t reg, uint8_t* pData, uint8_t len)
 	return true;
 }
 
-void SPI_WriteRegister(SPICtrld_t* sensor, uint8_t reg, uint8_t val) {
+bool SPI_WriteRegister(SPICtrld_t* sensor, uint8_t reg, uint8_t val) {
 	uint8_t txBuff[2];
 	txBuff[0] = reg;
 	txBuff[1] = val;
@@ -60,8 +60,10 @@ void SPI_WriteRegister(SPICtrld_t* sensor, uint8_t reg, uint8_t val) {
 
 	// send the device the register you want to read:
 	// send a value to write
-	HAL_SPI_Transmit(sensor->hspi, txBuff, 2, HAL_MAX_DELAY);
+	HAL_StatusTypeDef ret = HAL_SPI_Transmit(sensor->hspi, txBuff, 2, HAL_MAX_DELAY);
 
 	// bring CS pin high
 	HAL_GPIO_WritePin(sensor->port, sensor->pin, 1);
+
+	return HAL_OK == ret;
 }

@@ -4,7 +4,7 @@
 
 bool set_bank(ICM20948Ctrl_t *sensor, uint8_t bank)
 {
-  SPI_WriteRegister(&sensor->spiconfig, BANK_SELECT, bank);
+  return SPI_WriteRegister(&sensor->spiconfig, BANK_SELECT, bank);
 }
 
 uint8_t spi_read(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg)
@@ -34,7 +34,7 @@ void spi_write(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg, uint8_t val)
     set_bank(sensor, bank);
     sensor->last_bank = bank;
   }
-  return SPI_WriteRegister(&sensor->spiconfig, reg, val);
+  SPI_WriteRegister(&sensor->spiconfig, reg, val);
 }
 
 // from Sparkfun driver
@@ -116,6 +116,11 @@ uint8_t readMag(ICM20948Ctrl_t *sensor, uint8_t reg)
   return data;
 }
 
+uint8_t writeMag(ICM20948Ctrl_t *sensor, uint8_t reg, uint8_t data)
+{
+  return ICM_20948_i2c_controller_periph4_txn(sensor, MAG_AK09916_I2C_ADDR, reg, &data, 1, false, true);
+}
+
 bool ICM20948_init(ICM20948Ctrl_t *sensor, ICM_20948_ACCEL_CONFIG_t accel_config, ICM_20948_GYRO_CONFIG_t gyro_config)
 {
   // Check to make sure we can see the sensor
@@ -165,13 +170,40 @@ bool ICM20948_init(ICM20948Ctrl_t *sensor, ICM_20948_ACCEL_CONFIG_t accel_config
     return false;
   }
 
+  // Set up the magnetometer
+  const uint8_t mag_mode_100hz = 0x04 << 1; // From sparkfun, apparently this is 100hz
+  writeMag(sensor, AK09916_REG_CNTL2, mag_mode_100hz);
+
+  const uint8_t periph_addr_reg = 3;
+  const uint8_t periph_reg_reg = 4;
+  const uint8_t periph_ctrl_reg = 5;
+  // const uint8_t periph_do_reg = 6; // RW is false so this is unnedded
+
+  uint8_t i2c_addr = MAG_AK09916_I2C_ADDR << 1 | 1;
+  spi_write(sensor, 3, periph_addr_reg, i2c_addr);
+
+  uint8_t subaddress = AK09916_REG_ST1;
+  spi_write(sensor, 3, periph_reg_reg, subaddress);
+
+  ICM_20948_I2C_PERIPHX_CTRL_t ctrl;
+  ctrl.LENG = 9;
+  ctrl.EN = true;
+  ctrl.REG_DIS = false;
+  ctrl.GRP = false;
+  ctrl.BYTE_SW = false;
+  spi_write(sensor, 3, periph_ctrl_reg, *((uint8_t *)&ctrl));
+
+  // Set fullscale, Digital low pass config
   ICM20948_set_config(sensor, accel_config, gyro_config);
+
+  return true;
 }
 
 bool ICM20948_set_config(ICM20948Ctrl_t *sensor, ICM_20948_ACCEL_CONFIG_t accel_config, ICM_20948_GYRO_CONFIG_t gyro_config)
 {
   spi_write(sensor, 2, AGB2_ACCEL_CONFIG, *((uint8_t *)&accel_config));
   spi_write(sensor, 2, AGB2_GYRO_CONFIG_1, *((uint8_t *)&gyro_config));
+  return true; // TODO check if it actually worked
 }
 
 bool ICM20948_is_connected(ICM20948Ctrl_t *sensor)
@@ -198,6 +230,8 @@ bool ICM20948_readRaw(ICM20948Ctrl_t *sensor)
   sensor->rawData.mag_y_raw = ((buff[18] << 8) | (buff[17] & 0xFF));
   sensor->rawData.mag_z_raw = ((buff[20] << 8) | (buff[19] & 0xFF));
   sensor->rawData.magStat2 = buff[22];
+
+  return true; // TODO check if it worked
 }
 
 void ICM20948_scale_result(ICM20948Ctrl_t *sensor)
@@ -233,7 +267,7 @@ void ICM20948_scale_result(ICM20948Ctrl_t *sensor)
 
   float mag_scale = 0.15; // uT per LSB
 
-  // Apply scale factors   
+  // Apply scale factors
   sensor->imuData.accel_x = sensor->rawData.accel_x_raw / accel_scale;
   sensor->imuData.accel_y = sensor->rawData.accel_y_raw / accel_scale;
   sensor->imuData.accel_z = sensor->rawData.accel_y_raw / accel_scale;
@@ -246,7 +280,10 @@ void ICM20948_scale_result(ICM20948Ctrl_t *sensor)
   sensor->imuData.temp = ((sensor->rawData.temp_raw - 21) / 333.87) + 21;
 }
 
-bool ICM20948_read(ICM20948Ctrl_t* sensor) {
-  ICM20948_readRaw(sensor);
+bool ICM20948_read(ICM20948Ctrl_t *sensor)
+{
+  bool ret = ICM20948_readRaw(sensor);
   ICM20948_scale_result(sensor);
+
+  return ret;
 }

@@ -66,9 +66,20 @@ typedef struct
     uint8_t PASS_THROUGH : 1;
 } ICM_20948_I2C_MST_STATUS_t;
 
+typedef struct
+{
+    uint8_t LENG : 4;
+    uint8_t GRP : 1;
+    uint8_t REG_DIS : 1;
+    uint8_t BYTE_SW : 1;
+    uint8_t EN : 1;
+} ICM_20948_I2C_PERIPHX_CTRL_t;
+
 // I2c magnetometer stupidity
 #define MAG_AK09916_I2C_ADDR 0x0C
 #define MAG_AK09916_WHO_AM_I 0x4809
+#define AK09916_REG_CNTL2 0x31
+#define AK09916_REG_ST1 0x10
 #define MAG_REG_WHO_AM_I 0x00
 
 // Registers

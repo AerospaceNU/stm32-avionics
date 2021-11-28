@@ -90,11 +90,6 @@ typedef struct
     uint8_t reserved_0 : 2;
 } ICM_20948_GYRO_CONFIG_t;
 
-// Option registers
-// Note that these are ordered backwards of the datasheet
-// So the last element of the enum is the top bit
-#define PWR_MGMT_1 0x6
-
 typedef struct {
     double accel_x;
     double accel_y;
@@ -114,7 +109,7 @@ typedef struct {
 	ICM20948Data_t imuData;
     uint8_t last_bank;
     ICM_20948_ACCEL_CONFIG_t accel_config;
-    ICM_20948_GYRO_CONFIG_t gyro_config
+    ICM_20948_GYRO_CONFIG_t gyro_config;
 } ICM20948Ctrl_t;
 
 bool ICM20948_is_connected(ICM20948Ctrl_t* sensor);
