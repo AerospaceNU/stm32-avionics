@@ -53,22 +53,27 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, BARO2_CS_Pin|LED1_Pin|LED2_Pin|BLUETOOTH_CS_Pin
-                          |RADIO_CS_Pin|IMU2_M_CS_Pin|IMU2_AG_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, BARO2_CS_Pin|BLUETOOTH_CS_Pin|RADIO_CS_Pin|IMU2_M_CS_Pin
+                          |IMU2_AG_CS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(FLASH_CS_GPIO_Port, FLASH_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(FLASH_CS_GPIO_Port, FLASH_CS_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, LED1_Pin|LED2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(RADIO_RST_GPIO_Port, RADIO_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, FIRE6_Pin|FIRE5_Pin|FIRE4_Pin|FIRE3_Pin
-                          |FIRE2_Pin|FIRE1_Pin|IMU1_M_CS_Pin|IMU1_AG_CS_Pin
-                          |HIGH_G_CS_Pin, GPIO_PIN_RESET);
+                          |FIRE2_Pin|FIRE1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(BARO1_CS_GPIO_Port, BARO1_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(BARO1_CS_GPIO_Port, BARO1_CS_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, IMU1_M_CS_Pin|IMU1_AG_CS_Pin|HIGH_G_CS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pins : PEPin PEPin PEPin PEPin
                            PEPin PEPin PEPin */

@@ -55,25 +55,39 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, IMU2_CS_Pin|BARO2_CS_Pin|FIRE1_Pin|LED1_Pin
-                          |LED2_Pin|LED3_Pin|LED4_Pin|LED5_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, IMU2_CS_Pin|BARO2_CS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOF, BLUETOOTH_CS_Pin|FIRE6_Pin|FIRE5_Pin|FIRE4_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(BLUETOOTH_CS_GPIO_Port, BLUETOOTH_CS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, FLASH_CS_Pin|BARO1_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, FLASH_CS_Pin|BARO1_CS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, FIRE3_Pin|FIRE2_Pin|SERVO_EN_Pin|IMU1_M_CS_Pin
-                          |IMU1_AG_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOF, FIRE6_Pin|FIRE5_Pin|FIRE4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, RADIO_CS_Pin|IMU2_FSYNC_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOG, FIRE3_Pin|FIRE2_Pin|SERVO_EN_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, FIRE1_Pin|LED1_Pin|LED2_Pin|LED3_Pin
+                          |LED4_Pin|LED5_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(RADIO_CS_GPIO_Port, RADIO_CS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, RADIO_RST_Pin|HGM_Pin|HIGH_G_INT1_Pin|HIGH_G_INT2_Pin
-                          |HIGH_G_CS_Pin|IMU1_AG_INT2_Pin|IMU1_AG_INT1_Pin|IMU1_M_INT_Pin, GPIO_PIN_RESET);
+                          |IMU1_AG_INT2_Pin|IMU1_AG_INT1_Pin|IMU1_M_INT_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(HIGH_G_CS_GPIO_Port, HIGH_G_CS_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOG, IMU1_M_CS_Pin|IMU1_AG_CS_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(IMU2_FSYNC_GPIO_Port, IMU2_FSYNC_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PEPin PEPin PEPin PEPin
                            PEPin PEPin PEPin PEPin */
