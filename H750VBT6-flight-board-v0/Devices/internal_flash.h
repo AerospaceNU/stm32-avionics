@@ -5,6 +5,10 @@
 #ifndef INTERNAL_FLASH_H_
 #define INTERNAL_FLASH_H_
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 #include "stm32h7xx_hal.h"
 #include <stdbool.h>
 
@@ -16,5 +20,8 @@ bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data, uint32_t numB
 
 bool internal_flash_read(uint32_t RelFlashAddress, uint8_t *pData, uint32_t numBytes);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* INTERNAL_FLASH_H_ */
