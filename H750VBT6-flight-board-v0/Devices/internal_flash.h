@@ -9,7 +9,6 @@
 extern "C"{
 #endif
 
-#include "stm32h7xx_hal.h"
 #include <stdbool.h>
 
 #define FLASH_START_ADDRESS      0x08020000

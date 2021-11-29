@@ -3,6 +3,7 @@
  */
 
 #include "internal_flash.h"
+#include "stm32h7xx_hal.h"
 
 /*
  * Writes to the internal flash of the H750VBT6
