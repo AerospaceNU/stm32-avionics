@@ -4,6 +4,7 @@
 
 #include "internal_flash.h"
 #include "stm32h7xx_hal.h"
+#include <string.h>
 
 /*
  * Writes to the internal flash of the H750VBT6
@@ -12,7 +13,6 @@
  * @param numBytes - Number of bytes to be written from data
  */
 bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data, uint32_t numBytes) {
-
 	if (RelFlashAddress % 32) { //Relative address must be a multiple of 32
 		return false;
 	};
@@ -27,17 +27,14 @@ bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data, uint32_t numB
 
 	HAL_FLASH_Unlock();
 	uint32_t sofar = 0;
-	uint32_t index;
+	uint32_t copyBytes;
 	while (sofar < numBytes) {
-		index = 0;
-		while (index + sofar < numBytes && index < 32) {
-			flashWriteBuffer[index] = data[index + sofar];
-			++index;
-		}
-		sofar += index;
-		while (index < 32) {
-			flashWriteBuffer[index++] = 0xFF; //Fill remaining bytes with FF
-		}
+		copyBytes = (numBytes - sofar < 32) ? numBytes - sofar : 32; // Copy either 32 bytes, or less if we don't need to copy that many
+		memcpy(flashWriteBuffer, data + sofar, copyBytes);
+
+		memset(flashWriteBuffer + copyBytes, 0xFF, 32 - copyBytes); // Set any remaining bytes to 0xFF
+
+		sofar += copyBytes;
 
 		HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, writeAddress, (uint32_t)&flashWriteBuffer); // Write to the flash
 		writeAddress += 32;
@@ -58,10 +55,7 @@ bool internal_flash_read(uint32_t RelFlashAddress, uint8_t *pData, uint32_t numB
 		return false;
 	}
 
-	uint32_t sofar = 0;
-	while (sofar < numBytes) {
-		pData[sofar++] = *(uint8_t *)readAddress++;
-	}
+	memcpy(pData, (uint8_t *)readAddress, numBytes);
 
 	return true;
 }

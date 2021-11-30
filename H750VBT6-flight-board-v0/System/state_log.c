@@ -25,11 +25,11 @@ void state_log_reload_flight() {
  * @param currentState: int representation of the state id
  */
 void state_log_write(int currentState) {
-	uint8_t stateWriteBuffer[1]; // Buffer to store the byte that needs to be written to flash
-	uint8_t stateReadBuffer[1];
+	uint8_t stateWriteBuffer; // Buffer to store the byte that needs to be written to flash
+	uint8_t stateReadBuffer;
 	while (1) {
-		internal_flash_read(writeAddress, stateReadBuffer, 1);
-		curRead = stateReadBuffer[0]; // Read from the address
+		internal_flash_read(writeAddress, &stateReadBuffer, 1);
+		curRead = stateReadBuffer; // Read from the address
 		if (curRead == 255) { // Find the first empty address
 			break;
 		}
@@ -43,12 +43,12 @@ void state_log_write(int currentState) {
 	// that no state should be resumed, because we can't be sure
 	// that the state it would resume is correct
 	if (writeAddress == MAX_FLASH_ADDRESS - 31) {
-		stateWriteBuffer[0] = (uint8_t)(0xEE);
+		stateWriteBuffer = (uint8_t)(0xEE);
 	} else {
-		stateWriteBuffer[0] = (uint8_t)(currentState); // Otherwise write the state
+		stateWriteBuffer = (uint8_t)(currentState); // Otherwise write the state
 	}
 
-	internal_flash_write(writeAddress, stateWriteBuffer, 1);
+	internal_flash_write(writeAddress, &stateWriteBuffer, 1);
 }
 
 void state_log_write_complete() {
@@ -60,17 +60,17 @@ void state_log_write_complete() {
  * @return int representing the state id
  */
 int state_log_read() {
-	uint8_t stateReadBuffer[1];
-	internal_flash_read(readAddress, stateReadBuffer, 1);
-	prevRead = stateReadBuffer[0];
+	uint8_t stateReadBuffer;
+	internal_flash_read(readAddress, &stateReadBuffer, 1);
+	prevRead = stateReadBuffer;
 
 	if (prevRead == 255) { // If we immediately read 255, the state log is empty, so return -1 for no state to resume
 		return -1;
 	}
 
 	while (1) {
-		internal_flash_read(readAddress, stateReadBuffer, 1);
-		curRead = stateReadBuffer[0];
+		internal_flash_read(readAddress, &stateReadBuffer, 1);
+		curRead = stateReadBuffer;
 		readAddress += 32;
 
 		// If we reach an empty state or are going to read past the last address

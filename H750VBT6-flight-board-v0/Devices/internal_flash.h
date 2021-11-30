@@ -10,6 +10,7 @@ extern "C"{
 #endif
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #define FLASH_START_ADDRESS      0x08020000
 #define FLASH_END_ADDRESS        0x081FFFFF
