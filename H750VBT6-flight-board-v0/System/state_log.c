@@ -14,10 +14,12 @@ uint8_t prevRead;
  * @brief Reinitializes needed parameters for an in-flight restart
  */
 void state_log_reload_flight() {
-	FlightMetadata metadataPacket = data_log_get_last_stored_flight_metadata();
-	filterSetPressureRef(metadataPacket.pressureRef); // Set the ground pressure to the recovered value
-	data_log_write_pressure_metadata(); // Write a new metadata packet with the current flight metadata
-	data_log_assign_flight(); // Assign a new flight number for the restart flight
+	data_log_load_last_stored_flight_metadata(); // Load the previous flight metadata into the data log
+	FlightMetadata oldMetadataPacket = data_log_get_metadata(); // Get the previous flight metadata
+	filterSetPressureRef(oldMetadataPacket.pressureRef); // Set the ground pressure to the recovered value
+	data_log_assign_flight(); // Start a new flight
+	data_log_set_pressure_metadata(oldMetadataPacket.pressureRef); // Write a new metadata packet with the current flight metadata
+	data_log_write_metadata();
 }
 
 /*

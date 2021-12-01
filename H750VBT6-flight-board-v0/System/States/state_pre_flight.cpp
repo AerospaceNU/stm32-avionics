@@ -18,7 +18,6 @@ void PreFlightState::init() {
 }
 
 EndCondition_t PreFlightState::run() {
-
 	// Produce a tone for each functioning peripheral
 	buzzerReport();
 
@@ -72,8 +71,8 @@ void PreFlightState::cleanup() {
 	for (int i = 0; i < kBufferSize; i++) {
 		data_log_write(&sensorDataBuffer[i], &filterDataBuffer[i], this->getID());
 	}
-	
-	data_log_write_pressure_metadata();
+	data_log_set_pressure_metadata(filterGetPressureRef()); // Write pressure reference metadata
+	data_log_write_metadata();
 }
 
 

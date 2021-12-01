@@ -38,6 +38,7 @@ typedef struct __attribute__((__packed__)) LogData {
 } LogData;
 
 static LogData logPacket;
+static FlightMetadata metadataPacket;
 
 static const uint8_t kLogDataSize = sizeof(LogData);
 
@@ -78,12 +79,16 @@ uint32_t data_log_get_last_flight_num() {
 	return lastFlightNum;
 }
 
-FlightMetadata data_log_get_last_stored_flight_metadata() {
+void data_log_load_last_stored_flight_metadata() {
 	flightNum = data_log_get_last_flight_num(); // Load the previous flight number and sector
 	uint8_t metadataRxBuff[kFlightMetadataSize]; // Create a buffer for the metadata
-	HM_FlashReadStart(curSectorNum * FLASH_SECTOR_BYTES, 8, metadataRxBuff); // Read the metadata
-	FlightMetadata metadataPacket = *(FlightMetadata*)&metadataRxBuff;
-	return metadataPacket; // Cast the buffer as a metadata packet and return
+	uint32_t metadataReadAddress = (curSectorNum - 1) * FLASH_SECTOR_BYTES;
+	HM_FlashReadStart(metadataReadAddress, kFlightMetadataSize, metadataRxBuff); // Read the metadata
+	metadataPacket = *(FlightMetadata*)&metadataRxBuff;
+}
+
+FlightMetadata data_log_get_metadata() {
+	return metadataPacket;
 }
 
 void data_log_assign_flight() {
@@ -121,12 +126,15 @@ void data_log_assign_flight() {
 	curWriteAddress = curSectorNum * FLASH_SECTOR_BYTES + FLIGHT_METADATA_PAGES * FLASH_PAGE_SIZE_BYTES;
 }
 
-void data_log_write_pressure_metadata() {
+void data_log_set_pressure_metadata(double presRef) {
+	if (flightNum > 0) {
+		metadataPacket.pressureRef = presRef; // Set the correct pressure reference
+	}
+}
+
+void data_log_write_metadata() {
 	if (flightNum > 0) {
 		uint32_t metadataWriteAddress = curSectorNum * FLASH_SECTOR_BYTES; // Metadata is located at the start of the flight sector
-		FlightMetadata metadataPacket = data_log_get_last_stored_flight_metadata(); // Fetch previous flight metadata as we want to copy it
-		metadataPacket.pressureRef = filterGetPressureRef(); // Find pressure reference from filter
-
 		HM_FlashWriteStart(metadataWriteAddress, kFlightMetadataSize, (uint8_t*)&metadataPacket); // Write the metadata packet
 	}
 }
