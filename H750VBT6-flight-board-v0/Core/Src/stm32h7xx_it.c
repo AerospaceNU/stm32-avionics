@@ -73,7 +73,7 @@ extern UART_HandleTypeDef huart5;
 /* USER CODE END EV */
 
 /******************************************************************************/
-/*           Cortex Processor Interruption and Exception Handlers          */ 
+/*           Cortex Processor Interruption and Exception Handlers          */
 /******************************************************************************/
 /**
   * @brief This function handles Non maskable interrupt.
@@ -83,7 +83,6 @@ void NMI_Handler(void)
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
 
   /* USER CODE END NonMaskableInt_IRQn 0 */
-  HAL_RCC_NMI_IRQHandler();
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
 
   /* USER CODE END NonMaskableInt_IRQn 1 */

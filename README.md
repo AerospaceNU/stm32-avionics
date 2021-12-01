@@ -12,27 +12,54 @@ First, pull this git repository using the following command from a directory of 
 
 **Note:** you must have git installed. You can install git bash [here](https://gitforwindows.org/).
 
-Next, open STM32 Cube IDE. If you do not have Cube you can install it from this [link](https://www.st.com/en/development-tools/stm32cubeide.html). Please download version 1.3.0 for compatibility with our code. The default installation options should work.
+Next, open STM32 Cube IDE. If you do not have Cube you can install it from this [link](https://www.st.com/en/development-tools/stm32cubeide.html). Please download version 1.7.0 for compatibility with our code. The default installation options should work.
 
 When opening the IDE, you can use the default workspace. Using the cloned directory may cause problems.
 
-Once the IDE is open, you can import the project. Navigate to `File -> Import -> General -> Existing Projects into Workspace`. Browse for the `H750VBT6-flight-board-v0` folder in `stm32-avionics`. Make sure `Search for nested projects` is checked and that none of the other options are checked. The code should build at this point by clicking on the hammer icon.
+Once the IDE is open, you can import the project. Navigate to `File -> Import -> General -> Existing Projects into Workspace`. Browse for the `H750VBT6-flight-board-v0` folder (or another board version) in `stm32-avionics`. Make sure `Search for nested projects` is checked and that none of the other options are checked. The code should build at this point by clicking on the hammer icon.
 
 ## Running Code Using Debug
 
-To run code in debug mode, click on the bug symbol drop down. Click on `H750VBT6-flight-board-v0 Debug`. If it doesn't show up, click on `Debug Configurations...` and find it. The code should load onto the board.
+To run code in debug mode, click on the bug symbol drop down. Click on `H750VBT6-flight-board-v0` or the equivalent for the specific board version. If it doesn't show up, click on `Debug Configurations...` and find it. The code should load onto the board.
+
+# Code Overview
+Read this to understand how the code is set up. We will start with important folders with custom code then move to folders with "generated" code.
+
+## Devices
+- Files for communicating with hardware connected to the microcontroller
+- Calls HAL functions located in Driver folder
+
+## System
+- All files that don't deal directly with hardware.
+- These files should not call any code from Devices or HAL drivers, except for Hardware Manager.
+- Scheduler: Controls all states, including running current state and transitioning between states.
+- States: Hold an init, run, and cleanup function for scheduler to call. Running returns an end condition to help the scheduler determine what to do next.
+- Hardware Manager: Wrapper for all calls to Devices folder. Allows simplification from system level, such as calling a function to get all sensor data, initialize all sensor data, etc.
+- Others, like Data Log, Data Transmission, Filters: Files that don't need to know about hardware directly because the underlying implementation doesn't matter. For instance, it doesn't matter how the flash or radio are set up to call a function from hardware manager to control them.
+
+## Core
+- This folder is full of generated code. It will change when you generate code from the configuration GUI.
+- The only reason to edit files in this folder directly is to start your system level code in main.cpp. If editing, only write code in between the USER_CODE_BEGIN USER_CODE_END comments.
+- We replaced the generated main.c with a main.cpp. Whenever code is generated, you must delete the generated main.c, or building the code will fail.
+
+## Drivers
+- HAL drivers
+- Directory is created after generating code from the configuration GUI. The contents of each file should never change after a project is created.
+
+## Middlewares
+- Contains third-party tools, such as ST USB Device library. Folders may be generated or imported.
+
+## Other Important Files
+- ioc: Defines configuration GUI to generate code for the Core folder. This is where all settings for peripherals should be changed.
+- cproject: Configuration file for all code-related settings. This consists of includes, source folders, compiler options, build configurations, and more.
+
+# Additional Helpful Info
 
 ## Correcting Regenerated Sources
 
 The following corrections must be applied any time the source files are rebuilt due to a change in the `.ioc` file.
 
-When the sources are rebuilt, there are a few issues created in the sources. The first problem is because our project is a C++ project, but CubeMX generates only C sources. For this reason, the `main.c` file must be deleted.
-
-There is also an uncorrected bug in the USB driver when interfacing with Windows devices. Open `Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c` and on line 510 include the following line of code:
-
-`memset(pdev->pClassData,0,sizeof(USBD_CDC_HandleTypeDef));`
-
-This correction will allow Windows computers to connect to the board over USB as a Virtual COM device. This issue is not present on Linux computers, however this change should always be made when rebuilding sources for cross-platform compatibility.
+When the sources are rebuilt, there is one issue created in the sources. Our project is a C++ project, but CubeMX generates only C sources. For this reason, the `main.c` file must be deleted.
 
 ## Configuring the Build
 
