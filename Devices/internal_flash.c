@@ -6,6 +6,79 @@
 #include "stm32h7xx_hal.h"
 #include <string.h>
 
+#define FLASH_TIMEOUT_VALUE              50000U /* 50 s */
+
+/**
+  * @brief  Duplicate of HAL_FLASH_Program but without checking for a valid flash address
+  * @param  TypeProgram Indicate the way to program at a specified address.
+  *         This parameter can be a value of @ref FLASH_Type_Program
+  * @param  FlashAddress specifies the address to be programmed.
+  *         This parameter shall be aligned to the Flash word:
+  *          - 256 bits for STM32H74x/5X devices (8x 32bits words)
+  *          - 128 bits for STM32H7Ax/BX devices (4x 32bits words)
+  *          - 256 bits for STM32H72x/3X devices (8x 32bits words)
+  * @param  DataAddress specifies the address of data to be programmed.
+  *         This parameter shall be 32-bit aligned
+  *
+  * @retval HAL_StatusTypeDef HAL Status
+  */
+HAL_StatusTypeDef HAL_FLASH_Extra_Program(uint32_t TypeProgram, uint32_t FlashAddress, uint32_t DataAddress)
+{
+  HAL_StatusTypeDef status;
+  __IO uint32_t *dest_addr = (__IO uint32_t *)FlashAddress;
+  __IO uint32_t *src_addr = (__IO uint32_t*)DataAddress;
+  uint32_t bank;
+  uint8_t row_index = FLASH_NB_32BITWORD_IN_FLASHWORD;
+
+  /* Check the parameters */
+  assert_param(IS_FLASH_TYPEPROGRAM(TypeProgram));
+  // assert_param(IS_FLASH_PROGRAM_ADDRESS(FlashAddress));
+
+  /* Process Locked */
+  __HAL_LOCK(&pFlash);
+
+  bank = FLASH_BANK_1;
+
+  /* Reset error code */
+  pFlash.ErrorCode = HAL_FLASH_ERROR_NONE;
+
+  /* Wait for last operation to be completed */
+  status = FLASH_WaitForLastOperation((uint32_t)FLASH_TIMEOUT_VALUE, bank);
+
+
+  SET_BIT(FLASH->CR1, FLASH_CR_PG);
+
+  __ISB();
+  __DSB();
+
+
+  /* Program the flash word */
+  do
+  {
+    *dest_addr = *src_addr;
+    dest_addr++;
+    src_addr++;
+    row_index--;
+  } while (row_index != 0U);
+
+
+  __ISB();
+  __DSB();
+
+   /* Wait for last operation to be completed */
+   status = FLASH_WaitForLastOperation((uint32_t)FLASH_TIMEOUT_VALUE, bank);
+
+
+      /* If the program operation is completed, disable the PG */
+   CLEAR_BIT(FLASH->CR1, FLASH_CR_PG);
+
+
+  /* Process Unlocked */
+  __HAL_UNLOCK(&pFlash);
+
+  return status;
+}
+
 /*
  * Writes to the internal flash of the H750VBT6
  * @param RelFlashAddress - Relative address to write to, where 0 means the defined start of writable internal flash
@@ -36,7 +109,7 @@ bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data, uint32_t numB
 
 		sofar += copyBytes;
 
-		HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, writeAddress, (uint32_t)&flashWriteBuffer); // Write to the flash
+		HAL_FLASH_Extra_Program(FLASH_TYPEPROGRAM_FLASHWORD, writeAddress, (uint32_t)&flashWriteBuffer); // Write to the flash
 		writeAddress += 32;
 	}
 	HAL_FLASH_Lock();
