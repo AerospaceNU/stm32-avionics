@@ -18,6 +18,14 @@
 
 #include "arm_math.h"
 
+/**
+ * @brief Holds an arm matrix internally, with wrappers for common operations.
+ * Currently supported:
+ * +-, dot, inverse
+ * 
+ * @tparam Rows 
+ * @tparam Cols 
+ */
 template <int Rows, int Cols>
 class Matrix {
 public:
@@ -27,13 +35,28 @@ public:
 
 	template<int N>
 	Matrix<Rows, N> operator*(const Matrix<Cols, N> &other) {
-		return Dot(other);
-	}
-
-	template<int N>
-	Matrix<Rows, N> Dot(const Matrix<Cols, N>& other) {
 		Matrix<Rows, N> ret = {};
 		arm_mat_mult_f32(&this->m_matrix, &other.m_matrix, &ret.m_matrix);
+		return ret;
+	}
+	
+	Matrix<Rows, Cols> operator+(const Matrix<Rows, Cols> &other) {
+		Matrix<Rows, Cols> ret = {};
+		arm_mat_add_f32(&this->m_matrix, &other.m_matrix, &ret.m_matrix);
+		return ret;
+	}
+
+	Matrix<Rows, Cols> operator-(const Matrix<Rows, Cols> &other) {
+		Matrix<Rows, Cols> ret = {};
+		arm_mat_sub_f32(&this->m_matrix, &other.m_matrix, &ret.m_matrix);
+		return ret;
+	}
+
+
+	Matrix<Rows, Rows> inverse() {
+		static_assert(Rows == Cols, "Matrix must be square to invert!");
+		Matrix<Rows, Rows> ret = {};
+		arm_mat_inverse_f32(&this->m_matrix, &ret.m_matrix);
 		return ret;
 	}
 
