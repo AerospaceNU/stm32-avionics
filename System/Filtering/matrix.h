@@ -9,7 +9,13 @@
 #define FILTERING_MATRIX_H_
 
 #define ARM_MATH_CM7
+
+#if FCB_VERSION == 0
 #include "stm32h750xx.h"
+#elif FCB_VERSION == 1
+#include "stm32h743xx.h"
+#endif
+
 #include "arm_math.h"
 
 template <int Rows, int Cols>
