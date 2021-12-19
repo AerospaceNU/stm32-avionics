@@ -81,6 +81,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/H750VBT6-flight-board-v0/System/CMSIS}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/H750VBT6-flight-board-v0/Drivers/CMSIS/Device/ST/STM32H7xx/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/H750VBT6-flight-board-v0/System/Filtering}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/H743ZIT6-flight-board-v1/System/CMSIS}&quot;"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1145763924" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -113,6 +114,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/System/Tasks/cli}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/H750VBT6-flight-board-v0/System/CMSIS}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/H750VBT6-flight-board-v0/Drivers/CMSIS/Device/ST/STM32H7xx/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../System\CMSIS&quot;"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.input.cpp.121871861" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.input.cpp"/>
 							</tool>
