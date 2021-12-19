@@ -17,6 +17,7 @@
 #endif
 
 #include "arm_math.h"
+#include <initializer_list>
 
 /**
  * @brief Holds an arm matrix internally, with wrappers for common operations.
@@ -31,6 +32,11 @@ class Matrix {
 public:
 	Matrix() {
 		  arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray);
+	}
+
+	Matrix(const float32_t(&list)[Rows*Cols]) {
+		memcpy(m_backingArray, list, Rows*Cols*sizeof(float32_t));
+		arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray);
 	}
 
 	template<int N>
