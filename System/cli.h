@@ -30,7 +30,7 @@ typedef enum CliCommand_t {
 	CALIBRATE,
 	SHUTDOWN,
 	CONFIG,
-	ERASE,
+	ERASE_FLASH,
 	HELP
 } CliCommand_t;
 
@@ -40,6 +40,7 @@ typedef enum CliCommand_t {
 typedef struct {
 	char* f; // flight number
 	char* d; // drogue altitude
+	char* m; // main altitude
 	char* e; // ground elevation
 	char* t; // ground temperature
 	bool h;  // help flag
@@ -62,16 +63,24 @@ void cliInit();
 CliCommand_t cliParse(CliComms_t commsType);
 
 /**
+ * @brief Send message back to user via appropriate medium
+ * @param msg: Message to send to user as string
+ */
+void cliSend(const char* msg);
+
+/**
  * @brief Send acknowledgement of receive back to user
  * @param success: Whether acknowledgement should be a success or failure
+ * @param errMsg: Message to send if error occurred
  */
-void cliSendAck(bool success);
+void cliSendAck(bool success, const char* errMsg);
 
 /**
  * @brief Send task completion status back to user
  * @param completeSuccess: Whether completion was success or failure
+ * @param errMsg: Message to send if error occurred
  */
-void cliSendComplete(bool completeSuccess);
+void cliSendComplete(bool completeSuccess, const char* errMsg);
 
 /**
  * @brief Returns cli options (values and flags) raw (no conversions to other data types)

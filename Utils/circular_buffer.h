@@ -19,6 +19,7 @@ typedef struct {
     size_t count;       // number of items in the buffer
     size_t size;        // size of each item in the buffer
     void *head;         // pointer to head
+    void *tail;
 } CircularBuffer_t;
 
 /**

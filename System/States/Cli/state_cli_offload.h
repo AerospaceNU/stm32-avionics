@@ -19,6 +19,9 @@ class CliOffloadState : public State {
 		EndCondition_t run(void) override;
 
 		void cleanup(void) override;
+
+	private:
+		bool initSuccess_;
 };
 
 #ifdef __cplusplus

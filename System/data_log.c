@@ -5,7 +5,6 @@
 
 #include <stdbool.h>
 #include <string.h>
-#include "stm32h7xx_hal.h"
 
 #define BOARD_VERSION 		FCB_VERSION
 #define BOARD_ID 			0x01

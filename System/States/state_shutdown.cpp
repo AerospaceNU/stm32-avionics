@@ -1,8 +1,12 @@
 
+#include "cli.h"
 #include "state_shutdown.h"
 
 void ShutdownState::init() {
-
+	// Send acknowledgement that this command was reached
+	cliSendAck(true, nullptr);
+	// Notify CLI that shutdown has completed
+	cliSendComplete(true, nullptr);
 }
 
 EndCondition_t ShutdownState::run() {
@@ -12,6 +16,3 @@ EndCondition_t ShutdownState::run() {
 void ShutdownState::cleanup() {
 
 }
-
-
-

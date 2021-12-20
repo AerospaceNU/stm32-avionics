@@ -1,16 +1,18 @@
 
 #include "state_cli_calibrate.h"
 
-void CliCalibrateState::init() {
+#include "cli.h"
 
+void CliCalibrateState::init() {
+	cliSendAck(true, nullptr);
 }
 
 EndCondition_t CliCalibrateState::run() {
-	return EndCondition_t::NoChange;
+	return EndCondition_t::CliCommandComplete;
 }
 
 void CliCalibrateState::cleanup() {
-
+	cliSendComplete(true, nullptr);
 }
 
 
