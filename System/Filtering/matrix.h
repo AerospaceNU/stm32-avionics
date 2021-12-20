@@ -34,7 +34,9 @@ public:
 		  arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray);
 	}
 
-	Matrix(const float32_t(&list)[Rows*Cols]) {
+	template <int N>
+	Matrix(const float32_t(&list)[N]) {
+		static_assert(N==Rows*Cols, "Array must be the same length as the matrix!");
 		memcpy(m_backingArray, list, Rows*Cols*sizeof(float32_t));
 		arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray);
 	}
