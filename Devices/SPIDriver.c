@@ -5,7 +5,6 @@
  *      Author: John
  */
 
-#include "main.h"
 #include "SPIDriver.h"
 
 uint8_t SPI_ReadRegister(SPICtrld_t* sensor, uint8_t reg) {

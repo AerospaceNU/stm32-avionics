@@ -53,7 +53,7 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl) {
 	uint8_t convertD1_512 = 0x42;
 	uint8_t convertD2_512 = 0x52;
 
-	uint8_t read = 0x00;
+	uint8_t read[4] = {0x00};
 
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(altCtrl->spiconfig.hspi, &convertD1_512, 1, 1000);
@@ -61,7 +61,7 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl) {
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
 
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_RESET);
-	HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, &read, presStore, 4, 1000);
+	HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, read, presStore, 4, 1000);
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
 
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_RESET);
@@ -70,7 +70,7 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl) {
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
 
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_RESET);
-	HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, &read, tempStore, 4, 1000);
+	HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, read, tempStore, 4, 1000);
 	HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin, GPIO_PIN_SET);
 
 	uint32_t D1 = (presStore[1] << 16 | presStore[2] << 8 | presStore[3]);

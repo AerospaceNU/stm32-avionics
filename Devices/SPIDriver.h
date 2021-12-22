@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#include "main.h"
+#include "stm32h7xx_hal.h"
 
 typedef struct SPICtrl_s{
 	SPI_HandleTypeDef* hspi;
