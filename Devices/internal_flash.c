@@ -22,61 +22,65 @@
   *
   * @retval HAL_StatusTypeDef HAL Status
   */
-HAL_StatusTypeDef HAL_FLASH_Extra_Program(uint32_t TypeProgram, uint32_t FlashAddress, uint32_t DataAddress)
+HAL_StatusTypeDef Internal_Flash_Program(uint32_t TypeProgram, uint32_t FlashAddress, uint32_t DataAddress)
 {
-  HAL_StatusTypeDef status;
-  __IO uint32_t *dest_addr = (__IO uint32_t *)FlashAddress;
-  __IO uint32_t *src_addr = (__IO uint32_t*)DataAddress;
-  uint32_t bank;
-  uint8_t row_index = FLASH_NB_32BITWORD_IN_FLASHWORD;
+	#if (FCB_VERSION == 1)
+	return HAL_FLASH_Program(TypeProgram, FlashAddress, DataAddress);
+	#else
+	HAL_StatusTypeDef status;
+	__IO uint32_t *dest_addr = (__IO uint32_t *)FlashAddress;
+	__IO uint32_t *src_addr = (__IO uint32_t*)DataAddress;
+	uint32_t bank;
+	uint8_t row_index = FLASH_NB_32BITWORD_IN_FLASHWORD;
 
-  /* Check the parameters */
-  assert_param(IS_FLASH_TYPEPROGRAM(TypeProgram));
-  // assert_param(IS_FLASH_PROGRAM_ADDRESS(FlashAddress));
+	/* Check the parameters */
+	assert_param(IS_FLASH_TYPEPROGRAM(TypeProgram));
+	// assert_param(IS_FLASH_PROGRAM_ADDRESS(FlashAddress));
 
-  /* Process Locked */
-  __HAL_LOCK(&pFlash);
+	/* Process Locked */
+	__HAL_LOCK(&pFlash);
 
-  bank = FLASH_BANK_1;
+	bank = FLASH_BANK_1;
 
-  /* Reset error code */
-  pFlash.ErrorCode = HAL_FLASH_ERROR_NONE;
+	/* Reset error code */
+	pFlash.ErrorCode = HAL_FLASH_ERROR_NONE;
 
-  /* Wait for last operation to be completed */
-  status = FLASH_WaitForLastOperation((uint32_t)FLASH_TIMEOUT_VALUE, bank);
-
-
-  SET_BIT(FLASH->CR1, FLASH_CR_PG);
-
-  __ISB();
-  __DSB();
+	/* Wait for last operation to be completed */
+	status = FLASH_WaitForLastOperation((uint32_t)FLASH_TIMEOUT_VALUE, bank);
 
 
-  /* Program the flash word */
-  do
-  {
-    *dest_addr = *src_addr;
-    dest_addr++;
-    src_addr++;
-    row_index--;
-  } while (row_index != 0U);
+	SET_BIT(FLASH->CR1, FLASH_CR_PG);
+
+	__ISB();
+	__DSB();
 
 
-  __ISB();
-  __DSB();
+	/* Program the flash word */
+	do
+	{
+	*dest_addr = *src_addr;
+	dest_addr++;
+	src_addr++;
+	row_index--;
+	} while (row_index != 0U);
 
-   /* Wait for last operation to be completed */
-   status = FLASH_WaitForLastOperation((uint32_t)FLASH_TIMEOUT_VALUE, bank);
+
+	__ISB();
+	__DSB();
+
+	/* Wait for last operation to be completed */
+	status = FLASH_WaitForLastOperation((uint32_t)FLASH_TIMEOUT_VALUE, bank);
 
 
-      /* If the program operation is completed, disable the PG */
-   CLEAR_BIT(FLASH->CR1, FLASH_CR_PG);
+		/* If the program operation is completed, disable the PG */
+	CLEAR_BIT(FLASH->CR1, FLASH_CR_PG);
 
 
-  /* Process Unlocked */
-  __HAL_UNLOCK(&pFlash);
+	/* Process Unlocked */
+	__HAL_UNLOCK(&pFlash);
 
-  return status;
+	return status;
+	#endif
 }
 
 /*
@@ -86,15 +90,11 @@ HAL_StatusTypeDef HAL_FLASH_Extra_Program(uint32_t TypeProgram, uint32_t FlashAd
  * @param numBytes - Number of bytes to be written from data
  */
 bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data, uint32_t numBytes) {
-	if (RelFlashAddress % 32) { //Relative address must be a multiple of 32
+	if (RelFlashAddress % 32 || RelFlashAddress > MAX_FLASH_ADDRESS) { //Relative address must be a multiple of 32 and within bounds
 		return false;
 	};
 
-	uint32_t writeAddress = FLASH_START_ADDRESS + RelFlashAddress;
-
-	if (writeAddress + numBytes > FLASH_END_ADDRESS) {
-		return false;
-	}
+	uint32_t writeAddress = INTERNAL_FLASH_START + RelFlashAddress;
 
 	uint8_t flashWriteBuffer[32]; //Flash writes only in increments of 32 bytes
 
@@ -109,7 +109,7 @@ bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data, uint32_t numB
 
 		sofar += copyBytes;
 
-		HAL_FLASH_Extra_Program(FLASH_TYPEPROGRAM_FLASHWORD, writeAddress, (uint32_t)&flashWriteBuffer); // Write to the flash
+		Internal_Flash_Program(FLASH_TYPEPROGRAM_FLASHWORD, writeAddress, (uint32_t)&flashWriteBuffer); // Write to the flash
 		writeAddress += 32;
 	}
 	HAL_FLASH_Lock();
@@ -123,10 +123,11 @@ bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data, uint32_t numB
  * @param numBytes - Number of bytes to be read from flash
  */
 bool internal_flash_read(uint32_t RelFlashAddress, uint8_t *pData, uint32_t numBytes) {
-	uint32_t readAddress = FLASH_START_ADDRESS + RelFlashAddress;
-	if (readAddress + numBytes > FLASH_END_ADDRESS) {
+	if (RelFlashAddress > MAX_FLASH_ADDRESS) {
 		return false;
 	}
+
+	uint32_t readAddress = INTERNAL_FLASH_START + RelFlashAddress;
 
 	memcpy(pData, (uint8_t *)readAddress, numBytes);
 

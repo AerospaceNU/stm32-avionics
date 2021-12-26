@@ -12,9 +12,16 @@ extern "C"{
 #include <stdbool.h>
 #include <stdint.h>
 
-#define FLASH_START_ADDRESS      0x08020000
-#define FLASH_END_ADDRESS        0x081FFFFF
-#define MAX_FLASH_ADDRESS        FLASH_END_ADDRESS - FLASH_START_ADDRESS
+
+#if (FCB_VERSION == 0)
+#define INTERNAL_FLASH_START 0x08020000
+#define INTERNAL_FLASH_END 0x080FFFFF
+#else
+#define INTERNAL_FLASH_START 0x081E0000
+#define INTERNAL_FLASH_END 0x081FFFFF
+#endif
+
+#define MAX_FLASH_ADDRESS        INTERNAL_FLASH_END - INTERNAL_FLASH_START
 
 bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data, uint32_t numBytes);
 
