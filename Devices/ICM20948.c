@@ -2,12 +2,12 @@
 #include "ICM20948_defs.h"
 #include <stdbool.h> // Not sure this is necessary?
 
-bool set_bank(ICM20948Ctrl_t *sensor, uint8_t bank)
+static bool set_bank(ICM20948Ctrl_t *sensor, uint8_t bank)
 {
   return SPI_WriteRegister(&sensor->spiconfig, BANK_SELECT, bank);
 }
 
-uint8_t spi_read(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg)
+static uint8_t spi_read(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg)
 {
   if (bank != sensor->last_bank)
   {
@@ -17,7 +17,7 @@ uint8_t spi_read(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg)
   return SPI_ReadRegister(&sensor->spiconfig, reg);
 }
 
-uint8_t spi_read_array(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg, uint8_t *array, uint8_t len)
+static uint8_t spi_read_array(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg, uint8_t *array, uint8_t len)
 {
   if (bank != sensor->last_bank)
   {
@@ -27,7 +27,7 @@ uint8_t spi_read_array(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg, uint8_
   return SPI_ReadArray(&sensor->spiconfig, reg, array, len);
 }
 
-void spi_write(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg, uint8_t val)
+static void spi_write(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg, uint8_t val)
 {
   if (bank != sensor->last_bank)
   {
@@ -40,7 +40,7 @@ void spi_write(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg, uint8_t val)
 // from Sparkfun driver
 // Transact directly with an I2C device, one byte at a time
 // Used to configure a device before it is setup into a normal 0-3 peripheral slot
-bool ICM_20948_i2c_controller_periph4_txn(ICM20948Ctrl_t *sensor, uint8_t addr, uint8_t reg, uint8_t *data,
+static bool ICM_20948_i2c_controller_periph4_txn(ICM20948Ctrl_t *sensor, uint8_t addr, uint8_t reg, uint8_t *data,
                                           uint8_t len, bool Rw, bool send_reg_addr)
 {
   // Thanks MikeFair! // https://github.com/kriswiner/MPU9250/issues/86
@@ -109,14 +109,14 @@ bool ICM_20948_i2c_controller_periph4_txn(ICM20948Ctrl_t *sensor, uint8_t addr, 
   return true;
 }
 
-uint8_t readMag(ICM20948Ctrl_t *sensor, uint8_t reg)
+static uint8_t readMag(ICM20948Ctrl_t *sensor, uint8_t reg)
 {
   uint8_t data = 0;
   ICM_20948_i2c_controller_periph4_txn(sensor, MAG_AK09916_I2C_ADDR, reg, &data, 1, true, true);
   return data;
 }
 
-uint8_t writeMag(ICM20948Ctrl_t *sensor, uint8_t reg, uint8_t data)
+static uint8_t writeMag(ICM20948Ctrl_t *sensor, uint8_t reg, uint8_t data)
 {
   return ICM_20948_i2c_controller_periph4_txn(sensor, MAG_AK09916_I2C_ADDR, reg, &data, 1, false, true);
 }
@@ -211,7 +211,7 @@ bool ICM20948_is_connected(ICM20948Ctrl_t *sensor)
   return spi_read(sensor, 0, IMU_WHO_AM_I) == ICM20948_WHOAMI_ID;
 }
 
-bool ICM20948_readRaw(ICM20948Ctrl_t *sensor)
+static bool ICM20948_readRaw(ICM20948Ctrl_t *sensor)
 {
   static uint8_t buff[RAW_DATA_SIZE];
   bool ret = spi_read_array(sensor, 0, ACCEL_XOUT_H, buff, RAW_DATA_SIZE);
@@ -234,7 +234,7 @@ bool ICM20948_readRaw(ICM20948Ctrl_t *sensor)
   return true; // TODO check if it worked
 }
 
-void ICM20948_scale_result(ICM20948Ctrl_t *sensor)
+static void ICM20948_scale_result(ICM20948Ctrl_t *sensor)
 {
   // From the datasheet
   float accel_scale;

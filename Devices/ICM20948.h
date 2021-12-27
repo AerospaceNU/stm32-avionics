@@ -74,7 +74,7 @@ typedef enum
     gyr_d361bw4_n376bw5,
 } ICM20948_GYRO_CONFIG_1_DLPCFG_e;
 
-typedef struct
+typedef struct __attribute__((__packed__))
 {
     uint8_t ACCEL_FCHOICE : 1;
     uint8_t ACCEL_FS_SEL : 2;
@@ -82,7 +82,7 @@ typedef struct
     uint8_t reserved_0 : 2;
 } ICM_20948_ACCEL_CONFIG_t;
 
-typedef struct
+typedef struct __attribute__((__packed__))
 {
     uint8_t GYRO_FCHOICE : 1;
     uint8_t GYRO_FS_SEL : 2;

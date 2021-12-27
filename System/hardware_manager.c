@@ -11,6 +11,7 @@
 #include "usbd_cdc_if.h"
 #include "cc1120.h"
 #include "GPS.h"
+#include "ICM20948.h"
 
 #include "adc.h"
 #include "tim.h"
@@ -22,7 +23,11 @@
 
 /* IMUs */
 static LSM9DS1Ctrl_t lsm9ds1_1;
+#if (FCB_VERSION == 0)
 static LSM9DS1Ctrl_t lsm9ds1_2;
+#elif (FCB_VERSION == 1)
+static ICM20948Ctrl_t icm20948;
+#endif
 
 /* Barometers */
 static MS5607Ctrl_t ms5607_1;
@@ -78,7 +83,6 @@ bool hardwareStatus[NUM_HARDWARE];
 
 void HM_HardwareInit() {
 
-
 	/* LSM9DS1 IMU 1 */
 	lsm9ds1_1.ag.LSM9DS1SPI.hspi = IMU1_AG_HSPI;
 	lsm9ds1_1.ag.LSM9DS1SPI.port = IMU1_AG_CS_GPIO_Port;
@@ -105,6 +109,22 @@ void HM_HardwareInit() {
 	LSM9DS1_init(&lsm9ds1_2);
 #else
 	/* ICM20948 IMU 2 */
+	icm20948.spiconfig.hspi = IMU2_HSPI;
+	icm20948.spiconfig.port = IMU2_CS_GPIO_Port;
+	icm20948.spiconfig.pin = IMU2_CS_Pin;
+	ICM_20948_ACCEL_CONFIG_t icm20948AccelConfig = {
+		.ACCEL_FS_SEL = 3,
+		.ACCEL_FCHOICE = 1,
+		.ACCEL_DLPFCFG = 0,
+		.reserved_0 = 0
+	};
+	ICM_20948_GYRO_CONFIG_t icm20948GyroConfig = {
+		.GYRO_FS_SEL = 3,
+		.GYRO_FCHOICE = 1,
+		.GYRO_DLPFCFG = 0,
+		.reserved_0 = 0
+	};
+	hardwareStatus[IMU2] = ICM20948_init(&icm20948, icm20948AccelConfig, icm20948GyroConfig);
 #endif /* FCB_VERSION */
 
 	/* MS5607 Barometer 1 */
@@ -349,6 +369,8 @@ void HM_ReadSensorData() {
 
 	// IMU 2 data
 	if (bImu2Sampling) {
+#if (FCB_VERSION == 0)
+		// LSM9DS1 for FCBv0
 		LSM9DS1_get_data(&lsm9ds1_2);
 		sensorData.imu2_accel_x_raw = lsm9ds1_2.ag.aRawVal.x;
 		sensorData.imu2_accel_y_raw = lsm9ds1_2.ag.aRawVal.y;
@@ -368,6 +390,28 @@ void HM_ReadSensorData() {
 		sensorData.imu2_mag_x = lsm9ds1_2.m.mVal.x;
 		sensorData.imu2_mag_y = lsm9ds1_2.m.mVal.y;
 		sensorData.imu2_mag_z = lsm9ds1_2.m.mVal.z;
+#elif (FCB_VERSION == 1)
+		// ICM20948 for FCBv1
+		ICM20948_read(&icm20948);
+		sensorData.imu2_accel_x_raw = icm20948.rawData.accel_x_raw;
+		sensorData.imu2_accel_y_raw = icm20948.rawData.accel_y_raw;
+		sensorData.imu2_accel_z_raw = icm20948.rawData.accel_z_raw;
+		sensorData.imu2_accel_x = icm20948.imuData.accel_x;
+		sensorData.imu2_accel_y = icm20948.imuData.accel_y;
+		sensorData.imu2_accel_z = icm20948.imuData.accel_z;
+		sensorData.imu2_gyro_x_raw = icm20948.rawData.gyro_x_raw;
+		sensorData.imu2_gyro_y_raw = icm20948.rawData.gyro_y_raw;
+		sensorData.imu2_gyro_z_raw = icm20948.rawData.gyro_z_raw;
+		sensorData.imu2_gyro_x = icm20948.imuData.gyro_x;
+		sensorData.imu2_gyro_y = icm20948.imuData.gyro_y;
+		sensorData.imu2_gyro_z = icm20948.imuData.gyro_z;
+		sensorData.imu2_mag_x_raw = icm20948.rawData.mag_x_raw;
+		sensorData.imu2_mag_y_raw = icm20948.rawData.mag_y_raw;
+		sensorData.imu2_mag_z_raw = icm20948.rawData.mag_z_raw;
+		sensorData.imu2_mag_x = icm20948.imuData.mag_x;
+		sensorData.imu2_mag_y = icm20948.imuData.mag_y;
+		sensorData.imu2_mag_z = icm20948.imuData.mag_z;
+#endif /* FCB_VERSION */
 	}
 
 	// High G Accelerometer data
@@ -441,8 +485,6 @@ void HM_ReadSensorData() {
 				sensorData.pyro_continuity[i] = false;
 		}
 	}
-
-
 
 	// Timestamp data
 	// TODO: Make sensor data timestamp get time from PPS-updated timer

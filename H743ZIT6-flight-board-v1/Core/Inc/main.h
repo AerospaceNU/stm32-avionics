@@ -168,8 +168,7 @@ void Error_Handler(void);
 #define IMU1_AG_HSPI		&hspi3
 #define IMU1_M_HSPI			&hspi3
 
-#define IMU2_AG_HSPI		&hspi4
-#define IMU2_M_HSPI			&hspi4
+#define IMU2_HSPI			&hspi4
 
 #define BARO1_HSPI			&hspi3
 
