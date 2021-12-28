@@ -36,7 +36,7 @@ bool SPI_ReadArray(SPICtrld_t* sensor, uint8_t reg, uint8_t* pData, uint8_t len)
 	// bring CS pin low
 	HAL_GPIO_WritePin(sensor->port, sensor->pin, 0);
 
-	HAL_StatusTypeDef ret = HAL_SPI_TransmitReceive(sensor->hspi, txBuff, rxBuff, 2, HAL_MAX_DELAY);
+	HAL_StatusTypeDef ret = HAL_SPI_TransmitReceive(sensor->hspi, txBuff, rxBuff, len + 1, HAL_MAX_DELAY);
 
 	// bring CS pin high
 	HAL_GPIO_WritePin(sensor->port, sensor->pin, 1);

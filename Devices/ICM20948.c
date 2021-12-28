@@ -19,6 +19,7 @@ static uint8_t spi_read(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg)
 
 static uint8_t spi_read_array(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg, uint8_t *array, uint8_t len)
 {
+  reg = reg | 0x80;
   if (bank != sensor->last_bank)
   {
     set_bank(sensor, bank);
@@ -29,6 +30,7 @@ static uint8_t spi_read_array(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg,
 
 static void spi_write(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg, uint8_t val)
 {
+  reg = reg | 0x80;
   if (bank != sensor->last_bank)
   {
     set_bank(sensor, bank);
