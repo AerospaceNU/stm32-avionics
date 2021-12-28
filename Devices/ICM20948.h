@@ -28,6 +28,19 @@ extern "C" {
 
 #define CLK_BEST_AVAIL	(0x01)
 
+// Bank 3
+#define GYRO_SMPLRT_DIV 0x00
+#define I2C_MST_CTRL 0x01
+#define I2C_MST_DELAY_CTRL 0x2
+#define I2C_SLV0_CTRL 0x05
+#define ACCEL_CONFIG 0x14
+#define ACCEL_SMPLRT_DIV_1 0x10
+#define ACCEL_SMPLRT_DIV_2 0x11
+
+// Mag
+#define MAG_CNTL3 0x32
+#define MAG_CNTL2 0x31
+
 // Accelerometer fullscale
 typedef enum {
     ACCEL_2G = 0,
@@ -131,7 +144,7 @@ bool ICM_PowerOn(ICM20948Ctrl_t *sensor, ICM_20948_ACCEL_CONFIG_t accelConfig, I
 
 uint8_t ICM_WHOAMI(ICM20948Ctrl_t *sensor);
 void ICM_SelectBank(ICM20948Ctrl_t *sensor, uint8_t bank);
-void ICM_ReadAccelGyroData(ICM20948Ctrl_t *sensor);
+void ICM_ReadRawAccelGyro(ICM20948Ctrl_t *sensor);
 void ICM_ReadMagData(ICM20948Ctrl_t *sensor);
 uint16_t ICM_Initialize(ICM20948Ctrl_t *sensor, ICM_20948_ACCEL_CONFIG_t accelConfig, ICM_20948_GYRO_CONFIG_t gyroConfig);
 void ICM_Disable_I2C(ICM20948Ctrl_t *sensor);

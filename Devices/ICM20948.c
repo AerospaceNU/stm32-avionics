@@ -78,25 +78,6 @@ static uint8_t ICM_Mag_Read(ICM20948Ctrl_t *sensor, uint8_t reg)
   return Data;
 }
 
-void ICM20948_READ_MAG(ICM20948Ctrl_t *sensor, int16_t magn[3])
-{
-  uint8_t mag_buffer[10];
-
-  mag_buffer[0] = ICM_Mag_Read(sensor, 0x01);
-
-  mag_buffer[1] = ICM_Mag_Read(sensor, 0x11);
-  mag_buffer[2] = ICM_Mag_Read(sensor, 0x12);
-  magn[0] = mag_buffer[1] | mag_buffer[2] << 8;
-  mag_buffer[3] = ICM_Mag_Read(sensor, 0x13);
-  mag_buffer[4] = ICM_Mag_Read(sensor, 0x14);
-  magn[1] = mag_buffer[3] | mag_buffer[4] << 8;
-  mag_buffer[5] = ICM_Mag_Read(sensor, 0x15);
-  mag_buffer[6] = ICM_Mag_Read(sensor, 0x16);
-  magn[2] = mag_buffer[5] | mag_buffer[6] << 8;
-
-  i2c_Mag_write(sensor, 0x31, 0x01);
-}
-
 /*
  *
  * Read magnetometer
@@ -118,7 +99,8 @@ void ICM_ReadMagData(ICM20948Ctrl_t *sensor)
   mag_buffer[6] = ICM_Mag_Read(sensor, 0x16);
   sensor->rawData.mag_z_raw = mag_buffer[5] | mag_buffer[6] << 8;
 
-  i2c_Mag_write(sensor, 0x31, 0x01);
+  // TODO why do we set this back into single-measurement mode??
+  i2c_Mag_write(sensor, 0x31, 0x01); 
 
   // LSB * uT/LSB =uT
   sensor->imuData.mag_x = sensor->rawData.mag_x_raw * MAG_SENSITIVITY_ICM20948;
@@ -143,19 +125,17 @@ bool ICM_PowerOn(ICM20948Ctrl_t *sensor, ICM_20948_ACCEL_CONFIG_t accelConfig, I
   HAL_Delay(10);
   ICM_Disable_I2C(sensor);
   HAL_Delay(10);
-  ICM_SetClock(sensor, (uint8_t)CLK_BEST_AVAIL);
+  // Set clock to best available
+  ICM_WriteOneByte(sensor, PWR_MGMT_1, CLK_BEST_AVAIL);
   HAL_Delay(10);
+
+  // TODO do we really need to toggle the gyro on and off?
   ICM_AccelGyroOff(sensor);
   HAL_Delay(20);
   ICM_AccelGyroOn(sensor);
   HAL_Delay(10);
-  ICM_Initialize(sensor, accelConfig, gyroConfig);
-  //} else {
-  // sprintf(uart_buffer, "Failed WHO_AM_I.  %i is not 0xEA\r\n", test);
-  // HAL_UART_Transmit_DMA(UART_BUS, (uint8_t*) uart_buffer, strlen(uart_buffer));
-  // HAL_Delay(100);
-  //}
 
+  ICM_Initialize(sensor, accelConfig, gyroConfig);
   return true;
 }
 
@@ -170,41 +150,40 @@ uint16_t ICM_Initialize(ICM20948Ctrl_t *sensor, ICM_20948_ACCEL_CONFIG_t accelCo
   // Set gyroscope sample rate to 100hz (0x0A) in GYRO_SMPLRT_DIV register (0x00)
   // TODO do we ever need to change this
   // Math: ODR = 1.1khz / (1+value)
-  ICM_WriteOneByte(sensor, 0x00, 10);
+  ICM_WriteOneByte(sensor, GYRO_SMPLRT_DIV, 10);
   HAL_Delay(10);
 
   // Set accelerometer dlpf, full-scale
-  ICM_WriteOneByte(sensor, 0x14, *((uint8_t*) &accelConfig));
+  ICM_WriteOneByte(sensor, ACCEL_CONFIG, *((uint8_t*) &accelConfig));
 
   // Set accelerometer sample rate to 100hz (0x00) in ACCEL_SMPLRT_DIV_1 register (0x10) and DIV_2 (0x11)
   // TODO do we ever need to change this
   // Math: ODR = 1.1khz / (1+value)
-  ICM_WriteOneByte(sensor, 0x10, 0x00);
+  ICM_WriteOneByte(sensor, ACCEL_SMPLRT_DIV_1, 0x00);
   HAL_Delay(10);
-  ICM_WriteOneByte(sensor, 0x11, 0x0A);
+  ICM_WriteOneByte(sensor, ACCEL_SMPLRT_DIV_2, 0x0A);
   HAL_Delay(10);
 
   ICM_SelectBank(sensor, USER_BANK_2);
   HAL_Delay(20);
 
   // Configure AUX_I2C Magnetometer (onboard ICM-20948)
-  ICM_WriteOneByte(sensor, 0x7F, 0x00); // Select user bank 0
-  ICM_WriteOneByte(sensor, 0x0F, 0x30); // INT Pin / Bypass Enable Configuration
-  ICM_WriteOneByte(sensor, 0x03, 0x20); // I2C_MST_EN
-  ICM_WriteOneByte(sensor, 0x7F, 0x30); // Select user bank 3
-  ICM_WriteOneByte(sensor, 0x01, 0x4D); // I2C Master mode and Speed 400 kHz
-  ICM_WriteOneByte(sensor, 0x02, 0x01); // I2C_SLV0 _DLY_ enable
-  ICM_WriteOneByte(sensor, 0x05, 0x81); // enable IIC	and EXT_SENS_DATA==1 Byte
+  ICM_SelectBank(sensor, USER_BANK_0);
+  ICM_WriteOneByte(sensor, 0x0F, 0b00110000); // INT Pin / Bypass Enable Configuration
+  ICM_WriteOneByte(sensor, 0x03, 0b00100000); // I2C_MST_EN
+  ICM_SelectBank(sensor, USER_BANK_3); // Move to bank 3
+  ICM_WriteOneByte(sensor, I2C_MST_CTRL, 0x4D); // I2C Master mode and Speed 400 kHz
+  ICM_WriteOneByte(sensor, I2C_MST_DELAY_CTRL, 0x01); // I2C_SLV0 _DLY_ enable
+  ICM_WriteOneByte(sensor, I2C_SLV0_CTRL, 0b10000001); // enable IIC and EXT_SENS_DATA==1 Byte
 
   // Initialize magnetometer
-  i2c_Mag_write(sensor, 0x32, 0x01); // Reset AK8963
+  i2c_Mag_write(sensor, MAG_CNTL3, 0x01); // Reset AK8963
   HAL_Delay(1000);
-  i2c_Mag_write(sensor, 0x31, 0b1000); // use i2c to set AK8963 working on Continuous measurement mode at 100hz
-
+  i2c_Mag_write(sensor, MAG_CNTL2, 0b1000); // use i2c to set AK8963 working on Continuous measurement mode at 100hz
   return 1337;
 }
 
-void ICM_ReadAccelGyroData(ICM20948Ctrl_t *sensor)
+void ICM_ReadRawAccelGyro(ICM20948Ctrl_t *sensor)
 {
   ICM_WriteOneByte(sensor, 0x7F, 0x00);
   HAL_Delay(1);
@@ -264,6 +243,6 @@ void ICM_SetGyroRateLPF(ICM20948Ctrl_t *sensor, uint8_t rate, uint8_t lpf)
 
 void ICM20948_read(ICM20948Ctrl_t *sensor)
 {
-  ICM_ReadAccelGyroData(sensor);
+  ICM_ReadRawAccelGyro(sensor);
   ICM_ReadMagData(sensor);
 }
