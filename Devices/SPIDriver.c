@@ -30,7 +30,7 @@ bool SPI_ReadArray(SPICtrld_t* sensor, uint8_t reg, uint8_t* pData, uint8_t len)
 	uint8_t rxBuff[len + 1];
 	uint8_t txBuff[len + 1];
 	memset(txBuff, 0, len + 1);
-	// We don't technically need to clear rxBuff, as spi should fill it for us?
+	memset(rxBuff, 1, len);
 	txBuff[0] = reg;
 
 	// bring CS pin low

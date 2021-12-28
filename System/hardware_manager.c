@@ -109,22 +109,22 @@ void HM_HardwareInit() {
 	LSM9DS1_init(&lsm9ds1_2);
 #else
 	/* ICM20948 IMU 2 */
-	icm20948.spiconfig.hspi = IMU2_HSPI;
-	icm20948.spiconfig.port = IMU2_CS_GPIO_Port;
-	icm20948.spiconfig.pin = IMU2_CS_Pin;
-	ICM_20948_ACCEL_CONFIG_t icm20948AccelConfig = {
-		.ACCEL_FS_SEL = 3,
-		.ACCEL_FCHOICE = 1,
-		.ACCEL_DLPFCFG = 0,
-		.reserved_0 = 0
-	};
-	ICM_20948_GYRO_CONFIG_t icm20948GyroConfig = {
-		.GYRO_FS_SEL = 3,
-		.GYRO_FCHOICE = 1,
-		.GYRO_DLPFCFG = 0,
-		.reserved_0 = 0
-	};
-	hardwareStatus[IMU2] = ICM20948_init(&icm20948, icm20948AccelConfig, icm20948GyroConfig);
+	icm20948.spictrl.hspi = IMU2_HSPI;
+	icm20948.spictrl.port = IMU2_CS_GPIO_Port;
+	icm20948.spictrl.pin = IMU2_CS_Pin;
+//	ICM_20948_ACCEL_CONFIG_t icm20948AccelConfig = {
+//		.ACCEL_FS_SEL = 3,
+//		.ACCEL_FCHOICE = 1,
+//		.ACCEL_DLPFCFG = 0,
+//		.reserved_0 = 0
+//	};
+//	ICM_20948_GYRO_CONFIG_t icm20948GyroConfig = {
+//		.GYRO_FS_SEL = 3,
+//		.GYRO_FCHOICE = 1,
+//		.GYRO_DLPFCFG = 0,
+//		.reserved_0 = 0
+//	};
+	hardwareStatus[IMU2] = ICM_PowerOn(&icm20948);
 #endif /* FCB_VERSION */
 
 	/* MS5607 Barometer 1 */
