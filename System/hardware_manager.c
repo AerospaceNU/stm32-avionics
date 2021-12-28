@@ -63,6 +63,10 @@
 #include "GPS.h"
 #endif
 
+#ifdef HAS_INA226
+#include "INA226.h"
+#endif
+
 #ifdef HAS_USB
 #include "usb.h"
 #endif
@@ -114,6 +118,8 @@ static BuzzerCtrl_t buzzer;
 #if (FCB_VERSION <= 0)
 static AdcCtrl_t adcBatteryVoltage;
 static AdcCtrl_t adcCurrent;
+#elif (FCB_VERSION == 1)
+static INA226Ctrl_t ina226;
 #endif /* FCB_VERSION */
 static AdcCtrl_t adcPyro[6];
 #endif
@@ -261,7 +267,14 @@ void HM_HardwareInit() {
   // TODO why does 67 make things work?
   adcInit(&adcBatteryVoltage, VBAT_ADC, VBAT_ADC_RANK, 0, vbattMax, true);
   adcInit(&adcCurrent, CURRENT_ADC, CURRENT_ADC_RANK, -12.5, 17.5, true);
+#elif (FCB_VERSION == 1)
+  ina226.hi2c = INA226_HI2C;
+  ina226.addr = 0x40;  // (01000000b)
+  ina226.rShuntVal = 0.002;
+  ina226.iMaxExpected = 10;
+  INA226_init(&ina226);
 #endif /* FCB_VERSION */
+
   adcInit(&adcPyro[0], PYRO1_ADC, PYRO1_ADC_RANK, 0, voltageDividerMax, true);
   adcInit(&adcPyro[1], PYRO2_ADC, PYRO2_ADC_RANK, 0, voltageDividerMax, true);
   adcInit(&adcPyro[2], PYRO3_ADC, PYRO3_ADC_RANK, 0, voltageDividerMax, true);
@@ -825,8 +838,8 @@ void HM_ReadSensorData() {
         sensorData.battery_voltage = (double)adcVal;
       else
         sensorData.battery_voltage = 0;
-#else
-      // TODO: Battery voltage from external ADC
+#elif (FCB_VERSION == 1)
+      sensorData.battery_voltage = (double)INA226_readBusVoltage(&ina226);
 #endif /* FCB_VERSION */
     }
     if (bPyroContinuitySampling) {
