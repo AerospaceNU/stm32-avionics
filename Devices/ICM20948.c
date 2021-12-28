@@ -24,19 +24,19 @@
  */
 void ICM_readBytes(ICM20948Ctrl_t *sensor, uint8_t reg, uint8_t *pData, uint16_t len) // ***
 {
-  reg = reg | 0x80;
+  reg = reg | 0x80; // Top bit means read, per page 31
   SPI_ReadArray(&sensor->spictrl, reg, pData, len);
 }
 
 void ICM_ReadOneByte(ICM20948Ctrl_t *sensor, uint8_t reg, uint8_t *pData) // ***
 {
-  reg = reg | 0x80;
+  reg = reg | 0x80; // Top bit means read, per page 31
   *pData = SPI_ReadRegister(&sensor->spictrl, reg);
 }
 
 void ICM_WriteOneByte(ICM20948Ctrl_t *sensor, uint8_t reg, uint8_t Data) // ***
 {
-  reg = reg & 0x7F;
+  reg = reg & 0x7F; // 8th bit should be zero, per page 31
   SPI_WriteRegister(&sensor->spictrl, reg, Data);
 }
 
