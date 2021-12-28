@@ -200,6 +200,8 @@ void Error_Handler(void);
 
 #define RAD915_HSPI			&hspi2
 
+#define INA226_HI2C			&hi2c2
+
 #define PYRO1_ADC			&hadc1
 #define PYRO1_ADC_RANK		2
 
