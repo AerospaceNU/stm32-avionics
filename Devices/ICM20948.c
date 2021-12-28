@@ -28,17 +28,6 @@ void ICM_readBytes(ICM20948Ctrl_t *sensor, uint8_t reg, uint8_t *pData, uint16_t
   SPI_ReadArray(&sensor->spictrl, reg, pData, len);
 }
 
-// void ICM_WriteBytes(uint8_t reg, uint8_t *pData, uint16_t Size) // ***
-// {
-// 	reg = reg & 0x7F;
-// 	// HAL_GPIO_WritePin(ICM_CS_GPIO_Port, ICM_CS_Pin, GPIO_PIN_RESET);
-// 	// HAL_SPI_Transmit_DMA(SPI_BUS, &reg, 1);
-// 	// HAL_SPI_Transmit_DMA(SPI_BUS, pData, Size);
-// 	// HAL_GPIO_WritePin(ICM_CS_GPIO_Port, ICM_CS_Pin, GPIO_PIN_SET);
-//   SPI_WriteRegister
-
-// }
-
 void ICM_ReadOneByte(ICM20948Ctrl_t *sensor, uint8_t reg, uint8_t *pData) // ***
 {
   reg = reg | 0x80;
@@ -143,7 +132,7 @@ void ICM_ReadMagData(ICM20948Ctrl_t *sensor)
  * This calls initialize internally!
  *
  */
-bool ICM_PowerOn(ICM20948Ctrl_t *sensor)
+bool ICM_PowerOn(ICM20948Ctrl_t *sensor, ICM_20948_ACCEL_CONFIG_t accelConfig, ICM_20948_GYRO_CONFIG_t gyroConfig)
 {
   uint8_t whoami = 0xEA;
   uint8_t test = ICM_WHOAMI(sensor);
@@ -160,7 +149,7 @@ bool ICM_PowerOn(ICM20948Ctrl_t *sensor)
   HAL_Delay(20);
   ICM_AccelGyroOn(sensor);
   HAL_Delay(10);
-  ICM_Initialize(sensor);
+  ICM_Initialize(sensor, accelConfig, gyroConfig);
   //} else {
   // sprintf(uart_buffer, "Failed WHO_AM_I.  %i is not 0xEA\r\n", test);
   // HAL_UART_Transmit_DMA(UART_BUS, (uint8_t*) uart_buffer, strlen(uart_buffer));
@@ -170,25 +159,28 @@ bool ICM_PowerOn(ICM20948Ctrl_t *sensor)
   return true;
 }
 
-uint16_t ICM_Initialize(ICM20948Ctrl_t *sensor)
+uint16_t ICM_Initialize(ICM20948Ctrl_t *sensor, ICM_20948_ACCEL_CONFIG_t accelConfig, ICM_20948_GYRO_CONFIG_t gyroConfig)
 {
   ICM_SelectBank(sensor, USER_BANK_2);
   HAL_Delay(20);
-  ICM_SetGyroRateLPF(sensor, GYRO_RATE_250, GYRO_LPF_17HZ);
+  // Set Gyro low-pass, full scale filter settings
+  ICM_WriteOneByte(sensor, GYRO_CONFIG_1, *((uint8_t*) &gyroConfig));
   HAL_Delay(10);
 
   // Set gyroscope sample rate to 100hz (0x0A) in GYRO_SMPLRT_DIV register (0x00)
-  ICM_WriteOneByte(sensor, 0x00, 0x0A);
+  // TODO do we ever need to change this
+  // Math: ODR = 1.1khz / (1+value)
+  ICM_WriteOneByte(sensor, 0x00, 10);
   HAL_Delay(10);
 
-  // Set accelerometer low pass filter to 136hz (0x11) and the rate to 8G (0x04) in register ACCEL_CONFIG (0x14)
-  ICM_WriteOneByte(sensor, 0x14, (0x04 | 0x11));
+  // Set accelerometer dlpf, full-scale
+  ICM_WriteOneByte(sensor, 0x14, *((uint8_t*) &accelConfig));
 
-  // Set accelerometer sample rate to 225hz (0x00) in ACCEL_SMPLRT_DIV_1 register (0x10)
+  // Set accelerometer sample rate to 100hz (0x00) in ACCEL_SMPLRT_DIV_1 register (0x10) and DIV_2 (0x11)
+  // TODO do we ever need to change this
+  // Math: ODR = 1.1khz / (1+value)
   ICM_WriteOneByte(sensor, 0x10, 0x00);
   HAL_Delay(10);
-
-  // Set accelerometer sample rate to 100 hz (0x0A) in ACCEL_SMPLRT_DIV_2 register (0x11)
   ICM_WriteOneByte(sensor, 0x11, 0x0A);
   HAL_Delay(10);
 
@@ -207,7 +199,7 @@ uint16_t ICM_Initialize(ICM20948Ctrl_t *sensor)
   // Initialize magnetometer
   i2c_Mag_write(sensor, 0x32, 0x01); // Reset AK8963
   HAL_Delay(1000);
-  i2c_Mag_write(sensor, 0x31, 0x02); // use i2c to set AK8963 working on Continuous measurement mode1 & 16-bit output
+  i2c_Mag_write(sensor, 0x31, 0b1000); // use i2c to set AK8963 working on Continuous measurement mode at 100hz
 
   return 1337;
 }

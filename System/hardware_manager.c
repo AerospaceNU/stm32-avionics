@@ -112,19 +112,17 @@ void HM_HardwareInit() {
 	icm20948.spictrl.hspi = IMU2_HSPI;
 	icm20948.spictrl.port = IMU2_CS_GPIO_Port;
 	icm20948.spictrl.pin = IMU2_CS_Pin;
-//	ICM_20948_ACCEL_CONFIG_t icm20948AccelConfig = {
-//		.ACCEL_FS_SEL = 3,
-//		.ACCEL_FCHOICE = 1,
-//		.ACCEL_DLPFCFG = 0,
-//		.reserved_0 = 0
-//	};
-//	ICM_20948_GYRO_CONFIG_t icm20948GyroConfig = {
-//		.GYRO_FS_SEL = 3,
-//		.GYRO_FCHOICE = 1,
-//		.GYRO_DLPFCFG = 0,
-//		.reserved_0 = 0
-//	};
-	hardwareStatus[IMU2] = ICM_PowerOn(&icm20948);
+	ICM_20948_ACCEL_CONFIG_t icm20948AccelConfig = {
+		.ACCEL_FCHOICE = 0, // disable the low-pass filter
+		.ACCEL_FS_SEL = ACCEL_16G,
+		.ACCEL_DLPFCFG = 0, // doesn't matter since we disabled dlpf above
+	};
+	ICM_20948_GYRO_CONFIG_t icm20948GyroConfig = {
+		.GYRO_FCHOICE = 0,
+		.GYRO_FS_SEL = GYRO_2000_DPS,
+		.GYRO_DLPFCFG = 0, // doesn't matter since we disabled dlpf above
+	};
+	hardwareStatus[IMU2] = ICM_PowerOn(&icm20948, icm20948AccelConfig, icm20948GyroConfig);
 #endif /* FCB_VERSION */
 
 	/* MS5607 Barometer 1 */
