@@ -206,6 +206,9 @@ uint16_t ICM_Initialize(ICM20948Ctrl_t *sensor, ICM_20948_ACCEL_CONFIG_t accelCo
 
 void ICM_ReadAccelGyroData(ICM20948Ctrl_t *sensor)
 {
+  ICM_WriteOneByte(sensor, 0x7F, 0x00);
+  HAL_Delay(1);
+
   uint8_t raw_data[12];
   ICM_readBytes(sensor, 0x2D, raw_data, 12);
 
@@ -218,14 +221,14 @@ void ICM_ReadAccelGyroData(ICM20948Ctrl_t *sensor)
   sensor->rawData.gyro_z_raw = (raw_data[10] << 8) | raw_data[11];
 
   // TODO abstract fullscale
-  sensor->imuData.accel_x = sensor->rawData.accel_x_raw / 8;
-  sensor->imuData.accel_y = sensor->rawData.accel_y_raw / 8;
-  sensor->imuData.accel_z = sensor->rawData.accel_z_raw / 8;
+  sensor->imuData.accel_x = sensor->rawData.accel_x_raw / 8.0;
+  sensor->imuData.accel_y = sensor->rawData.accel_y_raw / 8.0;
+  sensor->imuData.accel_z = sensor->rawData.accel_z_raw / 8.0;
 
   // TODO abstract fullscale
-  sensor->imuData.gyro_x = sensor->rawData.gyro_x_raw / 250;
-  sensor->imuData.gyro_y = sensor->rawData.gyro_y_raw / 250;
-  sensor->imuData.gyro_z = sensor->rawData.gyro_z_raw / 250;
+  sensor->imuData.gyro_x = sensor->rawData.gyro_x_raw / 250.0;
+  sensor->imuData.gyro_y = sensor->rawData.gyro_y_raw / 250.0;
+  sensor->imuData.gyro_z = sensor->rawData.gyro_z_raw / 250.0;
 }
 void ICM_SelectBank(ICM20948Ctrl_t *sensor, uint8_t bank)
 {
