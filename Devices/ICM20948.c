@@ -4,6 +4,7 @@
 
 static bool set_bank(ICM20948Ctrl_t *sensor, uint8_t bank)
 {
+  bank = bank | 0x7f;
   return SPI_WriteRegister(&sensor->spiconfig, BANK_SELECT, bank);
 }
 
@@ -14,6 +15,7 @@ static uint8_t spi_read(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg)
     set_bank(sensor, bank);
     sensor->last_bank = bank;
   }
+  reg = reg | 0x80; 
   return SPI_ReadRegister(&sensor->spiconfig, reg);
 }
 
@@ -30,7 +32,7 @@ static uint8_t spi_read_array(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg,
 
 static void spi_write(ICM20948Ctrl_t *sensor, uint8_t bank, uint8_t reg, uint8_t val)
 {
-  reg = reg | 0x80;
+  reg = reg | 0x7f;
   if (bank != sensor->last_bank)
   {
     set_bank(sensor, bank);
@@ -181,10 +183,12 @@ bool ICM20948_init(ICM20948Ctrl_t *sensor, ICM_20948_ACCEL_CONFIG_t accel_config
   const uint8_t periph_ctrl_reg = 5;
   // const uint8_t periph_do_reg = 6; // RW is false so this is unnedded
 
-  uint8_t i2c_addr = MAG_AK09916_I2C_ADDR << 1 | 1;
+  // the address depends on if it's a read or write
+  // I think we should be in read mode? so or with 0x80 (top bit set)
+  uint8_t i2c_addr = MAG_AK09916_I2C_ADDR << 1 | 0x80;
   spi_write(sensor, 3, periph_addr_reg, i2c_addr);
 
-  uint8_t subaddress = AK09916_REG_ST1;
+  uint8_t subaddress = AK09916_REG_ST1; // Where to start reads from
   spi_write(sensor, 3, periph_reg_reg, subaddress);
 
   ICM_20948_I2C_PERIPHX_CTRL_t ctrl;
@@ -215,7 +219,7 @@ bool ICM20948_is_connected(ICM20948Ctrl_t *sensor)
 
 static bool ICM20948_readRaw(ICM20948Ctrl_t *sensor)
 {
-  static uint8_t buff[RAW_DATA_SIZE];
+  uint8_t buff[RAW_DATA_SIZE];
   bool ret = spi_read_array(sensor, 0, ACCEL_XOUT_H, buff, RAW_DATA_SIZE);
   if (!ret)
     return false; // TODO should we log this?

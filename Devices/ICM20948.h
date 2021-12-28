@@ -30,7 +30,7 @@ typedef struct __attribute__((__packed__)) ICM20948_RawData_t {
     int16_t mag_z_raw;
     uint8_t magStat1, magStat2;
 } ICM20948_RawData_t;
-#define RAW_DATA_SIZE 14+9
+#define RAW_DATA_SIZE (14+9)
 
 // Accelerometer fullscale
 typedef enum {
