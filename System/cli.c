@@ -27,12 +27,13 @@ static CliOptionVals_t cliOptionVals = {
 static int primaryCommand = 0;
 
 static struct option longOptions[] = {
-		{"offload", no_argument, &primaryCommand, OFFLOAD},
 		{"calibrate", no_argument, &primaryCommand, CALIBRATE},
-		{"shutdown", no_argument, &primaryCommand, SHUTDOWN},
 		{"config", no_argument, &primaryCommand, CONFIG},
 		{"erase", no_argument, &primaryCommand, ERASE_FLASH},
 		{"help", no_argument, &primaryCommand, HELP},
+		{"offload", no_argument, &primaryCommand, OFFLOAD},
+		{"sense", no_argument, &primaryCommand, SENSE},
+		{"shutdown", no_argument, &primaryCommand, SHUTDOWN},
 		{0, 0, 0, 0}
 };
 

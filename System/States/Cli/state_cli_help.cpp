@@ -37,6 +37,7 @@ EndCondition_t CliHelpState::run() {
 	generateDoc("--offload", "", "Offloads the last flight recorded on the board");
 	generateDoc("", "-f int*1", "Offload a specific flight number off the board");
 	generateDoc("", "-h", "Help for offload. Prints info about each flight");
+	generateDoc("--sense", "", "Reads back most recent sensor data");
 	generateDoc("--shutdown", "", "Prevent FCB from doing anything else. FCB won't actually shut off, but it won't do or respond to anything");
 	return EndCondition_t::CliCommandComplete;
 }

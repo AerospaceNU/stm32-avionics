@@ -26,11 +26,12 @@ typedef enum CliComms_t {
  */
 typedef enum CliCommand_t {
 	NONE = 0,
-	OFFLOAD,
 	CALIBRATE,
-	SHUTDOWN,
 	CONFIG,
 	ERASE_FLASH,
+	OFFLOAD,
+	SENSE,
+	SHUTDOWN,
 	HELP
 } CliCommand_t;
 

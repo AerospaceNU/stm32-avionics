@@ -6,6 +6,7 @@
 #include "state_cli_help.h"
 #include "state_cli_main.h"
 #include "state_cli_offload.h"
+#include "state_cli_sense.h"
 #include "state_coast_ascent.h"
 #include "state_drogue_descent_n.h"
 #include "state_initialize.h"
@@ -25,6 +26,7 @@ void Scheduler::run(void) {
 	CliEraseFlashState cliEraseFlash = CliEraseFlashState(StateId::CliEraseFlash, defaultPeriod);
 	CliHelpState cliHelp = CliHelpState(StateId::CliHelp, defaultPeriod);
 	CliMainState cliMain = CliMainState(StateId::CliMain, defaultPeriod);
+	CliSenseState cliSense = CliSenseState(StateId::CliSense, defaultPeriod);
 	CliOffloadState cliOffload = CliOffloadState(StateId::CliOffload, defaultPeriod);
 	CoastAscentState coastAscent = CoastAscentState(StateId::CoastAscent, defaultPeriod);
 	DrogueDescentNState drogueDescentN = DrogueDescentNState(StateId::DrogueDescentN, defaultPeriod);
@@ -35,7 +37,7 @@ void Scheduler::run(void) {
 	PreFlightState preFlight = PreFlightState(StateId::PreFlight, defaultPeriod);
 	ShutdownState shutdown = ShutdownState(StateId::Shutdown, defaultPeriod);
 
-	State* states[] = {&cliCalibrate, &cliConfig, &cliEraseFlash, &cliHelp, &cliMain, &cliOffload,
+	State* states[] = {&cliCalibrate, &cliConfig, &cliEraseFlash, &cliHelp, &cliMain, &cliOffload, &cliSense,
 			&coastAscent, &drogueDescentN, &initialize, &mainDescent,
 			&postFlight, &poweredAscent, &preFlight, &shutdown};
 
@@ -91,6 +93,7 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 	case StateId::CliEraseFlash:
 	case StateId::CliHelp:
 	case StateId::CliOffload:
+	case StateId::CliSense:
 		switch(endCondition) {
 		case EndCondition_t::CliCommandComplete:
 			return StateId::CliMain;
@@ -112,6 +115,8 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 			return StateId::CliHelp;
 		case EndCondition_t::OffloadCommand:
 			return StateId::CliOffload;
+		case EndCondition_t::SenseCommand:
+			return StateId::CliSense;
 		case EndCondition_t::ShutdownCommand:
 			return StateId::Shutdown;
 		default:

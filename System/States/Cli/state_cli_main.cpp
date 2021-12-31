@@ -32,6 +32,8 @@ EndCondition_t CliMainState::run() {
 		return EndCondition_t::HelpCommand;
 	case CliCommand_t::OFFLOAD:
 		return EndCondition_t::OffloadCommand;
+	case CliCommand_t::SENSE:
+		return EndCondition_t::SenseCommand;
 	case CliCommand_t::SHUTDOWN:
 		return EndCondition_t::ShutdownCommand;
 	default:
@@ -44,6 +46,3 @@ EndCondition_t CliMainState::run() {
 void CliMainState::cleanup() {
 
 }
-
-
-

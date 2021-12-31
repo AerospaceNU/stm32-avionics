@@ -19,6 +19,7 @@ typedef enum {
 	MainCutAltitude,
 	MotorBurnout,
 	OffloadCommand,
+	SenseCommand,
 	ShutdownCommand,
 	Touchdown,
 	UsbConnect,
