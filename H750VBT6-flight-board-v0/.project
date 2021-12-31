@@ -43,5 +43,10 @@
 			<type>2</type>
 			<locationURI>PARENT-1-PROJECT_LOC/System</locationURI>
 		</link>
+		<link>
+			<name>Utils</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Utils</locationURI>
+		</link>
 	</linkedResources>
 </projectDescription>

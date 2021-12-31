@@ -12,7 +12,7 @@
 #define G_ACCEL_EARTH 9.80665 // m/s**2
 
 static FilterData_t filterData;
-static double presRef = 1013; // mbar
+static double presRef = 1.0; // atm
 
 static void filterAccels(SensorData_t* curSensorVals) {
 	// For now, just worry about z accel. Take accelerometer value, converting , and averaging

@@ -8,6 +8,8 @@ extern "C"{
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "circular_buffer.h"
+
 /* Useful defines for files that need to know some info about hardware it works with */
 #define FLASH_SECTOR_BYTES 		0x40000
 #define FLIGHT_METADATA_PAGES 	2
@@ -124,10 +126,15 @@ void HM_LedSet(int ledNum, bool on);
 void HM_LedToggle(int ledNum);
 
 /* Radio functions */
-bool HM_RadioSend(const uint8_t *data, uint32_t numBytes);
+bool HM_RadioSend(const uint8_t *data, uint16_t numBytes);
 
 /* USB functions */
 bool HM_UsbIsConnected();
+bool HM_UsbTransmit(uint8_t* data, uint16_t numBytes);
+CircularBuffer_t* HM_UsbGetRxBuffer();
+
+/* Bluetooth functions */
+bool HM_BluetoothSend(const uint8_t* data, uint16_t numBytes);
 
 /* Sensor functions */
 

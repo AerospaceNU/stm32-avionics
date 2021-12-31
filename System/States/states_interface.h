@@ -10,13 +10,20 @@ extern "C"{
 typedef enum {
 	NoChange,
 	Apogee,
+	CalibrateCommand,
+	CliCommandComplete,
+	ConfigCommand,
+	EraseFlashCommand,
+	HelpCommand,
 	Launch,
 	MainCutAltitude,
 	MotorBurnout,
+	OffloadCommand,
+	SenseCommand,
+	ShutdownCommand,
 	Touchdown,
 	UsbConnect,
 	UsbDisconnect,
-	CliCommandComplete
 } EndCondition_t;
 
 class State {

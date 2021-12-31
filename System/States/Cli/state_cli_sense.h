@@ -1,5 +1,9 @@
-#ifndef STATE_CLI_OFFLOAD_H_
-#define STATE_CLI_OFFLOAD_H_
+/*
+ * state_cli_sense.h
+ */
+
+#ifndef STATES_CLI_STATE_CLI_SENSE_H_
+#define STATES_CLI_STATE_CLI_SENSE_H_
 
 #ifdef __cplusplus
 extern "C"{
@@ -7,7 +11,7 @@ extern "C"{
 
 #include "states_interface.h"
 
-class CliOffloadState : public State {
+class CliSenseState : public State {
 
 	public:
 		using State::State;
@@ -25,5 +29,4 @@ class CliOffloadState : public State {
 }
 #endif
 
-#endif /* STATE_CLI_OFFLOAD_H_ */
-
+#endif /* STATES_CLI_STATE_CLI_SENSE_H_ */

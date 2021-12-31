@@ -1,12 +1,12 @@
 #include "hardware_manager.h"
 #include "scheduler.h"
 #include "state_cli_calibrate.h"
-#include "state_cli_choose_flight.h"
 #include "state_cli_config.h"
 #include "state_cli_erase_flash.h"
 #include "state_cli_help.h"
 #include "state_cli_main.h"
 #include "state_cli_offload.h"
+#include "state_cli_sense.h"
 #include "state_coast_ascent.h"
 #include "state_drogue_descent_n.h"
 #include "state_initialize.h"
@@ -22,11 +22,11 @@ void Scheduler::run(void) {
     /* Create all necessary states initially and store in list */
 	uint32_t defaultPeriod = 15;
 	CliCalibrateState cliCalibrate = CliCalibrateState(StateId::CliCalibrate, defaultPeriod);
-	CliChooseFlightState cliChooseFlight = CliChooseFlightState(StateId::CliChooseFlight, defaultPeriod);
 	CliConfigState cliConfig = CliConfigState(StateId::CliConfig, defaultPeriod);
 	CliEraseFlashState cliEraseFlash = CliEraseFlashState(StateId::CliEraseFlash, defaultPeriod);
 	CliHelpState cliHelp = CliHelpState(StateId::CliHelp, defaultPeriod);
 	CliMainState cliMain = CliMainState(StateId::CliMain, defaultPeriod);
+	CliSenseState cliSense = CliSenseState(StateId::CliSense, defaultPeriod);
 	CliOffloadState cliOffload = CliOffloadState(StateId::CliOffload, defaultPeriod);
 	CoastAscentState coastAscent = CoastAscentState(StateId::CoastAscent, defaultPeriod);
 	DrogueDescentNState drogueDescentN = DrogueDescentNState(StateId::DrogueDescentN, defaultPeriod);
@@ -37,8 +37,8 @@ void Scheduler::run(void) {
 	PreFlightState preFlight = PreFlightState(StateId::PreFlight, defaultPeriod);
 	ShutdownState shutdown = ShutdownState(StateId::Shutdown, defaultPeriod);
 
-	State* states[] = {&cliCalibrate, &cliChooseFlight, &cliConfig, &cliEraseFlash, &cliHelp,
-			&cliMain, &cliOffload, &coastAscent, &drogueDescentN, &initialize, &mainDescent,
+	State* states[] = {&cliCalibrate, &cliConfig, &cliEraseFlash, &cliHelp, &cliMain, &cliOffload, &cliSense,
+			&coastAscent, &drogueDescentN, &initialize, &mainDescent,
 			&postFlight, &poweredAscent, &preFlight, &shutdown};
 
 	// Initialize the current and next states
@@ -89,31 +89,14 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 	// Look for next state based on current state and end condition
 	switch(pCurrentState_->getID()) {
 	case StateId::CliCalibrate:
-		switch(endCondition) {
-		default:
-			break;
-		}
-		break;
-	case StateId::CliChooseFlight:
-		switch(endCondition) {
-		default:
-			break;
-		}
-		break;
 	case StateId::CliConfig:
-		switch(endCondition) {
-		default:
-			break;
-		}
-		break;
 	case StateId::CliEraseFlash:
-		switch(endCondition) {
-		default:
-			break;
-		}
-		break;
 	case StateId::CliHelp:
+	case StateId::CliOffload:
+	case StateId::CliSense:
 		switch(endCondition) {
+		case EndCondition_t::CliCommandComplete:
+			return StateId::CliMain;
 		default:
 			break;
 		}
@@ -122,12 +105,20 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		switch(endCondition) {
 		case EndCondition_t::UsbDisconnect:
 			return StateId::PreFlight;
-		default:
-			break;
-		}
-		break;
-	case StateId::CliOffload:
-		switch(endCondition) {
+		case EndCondition_t::CalibrateCommand:
+			return StateId::CliCalibrate;
+		case EndCondition_t::ConfigCommand:
+			return StateId::CliConfig;
+		case EndCondition_t::EraseFlashCommand:
+			return StateId::CliEraseFlash;
+		case EndCondition_t::HelpCommand:
+			return StateId::CliHelp;
+		case EndCondition_t::OffloadCommand:
+			return StateId::CliOffload;
+		case EndCondition_t::SenseCommand:
+			return StateId::CliSense;
+		case EndCondition_t::ShutdownCommand:
+			return StateId::Shutdown;
 		default:
 			break;
 		}

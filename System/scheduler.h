@@ -16,12 +16,12 @@ class Scheduler {
     private:
         typedef enum StateId {
 			CliCalibrate = 0,
-			CliChooseFlight,
 			CliConfig,
 			CliEraseFlash,
 			CliHelp,
 			CliMain,
 			CliOffload,
+			CliSense,
 			CoastAscent,
 			DrogueDescentN,
 			Initialize,
