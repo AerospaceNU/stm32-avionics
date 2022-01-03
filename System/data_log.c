@@ -199,14 +199,14 @@ void data_log_write(SensorData_t* sensorData, FilterData_t* filterData, uint8_t 
 	}
 }
 
-uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata) {
+uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata, bool reset) {
 
 	static uint32_t firstSector;
 	static uint32_t lastSector;
 	static uint32_t lastFlightNum;
 	static uint32_t readOffset;
 	// Find first sector of flight num using metadata if no offset specified
-	if (flightNum != lastFlightNum) {
+	if ((flightNum != lastFlightNum) || reset) {
 		firstSector = 0;
 		lastSector = 0;
 		lastFlightNum = flightNum;
