@@ -132,6 +132,12 @@ void data_log_set_pressure_metadata(double presRef) {
 	}
 }
 
+void data_log_set_launched_metadata() {
+	if (flightNum > 0) {
+			metadataPacket.launched = 1; // Indicate that the current flight was launched (transitioned past preflight)
+		}
+}
+
 void data_log_write_metadata() {
 	if (flightNum > 0) {
 		uint32_t metadataWriteAddress = curSectorNum * FLASH_SECTOR_BYTES; // Metadata is located at the start of the flight sector

@@ -76,6 +76,7 @@ void PreFlightState::cleanup() {
 		data_log_write(&sensorDataBuffer[i], &filterDataBuffer[i], this->getID());
 	}
 	data_log_set_pressure_metadata(filterGetPressureRef()); // Write pressure reference metadata
+	data_log_set_launched_metadata(); // Write launched status
 	data_log_write_metadata();
 }
 
