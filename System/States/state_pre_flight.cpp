@@ -26,7 +26,7 @@ EndCondition_t PreFlightState::run() {
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
 	memcpy(&sensorDataBuffer[bufferCounter], sensorData, sizeof(SensorData_t));
-	filterApplyData(sensorData);
+	filterApplyData(sensorData, false);
 	FilterData_t* filterData = filterGetData();
 	memcpy(&filterDataBuffer[bufferCounter], filterData, sizeof(FilterData_t));
 

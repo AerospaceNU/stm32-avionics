@@ -19,7 +19,7 @@ EndCondition_t DrogueDescentNState::run() {
 	// Collect, filter, and log all data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
-	filterApplyData(sensorData);
+	filterApplyData(sensorData, true);
 	FilterData_t* filterData = filterGetData();
 	data_log_write(sensorData, filterData, this->getID());
 
