@@ -57,3 +57,9 @@ bool usbIsConnected() {
 	return hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED;
 }
 
+// Overwrite _write so printf prints to USB
+int _write(int file, char *ptr, int len) {
+	if(hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED) return 0;
+	if(USBD_OK == CDC_Transmit_FS((uint8_t *) ptr, len)) return len;
+	return 0;
+}
