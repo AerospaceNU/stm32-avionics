@@ -32,6 +32,9 @@ EndCondition_t CliMainState::run() {
 		return EndCondition_t::HelpCommand;
 	case CliCommand_t::OFFLOAD:
 		return EndCondition_t::OffloadCommand;
+	case CliCommand_t::SIM:
+		HM_EnableSimMode(cliGetRxBuffer());
+		return EndCondition_t::SimCommand;
 	case CliCommand_t::SENSE:
 		return EndCondition_t::SenseCommand;
 	case CliCommand_t::SHUTDOWN:

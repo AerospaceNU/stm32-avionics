@@ -58,6 +58,7 @@ static const uint8_t payloadSize = sizeof(TransmitData_t);
 
 /* Sensor data */
 static SensorData_t sensorData;
+static size_t SENSOR_DATA_SIZE = sizeof(SensorData_t);
 
 /* Sensor states */
 static bool bImu1Sampling = true;
@@ -72,8 +73,11 @@ static bool bPyroContinuitySampling = true;
 /* Array of hardware status states */
 bool hardwareStatus[NUM_HARDWARE];
 
-void HM_HardwareInit() {
+/* Hardware manager sim mode trackers */
+static bool inSim = false;
+static CircularBuffer_t* simRxBuffer = NULL;
 
+void HM_HardwareInit() {
 
 	/* LSM9DS1 IMU 1 */
 	lsm9ds1_1.ag.LSM9DS1SPI.hspi = IMU1_AG_HSPI;
@@ -334,134 +338,177 @@ void HM_SetPyroContinuitySampling(bool enable) {
 	bPyroContinuitySampling = enable;
 }
 
-void HM_ReadSensorData() {
+static void HM_SimReadSensorData() {
+	size_t buffCount = simRxBuffer->count; // This might change if in middle of reception, so use consistently across function
 
-	// IMU 1 data
-	if (bImu1Sampling) {
-		LSM9DS1_get_data(&lsm9ds1_1);
-		sensorData.imu1_accel_x_raw = lsm9ds1_1.ag.aRawVal.x;
-		sensorData.imu1_accel_y_raw = lsm9ds1_1.ag.aRawVal.y;
-		sensorData.imu1_accel_z_raw = lsm9ds1_1.ag.aRawVal.z;
-		sensorData.imu1_accel_x = lsm9ds1_1.ag.aVal.x;
-		sensorData.imu1_accel_y = lsm9ds1_1.ag.aVal.y;
-		sensorData.imu1_accel_z = lsm9ds1_1.ag.aVal.z;
-		sensorData.imu1_gyro_x_raw = lsm9ds1_1.ag.gRawVal.x;
-		sensorData.imu1_gyro_y_raw = lsm9ds1_1.ag.gRawVal.y;
-		sensorData.imu1_gyro_z_raw = lsm9ds1_1.ag.gRawVal.z;
-		sensorData.imu1_gyro_x = lsm9ds1_1.ag.gVal.x;
-		sensorData.imu1_gyro_y = lsm9ds1_1.ag.gVal.y;
-		sensorData.imu1_gyro_z = lsm9ds1_1.ag.gVal.z;
-		sensorData.imu1_mag_x_raw = lsm9ds1_1.m.mRawVal.x;
-		sensorData.imu1_mag_y_raw = lsm9ds1_1.m.mRawVal.y;
-		sensorData.imu1_mag_z_raw = lsm9ds1_1.m.mRawVal.z;
-		sensorData.imu1_mag_x = lsm9ds1_1.m.mVal.x;
-		sensorData.imu1_mag_y = lsm9ds1_1.m.mVal.y;
-		sensorData.imu1_mag_z = lsm9ds1_1.m.mVal.z;
+	// If buffer full, throw everything away since it's probably bad
+	if (buffCount == simRxBuffer->capacity) {
+		cbFlush(simRxBuffer);
 	}
 
-	// IMU 2 data
-	if (bImu2Sampling) {
-		LSM9DS1_get_data(&lsm9ds1_2);
-		sensorData.imu2_accel_x_raw = lsm9ds1_2.ag.aRawVal.x;
-		sensorData.imu2_accel_y_raw = lsm9ds1_2.ag.aRawVal.y;
-		sensorData.imu2_accel_z_raw = lsm9ds1_2.ag.aRawVal.z;
-		sensorData.imu2_accel_x = lsm9ds1_2.ag.aVal.x;
-		sensorData.imu2_accel_y = lsm9ds1_2.ag.aVal.y;
-		sensorData.imu2_accel_z = lsm9ds1_2.ag.aVal.z;
-		sensorData.imu2_gyro_x_raw = lsm9ds1_2.ag.gRawVal.x;
-		sensorData.imu2_gyro_y_raw = lsm9ds1_2.ag.gRawVal.y;
-		sensorData.imu2_gyro_z_raw = lsm9ds1_2.ag.gRawVal.z;
-		sensorData.imu2_gyro_x = lsm9ds1_2.ag.gVal.x;
-		sensorData.imu2_gyro_y = lsm9ds1_2.ag.gVal.y;
-		sensorData.imu2_gyro_z = lsm9ds1_2.ag.gVal.z;
-		sensorData.imu2_mag_x_raw = lsm9ds1_2.m.mRawVal.x;
-		sensorData.imu2_mag_y_raw = lsm9ds1_2.m.mRawVal.y;
-		sensorData.imu2_mag_z_raw = lsm9ds1_2.m.mRawVal.z;
-		sensorData.imu2_mag_x = lsm9ds1_2.m.mVal.x;
-		sensorData.imu2_mag_y = lsm9ds1_2.m.mVal.y;
-		sensorData.imu2_mag_z = lsm9ds1_2.m.mVal.z;
-	}
-
-	// High G Accelerometer data
-	if (bHighGSampling) {
-		H3LIS331DL_get_data(&h3lis_1);
-		sensorData.high_g_accel_x_raw = h3lis_1.rawVal.x;
-		sensorData.high_g_accel_x = h3lis_1.val.x;
-		sensorData.high_g_accel_y_raw = h3lis_1.rawVal.y;
-		sensorData.high_g_accel_y = h3lis_1.val.y;
-		sensorData.high_g_accel_z_raw = h3lis_1.rawVal.z;
-		sensorData.high_g_accel_z = h3lis_1.val.z;
-	}
-
-	// Baro 1 data
-	if (bBaro1Sampling) {
-		MS5607_get_data(&ms5607_1);
-		sensorData.baro1_pres = ms5607_1.altData.baro;
-		sensorData.baro1_temp = ms5607_1.altData.temp;
-	}
-
-	// Baro 2 data
-	if (bBaro2Sampling) {
-		MS5607_get_data(&ms5607_2);
-		sensorData.baro2_pres = ms5607_2.altData.baro;
-		sensorData.baro2_temp = ms5607_2.altData.temp;
-	}
-
-	// GPS data
-	// TODO: Poll GPS status to determine if data is good
-	if (bGpsSampling) {
-		gps_new_data(&gps);
-		sensorData.gps_lat = gps.latitude;
-		sensorData.gps_long = gps.longitude;
-		sensorData.gps_alt = gps.altitude;
-		sensorData.gps_speed = gps.speed;
-		sensorData.gps_course = gps.course;
-		sensorData.gps_latitude_deviation = gps.latitude_deviation;
-		sensorData.gps_longitude_deviation = gps.longitude_deviation;
-		sensorData.gps_altitude_deviation = gps.altitude_deviation;
-		sensorData.gps_speed_kph = gps.speed_kph;
-		sensorData.gps_speed_knots = gps.speed_knots;
-		sensorData.gps_timestamp = gps.timestamp;
-		sensorData.gps_seconds = gps.seconds;
-		sensorData.gps_minutes = gps.minutes;
-		sensorData.gps_hours = gps.hours;
-		sensorData.gps_day = gps.day;
-		sensorData.gps_month = gps.month;
-		sensorData.gps_year = gps.year;
-		sensorData.gps_num_sats = gps.num_sats;
-		sensorData.gps_status = gps.status;
-	}
-
-	// ADC data
-	float adcVal = 0;
-	if (bBatteryVoltageSampling) {
-#if (FCB_VERSION <= 0)
-		adcStartSingleRead(&adcBatteryVoltage);
-		if (adcGetValue(&adcBatteryVoltage, &adcVal, 5))
-			sensorData.battery_voltage = (double) adcVal;
-		else
-			sensorData.battery_voltage = 0;
-#else
-		// TODO: Battery voltage from external ADC
-#endif /* FCB_VERSION */
-	}
-	if (bPyroContinuitySampling) {
-		for (int i = 0; i < sizeof(sensorData.pyro_continuity) / sizeof(bool); i++) {
-			adcStartSingleRead(&adcPyro[i]);
-			if (adcGetValue(&adcPyro[i], &adcVal, 5))
-				sensorData.pyro_continuity[i] = adcVal > PYRO_CONTINUITY_THRESHOLD;
-			else
-				sensorData.pyro_continuity[i] = false;
+	// Buffer isn't full, continue as normal
+	else {
+		// First throw away any old data that wasn't processed in time
+		if (buffCount > SENSOR_DATA_SIZE) {
+			cbDequeue(simRxBuffer, buffCount - SENSOR_DATA_SIZE);
+			buffCount = SENSOR_DATA_SIZE;
+		}
+		// If right amount of bytes are seen, grab them as sensor data
+		if (buffCount == SENSOR_DATA_SIZE) {
+			cbPeek(simRxBuffer, &sensorData, &SENSOR_DATA_SIZE);
+			cbFlush(simRxBuffer);
 		}
 	}
+}
 
+void HM_ReadSensorData() {
 
+	// Sim mode is off, collect data from sensors
+	if (!inSim) {
 
-	// Timestamp data
-	// TODO: Make sensor data timestamp get time from PPS-updated timer
-	sensorData.timestamp_s = HM_Millis();
+		// IMU 1 data
+		if (bImu1Sampling) {
+			LSM9DS1_get_data(&lsm9ds1_1);
+			sensorData.imu1_accel_x_raw = lsm9ds1_1.ag.aRawVal.x;
+			sensorData.imu1_accel_y_raw = lsm9ds1_1.ag.aRawVal.y;
+			sensorData.imu1_accel_z_raw = lsm9ds1_1.ag.aRawVal.z;
+			sensorData.imu1_accel_x = lsm9ds1_1.ag.aVal.x;
+			sensorData.imu1_accel_y = lsm9ds1_1.ag.aVal.y;
+			sensorData.imu1_accel_z = lsm9ds1_1.ag.aVal.z;
+			sensorData.imu1_gyro_x_raw = lsm9ds1_1.ag.gRawVal.x;
+			sensorData.imu1_gyro_y_raw = lsm9ds1_1.ag.gRawVal.y;
+			sensorData.imu1_gyro_z_raw = lsm9ds1_1.ag.gRawVal.z;
+			sensorData.imu1_gyro_x = lsm9ds1_1.ag.gVal.x;
+			sensorData.imu1_gyro_y = lsm9ds1_1.ag.gVal.y;
+			sensorData.imu1_gyro_z = lsm9ds1_1.ag.gVal.z;
+			sensorData.imu1_mag_x_raw = lsm9ds1_1.m.mRawVal.x;
+			sensorData.imu1_mag_y_raw = lsm9ds1_1.m.mRawVal.y;
+			sensorData.imu1_mag_z_raw = lsm9ds1_1.m.mRawVal.z;
+			sensorData.imu1_mag_x = lsm9ds1_1.m.mVal.x;
+			sensorData.imu1_mag_y = lsm9ds1_1.m.mVal.y;
+			sensorData.imu1_mag_z = lsm9ds1_1.m.mVal.z;
+		}
+
+		// IMU 2 data
+		if (bImu2Sampling) {
+			LSM9DS1_get_data(&lsm9ds1_2);
+			sensorData.imu2_accel_x_raw = lsm9ds1_2.ag.aRawVal.x;
+			sensorData.imu2_accel_y_raw = lsm9ds1_2.ag.aRawVal.y;
+			sensorData.imu2_accel_z_raw = lsm9ds1_2.ag.aRawVal.z;
+			sensorData.imu2_accel_x = lsm9ds1_2.ag.aVal.x;
+			sensorData.imu2_accel_y = lsm9ds1_2.ag.aVal.y;
+			sensorData.imu2_accel_z = lsm9ds1_2.ag.aVal.z;
+			sensorData.imu2_gyro_x_raw = lsm9ds1_2.ag.gRawVal.x;
+			sensorData.imu2_gyro_y_raw = lsm9ds1_2.ag.gRawVal.y;
+			sensorData.imu2_gyro_z_raw = lsm9ds1_2.ag.gRawVal.z;
+			sensorData.imu2_gyro_x = lsm9ds1_2.ag.gVal.x;
+			sensorData.imu2_gyro_y = lsm9ds1_2.ag.gVal.y;
+			sensorData.imu2_gyro_z = lsm9ds1_2.ag.gVal.z;
+			sensorData.imu2_mag_x_raw = lsm9ds1_2.m.mRawVal.x;
+			sensorData.imu2_mag_y_raw = lsm9ds1_2.m.mRawVal.y;
+			sensorData.imu2_mag_z_raw = lsm9ds1_2.m.mRawVal.z;
+			sensorData.imu2_mag_x = lsm9ds1_2.m.mVal.x;
+			sensorData.imu2_mag_y = lsm9ds1_2.m.mVal.y;
+			sensorData.imu2_mag_z = lsm9ds1_2.m.mVal.z;
+		}
+
+		// High G Accelerometer data
+		if (bHighGSampling) {
+			H3LIS331DL_get_data(&h3lis_1);
+			sensorData.high_g_accel_x_raw = h3lis_1.rawVal.x;
+			sensorData.high_g_accel_x = h3lis_1.val.x;
+			sensorData.high_g_accel_y_raw = h3lis_1.rawVal.y;
+			sensorData.high_g_accel_y = h3lis_1.val.y;
+			sensorData.high_g_accel_z_raw = h3lis_1.rawVal.z;
+			sensorData.high_g_accel_z = h3lis_1.val.z;
+		}
+
+		// Baro 1 data
+		if (bBaro1Sampling) {
+			MS5607_get_data(&ms5607_1);
+			sensorData.baro1_pres = ms5607_1.altData.baro;
+			sensorData.baro1_temp = ms5607_1.altData.temp;
+		}
+
+		// Baro 2 data
+		if (bBaro2Sampling) {
+			MS5607_get_data(&ms5607_2);
+			sensorData.baro2_pres = ms5607_2.altData.baro;
+			sensorData.baro2_temp = ms5607_2.altData.temp;
+		}
+
+		// GPS data
+		// TODO: Poll GPS status to determine if data is good
+		if (bGpsSampling) {
+			gps_new_data(&gps);
+			sensorData.gps_lat = gps.latitude;
+			sensorData.gps_long = gps.longitude;
+			sensorData.gps_alt = gps.altitude;
+			sensorData.gps_speed = gps.speed;
+			sensorData.gps_course = gps.course;
+			sensorData.gps_latitude_deviation = gps.latitude_deviation;
+			sensorData.gps_longitude_deviation = gps.longitude_deviation;
+			sensorData.gps_altitude_deviation = gps.altitude_deviation;
+			sensorData.gps_speed_kph = gps.speed_kph;
+			sensorData.gps_speed_knots = gps.speed_knots;
+			sensorData.gps_timestamp = gps.timestamp;
+			sensorData.gps_seconds = gps.seconds;
+			sensorData.gps_minutes = gps.minutes;
+			sensorData.gps_hours = gps.hours;
+			sensorData.gps_day = gps.day;
+			sensorData.gps_month = gps.month;
+			sensorData.gps_year = gps.year;
+			sensorData.gps_num_sats = gps.num_sats;
+			sensorData.gps_status = gps.status;
+		}
+
+		// ADC data
+		float adcVal = 0;
+		if (bBatteryVoltageSampling) {
+#if (FCB_VERSION <= 0)
+			adcStartSingleRead(&adcBatteryVoltage);
+			if (adcGetValue(&adcBatteryVoltage, &adcVal, 5))
+				sensorData.battery_voltage = (double) adcVal;
+			else
+				sensorData.battery_voltage = 0;
+#else
+			// TODO: Battery voltage from external ADC
+#endif /* FCB_VERSION */
+		}
+		if (bPyroContinuitySampling) {
+			for (int i = 0; i < sizeof(sensorData.pyro_continuity) / sizeof(bool); i++) {
+				adcStartSingleRead(&adcPyro[i]);
+				if (adcGetValue(&adcPyro[i], &adcVal, 5))
+					sensorData.pyro_continuity[i] = adcVal > PYRO_CONTINUITY_THRESHOLD;
+				else
+					sensorData.pyro_continuity[i] = false;
+			}
+		}
+
+		// Timestamp data
+		// TODO: Make sensor data timestamp get time from PPS-updated timer
+		sensorData.timestamp_s = HM_Millis();
+	}
+
+	// Simming
+	else {
+		HM_SimReadSensorData();
+	}
 }
 
 SensorData_t* HM_GetSensorData() {
 	return &sensorData;
+}
+
+void HM_EnableSimMode(CircularBuffer_t* rxBuffer) {
+	inSim = true;
+	simRxBuffer = rxBuffer;
+}
+
+void HM_DisableSimMode(CircularBuffer_t* rxBuffer) {
+	inSim = false;
+}
+
+bool HM_InSimMode() {
+	return inSim;
 }
