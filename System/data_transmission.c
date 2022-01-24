@@ -13,18 +13,25 @@ void Telemetry_DecodePacket(const Packet_t *packet) {
 			PositionData_t data = packet->payload.positionData;
 			printf("lat %f lon %f alt %f sats %u\n", data.lat,
 				data.lon, data.gps_alt, data.sats);
+			break;
 		}
 		case TELEMETRY_ID_PROPSTUFF: {
 			PropStuff_t data = packet->payload.propStuff;
 			printf("loxTank %f kerTank %f purge %f\n",
 				data.loxTankDucer, data.kerTankDucer, data.purgeDucer);
+			break;
+		}
+		case TELEMETRY_ID_STRING: {
+			CliString_t data = packet->payload.cliString;
+			printf("%s", data.string);
+			break;
 		}
 	}
 }
 
 void transmitData(SensorData_t* sensorData, FilterData_t* filterData, uint8_t state) {
 
-
+	// TODO add data to the packet
 
 //	// Gather packet
 //	transmitPacket.gps_lat = sensorData->gps_lat;

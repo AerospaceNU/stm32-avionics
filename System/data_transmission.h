@@ -15,6 +15,8 @@ extern "C"{
 
 #define PACKED_STRUCT typedef struct __attribute__((__packed__))
 
+#define MAX_STRING 48 // The maximum length one string sent over radio can be. Longer must be segmented
+
 // Prop data, from the link budget Google sheet
 #define TELEMETRY_ID_PROPSTUFF 1
 PACKED_STRUCT {
@@ -23,7 +25,6 @@ PACKED_STRUCT {
 	float purgeDucer;
 	// etc
 } PropStuff_t;
-
 
 // Location data?? from the link budget Google sheet
 #define TELEMETRY_ID_POSITION 2
@@ -34,9 +35,17 @@ PACKED_STRUCT {
 	// etc
 } PositionData_t;
 
+// Uplinked string (not necessarily null-terminated)
+#define TELEMETRY_ID_STRING 3
+PACKED_STRUCT {
+	char string[MAX_STRING]
+	// etc
+} CliString_t;
+
 typedef union {
 	PropStuff_t propStuff;
 	PositionData_t positionData;
+	CliString_t cliString;
 } PayloadPacket_u;
 
 PACKED_STRUCT {
