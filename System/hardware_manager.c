@@ -54,7 +54,7 @@ static GPSCtrl_t gps;
 
 /* Radio */
 static CC1120Ctrl_t cc1120;
-static const uint8_t payloadSize = sizeof(TransmitData_t);
+static const uint8_t payloadSize = RADIO_PACKET_SIZE;
 
 /* Sensor data */
 static SensorData_t sensorData;
