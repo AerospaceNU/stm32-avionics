@@ -15,7 +15,9 @@ void PreFlightState::init() {
 	// Set filter pressure reference to current pressure
 	HM_ReadSensorData();
 	filterSetPressureRef((HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
+	gpsTimestamp = false;
 }
+
 
 EndCondition_t PreFlightState::run() {
 	// Produce a tone for each functioning peripheral
@@ -24,11 +26,16 @@ EndCondition_t PreFlightState::run() {
 	// Collect, and filter data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
+	if (!gpsTimestamp && sensorData->gps_timestamp > 0) {
+		data_log_set_timestamp_metadata(sensorData->gps_timestamp);
+		data_log_write_metadata();
+		gpsTimestamp = true;
+	}
+
 	memcpy(&sensorDataBuffer[bufferCounter], sensorData, sizeof(SensorData_t));
 	filterApplyData(sensorData);
 	FilterData_t* filterData = filterGetData();
 	memcpy(&filterDataBuffer[bufferCounter], filterData, sizeof(FilterData_t));
-
 	// Transmit at 1/100th rate
 	if (this->getRunCounter() % 100 == 0) {
 		transmitData(sensorData, filterData, this->getID());

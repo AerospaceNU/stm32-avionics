@@ -17,6 +17,7 @@ extern "C"{
 typedef struct __attribute__((__packed__)) FlightMetadata {
 	double pressureRef;
 	bool launched;
+	uint64_t timestamp;
 } FlightMetadata;
 
 uint32_t data_log_get_last_flight_num();
@@ -30,6 +31,8 @@ void data_log_assign_flight();
 void data_log_set_pressure_metadata(double presRef);
 
 void data_log_set_launched_metadata();
+
+void data_log_set_timestamp_metadata(uint64_t timestamp);
 
 void data_log_write_metadata();
 

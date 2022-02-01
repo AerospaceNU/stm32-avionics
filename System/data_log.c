@@ -116,6 +116,9 @@ void data_log_assign_flight() {
 
 	// TODO: Write flight metadata
 
+	// Empty metadata packet
+	memset(&metadataPacket, 0xFF, kFlightMetadataSize);
+
 	// Write flight number and sector to metadata (since flight metadata written to it)
 	uint8_t flightTxBuff[2] = {(flightNum >> 8) & 0xFF, flightNum & 0xFF};
 	HM_FlashWriteStart(curSectorNum * 2, 2, flightTxBuff);
@@ -134,8 +137,14 @@ void data_log_set_pressure_metadata(double presRef) {
 
 void data_log_set_launched_metadata() {
 	if (flightNum > 0) {
-			metadataPacket.launched = 1; // Indicate that the current flight was launched (transitioned past preflight)
-		}
+		metadataPacket.launched = 1; // Indicate that the current flight was launched (transitioned past preflight)
+	}
+}
+
+void data_log_set_timestamp_metadata(uint64_t timestamp) {
+	if (flightNum > 0) {
+		metadataPacket.timestamp = timestamp;
+	}
 }
 
 void data_log_write_metadata() {

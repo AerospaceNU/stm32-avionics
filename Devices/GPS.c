@@ -100,9 +100,21 @@ void parseString(GPSCtrl_t *gps, char line[]) {
 			gps->hours = frame6.time.hours;
 			gps->minutes = frame6.time.minutes;
 			gps->seconds = frame6.time.seconds;
+			gps->microseconds = frame6.time.microseconds;
 			gps->day = frame6.date.day;
 			gps->month = frame6.date.month;
 			gps->year = frame6.date.year;
+
+			struct timespec ts;
+			memset(&ts, 0, sizeof(ts));
+
+			const struct minmea_date date = {gps->day, gps->month, gps->year};
+			const struct minmea_time time = {gps->hours, gps->minutes, gps->seconds, gps->microseconds};
+
+			if (!minmea_gettime(&ts, &date, &time)) {
+				gps->timestamp = ts.tv_sec;
+			}
+
 		}
 		break;
 	}
@@ -123,7 +135,7 @@ void gps_process_data(GPSCtrl_t *gps) {
 		if (buff[i] == '\n') {
 			gps->line[gps->place] = '\n';
 			parseString(gps, gps->line);
-			memcpy(gps->line, "", 1);
+			memset(gps->line, '\0', len);
 			gps->place = 0;
 		} else {
 			gps->line[gps->place] = buff[i];
@@ -148,7 +160,6 @@ void gps_RxCpltCallback(void *gps) {
 
 //TODO: Call gps_new_data to check if new data is available and update sensorData struct
 bool gps_new_data(GPSCtrl_t *gps) {
-
 	if(gps->data_available){
 		gps_process_data(gps);
 		return true;
@@ -162,4 +173,39 @@ void gps_init(GPSCtrl_t *gps) {
 	register_HAL_UART_RxHalfCpltCallback(gps->gps_uart, gps_RxHalfCpltCallback,
 			gps);
 	register_HAL_UART_RxCpltCallback(gps->gps_uart, gps_RxCpltCallback, gps);
+
+	uint8_t nmea[16] = {0xB5,
+						0x62,
+						0x06,
+						0x01,
+						0x08,
+						0x00,
+						0xF0,
+						0x08,
+						0x01,
+						0x01,
+						0x01,
+						0x01,
+						0x01,
+						0x00,
+						0x0B,
+						0x6B};
+	HAL_UART_Transmit(gps->gps_uart, (uint8_t*)nmea, sizeof(nmea), 1000);
+/* other messages?
+		uint8_t nmea2[] = {0xB5, 0x62, 0x06, 0x01, 0x02, 0x00, 0xF0, 0x08, 0x01, 0x19};
+
+		HAL_UART_Transmit(gps->gps_uart, (uint8_t*)nmea2, sizeof(nmea2), 100);
+
+		uint8_t nmea3[10] = {0xB5, 0x62, 0x05, 0x01, 0x02, 0x00, 0x06, 0x01, 0x0F, 0x38};
+
+		HAL_UART_Transmit(gps->gps_uart, (uint8_t*)nmea3, sizeof(nmea3), 100);
+
+		uint8_t nmea4[10] = {0xB5, 0x62, 0x06, 0x01, 0x08, 0x00, 0xF0, 0x08, 0x01, 0x01, 0x00, 0x01, 0x01, 0x00, 0x0B, 0x6B};
+
+		HAL_UART_Transmit(gps->gps_uart, (uint8_t*)nmea4, sizeof(nmea4), 100);
+
+		uint8_t nmea5[10] = {0xB5, 0x62, 0x05, 0x01, 0x02, 0x00, 0x06, 0x01, 0x0F, 0x38};
+
+		HAL_UART_Transmit(gps->gps_uart, (uint8_t*)nmea5, sizeof(nmea5), 100);
+*/
 }

@@ -75,6 +75,7 @@ typedef struct {
 	float gps_altitude_deviation;
 	float gps_speed_kph;
 	float gps_speed_knots;
+	uint64_t gps_timestamp;
 	int gps_seconds;
 	int gps_minutes;
 	int gps_hours;
