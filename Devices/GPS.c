@@ -174,38 +174,22 @@ void gps_init(GPSCtrl_t *gps) {
 			gps);
 	register_HAL_UART_RxCpltCallback(gps->gps_uart, gps_RxCpltCallback, gps);
 
-	uint8_t nmea[16] = {0xB5,
+	uint8_t nmea[16] = {0xB5, // CFG-MSG Header
 						0x62,
 						0x06,
 						0x01,
-						0x08,
+						0x08, // Payload length
 						0x00,
-						0xF0,
+						0xF0, // ZDA
 						0x08,
-						0x01,
-						0x01,
-						0x01,
-						0x01,
-						0x01,
-						0x00,
-						0x0B,
+						0x01, // Enable on I2C
+						0x01, // Enable on UART1
+						0x00, // Disable on UART2
+						0x01, // Enable on USB
+						0x01, // Enable on SPI
+						0x00, // Always 0x00
+						0x0B, // Checksum
 						0x6B};
-	HAL_UART_Transmit(gps->gps_uart, (uint8_t*)nmea, sizeof(nmea), 1000);
-/* other messages?
-		uint8_t nmea2[] = {0xB5, 0x62, 0x06, 0x01, 0x02, 0x00, 0xF0, 0x08, 0x01, 0x19};
-
-		HAL_UART_Transmit(gps->gps_uart, (uint8_t*)nmea2, sizeof(nmea2), 100);
-
-		uint8_t nmea3[10] = {0xB5, 0x62, 0x05, 0x01, 0x02, 0x00, 0x06, 0x01, 0x0F, 0x38};
-
-		HAL_UART_Transmit(gps->gps_uart, (uint8_t*)nmea3, sizeof(nmea3), 100);
-
-		uint8_t nmea4[10] = {0xB5, 0x62, 0x06, 0x01, 0x08, 0x00, 0xF0, 0x08, 0x01, 0x01, 0x00, 0x01, 0x01, 0x00, 0x0B, 0x6B};
-
-		HAL_UART_Transmit(gps->gps_uart, (uint8_t*)nmea4, sizeof(nmea4), 100);
-
-		uint8_t nmea5[10] = {0xB5, 0x62, 0x05, 0x01, 0x02, 0x00, 0x06, 0x01, 0x0F, 0x38};
-
-		HAL_UART_Transmit(gps->gps_uart, (uint8_t*)nmea5, sizeof(nmea5), 100);
-*/
+	// Transmit configuration over UART
+	HAL_UART_Transmit(gps->gps_uart, nmea, sizeof(nmea), 500);
 }
