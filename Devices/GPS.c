@@ -135,6 +135,7 @@ void gps_process_data(GPSCtrl_t *gps) {
 		if (buff[i] == '\n') {
 			gps->line[gps->place] = '\n';
 			parseString(gps, gps->line);
+			//TODO: This might need to be changed
 			memset(gps->line, '\0', len);
 			gps->place = 0;
 		} else {
