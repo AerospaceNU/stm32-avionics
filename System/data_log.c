@@ -154,6 +154,12 @@ void data_log_write_metadata() {
 	}
 }
 
+void data_log_copy_metadata(FlightMetadata *oldMetadataPacket) {
+	if (flightNum > 0) {
+		memcpy(&metadataPacket, oldMetadataPacket, kFlightMetadataSize);
+	}
+}
+
 void data_log_write(SensorData_t* sensorData, FilterData_t* filterData, uint8_t state) {
 
 	if (flightNum > 0) {

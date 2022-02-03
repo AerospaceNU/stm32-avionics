@@ -36,6 +36,8 @@ void data_log_set_timestamp_metadata(uint64_t timestamp);
 
 void data_log_write_metadata();
 
+void data_log_copy_metadata();
+
 void data_log_write(SensorData_t* sensorData, FilterData_t* filterData, uint8_t state);
 
 uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata);

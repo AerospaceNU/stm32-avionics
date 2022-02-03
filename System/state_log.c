@@ -18,7 +18,7 @@ void state_log_reload_flight() {
 	FlightMetadata oldMetadataPacket = data_log_get_metadata(); // Get the previous flight metadata
 	filterSetPressureRef(oldMetadataPacket.pressureRef); // Set the ground pressure to the recovered value
 	data_log_assign_flight(); // Start a new flight
-	data_log_set_pressure_metadata(oldMetadataPacket.pressureRef); // Write a new metadata packet with the current flight metadata
+	data_log_copy_metadata(&oldMetadataPacket); // Write a new metadata packet with the current flight metadata
 	data_log_write_metadata();
 }
 
