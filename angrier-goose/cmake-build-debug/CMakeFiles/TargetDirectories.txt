@@ -1,0 +1,3 @@
+C:/Users/matth/STM32CubeIDE/workspace_1.4.0/goos4/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/matth/STM32CubeIDE/workspace_1.4.0/goos4/cmake-build-debug/CMakeFiles/goos4.elf.dir
+C:/Users/matth/STM32CubeIDE/workspace_1.4.0/goos4/cmake-build-debug/CMakeFiles/rebuild_cache.dir
