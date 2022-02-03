@@ -18,7 +18,7 @@ extern "C"{
 #define FLASH_TIMEOUT_MS 		500
 #define PYRO_CONTINUITY_THRESHOLD 3
 
-typedef struct {
+typedef struct __attribute__((__packed__)) {
 	uint32_t timestamp_s;
 	uint32_t timestamp_us;
 	int16_t imu1_accel_x_raw;
@@ -159,6 +159,23 @@ void HM_ReadSensorData();
  * @return Pointer to statically-allocated struct where sensor data is stored
  */
 SensorData_t* HM_GetSensorData();
+
+/**
+ * @brief Turn on or off sim mode in the hardware manager
+ * @param[in] rxBuffer: Buffer to read from in during sim
+ */
+void HM_EnableSimMode(CircularBuffer_t* rxBuffer);
+
+/**
+ * @brief Turn off sim mode in the hardware manager
+ */
+void HM_DisableSimMode();
+
+/**
+ * @brief Return whether hardware manager is currently in sim mode
+ * @return True if in sim mode, false if not
+ */
+bool HM_InSimMode();
 
 #ifdef __cplusplus
 }

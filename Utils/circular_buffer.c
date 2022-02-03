@@ -73,5 +73,6 @@ void cbDequeue(CircularBuffer_t *cb, size_t numElements) {
 }
 
 void cbFlush(CircularBuffer_t *cb) {
-	cbInit(cb, cb->buffer, cb->capacity, cb->size);
+	cb->tail = cb->head;
+	cb->count = 0;
 }

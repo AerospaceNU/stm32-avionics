@@ -118,6 +118,8 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 			return StateId::CliOffload;
 		case EndCondition_t::SenseCommand:
 			return StateId::CliSense;
+		case EndCondition_t::SimCommand:
+			return StateId::PreFlight;
 		case EndCondition_t::ShutdownCommand:
 			return StateId::Shutdown;
 		default:
@@ -175,6 +177,7 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 	case StateId::PostFlight:
 		switch(endCondition) {
 		case EndCondition_t::UsbConnect:
+		case EndCondition_t::CliCommandComplete:
 			return StateId::CliMain;
 		default:
 			break;
