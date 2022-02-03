@@ -37,8 +37,11 @@ typedef struct __attribute__((__packed__)) LogData {
 } LogData;
 
 static LogData logPacket;
+static FlightMetadata metadataPacket;
 
 static const uint8_t kLogDataSize = sizeof(LogData);
+
+static const uint8_t kFlightMetadataSize = sizeof(FlightMetadata);
 
 uint32_t data_log_get_last_flight_num() {
 
@@ -75,6 +78,18 @@ uint32_t data_log_get_last_flight_num() {
 	return lastFlightNum;
 }
 
+void data_log_load_last_stored_flight_metadata() {
+	flightNum = data_log_get_last_flight_num(); // Load the previous flight number and sector
+	uint8_t metadataBuff[kFlightMetadataSize]; // Create a buffer for the metadata
+	uint32_t metadataReadAddress = (curSectorNum - 1) * FLASH_SECTOR_BYTES;
+	HM_FlashReadStart(metadataReadAddress, kFlightMetadataSize, metadataBuff); // Read the metadata
+	metadataPacket = *(FlightMetadata*)&metadataBuff;
+}
+
+FlightMetadata data_log_get_metadata() {
+	return metadataPacket;
+}
+
 void data_log_assign_flight() {
 
 	uint32_t waitStartMS = 0;
@@ -100,6 +115,9 @@ void data_log_assign_flight() {
 
 	// TODO: Write flight metadata
 
+	// Empty metadata packet
+	memset(&metadataPacket, 0xFF, kFlightMetadataSize);
+
 	// Write flight number and sector to metadata (since flight metadata written to it)
 	uint8_t flightTxBuff[2] = {(flightNum >> 8) & 0xFF, flightNum & 0xFF};
 	HM_FlashWriteStart(curSectorNum * 2, 2, flightTxBuff);
@@ -108,6 +126,37 @@ void data_log_assign_flight() {
 	HM_FlashReadStart(curSectorNum * 2, 2, flightTxBuff);
 
 	curWriteAddress = curSectorNum * FLASH_SECTOR_BYTES + FLIGHT_METADATA_PAGES * FLASH_PAGE_SIZE_BYTES;
+}
+
+void data_log_set_pressure_metadata(double presRef) {
+	if (flightNum > 0) {
+		metadataPacket.pressureRef = presRef; // Set the correct pressure reference
+	}
+}
+
+void data_log_set_launched_metadata() {
+	if (flightNum > 0) {
+		metadataPacket.launched = 1; // Indicate that the current flight was launched (transitioned past preflight)
+	}
+}
+
+void data_log_set_timestamp_metadata(uint64_t timestamp) {
+	if (flightNum > 0) {
+		metadataPacket.timestamp = timestamp;
+	}
+}
+
+void data_log_write_metadata() {
+	if (flightNum > 0) {
+		uint32_t metadataWriteAddress = curSectorNum * FLASH_SECTOR_BYTES; // Metadata is located at the start of the flight sector
+		HM_FlashWriteStart(metadataWriteAddress, kFlightMetadataSize, (uint8_t*)&metadataPacket); // Write the metadata packet
+	}
+}
+
+void data_log_copy_metadata(FlightMetadata *oldMetadataPacket) {
+	if (flightNum > 0) {
+		memcpy(&metadataPacket, oldMetadataPacket, kFlightMetadataSize);
+	}
 }
 
 void data_log_write(SensorData_t* sensorData, FilterData_t* filterData, uint8_t state) {

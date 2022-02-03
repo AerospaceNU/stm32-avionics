@@ -421,6 +421,7 @@ void HM_ReadSensorData() {
 		sensorData.gps_altitude_deviation = gps.altitude_deviation;
 		sensorData.gps_speed_kph = gps.speed_kph;
 		sensorData.gps_speed_knots = gps.speed_knots;
+		sensorData.gps_timestamp = gps.timestamp;
 		sensorData.gps_seconds = gps.seconds;
 		sensorData.gps_minutes = gps.minutes;
 		sensorData.gps_hours = gps.hours;

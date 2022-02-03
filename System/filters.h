@@ -43,6 +43,11 @@ void filterApplyData(SensorData_t* curSensorVals, bool has_past_apogee);
 void filterSetPressureRef(double pres);
 
 /**
+ * @brief Returns reference pressure
+ */
+double filterGetPressureRef();
+
+/**
  * @brief Returns most recent filtered data
  */
 FilterData_t* filterGetData();

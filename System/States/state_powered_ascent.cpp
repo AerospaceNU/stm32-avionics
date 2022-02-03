@@ -4,11 +4,13 @@
 #include "hardware_manager.h"
 #include "filters.h"
 #include "data_log.h"
+#include "state_log.h"
 #include "data_transmission.h"
 
 void PoweredAscentState::init() {
 	transitionResetTimer = HM_Millis();
 	maxAccelZ = 0;
+	state_log_write(this->getID());
 }
 
 EndCondition_t PoweredAscentState::run() {

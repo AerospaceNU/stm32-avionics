@@ -22,7 +22,9 @@ typedef struct GPSCtrl_s{
     float altitude_deviation;
     float speed_kph;
     float speed_knots;
+    uint64_t timestamp;
     int seconds;
+    int microseconds;
     int minutes;
     int hours;
     int day;

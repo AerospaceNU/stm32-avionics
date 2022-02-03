@@ -2,6 +2,7 @@
 #include "state_drogue_descent_n.h"
 
 #include "data_log.h"
+#include "state_log.h"
 #include "data_transmission.h"
 #include "filters.h"
 #include "hardware_manager.h"
@@ -11,6 +12,7 @@ void DrogueDescentNState::init() {
 	transitionResetTimer = HM_Millis();
 	completeDrogueCuts_ = 0;
 	// TODO: Actuate separation
+	state_log_write(this->getID());
 }
 
 EndCondition_t DrogueDescentNState::run() {

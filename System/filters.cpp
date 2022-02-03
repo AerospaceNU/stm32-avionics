@@ -61,6 +61,10 @@ void filterSetPressureRef(double pres) {
 	presRef = pres;
 }
 
+double filterGetPressureRef() {
+	return presRef;
+}
+
 void filterApplyData(SensorData_t* curSensorVals, bool has_past_apogee) {
 	// Filter z pos first so we still have the old accelerations
 	// This lets us project our state estimate forward from the last

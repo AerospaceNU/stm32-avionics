@@ -1,5 +1,6 @@
 #include "hardware_manager.h"
 #include "scheduler.h"
+#include "state_log.h"
 #include "state_cli_calibrate.h"
 #include "state_cli_config.h"
 #include "state_cli_erase_flash.h"
@@ -140,15 +141,29 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 		}
 		break;
 	case StateId::Initialize:
-		switch(endCondition) {
-		case EndCondition_t::UsbConnect:
+	{
+		if (endCondition == EndCondition_t::UsbConnect) {
 			return StateId::CliMain;
-		case EndCondition_t::UsbDisconnect:
+		}
+		int storedStateInt = state_log_read();
+		// Resumes a flight from the state log if there is a state to resume
+		if (storedStateInt >= 0) {
+			StateId storedStateId = static_cast<Scheduler::StateId>(storedStateInt);
+			// Only resume from the 4 flight states
+			// (They *should* be the only states written in the state log regardless)
+			if (storedStateId == StateId::PoweredAscent ||
+				storedStateId == StateId::CoastAscent ||
+				storedStateId == StateId::DrogueDescentN ||
+				storedStateId == StateId::MainDescent) {
+				state_log_reload_flight();
+				return storedStateId;
+			}
+		}
+		if (endCondition == EndCondition_t::UsbDisconnect) {
 			return StateId::PreFlight;
-		default:
-			break;
 		}
 		break;
+	}
 	case StateId::MainDescent:
 		switch(endCondition) {
 		case EndCondition_t::Touchdown:

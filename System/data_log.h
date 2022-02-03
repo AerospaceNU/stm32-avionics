@@ -13,6 +13,14 @@ extern "C"{
 #include "hardware_manager.h"
 #include "filters.h"
 
+
+// Flight metadata shows what data will be logged in what relative location
+typedef struct __attribute__((__packed__)) FlightMetadata {
+	double pressureRef;
+	bool launched;
+	uint64_t timestamp;
+} FlightMetadata;
+
 /**
  * @brief Return the last flight number that was logged
  * @return Last flight number
@@ -20,9 +28,42 @@ extern "C"{
 uint32_t data_log_get_last_flight_num();
 
 /**
+ * @brief Get the metadata from the previous flight and load into the current metadata packet
+ */
+void data_log_load_last_stored_flight_metadata();
+
+FlightMetadata data_log_get_metadata();
+
+/**
  * @brief Start a new flight in the log
  */
 void data_log_assign_flight();
+
+/**
+ * @brief Set the metadata stored pressure
+ */
+void data_log_set_pressure_metadata(double presRef);
+
+/**
+ * @brief Set the metadata launched field to true
+ */
+void data_log_set_launched_metadata();
+
+/**
+ * @brief Set the metadata timestamp to current timestamp
+ */
+void data_log_set_timestamp_metadata(uint64_t timestamp);
+
+
+/**
+ * @brief Write metadata to flash
+ */
+void data_log_write_metadata();
+
+/**
+ * @brief Copy an entire metadata packet into current metadata
+ */
+void data_log_copy_metadata(FlightMetadata *oldMetadataPacket);
 
 /**
  * @brief Write new packet of data to the data log
