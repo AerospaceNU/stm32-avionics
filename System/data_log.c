@@ -81,10 +81,10 @@ uint32_t data_log_get_last_flight_num() {
 
 void data_log_load_last_stored_flight_metadata() {
 	flightNum = data_log_get_last_flight_num(); // Load the previous flight number and sector
-	uint8_t metadataRxBuff[kFlightMetadataSize]; // Create a buffer for the metadata
+	uint8_t metadataBuff[kFlightMetadataSize]; // Create a buffer for the metadata
 	uint32_t metadataReadAddress = (curSectorNum - 1) * FLASH_SECTOR_BYTES;
-	HM_FlashReadStart(metadataReadAddress, kFlightMetadataSize, metadataRxBuff); // Read the metadata
-	metadataPacket = *(FlightMetadata*)&metadataRxBuff;
+	HM_FlashReadStart(metadataReadAddress, kFlightMetadataSize, metadataBuff); // Read the metadata
+	metadataPacket = *(FlightMetadata*)&metadataBuff;
 }
 
 FlightMetadata data_log_get_metadata() {
