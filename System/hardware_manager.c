@@ -8,9 +8,9 @@
 #include "buzzer.h"
 #include "adc_device.h"
 #include "S25FLx.h"
-#include "usbd_cdc_if.h"
 #include "cc1120.h"
 #include "GPS.h"
+#include "usb.h"
 
 #include "adc.h"
 #include "tim.h"
@@ -18,7 +18,6 @@
 #include "dma.h"
 
 #include "data_transmission.h"
-#include <stdbool.h>
 
 /* IMUs */
 static LSM9DS1Ctrl_t lsm9ds1_1;
@@ -56,9 +55,6 @@ static GPSCtrl_t gps;
 /* Radio */
 static CC1120Ctrl_t cc1120;
 static const uint8_t payloadSize = sizeof(TransmitData_t);
-
-/* USB device */
-extern USBD_HandleTypeDef hUsbDeviceFS;
 
 /* Sensor data */
 static SensorData_t sensorData;
@@ -179,6 +175,9 @@ void HM_HardwareInit() {
 	/* LED 1 */
 	HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
 
+	/* USB */
+	usbInit();
+
 	/* Checking if inits are successful (inits that don't return a boolean are assumed true) */
 	hardwareStatus[CC1120] = cc1120_init(&cc1120);
 	hardwareStatus[IMU1] = true;
@@ -276,7 +275,7 @@ void HM_LedToggle(int ledNum) {
 	}
 }
 
-bool HM_RadioSend(const uint8_t *data, uint32_t numBytes) {
+bool HM_RadioSend(const uint8_t *data, uint16_t numBytes) {
 #if (FCB_VERSION <= 0)
 	for (uint32_t i = 0; i < numBytes; i += payloadSize) {
 		memcpy(cc1120.packetToTX, data, payloadSize);
@@ -287,7 +286,20 @@ bool HM_RadioSend(const uint8_t *data, uint32_t numBytes) {
 }
 
 bool HM_UsbIsConnected() {
-	return hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED;
+	return usbIsConnected();
+}
+
+bool HM_UsbTransmit(uint8_t* data, uint16_t numBytes) {
+	return usbTransmit(data, numBytes);
+}
+
+CircularBuffer_t* HM_UsbGetRxBuffer() {
+	return usbGetRxBuffer();
+}
+
+bool HM_BluetoothSend(const uint8_t* data, uint16_t numBytes) {
+	// TODO: Implement HM_BluetoothSend
+	return false;
 }
 
 void HM_SetImu1Sampling(bool enable) {

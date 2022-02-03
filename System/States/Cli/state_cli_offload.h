@@ -1,5 +1,5 @@
-#ifndef STATE_CLI_CHOOSE_FLIGHT_H_
-#define STATE_CLI_CHOOSE_FLIGHT_H_
+#ifndef STATE_CLI_OFFLOAD_H_
+#define STATE_CLI_OFFLOAD_H_
 
 #ifdef __cplusplus
 extern "C"{
@@ -7,7 +7,7 @@ extern "C"{
 
 #include "states_interface.h"
 
-class CliChooseFlightState : public State {
+class CliOffloadState : public State {
 
 	public:
 		using State::State;
@@ -19,11 +19,14 @@ class CliChooseFlightState : public State {
 		EndCondition_t run(void) override;
 
 		void cleanup(void) override;
+
+	private:
+		bool initSuccess_;
 };
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* STATE_CLI_CALIBRATE_H */
+#endif /* STATE_CLI_OFFLOAD_H_ */
 

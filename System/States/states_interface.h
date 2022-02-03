@@ -10,13 +10,20 @@ extern "C"{
 typedef enum {
 	NoChange,
 	Apogee,
+	CalibrateCommand,
+	CliCommandComplete,
+	ConfigCommand,
+	EraseFlashCommand,
+	HelpCommand,
 	Launch,
 	MainCutAltitude,
 	MotorBurnout,
+	OffloadCommand,
+	SenseCommand,
+	ShutdownCommand,
 	Touchdown,
 	UsbConnect,
 	UsbDisconnect,
-	CliCommandComplete
 } EndCondition_t;
 
 class State {
@@ -61,6 +68,8 @@ class State {
          */
         uint32_t getPeriodMS(void) { return period_ms_; }
 
+
+
     private:
 
         /**
@@ -70,8 +79,10 @@ class State {
         virtual EndCondition_t run(void) = 0;
 
         int id_;
-        int period_ms_;
         uint32_t run_counter_ = 0;
+
+    protected:
+        int period_ms_;
 };
 
 #ifdef __cplusplus

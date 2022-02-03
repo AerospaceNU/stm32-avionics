@@ -37,6 +37,10 @@ Read this to understand how the code is set up. We will start with important fol
 - Hardware Manager: Wrapper for all calls to Devices folder. Allows simplification from system level, such as calling a function to get all sensor data, initialize all sensor data, etc.
 - Others, like Data Log, Data Transmission, Filters: Files that don't need to know about hardware directly because the underlying implementation doesn't matter. For instance, it doesn't matter how the flash or radio are set up to call a function from hardware manager to control them.
 
+## Utils
+- Files that could be used anywhere in System or Devices
+- These files consist of general helpers and math operations
+
 ## Core
 - This folder is full of generated code. It will change when you generate code from the configuration GUI.
 - The only reason to edit files in this folder directly is to start your system level code in main.cpp. If editing, only write code in between the USER_CODE_BEGIN USER_CODE_END comments.

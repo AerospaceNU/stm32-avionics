@@ -20,15 +20,17 @@ class CliConfigState : public State {
 
 		void cleanup(void) override;
 
+		static constexpr int MAX_DROGUE_CUTS = 4;
+
 		struct Configs_t {
 			uint8_t drogueCuts; // Excludes initial separation and main descent
-			double drogueCutAltitudesM[4];
+			double drogueCutAltitudesM[MAX_DROGUE_CUTS];
 			double mainCutAltitudeM;
 			double groundElevationM;
 			double groundTemperatureC;
 		};
 
-		static const Configs_t* getConfigs();
+		static Configs_t* getConfigs();
 };
 
 #ifdef __cplusplus
