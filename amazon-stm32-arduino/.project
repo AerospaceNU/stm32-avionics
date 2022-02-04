@@ -34,7 +34,17 @@
 		<link>
 			<name>Devices</name>
 			<type>2</type>
-			<location>D:/Documents/GitHub/stm32-avionics/Devices</location>
+			<location>/home/nathan/Documents/DPF/stm32-avionics/Devices</location>
+		</link>
+		<link>
+			<name>System</name>
+			<type>2</type>
+			<location>/home/nathan/Documents/DPF/stm32-avionics/System</location>
+		</link>
+		<link>
+			<name>Utils</name>
+			<type>2</type>
+			<location>/home/nathan/Documents/DPF/stm32-avionics/Utils</location>
 		</link>
 	</linkedResources>
 </projectDescription>
