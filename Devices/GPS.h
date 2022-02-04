@@ -1,6 +1,7 @@
 #include "minmea.h"
 #include "string.h"
-#include "stm32h7xx_hal.h"
+//#include "stm32h7xx_hal.h"
+#include "stm32f4xx_hal"
 #include "hardware_manager.h"
 #include "stdbool.h"
 

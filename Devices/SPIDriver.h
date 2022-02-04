@@ -12,7 +12,8 @@
 extern "C" {
 #endif
 
-#include "stm32h7xx_hal.h"
+//#include "stm32h7xx_hal.h"
+#include "stm32f4xx_hal.h"
 
 typedef struct SPICtrl_s{
 	SPI_HandleTypeDef* hspi;
