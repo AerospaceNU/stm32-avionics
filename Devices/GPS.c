@@ -1,9 +1,12 @@
+#include "data_log.h"
+
 #include "GPS.h"
 
 #include "minmea.h"
 #include "string.h"
 #include "hal_callbacks.h"
 #include "stdbool.h"
+
 
 void parseString(GPSCtrl_t *gps, char line[]) {
 	switch (minmea_sentence_id(line, false)) {

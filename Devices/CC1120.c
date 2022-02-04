@@ -5,6 +5,8 @@
  *      Author: ben helfrich
  */
 
+#ifdef HAS_CC1120
+
 #include <CC1120.h>
 #include <smartrf_CC1120_cfg_1_2kbps_50k.h>
 #include "stdint.h"
@@ -679,4 +681,6 @@ bool cc1120_stopContinuousTX(CC1120Ctrl_t *radio){
 	trxSpiCmdStrobe(radio, CC112X_SIDLE);
 	return true;
 }
+
+#endif
 

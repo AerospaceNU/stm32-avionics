@@ -5,12 +5,13 @@
 #ifndef ADC_DEVICE_H_
 #define ADC_DEVICE_H_
 
+#include "board_config.h"
+
 #ifdef __cplusplus
 extern "C"{
 #endif
 
 #include <stdbool.h>
-#include "stm32h7xx_hal.h"
 
 #define MAX_CHANNELS 14
 
