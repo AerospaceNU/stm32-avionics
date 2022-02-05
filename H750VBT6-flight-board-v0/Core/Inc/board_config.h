@@ -35,6 +35,6 @@
  */
 
 #define IMU_1 1
-#define IMU_2 0
+#define IMU_2 1
 
 #endif

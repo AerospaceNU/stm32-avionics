@@ -3,6 +3,8 @@
  */
 #include "state_log.h"
 
+#include "board_config.h"
+
 #define STATE_START_ADDRESS  0x00000000; // Starting flash location for the state log, relative to start of internal flash
 
 uint32_t writeAddress = STATE_START_ADDRESS;
@@ -27,6 +29,7 @@ void state_log_reload_flight() {
  * @param currentState: int representation of the state id
  */
 void state_log_write(int currentState) {
+#ifdef HAS_INTERNAL_FLASH
 	uint8_t stateWriteBuffer; // Buffer to store the byte that needs to be written to flash
 	uint8_t stateReadBuffer;
 	while (1) {
@@ -51,6 +54,7 @@ void state_log_write(int currentState) {
 	}
 
 	internal_flash_write(writeAddress, &stateWriteBuffer, 1);
+#endif
 }
 
 void state_log_write_complete() {
@@ -62,6 +66,7 @@ void state_log_write_complete() {
  * @return int representing the state id
  */
 int state_log_read() {
+#ifdef HAS_INTERNAL_FLASH
 	uint8_t stateReadBuffer;
 	internal_flash_read(readAddress, &stateReadBuffer, 1);
 	prevRead = stateReadBuffer;
@@ -85,4 +90,7 @@ int state_log_read() {
 		}
 		prevRead = curRead;
 	}
+#else
+	return -1;
+#endif
 }
