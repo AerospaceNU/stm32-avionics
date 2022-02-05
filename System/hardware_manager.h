@@ -1,6 +1,8 @@
 #ifndef HARDWARE_MANAGER_H_
 #define HARDWARE_MANAGER_H_
 
+#include "board_config.h"
+
 #ifdef __cplusplus
 extern "C"{
 #endif

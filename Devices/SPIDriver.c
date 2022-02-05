@@ -5,6 +5,10 @@
  *      Author: John
  */
 
+#include "board_config.h"
+
+#ifdef HAS_SPI
+
 #include "SPIDriver.h"
 
 uint8_t SPI_ReadRegister(SPICtrld_t* sensor, uint8_t reg) {
@@ -39,3 +43,5 @@ void SPI_WriteRegister(SPICtrld_t* sensor, uint8_t reg, uint8_t val) {
 	// bring CS pin high
 	HAL_GPIO_WritePin(sensor->port, sensor->pin, 1);
 }
+
+#endif

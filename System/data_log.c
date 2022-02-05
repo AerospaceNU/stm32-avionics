@@ -3,6 +3,8 @@
  */
 #include "data_log.h"
 
+#include "board_config.h"
+
 #include <stdbool.h>
 #include <string.h>
 

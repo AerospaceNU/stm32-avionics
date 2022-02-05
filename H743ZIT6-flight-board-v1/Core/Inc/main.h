@@ -32,6 +32,10 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "tim.h"
+#include "usart.h"
+#include "adc.h"
+#include "spi.h"
 
 /* USER CODE END Includes */
 

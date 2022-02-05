@@ -2,6 +2,10 @@
  * buzzer.c
  */
 
+#include "board_config.h"
+
+#ifdef HAS_BUZZER
+
 #include "buzzer.h"
 
 void buzzerInit(BuzzerCtrl_t *buzzer, TIM_HandleTypeDef *htim, uint32_t channel, float minFrequency) {
@@ -44,3 +48,5 @@ void buzzerStop(BuzzerCtrl_t *buzzer) {
 	// Stop PWM generation
 	HAL_TIM_PWM_Stop(buzzer->htim, buzzer->channel);
 }
+
+#endif

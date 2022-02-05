@@ -1,60 +1,116 @@
+#include "board_config.h"
 
 #include "hardware_manager.h"
 #include "main.h"
-#include "LSM9DS1.h"
-#include "ms5607.h"
-#include "H3LIS331DL.h"
-#include "servo.h"
-#include "buzzer.h"
-#include "adc_device.h"
-#include "S25FLx.h"
-#include "cc1120.h"
-#include "GPS.h"
-#include "usb.h"
 
-#include "adc.h"
-#include "tim.h"
-#include "usart.h"
-#include "dma.h"
+#ifdef HAS_LSM9DS1
+#include "LSM9DS1.h"
+#endif
+
+#ifdef HAS_MS5607
+#include "ms5607.h"
+#endif
+
+#ifdef HAS_H3LIS331DL
+#include "H3LIS331DL.h"
+#endif
+
+#ifdef HAS_SERVO
+#include "servo.h"
+#endif
+
+#ifdef HAS_BUZZER
+#include "buzzer.h"
+#endif
+
+#ifdef HAS_ADC_DEVICE
+#include "adc_device.h"
+#endif
+
+#ifdef HAS_S25FLX
+#include "S25FLx.h"
+#endif
+
+#ifdef HAS_CC1120
+#include "CC1120.h"
+#endif
+
+#ifdef HAS_GPS
+#include "GPS.h"
+#endif
+
+#ifdef HAS_USB
+#include "usb.h"
+#endif
+
+//#include "adc.h"
+//#include "tim.h"
+//#include "usart.h"
+//#include "dma.h"
 
 #include "data_transmission.h"
 
+//TODO: Some way of specifying what IMU1 and (and baro1 and baro2) other than just a boolean
+
 /* IMUs */
+#ifdef HAS_LSM9DS1
+#if (IMU_1 == 1)
 static LSM9DS1Ctrl_t lsm9ds1_1;
+#endif
+
+#if (IMU_2 == 1)
 static LSM9DS1Ctrl_t lsm9ds1_2;
+#endif
+#endif
 
 /* Barometers */
+#ifdef HAS_MS5607
 static MS5607Ctrl_t ms5607_1;
 static MS5607Ctrl_t ms5607_2;
+#endif
 
 /* High G Accelerometers */
+#ifdef HAS_H3LIS331DL
 static H3LIS331DLCtrl_t h3lis_1;
+#endif
 
 /* Servos */
+#ifdef HAS_SERVO
 static ServoCtrl_t servo1;
 static ServoCtrl_t servo2;
 static ServoCtrl_t servo3;
 static ServoCtrl_t servo4;
+#endif
 
 /* Buzzers */
+#ifdef HAS_BUZZER
 static BuzzerCtrl_t buzzer;
+#endif
 
 /* ADCs */
+#ifdef HAS_ADC_DEVICE
 #if (FCB_VERSION <= 0)
 static AdcCtrl_t adcBatteryVoltage;
 static AdcCtrl_t adcCurrent;
 #endif /* FCB_VERSION */
 static AdcCtrl_t adcPyro[6];
+#endif
 
 /* Flash memory */
+#ifdef HAS_S25FLX
 static S25FLXCtrl_t s25flx1;
+#endif
 
 /* GPS */
+#ifdef HAS_GPS
 static GPSCtrl_t gps;
+#endif
 
 /* Radio */
+#ifdef HAS_CC1120
 static CC1120Ctrl_t cc1120;
 static const uint8_t payloadSize = sizeof(TransmitData_t);
+#endif
 
 /* Sensor data */
 static SensorData_t sensorData;
@@ -73,8 +129,8 @@ static bool bPyroContinuitySampling = true;
 bool hardwareStatus[NUM_HARDWARE];
 
 void HM_HardwareInit() {
-
-
+#ifdef HAS_LSM9DS1
+#if (IMU_1 == 1)
 	/* LSM9DS1 IMU 1 */
 	lsm9ds1_1.ag.LSM9DS1SPI.hspi = IMU1_AG_HSPI;
 	lsm9ds1_1.ag.LSM9DS1SPI.port = IMU1_AG_CS_GPIO_Port;
@@ -86,8 +142,9 @@ void HM_HardwareInit() {
 	lsm9ds1_1.ag.gFs = FS_G_500;
 	lsm9ds1_1.m.mFs = FS_M_8;
 	LSM9DS1_init(&lsm9ds1_1);
+#endif
 
-#if (FCB_VERSION <= 0)
+#if (IMU_2 == 1)
 	/* LSM9DS1 IMU 2 */
 	lsm9ds1_2.ag.LSM9DS1SPI.hspi = IMU2_AG_HSPI;
 	lsm9ds1_2.ag.LSM9DS1SPI.port = IMU2_AG_CS_GPIO_Port;
@@ -99,10 +156,11 @@ void HM_HardwareInit() {
 	lsm9ds1_2.ag.gFs = FS_G_500;
 	lsm9ds1_2.m.mFs = FS_M_8;
 	LSM9DS1_init(&lsm9ds1_2);
-#else
-	/* ICM20948 IMU 2 */
-#endif /* FCB_VERSION */
+#endif
 
+#endif
+
+#ifdef HAS_MS5607
 	/* MS5607 Barometer 1 */
 	ms5607_1.spiconfig.hspi = BARO1_HSPI;
 	ms5607_1.spiconfig.port = BARO1_CS_GPIO_Port;
@@ -114,13 +172,17 @@ void HM_HardwareInit() {
 	ms5607_2.spiconfig.port = BARO2_CS_GPIO_Port;
 	ms5607_2.spiconfig.pin = BARO2_CS_Pin;
 	MS5607_init(&ms5607_2);
+#endif
 
+#ifdef HAS_H3LIS331DL
 	/* H3LIS331DL High G Accelerometer */
 	h3lis_1.H3LIS331DLSPI.hspi = HIGH_G_HSPI;
 	h3lis_1.H3LIS331DLSPI.port = HIGH_G_CS_GPIO_Port;
 	h3lis_1.H3LIS331DLSPI.pin = HIGH_G_CS_Pin;
 	H3LIS331DL_init(&h3lis_1);
+#endif
 
+#ifdef HAS_SERVO
 	/* Servos 1-4
 	 *
 	 * TODO: minPulseMS and maxPulseMS will need a method of tuning based on servo (currently 0.75-2.25)
@@ -129,10 +191,14 @@ void HM_HardwareInit() {
 	servoInit(&servo2, SERVO2_HTIM, SERVO2_CHANNEL, 20, 0.75, 2.25, -90, 90);
 	servoInit(&servo3, SERVO3_HTIM, SERVO3_CHANNEL, 20, 0.75, 2.25, -90, 90);
 	servoInit(&servo4, SERVO4_HTIM, SERVO4_CHANNEL, 20, 0.75, 2.25, -90, 90);
+#endif
 
+#ifdef HAS_BUZZER
 	/* Buzzer */
 	buzzerInit(&buzzer, BUZZER_HTIM, BUZZER_CHANNEL, 500);
+#endif
 
+#ifdef HAS_ADC_DEVICE
 	/* ADCs */
     // Battery voltage - 0 min, 36.3 max (110k/10k*3.3V)
     // Pyros - 0 min, 36.3 max (110k/10k*3.3V)
@@ -147,14 +213,20 @@ void HM_HardwareInit() {
     adcInit(&adcPyro[3], PYRO4_ADC, PYRO4_ADC_RANK, 0, voltageDividerMax, true);
     adcInit(&adcPyro[4], PYRO5_ADC, PYRO5_ADC_RANK, 0, voltageDividerMax, true);
     adcInit(&adcPyro[5], PYRO6_ADC, PYRO6_ADC_RANK, 0, voltageDividerMax, true);
+#endif
 
+#ifdef HAS_S25FLX
 	/* Flash */
 	S25FLX_init(&s25flx1, FLASH_HSPI, FLASH_CS_GPIO_Port, FLASH_CS_Pin, FLASH_SIZE_BYTES);
+#endif
 
+#ifdef HAS_GPS
 	/* GPS */
 	gps.gps_uart = GPS_HUART;
 	gps_init(&gps);
+#endif
 
+#ifdef HAS_CC1120
 	/* Radio */
 	cc1120.radhspi = RADIO_HSPI;
 	cc1120.CS_port = RADIO_CS_GPIO_Port;
@@ -171,15 +243,23 @@ void HM_HardwareInit() {
 	cc1120.GP3_pin = RADIO_GP3_Pin;
 	cc1120.payloadSize = payloadSize;
 	cc1120.initialized = false;
+#endif
 
+#ifdef HAS_LED_1
 	/* LED 1 */
 	HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+#endif
 
+#ifdef HAS_USB
 	/* USB */
 	usbInit();
+#endif
 
 	/* Checking if inits are successful (inits that don't return a boolean are assumed true) */
+#ifdef HAS_CC1120
 	hardwareStatus[CC1120] = cc1120_init(&cc1120);
+#endif
+
 	hardwareStatus[IMU1] = true;
 	hardwareStatus[IMU2] = true;
 	hardwareStatus[BAROMETER1] = true;
@@ -192,51 +272,88 @@ uint32_t HM_Millis() {
 }
 
 bool HM_FlashReadStart(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
+#ifdef HAS_S25FLX
 	return S25FLX_read_start(&s25flx1, startLoc, numBytes, pData);
+#else
+	return false;
+#endif
 }
 
 bool HM_FlashWriteStart(uint32_t startLoc, uint32_t numBytes, uint8_t *data) {
+#ifdef HAS_S25FLX
 	return S25FLX_write_start(&s25flx1, startLoc, numBytes, data);
+#else
+	return false;
+#endif
 }
 
 bool HM_FlashEraseSectorStart(uint32_t sectorNum) {
+#ifdef HAS_S25FLX
 	return S25FLX_erase_sector_start(&s25flx1, sectorNum);
+#else
+	return false;
+#endif
 }
 
 bool HM_FlashEraseChipStart() {
+#ifdef HAS_S25FLX
 	return S25FLX_erase_chip_start(&s25flx1);
+#else
+	return false;
+#endif
 }
 
 
 bool HM_FlashIsReadComplete() {
+#ifdef HAS_S25FLX
+
 #ifdef USE_S25FLx_DMA
 	return S25FLX_is_read_complete(&s25flx1);
 #else
 	return true;
 #endif
+
+#else
+	return false;
+#endif //HAS_S25FLX
 }
 
 bool HM_FlashIsWriteComplete() {
+#ifdef HAS_S25FLX
 	return S25FLX_is_write_complete(&s25flx1);
+#else
+	return false;
+#endif
 }
 
 bool HM_FlashIsEraseComplete() {
+#ifdef HAS_S25FLX
 	return S25FLX_is_erase_complete(&s25flx1);
+#else
+	return false;
+#endif
 }
 
 void HM_BuzzerSetFrequency(float fHz) {
+#ifdef HAS_BUZZER
 	buzzerSetFrequency(&buzzer, fHz);
+#endif
 }
 
 void HM_BuzzerStart() {
+#ifdef HAS_BUZZER
 	buzzerStart(&buzzer);
+#endif
 }
 
 void HM_BuzzerStop() {
+#ifdef HAS_BUZZER
 	buzzerStop(&buzzer);
+#endif
 }
 
 void HM_ServoSetAngle(int servoNum, float degrees) {
+#ifdef HAS_SERVO
 	switch(servoNum) {
 	case 1:
 		servoSetAngle(&servo1, degrees);
@@ -253,12 +370,15 @@ void HM_ServoSetAngle(int servoNum, float degrees) {
 	default:
 		break;
 	}
+#endif
 }
 
 void HM_LedSet(int ledNum, bool set) {
 	switch(ledNum) {
 	case 1:
+#ifdef HAS_LED_1
 		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, set);
+#endif
 		break;
 	default:
 		break;
@@ -268,7 +388,9 @@ void HM_LedSet(int ledNum, bool set) {
 void HM_LedToggle(int ledNum) {
 	switch(ledNum) {
 	case 1:
+#ifdef HAS_LED_1
 		HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+#endif
 		break;
 	default:
 		break;
@@ -276,25 +398,39 @@ void HM_LedToggle(int ledNum) {
 }
 
 bool HM_RadioSend(const uint8_t *data, uint16_t numBytes) {
+#ifdef HAS_CC1120
 #if (FCB_VERSION <= 0)
 	for (uint32_t i = 0; i < numBytes; i += payloadSize) {
 		memcpy(cc1120.packetToTX, data, payloadSize);
 		cc1120State(&cc1120);
 	}
 #endif /* FCB_VERSION */
+#endif //HAS_CC1120
 	return false;
 }
 
 bool HM_UsbIsConnected() {
+#ifdef HAS_USB
 	return usbIsConnected();
+#else
+	return false;
+#endif
 }
 
 bool HM_UsbTransmit(uint8_t* data, uint16_t numBytes) {
+#ifdef HAS_USB
 	return usbTransmit(data, numBytes);
+#else
+	return false;
+#endif
 }
 
 CircularBuffer_t* HM_UsbGetRxBuffer() {
+#ifdef HAS_USB
 	return usbGetRxBuffer();
+#else
+	return false;
+#endif
 }
 
 bool HM_BluetoothSend(const uint8_t* data, uint16_t numBytes) {
@@ -338,6 +474,7 @@ void HM_ReadSensorData() {
 
 	// IMU 1 data
 	if (bImu1Sampling) {
+#if (IMU_1 == 1)
 		LSM9DS1_get_data(&lsm9ds1_1);
 		sensorData.imu1_accel_x_raw = lsm9ds1_1.ag.aRawVal.x;
 		sensorData.imu1_accel_y_raw = lsm9ds1_1.ag.aRawVal.y;
@@ -357,10 +494,12 @@ void HM_ReadSensorData() {
 		sensorData.imu1_mag_x = lsm9ds1_1.m.mVal.x;
 		sensorData.imu1_mag_y = lsm9ds1_1.m.mVal.y;
 		sensorData.imu1_mag_z = lsm9ds1_1.m.mVal.z;
+#endif
 	}
 
 	// IMU 2 data
 	if (bImu2Sampling) {
+#if (IMU_2 == 1)
 		LSM9DS1_get_data(&lsm9ds1_2);
 		sensorData.imu2_accel_x_raw = lsm9ds1_2.ag.aRawVal.x;
 		sensorData.imu2_accel_y_raw = lsm9ds1_2.ag.aRawVal.y;
@@ -380,10 +519,12 @@ void HM_ReadSensorData() {
 		sensorData.imu2_mag_x = lsm9ds1_2.m.mVal.x;
 		sensorData.imu2_mag_y = lsm9ds1_2.m.mVal.y;
 		sensorData.imu2_mag_z = lsm9ds1_2.m.mVal.z;
+#endif
 	}
 
 	// High G Accelerometer data
 	if (bHighGSampling) {
+#ifdef HAS_H3LIS331DL
 		H3LIS331DL_get_data(&h3lis_1);
 		sensorData.high_g_accel_x_raw = h3lis_1.rawVal.x;
 		sensorData.high_g_accel_x = h3lis_1.val.x;
@@ -391,8 +532,10 @@ void HM_ReadSensorData() {
 		sensorData.high_g_accel_y = h3lis_1.val.y;
 		sensorData.high_g_accel_z_raw = h3lis_1.rawVal.z;
 		sensorData.high_g_accel_z = h3lis_1.val.z;
+#endif
 	}
 
+#ifdef HAS_MS5607
 	// Baro 1 data
 	if (bBaro1Sampling) {
 		MS5607_get_data(&ms5607_1);
@@ -406,7 +549,9 @@ void HM_ReadSensorData() {
 		sensorData.baro2_pres = ms5607_2.altData.baro;
 		sensorData.baro2_temp = ms5607_2.altData.temp;
 	}
+#endif
 
+#ifdef HAS_GPS
 	// GPS data
 	// TODO: Poll GPS status to determine if data is good
 	if (bGpsSampling) {
@@ -431,7 +576,9 @@ void HM_ReadSensorData() {
 		sensorData.gps_num_sats = gps.num_sats;
 		sensorData.gps_status = gps.status;
 	}
+#endif
 
+#ifdef HAS_ADC_DEVICE
 	// ADC data
 	float adcVal = 0;
 	if (bBatteryVoltageSampling) {
@@ -454,6 +601,7 @@ void HM_ReadSensorData() {
 				sensorData.pyro_continuity[i] = false;
 		}
 	}
+#endif
 
 
 

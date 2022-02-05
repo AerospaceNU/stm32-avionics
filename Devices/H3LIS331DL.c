@@ -5,6 +5,10 @@
  *      Author: John
  */
 
+#include "board_config.h"
+
+#ifdef HAS_H3LIS331DL
+
 #include "H3LIS331DL.h"
 
 uint8_t whoAmI(H3LIS331DLCtrl_t* sensor) {
@@ -65,3 +69,5 @@ void H3LIS331DL_get_adj(H3LIS331DLCtrl_t* sensor) {
 void H3LIS331DL_get_gain(H3LIS331DLCtrl_t* sensor) {
 	sensor->gain = 0.02942;
 }
+
+#endif

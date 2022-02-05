@@ -16,7 +16,10 @@
 #include "state_powered_ascent.h"
 #include "state_pre_flight.h"
 #include "state_shutdown.h"
-#include "stm32h7xx_hal.h"
+//#include STM_HAL_HEADER
+
+//#include "stm32h7xx_hal.h"
+
 
 void Scheduler::run(void) {
 

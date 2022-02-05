@@ -1,9 +1,16 @@
+#include "board_config.h"
+
+#ifdef HAS_GPS
+
+#include "data_log.h"
+
 #include "GPS.h"
 
 #include "minmea.h"
 #include "string.h"
 #include "hal_callbacks.h"
 #include "stdbool.h"
+
 
 void parseString(GPSCtrl_t *gps, char line[]) {
 	switch (minmea_sentence_id(line, false)) {
@@ -194,3 +201,5 @@ void gps_init(GPSCtrl_t *gps) {
 	// Transmit configuration over UART
 	HAL_UART_Transmit(gps->gps_uart, nmea, sizeof(nmea), 500);
 }
+
+#endif
