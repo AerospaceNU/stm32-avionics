@@ -8,7 +8,7 @@
 #include "buzzer.h"
 #include "adc_device.h"
 #include "S25FLx.h"
-#include "cc1120.h"
+#include "CC1120.h"
 #include "GPS.h"
 #include "usb.h"
 
