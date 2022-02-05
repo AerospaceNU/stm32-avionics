@@ -8,12 +8,11 @@
 #ifndef SRC_SPIDRIVER_H_
 #define SRC_SPIDRIVER_H_
 
+#include "board_config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-//#include "stm32h7xx_hal.h"
-#include "stm32f4xx_hal.h"
 
 typedef struct SPICtrl_s{
 	SPI_HandleTypeDef* hspi;

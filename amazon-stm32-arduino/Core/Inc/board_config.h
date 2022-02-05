@@ -37,8 +37,8 @@
  * 1: LSM9DS1
  */
 
-//#define IMU_0 1
 //#define IMU_1 1
+//#define IMU_2 1
 
 
 #endif

@@ -5,14 +5,15 @@
 #include "tim.h"
 #include "dc_motor.h"
 #include "stdbool.h"
-#include "serialPrint.h"
+
+#include <stdio.h>
 
 /* inits a DC motor specified by the user */
 void DC_motor_init(pwm_control_t *pwm_control){
     /* check that PWM was started successfully */
     if( HAL_OK != HAL_TIM_PWM_Start(pwm_control->timer, pwm_control->channel))
     {
-        debugprintf("can't start PWM\r\n");
+        printf("can't start PWM\r\n");
     }
 }
 
@@ -20,7 +21,7 @@ void DC_motor_init(pwm_control_t *pwm_control){
 void DC_motor_stop(pwm_control_t *pwmObj){
     if(HAL_OK != HAL_TIM_PWM_Stop(pwmObj->timer, pwmObj->channel))
     {
-        debugprintf("can't stop DC Motor\r\n");
+        printf("can't stop DC Motor\r\n");
     }
 }
 

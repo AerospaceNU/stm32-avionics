@@ -54,8 +54,13 @@
 
 /* IMUs */
 #ifdef HAS_LSM9DS1
+#if (IMU_1 == 1)
 static LSM9DS1Ctrl_t lsm9ds1_1;
+#endif
+
+#if (IMU_2 == 1)
 static LSM9DS1Ctrl_t lsm9ds1_2;
+#endif
 #endif
 
 /* Barometers */
@@ -125,7 +130,7 @@ bool hardwareStatus[NUM_HARDWARE];
 
 void HM_HardwareInit() {
 #ifdef HAS_LSM9DS1
-#if (IMU_0 == 1)
+#if (IMU_1 == 1)
 	/* LSM9DS1 IMU 1 */
 	lsm9ds1_1.ag.LSM9DS1SPI.hspi = IMU1_AG_HSPI;
 	lsm9ds1_1.ag.LSM9DS1SPI.port = IMU1_AG_CS_GPIO_Port;
@@ -139,7 +144,7 @@ void HM_HardwareInit() {
 	LSM9DS1_init(&lsm9ds1_1);
 #endif
 
-#if (IMU_1 == 1)
+#if (IMU_2 == 1)
 	/* LSM9DS1 IMU 2 */
 	lsm9ds1_2.ag.LSM9DS1SPI.hspi = IMU2_AG_HSPI;
 	lsm9ds1_2.ag.LSM9DS1SPI.port = IMU2_AG_CS_GPIO_Port;
@@ -469,7 +474,7 @@ void HM_ReadSensorData() {
 
 	// IMU 1 data
 	if (bImu1Sampling) {
-#if (IMU_0 == 1)
+#if (IMU_1 == 1)
 		LSM9DS1_get_data(&lsm9ds1_1);
 		sensorData.imu1_accel_x_raw = lsm9ds1_1.ag.aRawVal.x;
 		sensorData.imu1_accel_y_raw = lsm9ds1_1.ag.aRawVal.y;
@@ -494,7 +499,7 @@ void HM_ReadSensorData() {
 
 	// IMU 2 data
 	if (bImu2Sampling) {
-#if (IMU_1 == 1)
+#if (IMU_2 == 1)
 		LSM9DS1_get_data(&lsm9ds1_2);
 		sensorData.imu2_accel_x_raw = lsm9ds1_2.ag.aRawVal.x;
 		sensorData.imu2_accel_y_raw = lsm9ds1_2.ag.aRawVal.y;
@@ -519,7 +524,7 @@ void HM_ReadSensorData() {
 
 	// High G Accelerometer data
 	if (bHighGSampling) {
-#if HAS_H3LIS331DL
+#ifdef HAS_H3LIS331DL
 		H3LIS331DL_get_data(&h3lis_1);
 		sensorData.high_g_accel_x_raw = h3lis_1.rawVal.x;
 		sensorData.high_g_accel_x = h3lis_1.val.x;
@@ -530,7 +535,7 @@ void HM_ReadSensorData() {
 #endif
 	}
 
-#if HAS_MS5607
+#ifdef HAS_MS5607
 	// Baro 1 data
 	if (bBaro1Sampling) {
 		MS5607_get_data(&ms5607_1);
@@ -546,7 +551,7 @@ void HM_ReadSensorData() {
 	}
 #endif
 
-#if HAS_GPS
+#ifdef HAS_GPS
 	// GPS data
 	// TODO: Poll GPS status to determine if data is good
 	if (bGpsSampling) {
