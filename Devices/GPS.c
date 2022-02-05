@@ -1,3 +1,7 @@
+#include "board_config.h"
+
+#ifdef HAS_GPS
+
 #include "data_log.h"
 
 #include "GPS.h"
@@ -197,3 +201,5 @@ void gps_init(GPSCtrl_t *gps) {
 	// Transmit configuration over UART
 	HAL_UART_Transmit(gps->gps_uart, nmea, sizeof(nmea), 500);
 }
+
+#endif

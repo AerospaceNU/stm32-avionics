@@ -2,6 +2,10 @@
  * S25FLx2.c
  */
 
+#include "board_config.h"
+
+#ifdef HAS_S25FLX
+
 #include <string.h>
 #include <S25FLx.h>
 #include "hal_callbacks.h"
@@ -289,3 +293,5 @@ bool S25FLX_is_erase_complete(S25FLXCtrl_t *s25flx) {
 	// Same functionality as write, but different public function name is clearer for programmers at higher levels
 	return S25FLX_is_write_complete(s25flx);
 }
+
+#endif

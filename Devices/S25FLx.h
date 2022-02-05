@@ -5,13 +5,15 @@
 #ifndef S25FLX_H_
 #define S25FLX_H_
 
+#include "board_config.h"
+
 #ifdef __cplusplus
 extern "C"{
 #endif
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "board_config.h"
+
 
 // #define USE_S25FLx_DMA
 // NOTE: DMA is not yet functional. Leave the define commented and remove this comment when DMA works

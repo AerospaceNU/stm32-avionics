@@ -5,6 +5,10 @@
  *      Author: John
  */
 
+#include "board_config.h"
+
+#ifdef HAS_LSM9DS1
+
 #include "LSM9DS1.h"
 
 uint8_t AG_whoAmI(AG_LSM9DS1Ctrl_t* sensor) {
@@ -169,3 +173,5 @@ void LSM9DS1_calcRes(LSM9DS1Ctrl_t* sensor) {
 			break;
 	}
 }
+
+#endif

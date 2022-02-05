@@ -1,3 +1,7 @@
+#include "board_config.h"
+
+#ifdef HAS_DC_MOTOR
+
 #include "tim.h"
 #include "dc_motor.h"
 #include "stdbool.h"
@@ -32,3 +36,5 @@ void DC_motor_run(pwm_control_t *pwmObj, uint32_t speed_percent){ //0 -> 255?
     int setPeriod = (speed_percent / 100.0) * pwmObj->timer->Init.Period;
     __HAL_TIM_SET_COMPARE(pwmObj->timer, pwmObj->channel, setPeriod);
 }
+
+#endif
