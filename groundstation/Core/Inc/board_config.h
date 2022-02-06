@@ -30,6 +30,6 @@
  */
 
 #define HAS_RADIO_433
-#define HAS_RADIO_915 // TODO commented out for now
+//#define HAS_RADIO_915 // TODO commented out for now
 
 #endif /* INC_BOARD_CONFIG_H_ */
