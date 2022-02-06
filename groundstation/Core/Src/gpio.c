@@ -80,8 +80,8 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin
                            PDPin */
-  GPIO_InitStruct.Pin = RAD2_IO0_Pin|RAD2_IO2_Pin|RAD2_IO3_Pin|RAD1_IO0_Pin
-                          |RAD1_IO2_Pin;
+  GPIO_InitStruct.Pin = RAD2_GP0_Pin|RAD2_GP2_Pin|RAD2_GP3_Pin|RAD1_GP0_Pin
+                          |RAD1_GP2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
@@ -94,7 +94,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin PBPin */
-  GPIO_InitStruct.Pin = RAD1_IO3_Pin|GPS_INT_Pin|GPS_PPS_Pin;
+  GPIO_InitStruct.Pin = RAD1_GP3_Pin|GPS_INT_Pin|GPS_PPS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);

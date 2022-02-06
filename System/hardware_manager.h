@@ -93,7 +93,8 @@ typedef struct {
 } SensorData_t;
 
 typedef enum hardware_t{
-	CC1120 = 0,
+	RADIO_433 = 0,
+	RADIO_915,
 	IMU1,
 	IMU2,
 	BAROMETER1,
@@ -101,6 +102,11 @@ typedef enum hardware_t{
 	HIGH_G_ACCELEROMETER,
 	NUM_HARDWARE
 } hardware_t;
+
+typedef enum {
+	RADIO_HW_433,
+	RADIO_HW_915,
+} RadioTransciever_t;
 
 void HM_HardwareInit();
 
@@ -129,7 +135,9 @@ void HM_LedSet(int ledNum, bool on);
 void HM_LedToggle(int ledNum);
 
 /* Radio functions */
-bool HM_RadioSend(const uint8_t *data, uint16_t numBytes);
+bool HM_RadioSend(RadioTransciever_t radio, const uint8_t *data, uint16_t numBytes);
+bool HM_RadioUpdate();
+uint8_t* HM_RadioGetRxPtr(RadioTransciever_t radio);
 
 /* USB functions */
 bool HM_UsbIsConnected();

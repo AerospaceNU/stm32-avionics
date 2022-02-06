@@ -64,10 +64,6 @@ typedef struct CC1120Ctrl_s{
  * CONSTANTS
  */
 
-//TODO: put this somewhere else it make more sense
-#define CC1120_TRUE 0
-
-
 #define CC1120_OSC_FREQ 32000000//32 MHz
 #define CC1200_OSC_FREQ 40000000
 

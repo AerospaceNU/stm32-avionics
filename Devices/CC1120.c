@@ -7,10 +7,10 @@
 
 #include "board_config.h"
 
-#ifdef HAS_CC1120
+#if defined(HAS_CC1120) || defined(HAS_CC1200)
 
 #include <CC1120.h>
-#include <smartrf_CC1200_cfg_434_1_2kbps.h>
+#include "radioconfig/smartrf_CC1200_cfg_434_1_2kbps.h"
 #include "stdint.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -70,7 +70,7 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 
 	//cc1120_setFrequency(radio);
 
-#if (CC1120_TRUE)
+#ifdef HAS_CC1120
 		//calibrate the radio
 	if (!manualCalibration(radio))
 		return false;
@@ -594,7 +594,7 @@ bool cc1120_setFrequency(CC1120Ctrl_t* radio)
 	//uint8_t ifamp = 0x03; cc1120SpiWriteReg(radio, CC112X_IFAMP,&ifamp,1);
 
 	//cc1120 errata eliminates need for this operation
-#if (!CC1120_TRUE)
+#if (!HAS_CC1120)
     if(radio->band == BAND_820_960MHz)
     {
     	cc1120SpiWriteReg(radio, CC112X_FS_DIG0,0x55,1);

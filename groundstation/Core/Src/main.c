@@ -114,44 +114,29 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  CC1120Ctrl_t radio;
-  radio.radhspi = &hspi3;
-  radio.CS_pin = RAD2_CS_Pin;
-  radio.CS_port = RAD2_CS_GPIO_Port;
-  radio.RST_pin = RAD2_RST_Pin;
-  radio.RST_port = RAD2_RST_GPIO_Port;
-  radio.RDY_pin = RAD2_MISO_Pin;
-  radio.RDY_port = RAD2_MISO_GPIO_Port;
-  radio.GP0_pin = RAD2_IO0_Pin;
-  radio.GP0_port = RAD2_IO0_GPIO_Port;
-  radio.GP2_pin = RAD2_IO2_Pin;
-  radio.GP2_port = RAD2_IO2_GPIO_Port;
-  radio.GP3_pin = RAD2_IO3_Pin;
-  radio.GP3_port = RAD2_IO3_GPIO_Port;
-  radio.payloadSize = sizeof(TransmitData_t);
-  radio.packetCfg = 0x0;
-  radio.initialized = false;
-
-  cc1120_init(&radio);
+  HM_HardwareInit();
+  uint8_t *radioPtr = HM_RadioGetRxPtr(RADIO_HW_433);
 
   while (1)
 
  {
-	char* buf = "Hell0\n";
+	if(radioPtr == NULL) continue;
+	//char* buf = "Hell0\n";
 
-	cc1120State(&radio);
-	TransmitData_t t = * ((TransmitData_t *) radio.packetRX);
+	HM_RadioUpdate();
+
+	TransmitData_t t = * ((TransmitData_t *) radioPtr);
 
 	char * call = t.callsign;
 	char * ret = "\n";
 
-	usbTransmit(call, 8);
-	usbTransmit(ret, strlen(ret));
-	if(radio.CRC_LQI >> 7 == 0) {
-		call = "CRC err\n";
-		usbTransmit(call, strlen(call));
-	}
-	memset(radio.packetRX, 0, radio.payloadSize);
+	HM_UsbTransmit((uint8_t*)call, 8);
+	HM_UsbTransmit((uint8_t*)ret, strlen(ret));
+//	if(radio.CRC_LQI >> 7 == 0) {
+//		call = "CRC err\n";
+//		HM_UsbTransmit((uint8_t*)call, strlen(call));
+//	}
+	memset(radioPtr, 0, sizeof(TransmitData_t));
 	HAL_Delay(300);
 //	usbTransmit(&t.pos_z, 4);
 //	usbTransmit(&t.vel_z, 4);

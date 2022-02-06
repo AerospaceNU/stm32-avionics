@@ -32,7 +32,8 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "usart.h"
+#include "spi.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -76,22 +77,22 @@ void Error_Handler(void);
 #define RAD2_MISO_GPIO_Port GPIOC
 #define RAD2_MOSI_Pin GPIO_PIN_12
 #define RAD2_MOSI_GPIO_Port GPIOC
-#define RAD2_IO0_Pin GPIO_PIN_0
-#define RAD2_IO0_GPIO_Port GPIOD
-#define RAD2_IO2_Pin GPIO_PIN_1
-#define RAD2_IO2_GPIO_Port GPIOD
-#define RAD2_IO3_Pin GPIO_PIN_2
-#define RAD2_IO3_GPIO_Port GPIOD
+#define RAD2_GP0_Pin GPIO_PIN_0
+#define RAD2_GP0_GPIO_Port GPIOD
+#define RAD2_GP2_Pin GPIO_PIN_1
+#define RAD2_GP2_GPIO_Port GPIOD
+#define RAD2_GP3_Pin GPIO_PIN_2
+#define RAD2_GP3_GPIO_Port GPIOD
 #define RAD2_RST_Pin GPIO_PIN_3
 #define RAD2_RST_GPIO_Port GPIOD
 #define RAD1_CS_Pin GPIO_PIN_4
 #define RAD1_CS_GPIO_Port GPIOD
-#define RAD1_IO0_Pin GPIO_PIN_5
-#define RAD1_IO0_GPIO_Port GPIOD
-#define RAD1_IO2_Pin GPIO_PIN_6
-#define RAD1_IO2_GPIO_Port GPIOD
-#define RAD1_IO3_Pin GPIO_PIN_5
-#define RAD1_IO3_GPIO_Port GPIOB
+#define RAD1_GP0_Pin GPIO_PIN_5
+#define RAD1_GP0_GPIO_Port GPIOD
+#define RAD1_GP2_Pin GPIO_PIN_6
+#define RAD1_GP2_GPIO_Port GPIOD
+#define RAD1_GP3_Pin GPIO_PIN_5
+#define RAD1_GP3_GPIO_Port GPIOB
 #define RAD1_RST_Pin GPIO_PIN_6
 #define RAD1_RST_GPIO_Port GPIOB
 #define GPS_INT_Pin GPIO_PIN_8
@@ -99,7 +100,12 @@ void Error_Handler(void);
 #define GPS_PPS_Pin GPIO_PIN_9
 #define GPS_PPS_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
+#define GPS_HUART &huart8
+#define RAD1_HSPI	&hspi1 // 915mhz radio
+#define RAD2_HSPI	&hspi3 // 433mhz radio
 
+#define RAD1_MISO_GPIO_Port GPIOB
+#define RAD1_MISO_Pin GPIO_PIN_4
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

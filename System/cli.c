@@ -182,7 +182,8 @@ void cliSend(const char* msg) {
 		HM_BluetoothSend((uint8_t*) msg, (uint16_t) strlen(msg));
 		break;
 	case CLI_RADIO:
-		HM_RadioSend((uint8_t*) msg, (uint16_t) strlen(msg));
+		// TODO frequency
+		HM_RadioSend(RADIO_HW_433, (uint8_t*) msg, (uint16_t) strlen(msg));
 		break;
 	case CLI_USB:
 		HM_UsbTransmit((uint8_t*) msg, (uint16_t) strlen(msg));

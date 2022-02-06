@@ -9,7 +9,7 @@
 
 #include "stm32h7xx.h"
 
-#define HAS_CC1120
+#define HAS_CC1200
 #define HAS_ADC_DEVICE
 #define HAS_GPS
 #define HAS_MS5607
@@ -36,6 +36,14 @@
 
 #define IMU_1 1
 #define IMU_2 0
+
+/*
+ * Radio. We assume we can only have 433 or 915, and they're both
+ * either cc1200 or cc1120
+ */
+
+//#define HAS_RADIO_433
+#define HAS_RADIO_915
 
 
 #endif

@@ -1,16 +1,12 @@
 #include "board_config.h"
-
 #include "hardware_manager.h"
-
-#if (FCB_VERSION < 100)
-
 #include "main.h"
 
 #ifdef HAS_LSM9DS1
 #include "LSM9DS1.h"
 #endif
 
-#ifdef HAS_MS5607
+#if (BARO_1 == 1 || BARO_2 == 1)
 #include "ms5607.h"
 #endif
 
@@ -34,7 +30,7 @@
 #include "S25FLx.h"
 #endif
 
-#ifdef HAS_CC1120
+#if defined(HAS_CC1120) || defined(HAS_CC1200)
 #include "CC1120.h"
 #endif
 
@@ -67,9 +63,15 @@ static LSM9DS1Ctrl_t lsm9ds1_2;
 #endif
 
 /* Barometers */
-#ifdef HAS_MS5607
+#ifdef BARO_2
+#if (BARO_1 == 1)
 static MS5607Ctrl_t ms5607_1;
+#endif
+#endif
+#ifdef BARO_2
+#if (BARO_2 == 1)
 static MS5607Ctrl_t ms5607_2;
+#endif
 #endif
 
 /* High G Accelerometers */
@@ -110,9 +112,12 @@ static GPSCtrl_t gps;
 #endif
 
 /* Radio */
-#ifdef HAS_CC1120
-static CC1120Ctrl_t cc1120;
 static const uint8_t payloadSize = sizeof(TransmitData_t);
+#ifdef HAS_RADIO_433
+static CC1120Ctrl_t radio1;
+#endif
+#ifdef HAS_RADIO_915
+static CC1120Ctrl_t radio2;
 #endif
 
 /* Sensor data */
@@ -163,18 +168,24 @@ void HM_HardwareInit() {
 
 #endif
 
-#ifdef HAS_MS5607
+#ifdef BARO_1
+#if (BARO_1 == 1)
 	/* MS5607 Barometer 1 */
 	ms5607_1.spiconfig.hspi = BARO1_HSPI;
 	ms5607_1.spiconfig.port = BARO1_CS_GPIO_Port;
 	ms5607_1.spiconfig.pin = BARO1_CS_Pin;
 	MS5607_init(&ms5607_1);
+#endif
+#endif
 
+#ifdef BARO_2
+#if (BARO_2 == 1)
 	/* MS5607 Barometer 2 */
 	ms5607_2.spiconfig.hspi = BARO2_HSPI;
 	ms5607_2.spiconfig.port = BARO2_CS_GPIO_Port;
 	ms5607_2.spiconfig.pin = BARO2_CS_Pin;
 	MS5607_init(&ms5607_2);
+#endif
 #endif
 
 #ifdef HAS_H3LIS331DL
@@ -229,23 +240,42 @@ void HM_HardwareInit() {
 	gps_init(&gps);
 #endif
 
-#ifdef HAS_CC1120
+#ifdef HAS_RADIO_433
 	/* Radio */
-	cc1120.radhspi = RADIO_HSPI;
-	cc1120.CS_port = RADIO_CS_GPIO_Port;
-	cc1120.CS_pin = RADIO_CS_Pin;
-	cc1120.RST_port = RADIO_RST_GPIO_Port;
-	cc1120.RST_pin = RADIO_RST_Pin;
-	cc1120.RDY_port = RADIO_RDY_GPIO_Port;
-	cc1120.RDY_pin = RADIO_RDY_Pin;
-	cc1120.GP0_port = RADIO_GP0_GPIO_Port;
-	cc1120.GP0_pin = RADIO_GP0_Pin;
-	cc1120.GP2_port = RADIO_GP2_GPIO_Port;
-	cc1120.GP2_pin = RADIO_GP2_Pin;
-	cc1120.GP3_port = RADIO_GP3_GPIO_Port;
-	cc1120.GP3_pin = RADIO_GP3_Pin;
-	cc1120.payloadSize = payloadSize;
-	cc1120.initialized = false;
+	radio1.radhspi = RAD1_HSPI;
+	radio1.CS_port = RAD1_CS_GPIO_Port;
+	radio1.CS_pin = RAD1_CS_Pin;
+	radio1.RST_port = RAD1_RST_GPIO_Port;
+	radio1.RST_pin = RAD1_RST_Pin;
+	radio1.RDY_port = RAD1_MISO_GPIO_Port;
+	radio1.RDY_pin = RAD1_MISO_Pin;
+	radio1.GP0_port = RAD1_GP0_GPIO_Port;
+	radio1.GP0_pin = RAD1_GP0_Pin;
+	radio1.GP2_port = RAD1_GP2_GPIO_Port;
+	radio1.GP2_pin = RAD1_GP2_Pin;
+	radio1.GP3_port = RAD1_GP3_GPIO_Port;
+	radio1.GP3_pin = RAD1_GP3_Pin;
+	radio1.payloadSize = payloadSize;
+	radio1.initialized = false;
+#endif
+
+#ifdef HAS_RADIO_915
+	/* Radio */
+	radio2.radhspi = RAD2_HSPI;
+	radio2.CS_port = RAD2_CS_GPIO_Port;
+	radio2.CS_pin = RAD2_CS_Pin;
+	radio2.RST_port = RAD2_RST_GPIO_Port;
+	radio2.RST_pin = RAD2_RST_Pin;
+	radio2.RDY_port = RAD2_MISO_GPIO_Port;
+	radio2.RDY_pin = RAD2_MISO_Pin;
+	radio2.GP0_port = RAD2_GP0_GPIO_Port;
+	radio2.GP0_pin = RAD2_GP0_Pin;
+	radio2.GP2_port = RAD2_GP2_GPIO_Port;
+	radio2.GP2_pin = RAD2_GP2_Pin;
+	radio2.GP3_port = RAD2_GP3_GPIO_Port;
+	radio2.GP3_pin = RAD2_GP3_Pin;
+	radio2.payloadSize = payloadSize;
+	radio2.initialized = false;
 #endif
 
 #ifdef HAS_LED_1
@@ -259,8 +289,11 @@ void HM_HardwareInit() {
 #endif
 
 	/* Checking if inits are successful (inits that don't return a boolean are assumed true) */
-#ifdef HAS_CC1120
-	hardwareStatus[CC1120] = cc1120_init(&cc1120);
+#ifdef RADIO_1_TYPE
+	hardwareStatus[RADIO_433] = cc1120_init(&radio1);
+#endif
+#ifdef RADIO_2_TYPE
+	hardwareStatus[RADIO_915] = cc1120_init(&radio2);
 #endif
 
 	hardwareStatus[IMU1] = true;
@@ -400,16 +433,56 @@ void HM_LedToggle(int ledNum) {
 	}
 }
 
-bool HM_RadioSend(const uint8_t *data, uint16_t numBytes) {
-#ifdef HAS_CC1120
+bool HM_RadioSend(RadioTransciever_t radioType, const uint8_t *data, uint16_t numBytes) {
 #if (FCB_VERSION <= 0)
 	for (uint32_t i = 0; i < numBytes; i += payloadSize) {
-		memcpy(cc1120.packetToTX, data, payloadSize);
-		cc1120State(&cc1120);
+		CC1120Ctrl_t *radioPtr;
+		switch (radioType) {
+#ifdef HAS_RADIO_433
+		case RADIO_HW_433:
+			radioPtr = &radio1;
+			break;
+#endif
+#ifdef HAS_RADIO_915
+		case RADIO_HW_915:
+			radioPtr = &radio2;
+			break;
+#endif
+		default:
+			return false;
+		}
+
+		memcpy(radioPtr->packetToTX, data, payloadSize);
+		cc1120State(radioPtr);
 	}
+	return true;
 #endif /* FCB_VERSION */
-#endif //HAS_CC1120
 	return false;
+}
+
+bool HM_RadioUpdate() {
+#ifdef HAS_RADIO_433
+	cc1120State(&radio1);
+#endif
+#ifdef HAS_RADIO_915
+	cc1120State(&radio2);
+#endif
+	return true; // TODO
+}
+
+uint8_t* HM_RadioGetRxPtr(RadioTransciever_t radio) {
+	switch(radio) {
+#ifdef HAS_RADIO_433
+	case RADIO_HW_433:
+		return radio1.packetRX;
+#endif
+#ifdef HAS_RADIO_915
+	case RADIO_HW_915:
+		return radio2.packetRX;
+#endif
+	default:
+		return NULL;
+	}
 }
 
 bool HM_UsbIsConnected() {
@@ -538,14 +611,16 @@ void HM_ReadSensorData() {
 #endif
 	}
 
-#ifdef HAS_MS5607
+#if (BARO_1 == 1)
 	// Baro 1 data
 	if (bBaro1Sampling) {
 		MS5607_get_data(&ms5607_1);
 		sensorData.baro1_pres = ms5607_1.altData.baro;
 		sensorData.baro1_temp = ms5607_1.altData.temp;
 	}
+#endif
 
+#if (BARO_2 == 1)
 	// Baro 2 data
 	if (bBaro2Sampling) {
 		MS5607_get_data(&ms5607_2);
@@ -616,6 +691,3 @@ void HM_ReadSensorData() {
 SensorData_t* HM_GetSensorData() {
 	return &sensorData;
 }
-
-#endif
-

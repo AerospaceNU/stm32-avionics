@@ -90,22 +90,22 @@ void Error_Handler(void);
 #define LED2_GPIO_Port GPIOE
 #define BLUETOOTH_CS_Pin GPIO_PIN_10
 #define BLUETOOTH_CS_GPIO_Port GPIOE
-#define RADIO_CS_Pin GPIO_PIN_11
-#define RADIO_CS_GPIO_Port GPIOE
-#define RADIO_GP0_Pin GPIO_PIN_15
-#define RADIO_GP0_GPIO_Port GPIOE
-#define RADIO_GP2_Pin GPIO_PIN_10
-#define RADIO_GP2_GPIO_Port GPIOB
-#define RADIO_GP3_Pin GPIO_PIN_11
-#define RADIO_GP3_GPIO_Port GPIOB
+#define RAD1_CS_Pin GPIO_PIN_11
+#define RAD1_CS_GPIO_Port GPIOE
+#define RAD1_GP0_Pin GPIO_PIN_15
+#define RAD1_GP0_GPIO_Port GPIOE
+#define RAD1_GP2_Pin GPIO_PIN_10
+#define RAD1_GP2_GPIO_Port GPIOB
+#define RAD1_GP3_Pin GPIO_PIN_11
+#define RAD1_GP3_GPIO_Port GPIOB
 #define GPS_RX_Pin GPIO_PIN_12
 #define GPS_RX_GPIO_Port GPIOB
 #define GPS_TX_Pin GPIO_PIN_13
 #define GPS_TX_GPIO_Port GPIOB
 #define PPS_Pin GPIO_PIN_14
 #define PPS_GPIO_Port GPIOB
-#define RADIO_RST_Pin GPIO_PIN_15
-#define RADIO_RST_GPIO_Port GPIOB
+#define RAD1_RST_Pin GPIO_PIN_15
+#define RAD1_RST_GPIO_Port GPIOB
 #define FIRE6_Pin GPIO_PIN_10
 #define FIRE6_GPIO_Port GPIOD
 #define FIRE5_Pin GPIO_PIN_11
@@ -172,9 +172,9 @@ void Error_Handler(void);
 
 #define GPS_HUART			&huart5
 
-#define RADIO_HSPI			&hspi4
-#define RADIO_RDY_GPIO_Port GPIOE
-#define RADIO_RDY_Pin		GPIO_PIN_13
+#define RAD1_HSPI			&hspi4
+#define RAD1_MISO_GPIO_Port GPIOE
+#define RAD1_MISO_Pin		GPIO_PIN_13
 
 #define VBAT_ADC			&hadc3
 #define VBAT_ADC_RANK		1

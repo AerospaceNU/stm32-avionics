@@ -37,4 +37,20 @@
 #define IMU_1 1
 #define IMU_2 1
 
+/*
+ * Baro Types: (up to 2 baros)
+ * 0: No Baro
+ * 1: MS5607 over SPI
+ */
+#define BARO_1 1
+#define BARO_2 1
+
+/*
+ * Radio. We assume we can only have 433 or 915, and they're both
+ * either cc1200 or cc1120
+ */
+
+#define HAS_RADIO_433
+// #define HAS_RADIO_915
+
 #endif
