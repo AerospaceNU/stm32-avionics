@@ -9,13 +9,12 @@
 
 #if defined(HAS_CC1120) || defined(HAS_CC1200)
 
-#include <CC1120.h>
-#include "radioconfig/smartrf_CC1200_cfg_434_1_2kbps.h"
+#include "CC1120.h"
+
 #include "stdint.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include "hardware_manager.h"
 
 static void trxReadWriteBurstSingle(CC1120Ctrl_t* radio, uint8_t addr, uint8_t *pData, uint16_t len);
 
@@ -49,9 +48,9 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 	HAL_Delay(50);
 
 	uint8_t writeByte;
-	for(uint16_t i = 0; i < (sizeof(preferredSettings)/sizeof(registerSetting_t)); i++) {
-	        writeByte = preferredSettings[i].data;
-	        cc1120SpiWriteReg(radio, preferredSettings[i].addr, &writeByte, 1);
+	for(uint16_t i = 0; i < (radio->settingsSize/sizeof(registerSetting_t)); i++) {
+	        writeByte = radio->settingsPtr[i].data;
+	        cc1120SpiWriteReg(radio, radio->settingsPtr[i].addr, &writeByte, 1);
 	}
 
 	uint8_t pkt_len = 0xFF;

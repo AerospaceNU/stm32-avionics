@@ -19,8 +19,7 @@ extern "C" {
 
 #include "stdint.h"
 #include <stdbool.h>
-
-
+#include "radioconfig/smartrf_registersettings.h"
 
 typedef struct CC1120Ctrl_s{
 
@@ -49,9 +48,9 @@ typedef struct CC1120Ctrl_s{
 	uint8_t RSSI;
 	uint8_t CRC_LQI;
 
-	uint8_t band;
-
-	float frequencyHz;
+	// Set from smartRF config
+	const registerSetting_t* settingsPtr;
+	size_t settingsSize;
 
 	bool initialized;
 }CC1120Ctrl_t;

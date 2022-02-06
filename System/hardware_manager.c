@@ -32,6 +32,8 @@
 
 #if defined(HAS_CC1120) || defined(HAS_CC1200)
 #include "CC1120.h"
+#include "radioconfig/smartrf_CC1200_cfg_434_1_2kbps.h"
+#include "radioconfig/smartrf_CC1120_cfg_434_1_2kbps.h"
 #endif
 
 #ifdef HAS_GPS
@@ -257,6 +259,16 @@ void HM_HardwareInit() {
 	radio1.GP3_pin = RAD1_GP3_Pin;
 	radio1.payloadSize = payloadSize;
 	radio1.initialized = false;
+
+#ifdef HAS_CC1200
+	radio1.settingsPtr = cc1200_433_1_2kbps_cfg;
+	radio1.settingsSize = cc1200_433_1_2kbps_size;
+#endif
+#ifdef HAS_CC1120
+	radio1.settingsPtr = cc1120_433_1_2kbps_cfg;
+	radio1.settingsSize = cc1120_433_1_2kbps_size;
+#endif
+
 #endif
 
 #ifdef HAS_RADIO_915
@@ -276,6 +288,8 @@ void HM_HardwareInit() {
 	radio2.GP3_pin = RAD2_GP3_Pin;
 	radio2.payloadSize = payloadSize;
 	radio2.initialized = false;
+
+	// TODO add configuration
 #endif
 
 #ifdef HAS_LED_1
