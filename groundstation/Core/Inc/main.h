@@ -69,43 +69,43 @@ void Error_Handler(void);
 #define RS485_DE_GPIO_Port GPIOE
 #define RS485_RE_Pin GPIO_PIN_10
 #define RS485_RE_GPIO_Port GPIOE
-#define RAD2_CS_Pin GPIO_PIN_15
-#define RAD2_CS_GPIO_Port GPIOA
-#define RAD2_SCK_Pin GPIO_PIN_10
-#define RAD2_SCK_GPIO_Port GPIOC
-#define RAD2_MISO_Pin GPIO_PIN_11
-#define RAD2_MISO_GPIO_Port GPIOC
-#define RAD2_MOSI_Pin GPIO_PIN_12
-#define RAD2_MOSI_GPIO_Port GPIOC
-#define RAD2_GP0_Pin GPIO_PIN_0
-#define RAD2_GP0_GPIO_Port GPIOD
-#define RAD2_GP2_Pin GPIO_PIN_1
-#define RAD2_GP2_GPIO_Port GPIOD
-#define RAD2_GP3_Pin GPIO_PIN_2
-#define RAD2_GP3_GPIO_Port GPIOD
-#define RAD2_RST_Pin GPIO_PIN_3
-#define RAD2_RST_GPIO_Port GPIOD
-#define RAD1_CS_Pin GPIO_PIN_4
-#define RAD1_CS_GPIO_Port GPIOD
-#define RAD1_GP0_Pin GPIO_PIN_5
+#define RAD1_CS_Pin GPIO_PIN_15
+#define RAD1_CS_GPIO_Port GPIOA
+#define RAD1_SCK_Pin GPIO_PIN_10
+#define RAD1_SCK_GPIO_Port GPIOC
+#define RAD1_MISO_Pin GPIO_PIN_11
+#define RAD1_MISO_GPIO_Port GPIOC
+#define RAD1_MOSI_Pin GPIO_PIN_12
+#define RAD1_MOSI_GPIO_Port GPIOC
+#define RAD1_GP0_Pin GPIO_PIN_0
 #define RAD1_GP0_GPIO_Port GPIOD
-#define RAD1_GP2_Pin GPIO_PIN_6
+#define RAD1_GP2_Pin GPIO_PIN_1
 #define RAD1_GP2_GPIO_Port GPIOD
-#define RAD1_GP3_Pin GPIO_PIN_5
-#define RAD1_GP3_GPIO_Port GPIOB
-#define RAD1_RST_Pin GPIO_PIN_6
-#define RAD1_RST_GPIO_Port GPIOB
+#define RAD1_GP3_Pin GPIO_PIN_2
+#define RAD1_GP3_GPIO_Port GPIOD
+#define RAD1_RST_Pin GPIO_PIN_3
+#define RAD1_RST_GPIO_Port GPIOD
+#define RAD2_CS_Pin GPIO_PIN_4
+#define RAD2_CS_GPIO_Port GPIOD
+#define RAD2_GP0_Pin GPIO_PIN_5
+#define RAD2_GP0_GPIO_Port GPIOD
+#define RAD2_GP2_Pin GPIO_PIN_6
+#define RAD2_GP2_GPIO_Port GPIOD
+#define RAD2_GP3_Pin GPIO_PIN_5
+#define RAD2_GP3_GPIO_Port GPIOB
+#define RAD2_RST_Pin GPIO_PIN_6
+#define RAD2_RST_GPIO_Port GPIOB
 #define GPS_INT_Pin GPIO_PIN_8
 #define GPS_INT_GPIO_Port GPIOB
 #define GPS_PPS_Pin GPIO_PIN_9
 #define GPS_PPS_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define GPS_HUART &huart8
-#define RAD1_HSPI	&hspi1 // 915mhz radio
-#define RAD2_HSPI	&hspi3 // 433mhz radio
+#define RAD2_HSPI	&hspi1 // 915mhz radio
+#define RAD1_HSPI	&hspi3 // 433mhz radio
 
-#define RAD1_MISO_GPIO_Port GPIOB
-#define RAD1_MISO_Pin GPIO_PIN_4
+#define RAD2_MISO_GPIO_Port GPIOB
+#define RAD2_MISO_Pin GPIO_PIN_4
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
