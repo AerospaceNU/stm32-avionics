@@ -513,7 +513,7 @@ bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio){
 		  // Read n bytes from RX FIFO
 		  //cc1120SpiReadReg(raido, CC112X_RXFIRST)
 
-		  if (SMARTRF_SETTING_PKT_CFG0 == 0x20){
+		  if (radio->packetCfg == 0x20){
 			  cc1120SpiReadRxFifo(radio, rxBuffer, rxbytes);
 			  memcpy(radio->packetRX, rxBuffer, rxbytes-2);
 			  radio->RSSI = rxBuffer[rxbytes-2];
