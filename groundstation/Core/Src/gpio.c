@@ -56,13 +56,13 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOE, ALT1_CS_Pin|RS485_DE_Pin|RS485_RE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, VAPC_Pin|LNA433_EN_Pin|RAD1_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, VAPC_Pin|LNA433_EN_Pin|RAD433_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, RAD1_RST_Pin|RAD2_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, RAD433_RST_Pin|RAD915_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(RAD2_RST_GPIO_Port, RAD2_RST_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(RAD915_RST_GPIO_Port, RAD915_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PEPin PEPin PEPin */
   GPIO_InitStruct.Pin = ALT1_CS_Pin|RS485_DE_Pin|RS485_RE_Pin;
@@ -72,7 +72,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PAPin PAPin PAPin */
-  GPIO_InitStruct.Pin = VAPC_Pin|LNA433_EN_Pin|RAD1_CS_Pin;
+  GPIO_InitStruct.Pin = VAPC_Pin|LNA433_EN_Pin|RAD433_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -80,31 +80,31 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin
                            PDPin */
-  GPIO_InitStruct.Pin = RAD1_GP0_Pin|RAD1_GP2_Pin|RAD1_GP3_Pin|RAD2_GP0_Pin
-                          |RAD2_GP2_Pin;
+  GPIO_InitStruct.Pin = RAD433_GP0_Pin|RAD433_GP2_Pin|RAD433_GP3_Pin|RAD915_GP0_Pin
+                          |RAD915_GP2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PDPin PDPin */
-  GPIO_InitStruct.Pin = RAD1_RST_Pin|RAD2_CS_Pin;
+  GPIO_InitStruct.Pin = RAD433_RST_Pin|RAD915_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin PBPin */
-  GPIO_InitStruct.Pin = RAD2_GP3_Pin|GPS_INT_Pin|GPS_PPS_Pin;
+  GPIO_InitStruct.Pin = RAD915_GP3_Pin|GPS_INT_Pin|GPS_PPS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = RAD2_RST_Pin;
+  GPIO_InitStruct.Pin = RAD915_RST_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(RAD2_RST_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(RAD915_RST_GPIO_Port, &GPIO_InitStruct);
 
 }
 

@@ -116,10 +116,10 @@ static GPSCtrl_t gps;
 /* Radio */
 static const uint8_t payloadSize = sizeof(TransmitData_t);
 #ifdef HAS_RADIO_433
-static CC1120Ctrl_t radio1;
+static CC1120Ctrl_t radio433;
 #endif
 #ifdef HAS_RADIO_915
-static CC1120Ctrl_t radio2;
+static CC1120Ctrl_t radio915;
 #endif
 
 /* Sensor data */
@@ -244,50 +244,50 @@ void HM_HardwareInit() {
 
 #ifdef HAS_RADIO_433
 	/* Radio */
-	radio1.radhspi = RAD1_HSPI;
-	radio1.CS_port = RAD1_CS_GPIO_Port;
-	radio1.CS_pin = RAD1_CS_Pin;
-	radio1.RST_port = RAD1_RST_GPIO_Port;
-	radio1.RST_pin = RAD1_RST_Pin;
-	radio1.RDY_port = RAD1_MISO_GPIO_Port;
-	radio1.RDY_pin = RAD1_MISO_Pin;
-	radio1.GP0_port = RAD1_GP0_GPIO_Port;
-	radio1.GP0_pin = RAD1_GP0_Pin;
-	radio1.GP2_port = RAD1_GP2_GPIO_Port;
-	radio1.GP2_pin = RAD1_GP2_Pin;
-	radio1.GP3_port = RAD1_GP3_GPIO_Port;
-	radio1.GP3_pin = RAD1_GP3_Pin;
-	radio1.payloadSize = payloadSize;
-	radio1.initialized = false;
+	radio433.radhspi = RAD433_HSPI;
+	radio433.CS_port = RAD433_CS_GPIO_Port;
+	radio433.CS_pin = RAD433_CS_Pin;
+	radio433.RST_port = RAD433_RST_GPIO_Port;
+	radio433.RST_pin = RAD433_RST_Pin;
+	radio433.RDY_port = RAD433_MISO_GPIO_Port;
+	radio433.RDY_pin = RAD433_MISO_Pin;
+	radio433.GP0_port = RAD433_GP0_GPIO_Port;
+	radio433.GP0_pin = RAD433_GP0_Pin;
+	radio433.GP2_port = RAD433_GP2_GPIO_Port;
+	radio433.GP2_pin = RAD433_GP2_Pin;
+	radio433.GP3_port = RAD433_GP3_GPIO_Port;
+	radio433.GP3_pin = RAD433_GP3_Pin;
+	radio433.payloadSize = payloadSize;
+	radio433.initialized = false;
 
 #ifdef HAS_CC1200
-	radio1.settingsPtr = cc1200_433_1_2kbps_cfg;
-	radio1.settingsSize = cc1200_433_1_2kbps_size;
+	radio433.settingsPtr = cc1200_433_1_2kbps_cfg;
+	radio433.settingsSize = cc1200_433_1_2kbps_size;
 #endif
 #ifdef HAS_CC1120
-	radio1.settingsPtr = cc1120_433_1_2kbps_cfg;
-	radio1.settingsSize = cc1120_433_1_2kbps_size;
+	radio433.settingsPtr = cc1120_433_1_2kbps_cfg;
+	radio433.settingsSize = cc1120_433_1_2kbps_size;
 #endif
 
 #endif
 
 #ifdef HAS_RADIO_915
 	/* Radio */
-	radio2.radhspi = RAD2_HSPI;
-	radio2.CS_port = RAD2_CS_GPIO_Port;
-	radio2.CS_pin = RAD2_CS_Pin;
-	radio2.RST_port = RAD2_RST_GPIO_Port;
-	radio2.RST_pin = RAD2_RST_Pin;
-	radio2.RDY_port = RAD2_MISO_GPIO_Port;
-	radio2.RDY_pin = RAD2_MISO_Pin;
-	radio2.GP0_port = RAD2_GP0_GPIO_Port;
-	radio2.GP0_pin = RAD2_GP0_Pin;
-	radio2.GP2_port = RAD2_GP2_GPIO_Port;
-	radio2.GP2_pin = RAD2_GP2_Pin;
-	radio2.GP3_port = RAD2_GP3_GPIO_Port;
-	radio2.GP3_pin = RAD2_GP3_Pin;
-	radio2.payloadSize = payloadSize;
-	radio2.initialized = false;
+	radio915.radhspi = RAD915_HSPI;
+	radio915.CS_port = RAD915_CS_GPIO_Port;
+	radio915.CS_pin = RAD915_CS_Pin;
+	radio915.RST_port = RAD915_RST_GPIO_Port;
+	radio915.RST_pin = RAD915_RST_Pin;
+	radio915.RDY_port = RAD915_MISO_GPIO_Port;
+	radio915.RDY_pin = RAD915_MISO_Pin;
+	radio915.GP0_port = RAD915_GP0_GPIO_Port;
+	radio915.GP0_pin = RAD915_GP0_Pin;
+	radio915.GP2_port = RAD915_GP2_GPIO_Port;
+	radio915.GP2_pin = RAD915_GP2_Pin;
+	radio915.GP3_port = RAD915_GP3_GPIO_Port;
+	radio915.GP3_pin = RAD915_GP3_Pin;
+	radio915.payloadSize = payloadSize;
+	radio915.initialized = false;
 
 	// TODO add configuration
 #endif
@@ -304,10 +304,10 @@ void HM_HardwareInit() {
 
 	/* Checking if inits are successful (inits that don't return a boolean are assumed true) */
 #ifdef RADIO_1_TYPE
-	hardwareStatus[RADIO_433] = cc1120_init(&radio1);
+	hardwareStatus[RADIO_433] = cc1120_init(&radio433);
 #endif
 #ifdef RADIO_2_TYPE
-	hardwareStatus[RADIO_915] = cc1120_init(&radio2);
+	hardwareStatus[RADIO_915] = cc1120_init(&radio915);
 #endif
 
 	hardwareStatus[IMU1] = true;
@@ -454,12 +454,12 @@ bool HM_RadioSend(RadioTransciever_t radioType, const uint8_t *data, uint16_t nu
 		switch (radioType) {
 #ifdef HAS_RADIO_433
 		case RADIO_HW_433:
-			radioPtr = &radio1;
+			radioPtr = &radio433;
 			break;
 #endif
 #ifdef HAS_RADIO_915
 		case RADIO_HW_915:
-			radioPtr = &radio2;
+			radioPtr = &radio915;
 			break;
 #endif
 		default:
@@ -476,10 +476,10 @@ bool HM_RadioSend(RadioTransciever_t radioType, const uint8_t *data, uint16_t nu
 
 bool HM_RadioUpdate() {
 #ifdef HAS_RADIO_433
-	cc1120State(&radio1);
+	cc1120State(&radio433);
 #endif
 #ifdef HAS_RADIO_915
-	cc1120State(&radio2);
+	cc1120State(&radio915);
 #endif
 	return true; // TODO
 }
@@ -488,11 +488,11 @@ uint8_t* HM_RadioGetRxPtr(RadioTransciever_t radio) {
 	switch(radio) {
 #ifdef HAS_RADIO_433
 	case RADIO_HW_433:
-		return radio1.packetRX;
+		return radio433.packetRX;
 #endif
 #ifdef HAS_RADIO_915
 	case RADIO_HW_915:
-		return radio2.packetRX;
+		return radio915.packetRX;
 #endif
 	default:
 		return NULL;
