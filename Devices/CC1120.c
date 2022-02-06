@@ -62,6 +62,8 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 		pkt_len = radio->payloadSize;
 		pkt_cfg0 = 0x00;
 	}
+
+	// The size for fixed length should be known on init
 	cc1120SpiWriteReg(radio, CC112X_PKT_LEN, &pkt_len, 0x01);
 	cc1120SpiWriteReg(radio, CC112X_PKT_CFG0, &pkt_cfg0, 0x01);
 
