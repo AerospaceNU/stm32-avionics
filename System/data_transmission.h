@@ -13,7 +13,14 @@ extern "C"{
 #include "filters.h"
 
 typedef struct __attribute__((__packed__)) {
+
+	uint8_t packetType;
+	uint8_t softwareVersion;
+	uint32_t timestampMs;
+	char callsign[8];
+
 	float	 gps_lat,			gps_long,			gps_alt;
+	float pos_z, vel_z;
 	float 	 baro_pres;
 	double 	 battery_voltage;
 	uint8_t  pyro_continuity;

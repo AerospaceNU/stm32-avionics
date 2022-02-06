@@ -18,3 +18,5 @@
 *.d
 
 **/Debug/*
+**/.idea/*
+**/.vscode/*

@@ -3,6 +3,7 @@
  */
 
 #include "data_transmission.h"
+#include <string.h>
 
 static TransmitData_t transmitPacket;
 
@@ -15,6 +16,15 @@ void transmitData(SensorData_t* sensorData, FilterData_t* filterData, uint8_t st
 	transmitPacket.baro_pres = (sensorData->baro1_pres + sensorData->baro1_pres) / 2;
 	transmitPacket.battery_voltage = sensorData->battery_voltage;
 	transmitPacket.pyro_continuity = 0;
+
+	transmitPacket.packetType = 2;
+	transmitPacket.softwareVersion = FCB_VERSION;
+	char *call = "KM6GNL";
+	strncpy(transmitPacket.callsign, call, 8);
+	
+	transmitPacket.pos_z = filterData->pos_z;
+	transmitPacket.vel_z = filterData->vel_z;
+
 	for (int i = 0; i < sizeof(sensorData->pyro_continuity); i++) {
 		transmitPacket.pyro_continuity |= ((sensorData->pyro_continuity[i] & 0x01) << i);
 	}

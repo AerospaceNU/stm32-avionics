@@ -10,7 +10,7 @@
 #ifdef HAS_CC1120
 
 #include <CC1120.h>
-#include <smartrf_CC1120_cfg_1_2kbps_50k.h>
+#include <smartrf_CC1200_cfg_434_1_2kbps.h>
 #include "stdint.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -70,9 +70,13 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 
 	//cc1120_setFrequency(radio);
 
+#if (CC1120_TRUE)
 		//calibrate the radio
 	if (!manualCalibration(radio))
 		return false;
+#else
+	trxSpiCmdStrobe(radio, CC112X_SCAL);
+#endif
 
 	cc1120ForceIdle(radio);
 
@@ -550,7 +554,7 @@ bool cc1120_startRX(CC1120Ctrl_t* radio){
 }
 
 
-
+/*
 //function courtesy of USC
 //run before self-cal!
 bool cc1120_setFrequency(CC1120Ctrl_t* radio)
@@ -590,8 +594,8 @@ bool cc1120_setFrequency(CC1120Ctrl_t* radio)
 	//uint8_t ifamp = 0x03; cc1120SpiWriteReg(radio, CC112X_IFAMP,&ifamp,1);
 
 	//cc1120 errata eliminates need for this operation
-
-    /*if(radio->band == BAND_820_960MHz)
+#if (!CC1120_TRUE)
+    if(radio->band == BAND_820_960MHz)
     {
     	cc1120SpiWriteReg(radio, CC112X_FS_DIG0,0x55,1);
     	cc1120SpiWriteReg(radio, CC112X_FS_DVC0,0x17,1);
@@ -609,7 +613,8 @@ bool cc1120_setFrequency(CC1120Ctrl_t* radio)
     	cc1120SpiWriteReg(radio, CC112X_FS_DIG0,0x50,1);
     	cc1120SpiWriteReg(radio, CC112X_FS_DVC0,0x0F,1);
     	cc1120SpiWriteReg(radio, CC112X_IFAMP,0x0D,1);
-    }*/
+    }
+#endif
 
     // convert band to LO Divider value.
     // Most of the bands just multiply the register value by 2, but nooo, not BAND_136_160MHz.
@@ -646,7 +651,7 @@ bool cc1120_setFrequency(CC1120Ctrl_t* radio)
     cc1120SpiWriteReg(radio, CC112X_FREQ1, &freq1, 1);
     cc1120SpiWriteReg(radio, CC112X_FREQ0, &freq0, 1);
 
-/*#if CC1200_DEBUG
+#if CC1200_DEBUG
     debugStream->printf("Setting radio frequency, requested %.00f Hz, setting FREQ = 0x%" PRIx32 "\n",
                         frequencyHz, actualFreqValue);
 
@@ -654,10 +659,14 @@ bool cc1120_setFrequency(CC1120Ctrl_t* radio)
     float actualFrequency = (static_cast<float>(actualFreqValue) * CC1200_OSC_FREQ) / (twoToThe16 * static_cast<float>(loDividerValue));
 
     debugStream->printf("This yields an actual frequency of %.00f Hz\n", actualFrequency);
-#endif*/
+#endif
     return true;
 }
+*/
 
+
+//TODO: Resolve error here between cc1200 and cc1120
+/*
 bool cc1120_startContinuousTX(CC1120Ctrl_t *radio){
 	uint8_t preamble_cfg1 = 0x00; 	cc1120SpiWriteReg(radio, CC112X_PREAMBLE_CFG1, &preamble_cfg1, 1);
 	uint8_t mdmcfg1 = 0x06;			cc1120SpiWriteReg(radio, CC112X_MDMCFG1, &mdmcfg1, 1);
@@ -682,6 +691,7 @@ bool cc1120_stopContinuousTX(CC1120Ctrl_t *radio){
 	trxSpiCmdStrobe(radio, CC112X_SIDLE);
 	return true;
 }
+*/
 
 #endif
 

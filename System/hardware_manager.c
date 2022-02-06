@@ -1,6 +1,9 @@
 #include "board_config.h"
 
 #include "hardware_manager.h"
+
+#if (FCB_VERSION < 100)
+
 #include "main.h"
 
 #ifdef HAS_LSM9DS1
@@ -613,3 +616,6 @@ void HM_ReadSensorData() {
 SensorData_t* HM_GetSensorData() {
 	return &sensorData;
 }
+
+#endif
+
