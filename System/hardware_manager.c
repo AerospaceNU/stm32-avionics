@@ -303,10 +303,10 @@ void HM_HardwareInit() {
 #endif
 
 	/* Checking if inits are successful (inits that don't return a boolean are assumed true) */
-#ifdef RADIO_1_TYPE
+#ifdef HAS_RADIO_433
 	hardwareStatus[RADIO_433] = cc1120_init(&radio433);
 #endif
-#ifdef RADIO_2_TYPE
+#ifdef HAS_RADIO_915
 	hardwareStatus[RADIO_915] = cc1120_init(&radio915);
 #endif
 
