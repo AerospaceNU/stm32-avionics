@@ -60,6 +60,9 @@ void Scheduler::run(void) {
         // Visually show how fast scheduler is running using LED
         HM_LedToggle(1);
 
+        // Refresh watchdog
+        HM_IWDG_Refresh();
+
         // Cleanup current state and initialize next state if changing states
         if (pNextState != pCurrentState_) {
         	if (pCurrentState_) pCurrentState_->cleanup();
