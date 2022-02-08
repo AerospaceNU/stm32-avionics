@@ -21,6 +21,7 @@ void transmitData(SensorData_t* sensorData, FilterData_t* filterData, uint8_t st
 	transmitPacket.softwareVersion = FCB_VERSION;
 	char *call = "KM6GNL";
 	strncpy(transmitPacket.callsign, call, 8);
+	transmitPacket.timestampMs = HM_Millis();
 	
 	transmitPacket.pos_z = filterData->pos_z;
 	transmitPacket.vel_z = filterData->vel_z;
