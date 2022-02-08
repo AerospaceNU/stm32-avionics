@@ -148,6 +148,7 @@ void HM_SetBaro2Sampling(bool enable);
 void HM_SetGpsSampling(bool enable);
 void HM_SetBatteryVoltageSampling(bool enable);
 void HM_SetPyroContinuitySampling(bool enable);
+void HM_IWDG_Refresh();
 
 /**
  * @brief Updates sensor data from enabled sensors

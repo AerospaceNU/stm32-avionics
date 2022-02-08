@@ -11,6 +11,7 @@
 #include "CC1120.h"
 #include "GPS.h"
 #include "usb.h"
+#include "iwdg.h"
 
 #include "adc.h"
 #include "tim.h"
@@ -336,6 +337,10 @@ void HM_SetBatteryVoltageSampling(bool enable) {
 
 void HM_SetPyroContinuitySampling(bool enable) {
 	bPyroContinuitySampling = enable;
+}
+
+void HM_IWDG_Refresh() {
+	HAL_IWDG_Refresh(&hiwdg1);
 }
 
 static void HM_SimReadSensorData() {
