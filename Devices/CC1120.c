@@ -488,6 +488,8 @@ bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t paylo
 	return true;
 }
 
+#include <stdio.h>
+
 bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio){
 	uint8_t rxbytes = 0x00;
 	uint8_t rxBuffer[128] = {0};
@@ -499,9 +501,20 @@ bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio){
 		return false;
 	}
 
+	printf("We see a packet of length %u\n", rxbytes);
+
 	//Read GPIO
-	if(HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin)){
-		  uint8_t status;
+	if(HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_RESET){ // PKT_SYNC_RXTX, maybe, should be low when packet RX is done
+
+		// This should do the same thing as the below check
+		uint8_t state;
+		cc1120SpiReadReg(radio, CC112X_MARCSTATE, &state, 1);
+		if(state == 0x11) { // TODO don't hardcode the marcstate status
+			trxSpiCmdStrobe(radio, CC112X_SFRX);
+			return false;
+		}
+
+		uint8_t status;
 		  status = trxSpiCmdStrobe(radio, CC112X_SNOP);
 		  status = (status & mask);
 		  if(status == CC112X_STATE_RXFIFO_ERROR) {

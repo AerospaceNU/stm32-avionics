@@ -98,7 +98,7 @@
 
 static const registerSetting_t cc1200_433_1_2kbps_cfg[]=
 {
-  {CC112X_IOCFG3,            0x01},
+  {CC112X_IOCFG3,            0x06}, // asserted when sync word, de-asserted at end of packet (in RX)
   {CC112X_IOCFG2,            0x01},
   {CC112X_IOCFG1,            0x30},
   {CC112X_IOCFG0,            0x01},
