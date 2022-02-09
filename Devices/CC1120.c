@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdio.h>
 
 static void trxReadWriteBurstSingle(CC1120Ctrl_t* radio, uint8_t addr, uint8_t *pData, uint16_t len);
 
@@ -35,6 +36,17 @@ const float twoToThe16 = 65536.0;
 //const size_t maxValue8Bits = 256 - 1;
 //const size_t maxValue20Bits = 1048576 - 1;
 const size_t maxValue24Bits = 16777216 - 1;
+
+#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
+#define BYTE_TO_BINARY(byte)  \
+  (byte & 0x80 ? '1' : '0'), \
+  (byte & 0x40 ? '1' : '0'), \
+  (byte & 0x20 ? '1' : '0'), \
+  (byte & 0x10 ? '1' : '0'), \
+  (byte & 0x08 ? '1' : '0'), \
+  (byte & 0x04 ? '1' : '0'), \
+  (byte & 0x02 ? '1' : '0'), \
+  (byte & 0x01 ? '1' : '0')
 
 bool cc1120_init(CC1120Ctrl_t* radio) {
 
@@ -86,6 +98,24 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 	cc1120ForceIdle(radio);
 
 	radio->initialized = true;
+
+	// Dump registers
+#ifdef HAS_CC1200
+	printf("Registers:\n");
+	for(uint16_t i = CC112X_IOCFG3; i < CC112X_PKT_LEN; i++) {
+		uint8_t val;
+		cc1120SpiReadReg(radio, i, &val, 1);
+		printf("[0x%X]: 0x%X, or " BYTE_TO_BINARY_PATTERN "\n",
+				val, BYTE_TO_BINARY(val));
+	}
+	for(uint16_t i = CC112X_IF_MIX_CFG; i < CC112X_IRQ0F; i++) {
+			uint8_t val;
+			cc1120SpiReadReg(radio, i, &val, 1);
+			printf("[0x%X]: 0x%X, or " BYTE_TO_BINARY_PATTERN "\n",
+					val, BYTE_TO_BINARY(val));
+		}
+#endif
+
 	return true;
 
 }
@@ -492,8 +522,6 @@ bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t paylo
 	return true;
 }
 
-#include <stdio.h>
-
 bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio){
 	uint8_t rxbytes = 0x00;
 	uint8_t rxBuffer[128] = {0};
@@ -501,10 +529,15 @@ bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio){
 	// Read number of bytes in RX FIFO
 	cc1120SpiReadReg(radio, CC112X_NUM_RXBYTES, &rxbytes, 1);
 
-	printf("RX FIFO has %u\n", rxbytes);
 	if(rxbytes < 1){
 		return false;
 	}
+	printf("RX FIFO has %u\n", rxbytes);
+	uint8_t rxfirst = 0x00;
+	uint8_t rxlast = 0x00;
+	cc1120SpiReadReg(radio, CC112X_RXFIRST, &rxfirst, 1);
+	cc1120SpiReadReg(radio, CC112X_RXLAST, &rxlast, 1);
+	printf("RXFIRST %u TXFIRST %u\n", rxfirst, rxlast);
 
 	//Read GPIO
 	if(HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_RESET){ // PKT_SYNC_RXTX, maybe, should be low when packet RX is done

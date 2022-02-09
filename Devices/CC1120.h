@@ -83,7 +83,7 @@ typedef struct CC1120Ctrl_s{
 
 /* configuration registers */
 
-#if (CC1120_TRUE)
+#ifdef HAS_CC1120
 
 #define CC112X_IOCFG3                   0x0000
 #define CC112X_IOCFG2                   0x0001
@@ -303,7 +303,8 @@ typedef struct CC1120Ctrl_s{
 #define CC112X_STATE_RXFIFO_ERROR       0x60
 #define CC112X_STATE_TXFIFO_ERROR       0x70
 
-#else
+#endif
+#ifdef HAS_CC1200
 
 /* configuration registers */
 #define CC112X_IOCFG3                   0x0000
