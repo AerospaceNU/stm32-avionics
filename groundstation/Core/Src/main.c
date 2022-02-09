@@ -130,14 +130,20 @@ int main(void)
 	char * call = t.callsign;
 	char * ret = "\n";
 
-	HM_UsbTransmit((uint8_t*)call, 8);
-	HM_UsbTransmit((uint8_t*)ret, strlen(ret));
+	//HM_UsbTransmit((uint8_t*)call, 8);
+
+	static uint8_t zeros[48] = {0x0};
+	if(memcmp(zeros, radioPtr, 48)) {
+		HM_UsbTransmit((uint8_t*)radioPtr, sizeof(TransmitData_t) + 2);
+		memset(radioPtr, 0, sizeof(TransmitData_t));
+	}
+
 //	if(radio.CRC_LQI >> 7 == 0) {
 //		call = "CRC err\n";
 //		HM_UsbTransmit((uint8_t*)call, strlen(call));
 //	}
-	memset(radioPtr, 0, sizeof(TransmitData_t));
-	HAL_Delay(300);
+
+	HAL_Delay(50);
 //	usbTransmit(&t.pos_z, 4);
 //	usbTransmit(&t.vel_z, 4);
 

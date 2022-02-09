@@ -532,16 +532,16 @@ bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio){
 	if(rxbytes < 1){
 		return false;
 	}
-	printf("RX FIFO has %u\n", rxbytes);
+	//printf("RX FIFO has %u\n", rxbytes);
 	uint8_t rxfirst = 0x00;
 	uint8_t rxlast = 0x00;
 	cc1120SpiReadReg(radio, CC112X_RXFIRST, &rxfirst, 1);
 	cc1120SpiReadReg(radio, CC112X_RXLAST, &rxlast, 1);
-	printf("RXFIRST %u TXFIRST %u\n", rxfirst, rxlast);
+	//printf("RXFIRST %u TXFIRST %u\n", rxfirst, rxlast);
 
 	//Read GPIO
 	if(HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_RESET){ // PKT_SYNC_RXTX, maybe, should be low when packet RX is done
-		printf("GP3 is low, so not currently receiving pkt\n");
+		//printf("GP3 is low, so not currently receiving pkt\n");
 
 		// This should do the same thing as the below check
 		uint8_t state;
