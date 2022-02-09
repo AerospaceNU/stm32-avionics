@@ -47,6 +47,10 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 	HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, SET);
 	HAL_Delay(50);
 
+	// Reset everything
+	trxSpiCmdStrobe(radio, CC112X_SRES);
+
+	// Write provided default register settings
 	uint8_t writeByte;
 	for(uint16_t i = 0; i < (radio->settingsSize/sizeof(registerSetting_t)); i++) {
 	        writeByte = radio->settingsPtr[i].data;
@@ -497,14 +501,14 @@ bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio){
 	// Read number of bytes in RX FIFO
 	cc1120SpiReadReg(radio, CC112X_NUM_RXBYTES, &rxbytes, 1);
 
+	printf("RX FIFO has %u\n", rxbytes);
 	if(rxbytes < 1){
 		return false;
 	}
 
-	printf("We see a packet of length %u\n", rxbytes);
-
 	//Read GPIO
 	if(HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_RESET){ // PKT_SYNC_RXTX, maybe, should be low when packet RX is done
+		printf("GP3 is low, so not currently receiving pkt\n");
 
 		// This should do the same thing as the below check
 		uint8_t state;
@@ -515,32 +519,32 @@ bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio){
 		}
 
 		uint8_t status;
-		  status = trxSpiCmdStrobe(radio, CC112X_SNOP);
-		  status = (status & mask);
-		  if(status == CC112X_STATE_RXFIFO_ERROR) {
+		status = trxSpiCmdStrobe(radio, CC112X_SNOP);
+		status = (status & mask);
+		if(status == CC112X_STATE_RXFIFO_ERROR) {
+			// Flush RX FIFO
+		    trxSpiCmdStrobe(radio, CC112X_SFRX);
+		    return false;
+		}
 
-			  // Flush RX FIFO
-			  trxSpiCmdStrobe(radio, CC112X_SFRX);
-			  return false;
-		  }
+		// Read n bytes from RX FIFO
+		//cc1120SpiReadReg(raido, CC112X_RXFIRST)
 
-		  // Read n bytes from RX FIFO
-		  //cc1120SpiReadReg(raido, CC112X_RXFIRST)
-
-		  if (radio->packetCfg == 0x20){
-			  cc1120SpiReadRxFifo(radio, rxBuffer, rxbytes);
-			  memcpy(radio->packetRX, rxBuffer, rxbytes-2);
-			  radio->RSSI = rxBuffer[rxbytes-2];
-			  radio->CRC_LQI = rxBuffer[rxbytes-1];
-		  }else{
-			  cc1120SpiReadRxFifo(radio, radio->packetRX, radio->payloadSize);
-			  cc1120SpiReadRxFifo(radio, &radio->RSSI, 1);
-			  cc1120SpiReadRxFifo(radio, &radio->CRC_LQI, 1);
-		  }
-
+		if (radio->packetCfg == 0x20){
+            cc1120SpiReadRxFifo(radio, rxBuffer, rxbytes);
+			memcpy(radio->packetRX, rxBuffer, rxbytes-2);
+			radio->RSSI = rxBuffer[rxbytes-2];
+			radio->CRC_LQI = rxBuffer[rxbytes-1];
+		} else {
+		    cc1120SpiReadRxFifo(radio, radio->packetRX, radio->payloadSize);
+			cc1120SpiReadRxFifo(radio, &radio->RSSI, 1);
+			cc1120SpiReadRxFifo(radio, &radio->CRC_LQI, 1);
+		}
 
 
-		  return true;
+
+		return true;
+
 		  // Check CRC ok (CRC_OK: bit7 in second status byte)
 		  // This assumes status bytes are appended in RX_FIFO
 		  // (PKT_CFG1.APPEND_STATUS = 1)
