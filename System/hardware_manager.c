@@ -65,7 +65,7 @@ static LSM9DS1Ctrl_t lsm9ds1_2;
 #endif
 
 /* Barometers */
-#ifdef BARO_2
+#if defined(BARO_1) || defined(BARO_2)
 #if (BARO_1 == 1)
 static MS5607Ctrl_t ms5607_1;
 #endif
@@ -448,7 +448,7 @@ void HM_LedToggle(int ledNum) {
 }
 
 bool HM_RadioSend(RadioTransciever_t radioType, const uint8_t *data, uint16_t numBytes) {
-#if (FCB_VERSION <= 0)
+#if defined(HAS_CC1120) || defined(HAS_CC1200)
 	for (uint32_t i = 0; i < numBytes; i += payloadSize) {
 		CC1120Ctrl_t *radioPtr;
 		switch (radioType) {
