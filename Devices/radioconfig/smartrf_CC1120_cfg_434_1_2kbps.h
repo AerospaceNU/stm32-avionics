@@ -30,6 +30,7 @@
 // TX Power = 15
 // Whitening = false
 
+#ifdef HAS_CC1120
 static const registerSetting_t cc1120_433_1_2kbps_cfg[]=
 {
   {CC112X_IOCFG3,            0xB0}, // GPIO3 IO Pin Configuration
@@ -75,6 +76,6 @@ static const registerSetting_t cc1120_433_1_2kbps_cfg[]=
   {CC112X_XOSC1,             0x03}, // Crystal Oscillator Configuration Reg. 1
 };
 
-
+#endif
 
 #endif
