@@ -3,7 +3,6 @@
 
 #include "board_config.h"
 
-#include "hardware_manager.h"
 #include "stdbool.h"
 
 #define GPS_RX_BUF_SIZE			4096

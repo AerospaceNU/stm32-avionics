@@ -28,8 +28,8 @@ typedef struct CC1120Ctrl_s{
     uint16_t RST_pin;
     GPIO_TypeDef *CS_port;
     uint16_t CS_pin;
-    GPIO_TypeDef *RDY_port;
-    uint16_t RDY_pin;
+    GPIO_TypeDef *MISO_port;
+    uint16_t MISO_pin;
     GPIO_TypeDef *GP0_port;
     uint16_t GP0_pin;
     GPIO_TypeDef *GP2_port;

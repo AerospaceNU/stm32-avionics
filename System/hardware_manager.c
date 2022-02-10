@@ -249,8 +249,8 @@ void HM_HardwareInit() {
 	radio433.CS_pin = RAD433_CS_Pin;
 	radio433.RST_port = RAD433_RST_GPIO_Port;
 	radio433.RST_pin = RAD433_RST_Pin;
-	radio433.RDY_port = RAD433_MISO_GPIO_Port;
-	radio433.RDY_pin = RAD433_MISO_Pin;
+	radio433.MISO_port = RAD433_MISO_GPIO_Port;
+	radio433.MISO_pin = RAD433_MISO_Pin;
 	radio433.GP0_port = RAD433_GP0_GPIO_Port;
 	radio433.GP0_pin = RAD433_GP0_Pin;
 	radio433.GP2_port = RAD433_GP2_GPIO_Port;
@@ -278,8 +278,8 @@ void HM_HardwareInit() {
 	radio915.CS_pin = RAD915_CS_Pin;
 	radio915.RST_port = RAD915_RST_GPIO_Port;
 	radio915.RST_pin = RAD915_RST_Pin;
-	radio915.RDY_port = RAD915_MISO_GPIO_Port;
-	radio915.RDY_pin = RAD915_MISO_Pin;
+	radio915.MISO_port = RAD915_MISO_GPIO_Port;
+	radio915.MISO_pin = RAD915_MISO_Pin;
 	radio915.GP0_port = RAD915_GP0_GPIO_Port;
 	radio915.GP0_pin = RAD915_GP0_Pin;
 	radio915.GP2_port = RAD915_GP2_GPIO_Port;

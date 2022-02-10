@@ -11,9 +11,9 @@
 
 #define FCB_VERSION 0
 
-//#define HAS_CC1120
+#define HAS_CC1120
 //#define HAS_ADC_DEVICE
-//#define HAS_GPS
+#define HAS_GPS
 //#define HAS_MS5607
 //#define HAS_S25FLX
 //#define HAS_BUZZER

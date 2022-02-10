@@ -2,7 +2,7 @@
 
 #ifdef HAS_GPS
 
-#include "data_log.h"
+//#include "data_log.h"
 
 #include "GPS.h"
 

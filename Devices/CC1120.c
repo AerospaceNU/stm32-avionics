@@ -127,7 +127,7 @@ uint8_t trx8BitRegAccess(CC1120Ctrl_t* radio, uint8_t accessType, uint8_t addrBy
 
 	HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, RESET); //Pull CS LOW
 	uint32_t startMS = HAL_GetTick();
-	while (HAL_GPIO_ReadPin(radio->RDY_port, radio->RDY_pin) == 1 && HAL_GetTick() - startMS < 1000)
+	while (HAL_GPIO_ReadPin(radio->MISO_port, radio->MISO_pin) == 1 && HAL_GetTick() - startMS < 1000)
 		; //Wait for SO to go low
 
 	HAL_SPI_TransmitReceive(radio->radhspi, &txBuf, &readValue, 0x01, HAL_MAX_DELAY);
@@ -149,7 +149,7 @@ uint8_t trx16BitRegAccess(CC1120Ctrl_t* radio, uint8_t accessType, uint8_t extAd
 	//Pull CS LOW
 	HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, RESET);
 	uint32_t startMS = HAL_GetTick();
-	while (HAL_GPIO_ReadPin(radio->RDY_port, radio->RDY_pin) == 1 && HAL_GetTick() - startMS < 1000)
+	while (HAL_GPIO_ReadPin(radio->MISO_port, radio->MISO_pin) == 1 && HAL_GetTick() - startMS < 1000)
 		;
 	//Wait for SO to go low
 	//while(TRXEM_PORT_IN & TRXEM_SPI_MISO_PIN);
@@ -175,7 +175,7 @@ uint8_t trxSpiCmdStrobe(CC1120Ctrl_t* radio, uint8_t cmd) {
 
 	HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, RESET);
 	uint32_t startMS = HAL_GetTick();
-	while (HAL_GPIO_ReadPin(radio->RDY_port, radio->RDY_pin) == 1 && HAL_GetTick() - startMS < 1000)
+	while (HAL_GPIO_ReadPin(radio->MISO_port, radio->MISO_pin) == 1 && HAL_GetTick() - startMS < 1000)
 		;
 	//Wait for SO to go low
 
