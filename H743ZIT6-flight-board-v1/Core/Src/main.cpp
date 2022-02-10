@@ -28,6 +28,7 @@
 #include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
+#include "iwdg.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -106,6 +107,7 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_RTC_Init();
   MX_UART4_Init();
+  MX_IWDG1_Init();
   /* USER CODE BEGIN 2 */
 
   /* Initialize scheduler */
