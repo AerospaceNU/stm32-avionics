@@ -115,26 +115,32 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
   HM_HardwareInit();
-  uint8_t *radioPtr = HM_RadioGetRxPtr(RADIO_HW_433);
 
   while (1)
 
  {
+		HM_RadioUpdate();
+
+	  RadioPacket_t *radioPtr = HM_RadioGetRxPtr(RADIO_HW_433);
+
 	if(radioPtr == NULL) continue;
 	//char* buf = "Hell0\n";
 
-	HM_RadioUpdate();
 
-	TransmitData_t t = * ((TransmitData_t *) radioPtr);
-
-	char * call = t.callsign;
-	char * ret = "\n";
+//	TransmitData_t t = * ((TransmitData_t *) radioPtr);
+//
+//	char * call = t.callsign;
+//	char * ret = "\n";
 
 	//HM_UsbTransmit((uint8_t*)call, 8);
 
 	static uint8_t zeros[48] = {0x0};
-	if(memcmp(zeros, radioPtr, 48)) {
-		HM_UsbTransmit((uint8_t*)radioPtr, sizeof(TransmitData_t) + 2);
+	if(memcmp(zeros, radioPtr->packetRX, 48)) {
+		static uint8_t packet[50];
+		memcpy(packet, radioPtr->packetRX, sizeof(TransmitData_t));
+		packet[48] = radioPtr->RSSI;
+		packet[49] = radioPtr->CRC_LQI;
+		HM_UsbTransmit(packet, 50);
 		memset(radioPtr, 0, sizeof(TransmitData_t));
 	}
 
@@ -143,7 +149,7 @@ int main(void)
 //		HM_UsbTransmit((uint8_t*)call, strlen(call));
 //	}
 
-	HAL_Delay(50);
+	HAL_Delay(400);
 //	usbTransmit(&t.pos_z, 4);
 //	usbTransmit(&t.vel_z, 4);
 

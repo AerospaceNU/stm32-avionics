@@ -108,6 +108,12 @@ typedef enum {
 	RADIO_HW_915,
 } RadioTransciever_t;
 
+typedef struct {
+    uint8_t *packetRX;
+	uint8_t RSSI;
+	uint8_t CRC_LQI;
+} RadioPacket_t;
+
 void HM_HardwareInit();
 
 /* Microcontroller timer functions */
@@ -137,7 +143,7 @@ void HM_LedToggle(int ledNum);
 /* Radio functions */
 bool HM_RadioSend(RadioTransciever_t radio, const uint8_t *data, uint16_t numBytes);
 bool HM_RadioUpdate();
-uint8_t* HM_RadioGetRxPtr(RadioTransciever_t radio);
+RadioPacket_t *HM_RadioGetRxPtr(RadioTransciever_t radio);
 
 /* USB functions */
 bool HM_UsbIsConnected();

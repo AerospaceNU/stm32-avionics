@@ -484,19 +484,28 @@ bool HM_RadioUpdate() {
 	return true; // TODO
 }
 
-uint8_t* HM_RadioGetRxPtr(RadioTransciever_t radio) {
+static RadioPacket_t ret;
+RadioPacket_t *HM_RadioGetRxPtr(RadioTransciever_t radio) {
 	switch(radio) {
 #ifdef HAS_RADIO_433
 	case RADIO_HW_433:
-		return radio433.packetRX;
-#endif
-#ifdef HAS_RADIO_915
-	case RADIO_HW_915:
-		return radio915.packetRX;
-#endif
-	default:
-		return NULL;
+	{
+		ret.packetRX = radio433.packetRX;
+		ret.RSSI = radio433.RSSI;
+		ret.CRC_LQI = radio433.CRC_LQI;
+		break;
 	}
+#endif
+//#ifdef HAS_RADIO_915
+//	case RADIO_HW_915:
+//		return radio915.packetRX;
+//#endif
+	default:
+		ret.packetRX = NULL;
+		ret.RSSI = 0;
+		ret.CRC_LQI = 0;
+	}
+	return &ret;
 }
 
 bool HM_UsbIsConnected() {
