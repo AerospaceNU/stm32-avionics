@@ -10,18 +10,13 @@
 #if defined(HAS_CC1120) || defined(HAS_CC1200)
 
 #include "CC1120.h"
+#include "radioconfig/cc1120_cc1200_defs.h"
 
 #include "stdint.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdio.h>
-
-static void trxReadWriteBurstSingle(CC1120Ctrl_t* radio, uint8_t addr, uint8_t *pData, uint16_t len);
-
-
-extern SPI_HandleTypeDef hspi4;
-
 
 const float twoToThe16 = 65536.0;
 //const float twoToThe20 = 1048576.0;
@@ -37,19 +32,10 @@ const float twoToThe16 = 65536.0;
 //const size_t maxValue20Bits = 1048576 - 1;
 const size_t maxValue24Bits = 16777216 - 1;
 
-#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
-#define BYTE_TO_BINARY(byte)  \
-  (byte & 0x80 ? '1' : '0'), \
-  (byte & 0x40 ? '1' : '0'), \
-  (byte & 0x20 ? '1' : '0'), \
-  (byte & 0x10 ? '1' : '0'), \
-  (byte & 0x08 ? '1' : '0'), \
-  (byte & 0x04 ? '1' : '0'), \
-  (byte & 0x02 ? '1' : '0'), \
-  (byte & 0x01 ? '1' : '0')
-
+// Initially configure radio, apply settings provided
 bool cc1120_init(CC1120Ctrl_t* radio) {
 
+	// Set SPI pins into a known good state. Lots of waiting to make sure it actually happens
 	HAL_GPIO_WritePin(radio->RST_port, radio->RST_pin, SET);
 	HAL_Delay(50);
 	HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, SET);
@@ -69,6 +55,7 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 	        cc1120SpiWriteReg(radio, radio->settingsPtr[i].addr, &writeByte, 1);
 	}
 
+	// Figure out what packet length/config we need to send to the radio
 	uint8_t pkt_len = 0xFF;
 	uint8_t pkt_cfg0 = 0x20;
 	if (radio->payloadSize == 0xFF){
@@ -88,7 +75,7 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 	//cc1120_setFrequency(radio);
 
 #ifdef HAS_CC1120
-		//calibrate the radio
+		//calibrate the radio per errata
 	if (!manualCalibration(radio))
 		return false;
 #else
@@ -99,26 +86,312 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 
 	radio->initialized = true;
 
-	// Dump registers
-#ifdef HAS_CC1200
-	printf("Registers:\n");
-	for(uint16_t i = CC112X_IOCFG3; i < CC112X_PKT_LEN; i++) {
-		uint8_t val;
-		cc1120SpiReadReg(radio, i, &val, 1);
-		printf("[0x%X]: 0x%X, or " BYTE_TO_BINARY_PATTERN "\n",
-				val, BYTE_TO_BINARY(val));
-	}
-	for(uint16_t i = CC112X_IF_MIX_CFG; i < CC112X_IRQ0F; i++) {
-			uint8_t val;
-			cc1120SpiReadReg(radio, i, &val, 1);
-			printf("[0x%X]: 0x%X, or " BYTE_TO_BINARY_PATTERN "\n",
-					val, BYTE_TO_BINARY(val));
-		}
-#endif
-
 	return true;
+}
+
+// The main tick function. Checks for new packets and transmits the waiting one, if non-zero
+void cc1120State(CC1120Ctrl_t* radio){
+	// Don't let anything happen if radio isn't initialized
+	if (!radio->initialized)
+		return;
+
+	uint8_t status;
+	static uint8_t blank[128] = {0};
+
+	// Check for a new packet; if we've got one, dequeue it
+	cc1120_checkNewPacket(radio);
+
+	if(memcmp(radio->packetToTX, blank, radio->payloadSize) != 0){
+		cc1120_transmitPacket(radio, radio->packetToTX, radio->payloadSize);
+	}
+
+	status = trxSpiCmdStrobe(radio, CC112X_SNOP);
+	status = (status & CC1120_STATUS_MASK);
+
+
+	switch(status){
+	case CC112X_STATE_IDLE:
+		cc1120_startRX(radio);
+		break;
+	case CC112X_STATE_RX:
+
+		break;
+	case CC112X_STATE_TX:
+
+		break;
+	case CC112X_STATE_FSTXON:
+
+		break;
+	case CC112X_STATE_CALIBRATE:
+		break;
+	case CC112X_STATE_SETTLING:
+		break;
+	case CC112X_STATE_RXFIFO_ERROR:
+		trxSpiCmdStrobe(radio, CC112X_SFRX);
+		break;
+	case CC112X_STATE_TXFIFO_ERROR:
+		trxSpiCmdStrobe(radio, CC112X_SFTX);
+		break;
+	default:
+		trxSpiCmdStrobe(radio, CC112X_SIDLE);
+	}
 
 }
+
+bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t payloadLength){
+
+	uint8_t packetLength;
+
+	packetLength = payloadLength+1;
+
+	if (packetLength > MAX_PACKET_SIZE){
+		return false;
+	}
+
+	if (radio->payloadSize==0xFF){
+		cc1120SpiWriteTxFifo(radio, &payloadLength, 1);
+	}
+
+
+	cc1120SpiWriteTxFifo(radio, payload, payloadLength);
+
+	uint8_t status;
+	status = trxSpiCmdStrobe(radio, CC112X_SNOP);
+	status = (status & CC1120_STATUS_MASK);
+
+	if(status == CC112X_STATE_TXFIFO_ERROR) {
+	  // Flush TX FIFO
+	  trxSpiCmdStrobe(radio, CC112X_SFTX);
+
+	  return false;
+	}
+
+	//this strobe will only TX the pkt length defined by the register, fifo advances
+	trxSpiCmdStrobe(radio, CC112X_STX);
+	return true;
+}
+
+bool cc1120_checkNewPacket(CC1120Ctrl_t* radio){
+	uint8_t rxbytes = 0x00;
+	uint8_t rxBuffer[128] = {0};
+
+	// Read number of bytes in RX FIFO
+	cc1120SpiReadReg(radio, CC112X_NUM_RXBYTES, &rxbytes, 1);
+
+	if(rxbytes < 1){
+		return false;
+	}
+	//printf("RX FIFO has %u\n", rxbytes);
+	uint8_t rxfirst = 0x00;
+	uint8_t rxlast = 0x00;
+	cc1120SpiReadReg(radio, CC112X_RXFIRST, &rxfirst, 1);
+	cc1120SpiReadReg(radio, CC112X_RXLAST, &rxlast, 1);
+	//printf("RXFIRST %u TXFIRST %u\n", rxfirst, rxlast);
+
+	//Read GPIO
+	if(HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_RESET){ // PKT_SYNC_RXTX, maybe, should be low when packet RX is done
+		//printf("GP3 is low, so not currently receiving pkt\n");
+
+		// This should do the same thing as the below check
+		uint8_t state;
+		cc1120SpiReadReg(radio, CC112X_MARCSTATE, &state, 1);
+		if(state == 0x11) { // TODO don't hardcode the marcstate status
+			trxSpiCmdStrobe(radio, CC112X_SFRX);
+			return false;
+		}
+
+		uint8_t status;
+		status = trxSpiCmdStrobe(radio, CC112X_SNOP);
+		status = (status & CC1120_STATUS_MASK);
+		if(status == CC112X_STATE_RXFIFO_ERROR) {
+			// Flush RX FIFO
+		    trxSpiCmdStrobe(radio, CC112X_SFRX);
+		    return false;
+		}
+
+		// Read n bytes from RX FIFO
+		//cc1120SpiReadReg(raido, CC112X_RXFIRST)
+
+		if (radio->packetCfg == 0x20){
+            cc1120SpiReadRxFifo(radio, rxBuffer, rxbytes);
+			memcpy(radio->packetRX, rxBuffer, rxbytes-2);
+			radio->RSSI = rxBuffer[rxbytes-2];
+			radio->CRC_LQI = rxBuffer[rxbytes-1];
+		} else {
+		    cc1120SpiReadRxFifo(radio, radio->packetRX, radio->payloadSize);
+			cc1120SpiReadRxFifo(radio, &radio->RSSI, 1);
+			cc1120SpiReadRxFifo(radio, &radio->CRC_LQI, 1);
+		}
+
+
+
+		return true;
+
+		  // Check CRC ok (CRC_OK: bit7 in second status byte)
+		  // This assumes status bytes are appended in RX_FIFO
+		  // (PKT_CFG1.APPEND_STATUS = 1)
+		  // If CRC is disabled the CRC_OK field will read 1
+		  /*if(rxBuffer[rxbytes - 1] & 0x80) {
+			  //RingBuffer_Write(&radio->buf.RXbuf, rxBuffer, pktLen);
+			  return true;
+		  }*/
+
+	}
+
+	return false;
+}
+
+bool cc1120ForceIdle(CC1120Ctrl_t* radio){
+
+	//return the radio to idle somehow
+	uint8_t status;
+	status = trxSpiCmdStrobe(radio, CC112X_SNOP);
+	status = (status & CC1120_STATUS_MASK);
+
+	switch(status){
+	case CC112X_STATE_IDLE:
+		return true;
+		break;
+	case CC112X_STATE_RX:
+		trxSpiCmdStrobe(radio, CC112X_SIDLE);
+		return true;
+		break;
+	case CC112X_STATE_TX:
+		trxSpiCmdStrobe(radio, CC112X_SIDLE);
+		return true;
+		break;
+	case CC112X_STATE_FSTXON:
+		trxSpiCmdStrobe(radio, CC112X_SIDLE);
+		return true;
+				break;
+	case CC112X_STATE_CALIBRATE:
+		return false;
+		break;
+	case CC112X_STATE_SETTLING:
+		return false;
+		break;
+	case CC112X_STATE_RXFIFO_ERROR:
+		trxSpiCmdStrobe(radio, CC112X_SFRX);
+		return true;
+		break;
+	case CC112X_STATE_TXFIFO_ERROR:
+		trxSpiCmdStrobe(radio, CC112X_SFTX);
+		return true;
+		break;
+
+	default:
+		trxSpiCmdStrobe(radio, CC112X_SIDLE);
+		return true;
+	}
+
+	return false;
+}
+
+bool cc1120_startRX(CC1120Ctrl_t* radio){
+	uint8_t readByte;
+	 trxSpiCmdStrobe(radio, CC112X_SRX);
+	 //make sure we actually switch into rx
+	uint32_t startMS = HAL_GetTick();
+	do {
+		cc1120SpiReadReg(radio, CC112X_MARCSTATE, &readByte, 1);
+	} while (readByte != 0x6D && HAL_GetTick() - startMS < 1000);
+
+	return true;
+}
+
+#define VCDAC_START_OFFSET 2
+#define FS_VCO2_INDEX 0
+#define FS_VCO4_INDEX 1
+#define FS_CHP_INDEX 2
+bool manualCalibration(CC1120Ctrl_t* radio) {
+
+	uint8_t original_fs_cal2;
+	uint8_t calResults_for_vcdac_start_high[3];
+	uint8_t calResults_for_vcdac_start_mid[3];
+	uint8_t marcstate;
+	uint8_t writeByte;
+
+	cc1120SpiReadReg(radio, CC112X_MARCSTATE, &marcstate, 1);
+
+	// 1) Set VCO cap-array to 0 (FS_VCO2 = 0x00)
+	writeByte = 0x00;
+	cc1120SpiWriteReg(radio, CC112X_FS_VCO2, &writeByte, 1);
+
+	// 2) Start with high VCDAC (original VCDAC_START + 2):
+	cc1120SpiReadReg(radio, CC112X_FS_CAL2, &original_fs_cal2, 1);
+	writeByte = original_fs_cal2 + VCDAC_START_OFFSET;
+	cc1120SpiWriteReg(radio, CC112X_FS_CAL2, &writeByte, 1);
+
+	// 3) Calibrate and wait for calibration to be done
+	//   (radio back in IDLE state)
+	trxSpiCmdStrobe(radio, CC112X_SCAL);
+
+	uint32_t startMS = HAL_GetTick();
+	do {
+		cc1120SpiReadReg(radio, CC112X_MARCSTATE, &marcstate, 1);
+	} while (marcstate != 0x41 && HAL_GetTick() - startMS < 5000);
+	if (marcstate != 0x41)
+		return false;
+
+	// 4) Read FS_VCO2, FS_VCO4 and FS_CHP register obtained with
+	//    high VCDAC_START value
+	cc1120SpiReadReg(radio, CC112X_FS_VCO2,
+			&calResults_for_vcdac_start_high[FS_VCO2_INDEX], 1);
+	cc1120SpiReadReg(radio, CC112X_FS_VCO4,
+			&calResults_for_vcdac_start_high[FS_VCO4_INDEX], 1);
+	cc1120SpiReadReg(radio, CC112X_FS_CHP,
+			&calResults_for_vcdac_start_high[FS_CHP_INDEX], 1);
+
+	// 5) Set VCO cap-array to 0 (FS_VCO2 = 0x00)
+	writeByte = 0x00;
+	cc1120SpiWriteReg(radio, CC112X_FS_VCO2, &writeByte, 1);
+
+	// 6) Continue with mid VCDAC (original VCDAC_START):
+	writeByte = original_fs_cal2;
+	cc1120SpiWriteReg(radio, CC112X_FS_CAL2, &writeByte, 1);
+
+	// 7) Calibrate and wait for calibration to be done
+	//   (radio back in IDLE state)
+	trxSpiCmdStrobe(radio, CC112X_SCAL);
+
+	startMS = HAL_GetTick();
+	do {
+		cc1120SpiReadReg(radio, CC112X_MARCSTATE, &marcstate, 1);
+	} while (marcstate != 0x41 && HAL_GetTick() - startMS < 5000);
+	if (marcstate != 0x41)
+		return false;
+
+	// 8) Read FS_VCO2, FS_VCO4 and FS_CHP register obtained
+	//    with mid VCDAC_START value
+	cc1120SpiReadReg(radio, CC112X_FS_VCO2,
+			&calResults_for_vcdac_start_mid[FS_VCO2_INDEX], 1);
+	cc1120SpiReadReg(radio, CC112X_FS_VCO4,
+			&calResults_for_vcdac_start_mid[FS_VCO4_INDEX], 1);
+	cc1120SpiReadReg(radio, CC112X_FS_CHP,
+			&calResults_for_vcdac_start_mid[FS_CHP_INDEX], 1);
+
+	// 9) Write back highest FS_VCO2 and corresponding FS_VCO
+	//    and FS_CHP result
+	if (calResults_for_vcdac_start_high[FS_VCO2_INDEX]
+			> calResults_for_vcdac_start_mid[FS_VCO2_INDEX]) {
+		writeByte = calResults_for_vcdac_start_high[FS_VCO2_INDEX];
+		cc1120SpiWriteReg(radio, CC112X_FS_VCO2, &writeByte, 1);
+		writeByte = calResults_for_vcdac_start_high[FS_VCO4_INDEX];
+		cc1120SpiWriteReg(radio, CC112X_FS_VCO4, &writeByte, 1);
+		writeByte = calResults_for_vcdac_start_high[FS_CHP_INDEX];
+		cc1120SpiWriteReg(radio, CC112X_FS_CHP, &writeByte, 1);
+	} else {
+		writeByte = calResults_for_vcdac_start_mid[FS_VCO2_INDEX];
+		cc1120SpiWriteReg(radio, CC112X_FS_VCO2, &writeByte, 1);
+		writeByte = calResults_for_vcdac_start_mid[FS_VCO4_INDEX];
+		cc1120SpiWriteReg(radio, CC112X_FS_VCO4, &writeByte, 1);
+		writeByte = calResults_for_vcdac_start_mid[FS_CHP_INDEX];
+		cc1120SpiWriteReg(radio, CC112X_FS_CHP, &writeByte, 1);
+	}
+
+	return true;
+}
+
 
 uint8_t trx8BitRegAccess(CC1120Ctrl_t* radio, uint8_t accessType, uint8_t addrByte, uint8_t *pData,
 		uint16_t len) {
@@ -186,7 +459,7 @@ uint8_t trxSpiCmdStrobe(CC1120Ctrl_t* radio, uint8_t cmd) {
 	return (rc);
 }
 
-static void trxReadWriteBurstSingle(CC1120Ctrl_t* radio, uint8_t addr, uint8_t *pData, uint16_t len) {
+void trxReadWriteBurstSingle(CC1120Ctrl_t* radio, uint8_t addr, uint8_t *pData, uint16_t len) {
 
 	uint16_t i;
 	uint8_t pushByte = 0x00;
@@ -292,318 +565,6 @@ uint8_t cc1120GetTxStatus(CC1120Ctrl_t* radio) {
 uint8_t cc1120GetRxStatus(CC1120Ctrl_t* radio) {
 	return (trxSpiCmdStrobe(radio, CC112X_SNOP | RADIO_READ_ACCESS));
 }
-
-uint8_t mask = 0xF0;
-
-bool cc1120ForceIdle(CC1120Ctrl_t* radio){
-
-	//return the radio to idle somehow
-	uint8_t status;
-	status = trxSpiCmdStrobe(radio, CC112X_SNOP);
-	status = (status & mask);
-
-	switch(status){
-	case CC112X_STATE_IDLE:
-		return true;
-		break;
-	case CC112X_STATE_RX:
-		trxSpiCmdStrobe(radio, CC112X_SIDLE);
-		return true;
-		break;
-	case CC112X_STATE_TX:
-		trxSpiCmdStrobe(radio, CC112X_SIDLE);
-		return true;
-		break;
-	case CC112X_STATE_FSTXON:
-		trxSpiCmdStrobe(radio, CC112X_SIDLE);
-		return true;
-				break;
-	case CC112X_STATE_CALIBRATE:
-		return false;
-		break;
-	case CC112X_STATE_SETTLING:
-		return false;
-		break;
-	case CC112X_STATE_RXFIFO_ERROR:
-		trxSpiCmdStrobe(radio, CC112X_SFRX);
-		return true;
-		break;
-	case CC112X_STATE_TXFIFO_ERROR:
-		trxSpiCmdStrobe(radio, CC112X_SFTX);
-		return true;
-		break;
-
-	default:
-		trxSpiCmdStrobe(radio, CC112X_SIDLE);
-		return true;
-	}
-
-	return false;
-}
-
-#define VCDAC_START_OFFSET 2
-#define FS_VCO2_INDEX 0
-#define FS_VCO4_INDEX 1
-#define FS_CHP_INDEX 2
-bool manualCalibration(CC1120Ctrl_t* radio) {
-
-	uint8_t original_fs_cal2;
-	uint8_t calResults_for_vcdac_start_high[3];
-	uint8_t calResults_for_vcdac_start_mid[3];
-	uint8_t marcstate;
-	uint8_t writeByte;
-
-	cc1120SpiReadReg(radio, CC112X_MARCSTATE, &marcstate, 1);
-
-	// 1) Set VCO cap-array to 0 (FS_VCO2 = 0x00)
-	writeByte = 0x00;
-	cc1120SpiWriteReg(radio, CC112X_FS_VCO2, &writeByte, 1);
-
-	// 2) Start with high VCDAC (original VCDAC_START + 2):
-	cc1120SpiReadReg(radio, CC112X_FS_CAL2, &original_fs_cal2, 1);
-	writeByte = original_fs_cal2 + VCDAC_START_OFFSET;
-	cc1120SpiWriteReg(radio, CC112X_FS_CAL2, &writeByte, 1);
-
-	// 3) Calibrate and wait for calibration to be done
-	//   (radio back in IDLE state)
-	trxSpiCmdStrobe(radio, CC112X_SCAL);
-
-	uint32_t startMS = HAL_GetTick();
-	do {
-		cc1120SpiReadReg(radio, CC112X_MARCSTATE, &marcstate, 1);
-	} while (marcstate != 0x41 && HAL_GetTick() - startMS < 5000);
-	if (marcstate != 0x41)
-		return false;
-
-	// 4) Read FS_VCO2, FS_VCO4 and FS_CHP register obtained with
-	//    high VCDAC_START value
-	cc1120SpiReadReg(radio, CC112X_FS_VCO2,
-			&calResults_for_vcdac_start_high[FS_VCO2_INDEX], 1);
-	cc1120SpiReadReg(radio, CC112X_FS_VCO4,
-			&calResults_for_vcdac_start_high[FS_VCO4_INDEX], 1);
-	cc1120SpiReadReg(radio, CC112X_FS_CHP,
-			&calResults_for_vcdac_start_high[FS_CHP_INDEX], 1);
-
-	// 5) Set VCO cap-array to 0 (FS_VCO2 = 0x00)
-	writeByte = 0x00;
-	cc1120SpiWriteReg(radio, CC112X_FS_VCO2, &writeByte, 1);
-
-	// 6) Continue with mid VCDAC (original VCDAC_START):
-	writeByte = original_fs_cal2;
-	cc1120SpiWriteReg(radio, CC112X_FS_CAL2, &writeByte, 1);
-
-	// 7) Calibrate and wait for calibration to be done
-	//   (radio back in IDLE state)
-	trxSpiCmdStrobe(radio, CC112X_SCAL);
-
-	startMS = HAL_GetTick();
-	do {
-		cc1120SpiReadReg(radio, CC112X_MARCSTATE, &marcstate, 1);
-	} while (marcstate != 0x41 && HAL_GetTick() - startMS < 5000);
-	if (marcstate != 0x41)
-		return false;
-
-	// 8) Read FS_VCO2, FS_VCO4 and FS_CHP register obtained
-	//    with mid VCDAC_START value
-	cc1120SpiReadReg(radio, CC112X_FS_VCO2,
-			&calResults_for_vcdac_start_mid[FS_VCO2_INDEX], 1);
-	cc1120SpiReadReg(radio, CC112X_FS_VCO4,
-			&calResults_for_vcdac_start_mid[FS_VCO4_INDEX], 1);
-	cc1120SpiReadReg(radio, CC112X_FS_CHP,
-			&calResults_for_vcdac_start_mid[FS_CHP_INDEX], 1);
-
-	// 9) Write back highest FS_VCO2 and corresponding FS_VCO
-	//    and FS_CHP result
-	if (calResults_for_vcdac_start_high[FS_VCO2_INDEX]
-			> calResults_for_vcdac_start_mid[FS_VCO2_INDEX]) {
-		writeByte = calResults_for_vcdac_start_high[FS_VCO2_INDEX];
-		cc1120SpiWriteReg(radio, CC112X_FS_VCO2, &writeByte, 1);
-		writeByte = calResults_for_vcdac_start_high[FS_VCO4_INDEX];
-		cc1120SpiWriteReg(radio, CC112X_FS_VCO4, &writeByte, 1);
-		writeByte = calResults_for_vcdac_start_high[FS_CHP_INDEX];
-		cc1120SpiWriteReg(radio, CC112X_FS_CHP, &writeByte, 1);
-	} else {
-		writeByte = calResults_for_vcdac_start_mid[FS_VCO2_INDEX];
-		cc1120SpiWriteReg(radio, CC112X_FS_VCO2, &writeByte, 1);
-		writeByte = calResults_for_vcdac_start_mid[FS_VCO4_INDEX];
-		cc1120SpiWriteReg(radio, CC112X_FS_VCO4, &writeByte, 1);
-		writeByte = calResults_for_vcdac_start_mid[FS_CHP_INDEX];
-		cc1120SpiWriteReg(radio, CC112X_FS_CHP, &writeByte, 1);
-	}
-
-	return true;
-}
-
-
-uint8_t waiting_watchdog = 0;
-
-
-
-void cc1120State(CC1120Ctrl_t* radio){
-	// Don't let anything happen if radio isn't initialized
-	if (!radio->initialized)
-		return;
-
-	uint8_t status;
-
-
-	uint8_t blank[128] = {0};
-
-
-	cc1120_hasReceivedPacket(radio);
-
-	if(memcmp(radio->packetToTX, blank, radio->payloadSize) != 0){
-		cc1120_transmitPacket(radio, radio->packetToTX, radio->payloadSize);
-	}
-
-	status = trxSpiCmdStrobe(radio, CC112X_SNOP);
-	status = (status & mask);
-
-
-	switch(status){
-	case CC112X_STATE_IDLE:
-		cc1120_startRX(radio);
-		break;
-	case CC112X_STATE_RX:
-
-		break;
-	case CC112X_STATE_TX:
-
-		break;
-	case CC112X_STATE_FSTXON:
-
-		break;
-	case CC112X_STATE_CALIBRATE:
-		break;
-	case CC112X_STATE_SETTLING:
-		break;
-	case CC112X_STATE_RXFIFO_ERROR:
-		trxSpiCmdStrobe(radio, CC112X_SFRX);
-		break;
-	case CC112X_STATE_TXFIFO_ERROR:
-		trxSpiCmdStrobe(radio, CC112X_SFTX);
-		break;
-	default:
-		trxSpiCmdStrobe(radio, CC112X_SIDLE);
-	}
-
-}
-
-bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t payloadLength){
-
-	uint8_t packetLength;
-
-	packetLength = payloadLength+1;
-
-	if (packetLength > MAX_PACKET_SIZE){
-		return false;
-	}
-
-	if (radio->payloadSize==0xFF){
-		cc1120SpiWriteTxFifo(radio, &payloadLength, 1);
-	}
-
-
-	cc1120SpiWriteTxFifo(radio, payload, payloadLength);
-
-	uint8_t status;
-	status = trxSpiCmdStrobe(radio, CC112X_SNOP);
-	status = (status & mask);
-
-	if(status == CC112X_STATE_TXFIFO_ERROR) {
-	  // Flush TX FIFO
-	  trxSpiCmdStrobe(radio, CC112X_SFTX);
-
-	  return false;
-	}
-
-	//this strobe will only TX the pkt length defined by the register, fifo advances
-	trxSpiCmdStrobe(radio, CC112X_STX);
-	return true;
-}
-
-bool cc1120_hasReceivedPacket(CC1120Ctrl_t* radio){
-	uint8_t rxbytes = 0x00;
-	uint8_t rxBuffer[128] = {0};
-
-	// Read number of bytes in RX FIFO
-	cc1120SpiReadReg(radio, CC112X_NUM_RXBYTES, &rxbytes, 1);
-
-	if(rxbytes < 1){
-		return false;
-	}
-	//printf("RX FIFO has %u\n", rxbytes);
-	uint8_t rxfirst = 0x00;
-	uint8_t rxlast = 0x00;
-	cc1120SpiReadReg(radio, CC112X_RXFIRST, &rxfirst, 1);
-	cc1120SpiReadReg(radio, CC112X_RXLAST, &rxlast, 1);
-	//printf("RXFIRST %u TXFIRST %u\n", rxfirst, rxlast);
-
-	//Read GPIO
-	if(HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_RESET){ // PKT_SYNC_RXTX, maybe, should be low when packet RX is done
-		//printf("GP3 is low, so not currently receiving pkt\n");
-
-		// This should do the same thing as the below check
-		uint8_t state;
-		cc1120SpiReadReg(radio, CC112X_MARCSTATE, &state, 1);
-		if(state == 0x11) { // TODO don't hardcode the marcstate status
-			trxSpiCmdStrobe(radio, CC112X_SFRX);
-			return false;
-		}
-
-		uint8_t status;
-		status = trxSpiCmdStrobe(radio, CC112X_SNOP);
-		status = (status & mask);
-		if(status == CC112X_STATE_RXFIFO_ERROR) {
-			// Flush RX FIFO
-		    trxSpiCmdStrobe(radio, CC112X_SFRX);
-		    return false;
-		}
-
-		// Read n bytes from RX FIFO
-		//cc1120SpiReadReg(raido, CC112X_RXFIRST)
-
-		if (radio->packetCfg == 0x20){
-            cc1120SpiReadRxFifo(radio, rxBuffer, rxbytes);
-			memcpy(radio->packetRX, rxBuffer, rxbytes-2);
-			radio->RSSI = rxBuffer[rxbytes-2];
-			radio->CRC_LQI = rxBuffer[rxbytes-1];
-		} else {
-		    cc1120SpiReadRxFifo(radio, radio->packetRX, radio->payloadSize);
-			cc1120SpiReadRxFifo(radio, &radio->RSSI, 1);
-			cc1120SpiReadRxFifo(radio, &radio->CRC_LQI, 1);
-		}
-
-
-
-		return true;
-
-		  // Check CRC ok (CRC_OK: bit7 in second status byte)
-		  // This assumes status bytes are appended in RX_FIFO
-		  // (PKT_CFG1.APPEND_STATUS = 1)
-		  // If CRC is disabled the CRC_OK field will read 1
-		  /*if(rxBuffer[rxbytes - 1] & 0x80) {
-			  //RingBuffer_Write(&radio->buf.RXbuf, rxBuffer, pktLen);
-			  return true;
-		  }*/
-
-	}
-
-	return false;
-}
-
-bool cc1120_startRX(CC1120Ctrl_t* radio){
-	uint8_t readByte;
-	 trxSpiCmdStrobe(radio, CC112X_SRX);
-	 //make sure we actually switch into rx
-	uint32_t startMS = HAL_GetTick();
-	do {
-		cc1120SpiReadReg(radio, CC112X_MARCSTATE, &readByte, 1);
-	} while (readByte != 0x6D && HAL_GetTick() - startMS < 1000);
-
-	return true;
-}
-
 
 /*
 //function courtesy of USC

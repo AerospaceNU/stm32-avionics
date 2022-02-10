@@ -12,6 +12,7 @@
 #define SMARTRF_CC1120_H
 
 #include "smartrf_registersettings.h"
+#include "cc1120_cc1200_defs.h"
 
 // Address Config = No address check
 // Bit Rate = 38.4
