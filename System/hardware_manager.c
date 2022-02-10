@@ -266,7 +266,7 @@ void HM_HardwareInit() {
 #endif
 #ifdef HAS_CC1120
 	radio433.settingsPtr = cc1120_433_1_2kbps_cfg;
-	radio433.settingsSize = cc1120_433_1_2kbps_size;
+	radio433.settingsSize = sizeof(cc1120_433_1_2kbps_cfg);
 #endif
 
 #endif
