@@ -141,7 +141,7 @@ int main(void)
 		packet[48] = radioPtr->RSSI;
 		packet[49] = radioPtr->CRC_LQI;
 		HM_UsbTransmit(packet, 50);
-		memset(radioPtr, 0, sizeof(TransmitData_t));
+		memset(radioPtr->packetRX, 0, sizeof(TransmitData_t));
 	}
 
 //	if(radio.CRC_LQI >> 7 == 0) {
@@ -149,7 +149,7 @@ int main(void)
 //		HM_UsbTransmit((uint8_t*)call, strlen(call));
 //	}
 
-	HAL_Delay(400);
+	HAL_Delay(50);
 //	usbTransmit(&t.pos_z, 4);
 //	usbTransmit(&t.vel_z, 4);
 
