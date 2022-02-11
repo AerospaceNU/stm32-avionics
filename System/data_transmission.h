@@ -27,6 +27,13 @@ typedef struct __attribute__((__packed__)) {
 	uint8_t  state;
 } TransmitData_t;
 
+typedef struct __attribute__((__packed__)) {
+
+	uint8_t packetType;
+
+	float	 gps_lat,			gps_long,			gps_alt;
+} GSData_t;
+
 void transmitData(SensorData_t* sensorData, FilterData_t* filterData, uint8_t state);
 
 #ifdef __cplusplus

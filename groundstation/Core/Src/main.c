@@ -120,6 +120,7 @@ int main(void)
 
  {
 		HM_RadioUpdate();
+		HM_ReadSensorData();
 
 	  RadioPacket_t *radioPtr = HM_RadioGetRxPtr(RADIO_HW_433);
 
@@ -142,6 +143,19 @@ int main(void)
 		packet[49] = radioPtr->CRC_LQI;
 		HM_UsbTransmit(packet, 50);
 		memset(radioPtr->packetRX, 0, sizeof(TransmitData_t));
+	}
+
+	static int i = 0;
+	if(i++ % 1000/50 == 0) {
+		uint8_t pGPS[50] = {0};
+		SensorData_t *data = HM_GetSensorData();
+		GSData_t gps;
+		gps.packetType = 200;
+		gps.gps_lat = data->gps_lat;
+		gps.gps_long = data->gps_long;
+		gps.gps_alt = data->gps_alt;
+		memcpy(pGPS, &gps, sizeof(GSData_t));
+		HM_UsbTransmit(pGPS, 50);
 	}
 
 //	if(radio.CRC_LQI >> 7 == 0) {
