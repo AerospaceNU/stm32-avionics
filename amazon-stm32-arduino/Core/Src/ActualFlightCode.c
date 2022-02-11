@@ -10,25 +10,29 @@
 #include "stdio.h"
 #include "usart.h"
 #include "string.h"
+#include "spi.h"
+#include "gpio.h"
+#include "stm32f401xc.h"
 
 void FlightMain() {
 	// Do init things. These should be changed!
 	CC1120Ctrl_t radio;
-	radio.radhspi = 0;
-	radio.CS_port = 0;
-	radio.CS_pin = 0;
-	radio.RST_port = 0;
-	radio.RST_pin = 0;
-	radio.MISO_port = 0;
-	radio.MISO_pin = 0;
-	radio.GP0_port = 0;
-	radio.GP0_pin = 0;
-	radio.GP2_port = 0;
-	radio.GP2_pin = 0;
-	radio.GP3_port = 0;
-	radio.GP3_pin = 0;
+	radio.radhspi = &hspi1;
+	radio.CS_port = RAD_CS_GPIO_Port;
+	radio.CS_pin = RAD_CS_Pin;
+	radio.RST_port = RAD_RST_GPIO_Port;
+	radio.RST_pin = RAD_RST_Pin;
+	radio.MISO_port = GPIOA;
+	radio.MISO_pin = GPIO_PIN_6;
+//	radio.GP0_port = 0;
+//	radio.GP0_pin = 0;
+//	radio.GP2_port = 0;
+//	radio.GP2_pin = 0;
+//	radio.GP3_port = 0;
+//	radio.GP3_pin = 0;
 	radio.payloadSize = 48; // To match groundstation
 	radio.initialized = 0;
+	cc1120_init(&radio);
 
 	while (1) {
 		// Test the GPS
