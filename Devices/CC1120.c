@@ -392,6 +392,52 @@ bool manualCalibration(CC1120Ctrl_t* radio) {
 	return true;
 }
 
+//! Set power in db. Make sure to respect your PA maximum!
+void cc1120_SetOutputPower(CC1120Ctrl_t *radio, uint8_t powerDbM) {
+#ifdef HAS_CC1190
+	if(powerDbM > 10) powerDbM = 10;
+#endif
+
+	// output = (ramp + 1)/2-18
+	// (output+18)*2 - 1 = ramp
+	uint8_t power = (powerDmB + 18) * 2 - 1;
+
+	// Register must be between 3 and 64
+	if(power < 3) power = 3;
+	if(power > 64) power = 64;
+	cc1120SpiReadReg(radio, CC112X_MARCSTATE, &state, 1);
+	uint8_t reg = 0b01000000; // bit 7 set to enable ramping
+	reg |= power; // Lower 6 bits are power
+	cc1120SpiWriteReg(radio, PA_CFG2, &reg, 1);
+}
+
+enum CC1120_GPIO_CFG {
+	RXFIFO_THR_PKT = 1, // Associated to the RX FIFO. Asserted when the RX FIFO is filled above
+	// FIFO_CFG.FIFO_THR or the end of packet is reached. De-asserted
+	// when the RX FIFO is empty
+
+	// RX: Asserted when sync word has been received and de-asserted at the
+	// end of the packet. Will de-assert when the optional address and/or
+	// length check fails or the RX FIFO overflows/underflows.
+	// TX: Asserted when sync word has been sent, and de-asserted at the end
+	// of the packet. Will de-assert if the TX FIFO underflows/overflows
+	PKT_SYNC_RXTX = 6,
+
+	LNA_PD = 24, // control external LNA. Active low.
+	PA_PD = 25, // External PA, active low
+	RX0TX1_CFG = 26, // 0 in idle or rx, 1 in transmit
+
+	HIGHZ = 48 // High-impedance, if we need this to not do anything
+};
+
+//! Configure a GPIO pin. register should be CC112X_IOCFG3 or CC112X_IOCFG2 or CC112X_IOCFG1 or CC112X_IOCFG0
+//! gpio_config from CC1120_GPIO_CFG, and outputInverted flips the logic of the pin
+void cc1120_configGPIO(CC1120Ctrl_t *radio, uint8_t gpio_register, uint8_t gpio_config, bool outputInverted) {
+	uint8_t reg = 0;
+	reg |= (outputInverted ? 1 : 0) << 6; // invert is bit 6, 7th from bottom
+	reg |= gpio_config; // lower 6 are output selection
+	cc1120SpiWriteReg(radio, CC112X_IOCFG3, &reg, 1);
+}
 
 uint8_t trx8BitRegAccess(CC1120Ctrl_t* radio, uint8_t accessType, uint8_t addrByte, uint8_t *pData,
 		uint16_t len) {
