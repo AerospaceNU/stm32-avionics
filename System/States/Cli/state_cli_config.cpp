@@ -8,14 +8,6 @@
 
 #include "cli.h"
 
-static CliConfigState::Configs_t configVals = {
-	0, 	     	// drogueCuts
-	{0},		// drogueCutAltitudesM
-	1000000, 	// mainCutAltitude
-	0, 	     	// groundElevationM
-	14.85    	// groundTemperatureC
-};
-
 static void generateConfigHelp(const char* name, const char* value) {
 	char msg[50 + 4];
 	sprintf(msg, "%-30s %-20s\r\n", name, value);
@@ -33,7 +25,7 @@ EndCondition_t CliConfigState::run() {
 	// Configure another drogue cut
 	if (options.d) {
 		// There must be more drogue cuts available
-		if (configVals.drogueCuts >= MAX_DROGUE_CUTS) {
+		if (cliGetConfigs()->drogueCuts >= MAX_DROGUE_CUTS) {
 			cliSendAck(false, "Max supported drogue cuts reached");
 			return EndCondition_t::CliCommandComplete;
 		}
@@ -45,9 +37,9 @@ EndCondition_t CliConfigState::run() {
 			return EndCondition_t::CliCommandComplete;
 		}
 		// Set next available drogue cut and re-sort from highest to lowest altitude
-		configVals.drogueCutAltitudesM[configVals.drogueCuts] = cutCandidate;
-		configVals.drogueCuts++;
-		qsort(configVals.drogueCutAltitudesM, configVals.drogueCuts, sizeof(double),
+		cliGetConfigs()->drogueCutAltitudesM[cliGetConfigs()->drogueCuts] = cutCandidate;
+		cliGetConfigs()->drogueCuts++;
+		qsort(cliGetConfigs()->drogueCutAltitudesM, cliGetConfigs()->drogueCuts, sizeof(double),
 				[](const void* a, const void* b) {
 			return (*(double*)b > *(double*)a) ? 1 : (*(double*)b < *(double*)a) ? -1 : 0;
 		});
@@ -61,7 +53,7 @@ EndCondition_t CliConfigState::run() {
 			cliSendAck(false, "Main cut altitude invalid float");
 			return EndCondition_t::CliCommandComplete;
 		}
-		configVals.mainCutAltitudeM = altitude;
+		cliGetConfigs()->mainCutAltitudeM = altitude;
 	}
 
 	// Configure ground elevation
@@ -72,7 +64,7 @@ EndCondition_t CliConfigState::run() {
 			cliSendAck(false, "Ground elevation invalid float");
 			return EndCondition_t::CliCommandComplete;
 		}
-		configVals.groundElevationM = elevation;
+		cliGetConfigs()->groundElevationM = elevation;
 	}
 
 	// Configure ground temperature
@@ -83,7 +75,7 @@ EndCondition_t CliConfigState::run() {
 			cliSendAck(false, "Ground temperature invalid float");
 			return EndCondition_t::CliCommandComplete;
 		}
-		configVals.groundTemperatureC = temperature;
+		cliGetConfigs()->groundTemperatureC = temperature;
 	}
 
 	// Send positive ACK (all inputs have been appropriately processed)
@@ -96,19 +88,19 @@ EndCondition_t CliConfigState::run() {
 		// New line
 		cliSend("\r\n");
 		// Drogue cut
-		for (int i = 0; i < configVals.drogueCuts; i++) {
+		for (int i = 0; i < cliGetConfigs()->drogueCuts; i++) {
 			sprintf(name, "Drogue Cut %i Altitude (m):", i + 1);
-			sprintf(val, "%.3f", configVals.drogueCutAltitudesM[i]);
+			sprintf(val, "%.3f", cliGetConfigs()->drogueCutAltitudesM[i]);
 			generateConfigHelp(name, val);
 		}
 		// Main cut
-		sprintf(val, "%.3f", configVals.mainCutAltitudeM);
+		sprintf(val, "%.3f", cliGetConfigs()->mainCutAltitudeM);
 		generateConfigHelp("Main Cut Altitude (m):", val);
 		// Ground elevation
-		sprintf(val, "%.3f", configVals.groundElevationM);
+		sprintf(val, "%.3f", cliGetConfigs()->groundElevationM);
 		generateConfigHelp("Ground Elevation (m):", val);
 		// Ground temperature
-		sprintf(val, "%.3f", configVals.groundTemperatureC);
+		sprintf(val, "%.3f", cliGetConfigs()->groundTemperatureC);
 		generateConfigHelp("Ground Temperature (C):", val);
 	}
 
@@ -119,8 +111,4 @@ EndCondition_t CliConfigState::run() {
 
 void CliConfigState::cleanup() {
 	// No action
-}
-
-CliConfigState::Configs_t* CliConfigState::getConfigs() {
-	return &configVals;
 }

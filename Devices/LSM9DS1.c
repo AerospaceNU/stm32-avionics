@@ -80,9 +80,9 @@ void LSM9DS1_get_data_raw (LSM9DS1Ctrl_t* sensor) {
 
 void LSM9DS1_get_data (LSM9DS1Ctrl_t* sensor) {
 	LSM9DS1_get_data_raw(sensor);
-	sensor->ag.aVal.x = (sensor->ag.aRes * sensor->ag.aRawVal.x) - sensor->ag.aAdj.x;
-	sensor->ag.aVal.y = (sensor->ag.aRes * sensor->ag.aRawVal.y) - sensor->ag.aAdj.y;
-	sensor->ag.aVal.z = ((sensor->ag.aRes * sensor->ag.aRawVal.z) - sensor->ag.aAdj.z);
+	sensor->ag.aVal.x = sensor->ag.aRes * sensor->ag.aRawVal.x;
+	sensor->ag.aVal.y = sensor->ag.aRes * sensor->ag.aRawVal.y;
+	sensor->ag.aVal.z = sensor->ag.aRes * sensor->ag.aRawVal.z;
 
 	sensor->ag.gVal.x = (sensor->ag.gRes * sensor->ag.gRawVal.x) - sensor->ag.gAdj.x;
 	sensor->ag.gVal.y = (sensor->ag.gRes * sensor->ag.gRawVal.y) - sensor->ag.gAdj.y;
@@ -94,9 +94,6 @@ void LSM9DS1_get_data (LSM9DS1Ctrl_t* sensor) {
 }
 void LSM9DS1_get_adj(LSM9DS1Ctrl_t* sensor) {
 	int sampleCount = 100;
-	int aAdjX = 0;
-	int aAdjY = 0;
-	int aAdjZ = 0;
 	int gAdjX = 0;
 	int gAdjY = 0;
 	int gAdjZ = 0;
@@ -105,9 +102,6 @@ void LSM9DS1_get_adj(LSM9DS1Ctrl_t* sensor) {
 	int mAdjZ = 0;
 	for (int i = 0; i < sampleCount; i++) {
 		LSM9DS1_get_data_raw(sensor);
-		aAdjX += sensor->ag.aRawVal.x;
-		aAdjY += sensor->ag.aRawVal.y;
-		aAdjZ += sensor->ag.aRawVal.z;
 		gAdjX += sensor->ag.gRawVal.x;
 		gAdjY += sensor->ag.gRawVal.y;
 		gAdjZ += sensor->ag.gRawVal.z;
@@ -116,9 +110,6 @@ void LSM9DS1_get_adj(LSM9DS1Ctrl_t* sensor) {
 		mAdjZ += sensor->m.mRawVal.z;
 		HAL_Delay(5);
 	}
-	sensor->ag.aAdj.x = (aAdjX / sampleCount) * sensor->ag.aRes;
-	sensor->ag.aAdj.y = (aAdjY / sampleCount) * sensor->ag.aRes;
-	sensor->ag.aAdj.z = (aAdjZ / sampleCount) * sensor->ag.aRes - G_TO_MPS;
 	sensor->ag.gAdj.x = (gAdjX / sampleCount) * sensor->ag.gRes;
 	sensor->ag.gAdj.y = (gAdjY / sampleCount) * sensor->ag.gRes;
 	sensor->ag.gAdj.z = (gAdjZ / sampleCount) * sensor->ag.gRes;

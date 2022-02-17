@@ -57,7 +57,8 @@ static GPSCtrl_t gps;
 static CC1120Ctrl_t cc1120;
 static const uint8_t payloadSize = sizeof(TransmitData_t);
 
-/* Sensor data */
+/* Sensor info */
+static SensorProperties_t sensorProperties;
 static SensorData_t sensorData;
 static size_t SENSOR_DATA_SIZE = sizeof(SensorData_t);
 
@@ -91,6 +92,7 @@ void HM_HardwareInit() {
 	lsm9ds1_1.ag.gFs = FS_G_500;
 	lsm9ds1_1.m.mFs = FS_M_8;
 	LSM9DS1_init(&lsm9ds1_1);
+	sensorProperties.imu1_accel_fs = 156.96; // 16 G * 9.81 mpsps/G
 
 #if (FCB_VERSION <= 0)
 	/* LSM9DS1 IMU 2 */
@@ -104,8 +106,10 @@ void HM_HardwareInit() {
 	lsm9ds1_2.ag.gFs = FS_G_500;
 	lsm9ds1_2.m.mFs = FS_M_8;
 	LSM9DS1_init(&lsm9ds1_2);
+	sensorProperties.imu2_accel_fs = 156.96; // 16 G * 9.81 mpsps/G
 #else
 	/* ICM20948 IMU 2 */
+	sensorProperties.imu2_accel_fs = 0;
 #endif /* FCB_VERSION */
 
 	/* MS5607 Barometer 1 */
@@ -503,6 +507,10 @@ void HM_ReadSensorData() {
 
 SensorData_t* HM_GetSensorData() {
 	return &sensorData;
+}
+
+SensorProperties_t* HM_GetSensorProperties() {
+	return &sensorProperties;
 }
 
 void HM_EnableSimMode(CircularBuffer_t* rxBuffer) {

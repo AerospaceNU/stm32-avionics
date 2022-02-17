@@ -51,7 +51,7 @@ EndCondition_t PreFlightState::run() {
 	}
 
 	memcpy(&sensorDataBuffer[bufferCounter], sensorData, sizeof(SensorData_t));
-	filterApplyData(sensorData, false);
+	filterApplyData(sensorData, HM_GetSensorProperties(), false);
 	FilterData_t* filterData = filterGetData();
 	memcpy(&filterDataBuffer[bufferCounter], filterData, sizeof(FilterData_t));
 	// Transmit at 1/100th rate
