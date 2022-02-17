@@ -10,6 +10,7 @@ extern "C"{
 #endif
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "circular_buffer.h"
 
@@ -51,9 +52,27 @@ typedef struct {
 } CliOptionVals_t;
 
 /**
+ * Configs that can be changed via CLI
+ */
+#define MAX_DROGUE_CUTS 4
+typedef struct {
+	uint8_t drogueCuts; // Excludes initial separation and main descent
+	double drogueCutAltitudesM[MAX_DROGUE_CUTS];
+	double mainCutAltitudeM;
+	double groundElevationM;
+	double groundTemperatureC;
+} CliConfigs_t;
+
+/**
  * @brief Initializes command line expectations, including arguments, etc.
  */
 void cliInit();
+
+/**
+ * @brief Return current command line configs
+ * @return Pointer to statically-allocated CLI configs
+ */
+CliConfigs_t* cliGetConfigs();
 
 /**
  * @brief Parses all bytes that have come in through the specified comms type

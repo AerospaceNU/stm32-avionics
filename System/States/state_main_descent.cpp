@@ -19,7 +19,7 @@ EndCondition_t MainDescentState::run() {
 	// Collect, filter, and log all sensor data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
-	filterApplyData(sensorData, true);
+	filterApplyData(sensorData, HM_GetSensorProperties(), true);
 	FilterData_t* filterData = filterGetData();
 	data_log_write(sensorData, filterData, this->getID());
 
