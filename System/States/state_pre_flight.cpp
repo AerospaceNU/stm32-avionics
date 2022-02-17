@@ -37,7 +37,7 @@ EndCondition_t PreFlightState::run() {
 	FilterData_t* filterData = filterGetData();
 	memcpy(&filterDataBuffer[bufferCounter], filterData, sizeof(FilterData_t));
 	// Transmit at 1/100th rate
-	if (this->getRunCounter() % 100 == 0) {
+	if (this->getRunCounter() % 7 == 0) {
 		transmitData(sensorData, filterData, this->getID());
 	}
 

@@ -392,24 +392,24 @@ bool manualCalibration(CC1120Ctrl_t* radio) {
 	return true;
 }
 
-//! Set power in db. Make sure to respect your PA maximum!
-void cc1120_SetOutputPower(CC1120Ctrl_t *radio, uint8_t powerDbM) {
-#ifdef HAS_CC1190
-	if(powerDbM > 10) powerDbM = 10;
-#endif
-
-	// output = (ramp + 1)/2-18
-	// (output+18)*2 - 1 = ramp
-	uint8_t power = (powerDmB + 18) * 2 - 1;
-
-	// Register must be between 3 and 64
-	if(power < 3) power = 3;
-	if(power > 64) power = 64;
-	cc1120SpiReadReg(radio, CC112X_MARCSTATE, &state, 1);
-	uint8_t reg = 0b01000000; // bit 7 set to enable ramping
-	reg |= power; // Lower 6 bits are power
-	cc1120SpiWriteReg(radio, PA_CFG2, &reg, 1);
-}
+////! Set power in db. Make sure to respect your PA maximum!
+//void cc1120_SetOutputPower(CC1120Ctrl_t *radio, uint8_t powerDbM) {
+//#ifdef HAS_CC1190
+//	if(powerDbM > 10) powerDbM = 10;
+//#endif
+//
+//	// output = (ramp + 1)/2-18
+//	// (output+18)*2 - 1 = ramp
+//	uint8_t power = (powerDmB + 18) * 2 - 1;
+//
+//	// Register must be between 3 and 64
+//	if(power < 3) power = 3;
+//	if(power > 64) power = 64;
+//	cc1120SpiReadReg(radio, CC112X_MARCSTATE, &state, 1);
+//	uint8_t reg = 0b01000000; // bit 7 set to enable ramping
+//	reg |= power; // Lower 6 bits are power
+//	cc1120SpiWriteReg(radio, PA_CFG2, &reg, 1);
+//}
 
 enum CC1120_GPIO_CFG {
 	RXFIFO_THR_PKT = 1, // Associated to the RX FIFO. Asserted when the RX FIFO is filled above
