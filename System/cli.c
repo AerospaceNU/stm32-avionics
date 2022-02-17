@@ -37,10 +37,22 @@ static struct option longOptions[] = {
 		{0, 0, 0, 0}
 };
 
+static CliConfigs_t cliConfigs = {
+	0, 	     	// drogueCuts
+	{0},		// drogueCutAltitudesM
+	1000000, 	// mainCutAltitude
+	0, 	     	// groundElevationM
+	14.85    	// groundTemperatureC
+};
+
 static CliComms_t lastCommsType; // Used to help send ack to right places
 
 void cliInit() {
 	opterr = 0; // Don't print any messages to standard error stream since this is embedded device
+}
+
+CliConfigs_t* cliGetConfigs() {
+	return &cliConfigs;
 }
 
 CliCommand_t cliParse(CliComms_t commsType) {

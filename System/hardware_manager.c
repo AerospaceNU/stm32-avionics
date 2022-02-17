@@ -122,7 +122,8 @@ static CC1120Ctrl_t radio433;
 static CC1120Ctrl_t radio915;
 #endif
 
-/* Sensor data */
+/* Sensor info */
+static SensorProperties_t sensorProperties;
 static SensorData_t sensorData;
 
 /* Sensor states */
@@ -139,7 +140,6 @@ static bool bPyroContinuitySampling = true;
 bool hardwareStatus[NUM_HARDWARE];
 
 void HM_HardwareInit() {
-#ifdef HAS_LSM9DS1
 #if (IMU_1 == 1)
 	/* LSM9DS1 IMU 1 */
 	lsm9ds1_1.ag.LSM9DS1SPI.hspi = IMU1_AG_HSPI;
@@ -152,6 +152,7 @@ void HM_HardwareInit() {
 	lsm9ds1_1.ag.gFs = FS_G_500;
 	lsm9ds1_1.m.mFs = FS_M_8;
 	LSM9DS1_init(&lsm9ds1_1);
+	sensorProperties.imu1_accel_fs = 156.96; // 16 G * 9.81 mpsps/G
 #endif
 
 #if (IMU_2 == 1)
@@ -166,9 +167,11 @@ void HM_HardwareInit() {
 	lsm9ds1_2.ag.gFs = FS_G_500;
 	lsm9ds1_2.m.mFs = FS_M_8;
 	LSM9DS1_init(&lsm9ds1_2);
-#endif
-
-#endif
+	sensorProperties.imu2_accel_fs = 156.96; // 16 G * 9.81 mpsps/G
+#else
+	/* ICM20948 IMU 2 */
+	sensorProperties.imu2_accel_fs = 0;
+#endif /* FCB_VERSION */
 
 #ifdef BARO_1
 #if (BARO_1 == 1)
@@ -705,6 +708,17 @@ void HM_ReadSensorData() {
 #endif
 
 
+<<<<<<< HEAD
+=======
+SensorProperties_t* HM_GetSensorProperties() {
+	return &sensorProperties;
+}
+
+void HM_EnableSimMode(CircularBuffer_t* rxBuffer) {
+	inSim = true;
+	simRxBuffer = rxBuffer;
+}
+>>>>>>> 3919b55... Accel IMU Threshold
 
 	// Timestamp data
 	// TODO: Make sensor data timestamp get time from PPS-updated timer

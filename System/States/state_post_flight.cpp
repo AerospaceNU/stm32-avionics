@@ -20,7 +20,7 @@ EndCondition_t PostFlightState::run() {
 	// Collect and transmit data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
-	filterApplyData(sensorData, true);
+	filterApplyData(sensorData, HM_GetSensorProperties(), true);
 	FilterData_t* filterData = filterGetData();
 
 	// Log data at 1/10th rate for now in case this state is reached before it is supposed to

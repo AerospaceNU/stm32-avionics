@@ -92,6 +92,11 @@ typedef struct {
 	bool pyro_continuity[6];
 } SensorData_t;
 
+typedef struct {
+	double imu1_accel_fs;
+	double imu2_accel_fs;
+} SensorProperties_t;
+
 typedef enum hardware_t{
 	RADIO_433 = 0,
 	RADIO_915,
@@ -175,6 +180,29 @@ void HM_ReadSensorData();
  * @return Pointer to statically-allocated struct where sensor data is stored
  */
 SensorData_t* HM_GetSensorData();
+
+/**
+ * @brief Returns a pointer to the current sensor properties
+ * @return Pointer to statically-allocated struct where sensor properties are stored
+ */
+SensorProperties_t* HM_GetSensorProperties();
+
+/**
+ * @brief Turn on or off sim mode in the hardware manager
+ * @param[in] rxBuffer: Buffer to read from in during sim
+ */
+void HM_EnableSimMode(CircularBuffer_t* rxBuffer);
+
+/**
+ * @brief Turn off sim mode in the hardware manager
+ */
+void HM_DisableSimMode();
+
+/**
+ * @brief Return whether hardware manager is currently in sim mode
+ * @return True if in sim mode, false if not
+ */
+bool HM_InSimMode();
 
 #ifdef __cplusplus
 }

@@ -33,8 +33,11 @@ void filterInit(double dt);
 
 /**
  * @brief Applies filters based on current sensor data
+ * @param curSensorVals: Current measured sensor data
+ * @param sensorProperties: Current sensor non-measured properties
+ * @param hasPassedApogee: Whether rocket has passed apogee (true) or not (false)
  */
-void filterApplyData(SensorData_t* curSensorVals, bool has_past_apogee);
+void filterApplyData(SensorData_t* curSensorVals, SensorProperties_t* sensorProperties, bool hasPassedApogee);
 
 /**
  * @brief Sets reference pressure used for converting pressure to altitude
