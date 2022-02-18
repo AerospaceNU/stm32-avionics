@@ -13,6 +13,7 @@
 #include "spi.h"
 #include "gpio.h"
 #include "stm32f401xc.h"
+#include "radioconfig/smartrf_CC1120_cfg_434_1_2kbps.h"
 
 void FlightMain() {
 	// Do init things. These should be changed!
@@ -24,12 +25,14 @@ void FlightMain() {
 	radio.RST_pin = RAD_RST_Pin;
 	radio.MISO_port = GPIOA;
 	radio.MISO_pin = GPIO_PIN_6;
+	radio.settingsPtr = cc1120_433_1_2kbps_cfg;
+	radio.settingsSize = sizeof(cc1120_433_1_2kbps_cfg);
 //	radio.GP0_port = 0;
 //	radio.GP0_pin = 0;
 //	radio.GP2_port = 0;
 //	radio.GP2_pin = 0;
-//	radio.GP3_port = 0;
-//	radio.GP3_pin = 0;
+	radio.GP3_port = RAD_GP3_GPIO_Port;
+	radio.GP3_pin = RAD_GP3_Pin;
 	radio.payloadSize = 48; // To match groundstation
 	radio.initialized = 0;
 	cc1120_init(&radio);
@@ -50,6 +53,6 @@ void FlightMain() {
 		cc1120State(&radio);
 
 		// Wait a bit
-		HAL_Delay(1000);
+		HAL_Delay(100);
 	}
 }

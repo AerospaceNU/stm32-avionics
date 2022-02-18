@@ -26,10 +26,9 @@
 
 //define HAS_LED_1
 //define LED1_Pin 0
-
-//#define HAS_SPI
+#define HAS_SPI
 //#define HAS_ADC
-//#define HAS_UART
+#define HAS_UART
 
 /*
  * IMU Types:

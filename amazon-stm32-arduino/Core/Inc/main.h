@@ -62,6 +62,8 @@ void Error_Handler(void);
 #define RAD_RST_GPIO_Port GPIOA
 #define RAD_CS_Pin GPIO_PIN_4
 #define RAD_CS_GPIO_Port GPIOA
+#define RAD_GP3_Pin GPIO_PIN_8
+#define RAD_GP3_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
