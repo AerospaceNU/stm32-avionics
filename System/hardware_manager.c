@@ -478,8 +478,8 @@ bool HM_RadioUpdate() {
 #ifdef HAS_RADIO_433
 	cc1120State(&radio433);
 #endif
-#ifdef HAS_RADIO_915
-	cc1120State(&radio915);
+#if defined(HAS_RADIO_915) && 0
+	//cc1120State(&radio915);
 #endif
 	return true; // TODO
 }
