@@ -141,11 +141,11 @@ static bool bPyroContinuitySampling = true;
 /* Array of hardware status states */
 bool hardwareStatus[NUM_HARDWARE];
 
-void HM_HardwareInit() {
 /* Hardware manager sim mode trackers */
 static bool inSim = false;
 static CircularBuffer_t* simRxBuffer = NULL;
 
+void HM_HardwareInit() {
 #if (IMU_1 == 1)
 	/* LSM9DS1 IMU 1 */
 	lsm9ds1_1.ag.LSM9DS1SPI.hspi = IMU1_AG_HSPI;
@@ -583,9 +583,32 @@ void HM_IWDG_Refresh() {
 	HAL_IWDG_Refresh(&hiwdg1);
 }
 
+
+static void HM_SimReadSensorData() {
+	size_t buffCount = simRxBuffer->count; // This might change if in middle of reception, so use consistently across function
+
+	// If buffer full, throw everything away since it's probably bad
+	if (buffCount == simRxBuffer->capacity) {
+		cbFlush(simRxBuffer);
+	}
+
+	// Buffer isn't full, continue as normal
+	else {
+		// First throw away any old data that wasn't processed in time
+		if (buffCount > SENSOR_DATA_SIZE) {
+			cbDequeue(simRxBuffer, buffCount - SENSOR_DATA_SIZE);
+			buffCount = SENSOR_DATA_SIZE;
+		}
+		// If right amount of bytes are seen, grab them as sensor data
+		if (buffCount == SENSOR_DATA_SIZE) {
+			cbPeek(simRxBuffer, &sensorData, &SENSOR_DATA_SIZE);
+			cbFlush(simRxBuffer);
+		}
+	}
+}
+
 void HM_ReadSensorData() {
 	if(!inSim) {
-void HM_ReadSensorData() {
 
 	// IMU 1 data
 	if (bImu1Sampling) {
@@ -744,15 +767,6 @@ void HM_EnableSimMode(CircularBuffer_t* rxBuffer) {
 
 SensorData_t* HM_GetSensorData() {
 	return &sensorData;
-}
-
-SensorProperties_t* HM_GetSensorProperties() {
-	return &sensorProperties;
-}
-
-void HM_EnableSimMode(CircularBuffer_t* rxBuffer) {
-	inSim = true;
-	simRxBuffer = rxBuffer;
 }
 
 void HM_DisableSimMode(CircularBuffer_t* rxBuffer) {
