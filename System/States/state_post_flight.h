@@ -19,6 +19,9 @@ class PostFlightState : public State {
 		EndCondition_t run(void) override;
 
 		void cleanup(void) override;
+
+	private:
+		uint32_t lastSimDataTime = 0;
 };
 
 #ifdef __cplusplus

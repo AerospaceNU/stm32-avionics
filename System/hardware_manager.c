@@ -44,6 +44,7 @@
 #include "usb.h"
 #endif
 
+#include "iwdg.h"
 //#include "adc.h"
 //#include "tim.h"
 //#include "usart.h"
@@ -125,6 +126,7 @@ static CC1120Ctrl_t radio915;
 /* Sensor info */
 static SensorProperties_t sensorProperties;
 static SensorData_t sensorData;
+static size_t SENSOR_DATA_SIZE = sizeof(SensorData_t);
 
 /* Sensor states */
 static bool bImu1Sampling = true;
@@ -140,6 +142,10 @@ static bool bPyroContinuitySampling = true;
 bool hardwareStatus[NUM_HARDWARE];
 
 void HM_HardwareInit() {
+/* Hardware manager sim mode trackers */
+static bool inSim = false;
+static CircularBuffer_t* simRxBuffer = NULL;
+
 #if (IMU_1 == 1)
 	/* LSM9DS1 IMU 1 */
 	lsm9ds1_1.ag.LSM9DS1SPI.hspi = IMU1_AG_HSPI;
@@ -153,6 +159,8 @@ void HM_HardwareInit() {
 	lsm9ds1_1.m.mFs = FS_M_8;
 	LSM9DS1_init(&lsm9ds1_1);
 	sensorProperties.imu1_accel_fs = 156.96; // 16 G * 9.81 mpsps/G
+#else
+	sensorProperties.imu2_accel_fs = 0;
 #endif
 
 #if (IMU_2 == 1)
@@ -169,9 +177,8 @@ void HM_HardwareInit() {
 	LSM9DS1_init(&lsm9ds1_2);
 	sensorProperties.imu2_accel_fs = 156.96; // 16 G * 9.81 mpsps/G
 #else
-	/* ICM20948 IMU 2 */
 	sensorProperties.imu2_accel_fs = 0;
-#endif /* FCB_VERSION */
+#endif
 
 #ifdef BARO_1
 #if (BARO_1 == 1)
@@ -572,6 +579,12 @@ void HM_SetPyroContinuitySampling(bool enable) {
 	bPyroContinuitySampling = enable;
 }
 
+void HM_IWDG_Refresh() {
+	HAL_IWDG_Refresh(&hiwdg1);
+}
+
+void HM_ReadSensorData() {
+	if(!inSim) {
 void HM_ReadSensorData() {
 
 	// IMU 1 data
@@ -708,8 +721,18 @@ void HM_ReadSensorData() {
 #endif
 
 
-<<<<<<< HEAD
-=======
+
+	// Timestamp data
+	// TODO: Make sensor data timestamp get time from PPS-updated timer
+	sensorData.timestamp_s = HM_Millis();
+	}
+
+	// Simming
+	else {
+		HM_SimReadSensorData();
+	}
+}
+
 SensorProperties_t* HM_GetSensorProperties() {
 	return &sensorProperties;
 }
@@ -718,13 +741,24 @@ void HM_EnableSimMode(CircularBuffer_t* rxBuffer) {
 	inSim = true;
 	simRxBuffer = rxBuffer;
 }
->>>>>>> 3919b55... Accel IMU Threshold
-
-	// Timestamp data
-	// TODO: Make sensor data timestamp get time from PPS-updated timer
-	sensorData.timestamp_s = HM_Millis();
-}
 
 SensorData_t* HM_GetSensorData() {
 	return &sensorData;
+}
+
+SensorProperties_t* HM_GetSensorProperties() {
+	return &sensorProperties;
+}
+
+void HM_EnableSimMode(CircularBuffer_t* rxBuffer) {
+	inSim = true;
+	simRxBuffer = rxBuffer;
+}
+
+void HM_DisableSimMode(CircularBuffer_t* rxBuffer) {
+	inSim = false;
+}
+
+bool HM_InSimMode() {
+	return inSim;
 }

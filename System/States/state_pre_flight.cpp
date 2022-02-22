@@ -2,6 +2,8 @@
 #include "state_pre_flight.h"
 
 #include <string.h>
+
+#include "cli.h"
 #include "data_log.h"
 #include "data_transmission.h"
 #include "filters.h"
@@ -12,16 +14,32 @@ void PreFlightState::init() {
 	transitionResetTimer = HM_Millis();
 	data_log_assign_flight();
 	minPosZ = 1000000; // Reset min position each new time pre-flight is reached
+	simModeStarted = false;
 	// Set filter pressure reference to current pressure
 	HM_ReadSensorData();
 	filterSetPressureRef((HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
 	gpsTimestamp = false;
+
+	// Send ACK to CLI if in sim mode
+	if (HM_InSimMode()) {
+		cliSendAck(true, nullptr);
+	}
 }
 
 
 EndCondition_t PreFlightState::run() {
 	// Produce a tone for each functioning peripheral
 	buzzerReport();
+
+	// In sim mode, don't continue until at least 1 data point has arrived
+	if (HM_InSimMode() && !simModeStarted) {
+		if (cliGetRxBuffer()->count >= sizeof(SensorData_t)) {
+			simModeStarted = true;
+		}
+		else {
+			return EndCondition_t::NoChange;
+		}
+	}
 
 	// Collect, and filter data
 	HM_ReadSensorData();
@@ -68,8 +86,8 @@ EndCondition_t PreFlightState::run() {
 		transitionResetTimer = HM_Millis();
 	}
 
-	// Detect if USB was plugged back in
-	if (HM_UsbIsConnected()) {
+	// Detect if USB was plugged back in (not in sim mode)
+	if (!HM_InSimMode() && HM_UsbIsConnected()) {
 		return EndCondition_t::UsbConnect;
 	}
 

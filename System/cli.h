@@ -11,6 +11,7 @@ extern "C"{
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "circular_buffer.h"
 
 /**
  * Ways the command line can receive information
@@ -32,6 +33,7 @@ typedef enum CliCommand_t {
 	ERASE_FLASH,
 	OFFLOAD,
 	SENSE,
+	SIM,
 	SHUTDOWN,
 	HELP
 } CliCommand_t;
@@ -107,6 +109,12 @@ void cliSendComplete(bool completeSuccess, const char* errMsg);
  * @return Values of CLI options
  */
 CliOptionVals_t cliGetOptions();
+
+/**
+ * @brief Returns current RX buffer from the appropriate medium
+ * @return Pointer to circular buffer
+ */
+CircularBuffer_t* cliGetRxBuffer();
 
 #ifdef __cplusplus
 }

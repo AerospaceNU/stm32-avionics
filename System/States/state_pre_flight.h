@@ -35,6 +35,7 @@ class PreFlightState : public State {
 
 		uint32_t transitionResetTimer;
 		double minPosZ = 1000000;
+		bool simModeStarted = false;
 
 		bool gpsTimestamp;
 

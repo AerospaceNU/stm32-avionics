@@ -63,6 +63,9 @@ void Scheduler::run(void) {
         // Visually show how fast scheduler is running using LED
         HM_LedToggle(1);
 
+        // Refresh watchdog
+        HM_IWDG_Refresh();
+
         // Cleanup current state and initialize next state if changing states
         if (pNextState != pCurrentState_) {
         	if (pCurrentState_) pCurrentState_->cleanup();
@@ -121,6 +124,8 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 			return StateId::CliOffload;
 		case EndCondition_t::SenseCommand:
 			return StateId::CliSense;
+		case EndCondition_t::SimCommand:
+			return StateId::PreFlight;
 		case EndCondition_t::ShutdownCommand:
 			return StateId::Shutdown;
 		default:
@@ -178,6 +183,7 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 	case StateId::PostFlight:
 		switch(endCondition) {
 		case EndCondition_t::UsbConnect:
+		case EndCondition_t::CliCommandComplete:
 			return StateId::CliMain;
 		default:
 			break;

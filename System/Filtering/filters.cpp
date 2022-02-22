@@ -51,7 +51,7 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
 	double tempRef = cliGetConfigs()->groundTemperatureC + 273.15; // C to K
 	double elevRef = cliGetConfigs()->groundElevationM;
 	double presAvg = (curSensorVals->baro1_pres + curSensorVals->baro2_pres) / 2;
-	double baroAlt = (tempRef / lapseRate) * (1 - pow(presAvg / presRef, R_DRY_AIR * lapseRate / G_ACCEL_EARTH)) + elevRef;
+	double baroAlt = fabs(presAvg) < 0.001 ? 0 : (tempRef / lapseRate) * (1 - pow(presAvg / presRef, R_DRY_AIR * lapseRate / G_ACCEL_EARTH)) + elevRef;
 
 	// Kalman filtering, assuming Z is always up
 	// TODO rotate Z by orientation

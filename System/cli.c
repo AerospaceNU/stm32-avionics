@@ -32,6 +32,7 @@ static struct option longOptions[] = {
 		{"erase", no_argument, &primaryCommand, ERASE_FLASH},
 		{"help", no_argument, &primaryCommand, HELP},
 		{"offload", no_argument, &primaryCommand, OFFLOAD},
+		{"sim", no_argument, &primaryCommand, SIM},
 		{"sense", no_argument, &primaryCommand, SENSE},
 		{"shutdown", no_argument, &primaryCommand, SHUTDOWN},
 		{0, 0, 0, 0}
@@ -67,7 +68,12 @@ CliCommand_t cliParse(CliComms_t commsType) {
 	case CLI_RADIO:
 		break;
 	case CLI_USB: {
+		// Read buffer, flush if full (likely bad inputs), and copy to input buffer
 		bytesRead = HM_UsbGetRxBuffer()->count; // Each element 1 byte
+		if (bytesRead == HM_UsbGetRxBuffer()->capacity) {
+			cbFlush(HM_UsbGetRxBuffer());
+			bytesRead = 0;
+		}
 		cbPeek(HM_UsbGetRxBuffer(), inputBuffer, NULL);
 		break;
 	}
@@ -236,4 +242,17 @@ void cliSendComplete(bool completeSuccess, const char* errMsg) {
 
 CliOptionVals_t cliGetOptions() {
 	return cliOptionVals;
+}
+
+CircularBuffer_t* cliGetRxBuffer() {
+	switch(lastCommsType) {
+	case CLI_BLUETOOTH:
+		return NULL;
+	case CLI_RADIO:
+		return NULL;
+	case CLI_USB:
+		return HM_UsbGetRxBuffer();
+	default:
+		return NULL;
+	}
 }

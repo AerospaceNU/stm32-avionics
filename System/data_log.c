@@ -299,7 +299,9 @@ uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata, bo
 	HM_FlashReadStart(readAddress, maxBytes, pdata);
 	// If the last sector has been passed, return only the bytes that count
 	if ((readAddress + maxBytes) > FLASH_SECTOR_BYTES * (lastSector + 1)) {
-		return (lastSector + 1) * FLASH_SECTOR_BYTES - readAddress;
+		uint32_t bytesRead = (lastSector + 1) * FLASH_SECTOR_BYTES - readAddress;
+		readOffset += bytesRead;
+		return bytesRead;
 	}
 	// If all bytes are 0xFF, return that none count since that part of the log wasn't written to
 	// Only apply this if the max read bytes is large enough. Otherwise, the 0xFF could be caused by the data
