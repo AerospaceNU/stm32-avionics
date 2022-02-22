@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "dma.h"
 #include "i2c.h"
 #include "spi.h"
 #include "tim.h"
@@ -65,6 +66,9 @@ void PeriphCommonClock_Config(void);
 
 typedef struct __attribute__((__packed__)) {
 	uint8_t packetType;
+	float latitude;
+	float longitude;
+	float gps_alt;
 	double groundPressure;
 	double groundTemp;
 } HeartbeatData_t;
@@ -102,6 +106,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_SPI1_Init();
   MX_SPI3_Init();
   MX_SPI4_Init();
@@ -150,7 +155,10 @@ int main(void)
 		if((i++ >= 100)) {
 			i = 0;
 			memset(packet, 0, sizeof(packet));
-			heartbeat.packetType = 100;
+			heartbeat.packetType = 200;
+			heartbeat.latitude = HM_GetSensorData()->gps_lat;
+			heartbeat.longitude = HM_GetSensorData()->gps_long;
+			heartbeat.gps_alt = HM_GetSensorData()->gps_alt;
 			heartbeat.groundPressure = HM_GetSensorData()->baro1_pres;
 			heartbeat.groundTemp = HM_GetSensorData()->baro1_temp;
 			memcpy(packet, &heartbeat, sizeof(HeartbeatData_t));

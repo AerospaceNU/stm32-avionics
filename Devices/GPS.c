@@ -163,7 +163,6 @@ void gps_RxCpltCallback(void *gps) {
 	GPSCtrl_t *pgps = (GPSCtrl_t*) gps;
 	pgps->data_available = true;
 	pgps->half = true;
-	HAL_UART_Receive_IT(pgps->gps_uart, (uint8_t*) pgps->rx_buff, 4096);
 }
 
 
@@ -181,8 +180,7 @@ void gps_init(GPSCtrl_t *gps) {
 			gps);
 	register_HAL_UART_RxCpltCallback(gps->gps_uart, gps_RxCpltCallback, gps);
 
-	HAL_UART_Receive(gps->gps_uart, (uint8_t*) gps->rx_buff, 4096, 10000);
-//	HAL_UART_Receive_IT(gps->gps_uart, (uint8_t*) gps->rx_buff, 4096);
+	HAL_UART_Receive_DMA(gps->gps_uart, (uint8_t*) gps->rx_buff, 4096);
 
 	uint8_t nmea[16] = {0xB5, // CFG-MSG Header
 						0x62,
