@@ -102,48 +102,6 @@ int main(void)
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
 
-  char output[40];
-  __enable_irq();
-//
-//  S25FLXCtrl_t s25flx1;
-//  S25FLX_init(&s25flx1, &hspi1, GPIOB, GPIO_PIN_0, 0x8000000);
-//
-//  S25FLX_is_connected(&s25flx1);
-//  uint8_t data[] = {10, 10, 10, 10, 10};
-//  uint8_t data2[] = {1,2,3,4,5};
-//  S25FLX_erase_chip_start(&s25flx1);
-//  //while(!S25FLX_is_erase_complete(&s25flx1)) {}
-//  S25FLX_write_start(&s25flx1, 0, 5, data2);
-//  while(!S25FLX_is_write_complete(&s25flx1)) {}
-//  S25FLX_read_start(&s25flx1, 0, 5, data);
-
-  uint32_t srcRows, srcColumns;  /* Temporary variables */
-  arm_status status;
-  srcRows = 6;
-  srcColumns = 6;
-  float32_t A_f32[36] =
-  {
-    /* Const,   numTaps,   blockSize,   numTaps*blockSize */
-    3,3,3,4,1,6,
-	3,5,5,1,4,1,
-	3,5,8,5,0,0,
-	1,2,3,4,4,2,
-	0,0,1,0,0,2,
-	1,2,5,0,0,2,
-  };
-  float32_t ATMAI_f32[36] = {};
-  arm_matrix_instance_f32 ATMA;      /* Matrix A Instance */
-  arm_matrix_instance_f32 ATMAI;  /* Matrix ATMAI(Inverse of ATMA) instance */
-  arm_mat_init_f32(&ATMA, srcRows, srcColumns, A_f32);
-  arm_mat_init_f32(&ATMAI, srcRows, srcColumns, ATMAI_f32);
-
-  const uint32_t start = HAL_GetTick();
-  status = arm_mat_inverse_f32(&ATMA, &ATMAI);
-  status = arm_mat_mult_f32(&ATMA, &ATMAI, &ATMA);
-  const uint32_t dt = HAL_GetTick() - start;
-
-  return dt;
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -155,6 +113,11 @@ int main(void)
 //	  uint8_t b[] = "hello\r\n";
 //	  CDC_Transmit_FS(b, strlen(b));
 
+	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+	  HAL_Delay(1000);
+
+
+	/*
 	for(uint8_t addr = 0; addr < 128; addr++) {
 		uint8_t exists = HAL_I2C_IsDeviceReady(&hi2c1, addr << 1, 10, 50) == HAL_OK;
 		if(exists) {
@@ -169,7 +132,7 @@ int main(void)
 	sprintf(output, "done\n");
 	CDC_Transmit_FS((uint8_t*)output, strlen(output));
 	HAL_Delay(1000);
-
+*/
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
