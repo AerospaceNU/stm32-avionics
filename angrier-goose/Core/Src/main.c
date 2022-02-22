@@ -101,7 +101,8 @@ int main(void)
   MX_TIM1_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+uint8_t value = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -114,6 +115,11 @@ int main(void)
 //	  CDC_Transmit_FS(b, strlen(b));
 
 	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+	  /*while (value < 255) {
+		  htim1.Instance->CCR3 = value;
+		  value += 20;
+		  HAL_Delay (500);
+	  }*/
 	  HAL_Delay(1000);
 
 
