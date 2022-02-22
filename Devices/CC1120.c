@@ -84,6 +84,8 @@ bool cc1120_init(CC1120Ctrl_t* radio) {
 
 	cc1120ForceIdle(radio);
 
+	//cc1120_configGPIO(radio, CC112X_IOCFG2, CC1120_CRC_OK, false);
+
 	radio->initialized = true;
 
 	return true;
@@ -181,12 +183,6 @@ bool cc1120_checkNewPacket(CC1120Ctrl_t* radio){
 	if(rxbytes < 1){
 		return false;
 	}
-	//printf("RX FIFO has %u\n", rxbytes);
-	uint8_t rxfirst = 0x00;
-	uint8_t rxlast = 0x00;
-	cc1120SpiReadReg(radio, CC112X_RXFIRST, &rxfirst, 1);
-	cc1120SpiReadReg(radio, CC112X_RXLAST, &rxlast, 1);
-	//printf("RXFIRST %u TXFIRST %u\n", rxfirst, rxlast);
 
 	//Read GPIO
 	if(HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_RESET){ // PKT_SYNC_RXTX, maybe, should be low when packet RX is done
@@ -223,7 +219,8 @@ bool cc1120_checkNewPacket(CC1120Ctrl_t* radio){
 			cc1120SpiReadRxFifo(radio, &radio->CRC_LQI, 1);
 		}
 
-
+		//printf("Appended CRC? %u GPIO? %u CRCLQI Reg? %u", radio->CRC_LQI & CC112X_LQI_CRC_OK_BM ? 1 : 0,
+				//crc_ok, crclqi);
 
 		return true;
 
@@ -410,25 +407,6 @@ bool manualCalibration(CC1120Ctrl_t* radio) {
 //	reg |= power; // Lower 6 bits are power
 //	cc1120SpiWriteReg(radio, PA_CFG2, &reg, 1);
 //}
-
-enum CC1120_GPIO_CFG {
-	RXFIFO_THR_PKT = 1, // Associated to the RX FIFO. Asserted when the RX FIFO is filled above
-	// FIFO_CFG.FIFO_THR or the end of packet is reached. De-asserted
-	// when the RX FIFO is empty
-
-	// RX: Asserted when sync word has been received and de-asserted at the
-	// end of the packet. Will de-assert when the optional address and/or
-	// length check fails or the RX FIFO overflows/underflows.
-	// TX: Asserted when sync word has been sent, and de-asserted at the end
-	// of the packet. Will de-assert if the TX FIFO underflows/overflows
-	PKT_SYNC_RXTX = 6,
-
-	LNA_PD = 24, // control external LNA. Active low.
-	PA_PD = 25, // External PA, active low
-	RX0TX1_CFG = 26, // 0 in idle or rx, 1 in transmit
-
-	HIGHZ = 48 // High-impedance, if we need this to not do anything
-};
 
 //! Configure a GPIO pin. register should be CC112X_IOCFG3 or CC112X_IOCFG2 or CC112X_IOCFG1 or CC112X_IOCFG0
 //! gpio_config from CC1120_GPIO_CFG, and outputInverted flips the logic of the pin

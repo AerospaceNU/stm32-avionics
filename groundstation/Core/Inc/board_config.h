@@ -15,13 +15,14 @@
 #define HAS_USB
 #define HAS_UART
 #define HAS_SPI
+#define HAS_MS5607
 
 /*
  * Baro Types: (up to 2 baros)
  * 0: No Baro
  * 1: MS5607 over SPI
  */
-// #define BARO_1 0
+#define BARO_1 1
 // #define BARO_2 0
 
 /*

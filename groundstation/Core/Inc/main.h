@@ -59,8 +59,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define ALT1_CS_Pin GPIO_PIN_3
-#define ALT1_CS_GPIO_Port GPIOE
+#define BARO1_CS_Pin GPIO_PIN_3
+#define BARO1_CS_GPIO_Port GPIOE
 #define VAPC_Pin GPIO_PIN_4
 #define VAPC_GPIO_Port GPIOA
 #define LNA433_EN_Pin GPIO_PIN_6
@@ -103,6 +103,7 @@ void Error_Handler(void);
 #define GPS_HUART &huart8
 #define RAD915_HSPI	&hspi1 // 915mhz radio
 #define RAD433_HSPI	&hspi3 // 433mhz radio
+#define BARO1_HSPI &hspi4
 
 #define RAD915_MISO_GPIO_Port GPIOB
 #define RAD915_MISO_Pin GPIO_PIN_4

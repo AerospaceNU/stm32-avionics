@@ -13,7 +13,6 @@ extern "C"{
 #include "filters.h"
 
 typedef struct __attribute__((__packed__)) {
-
 	uint8_t packetType;
 	uint8_t softwareVersion;
 	uint32_t timestampMs;

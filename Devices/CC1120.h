@@ -54,6 +54,28 @@ typedef struct CC1120Ctrl_s{
 	bool initialized;
 }CC1120Ctrl_t;
 
+enum CC1120_GPIO_CFG {
+	CC1120_RXFIFO_THR_PKT = 1, // Associated to the RX FIFO. Asserted when the RX FIFO is filled above
+	// FIFO_CFG.FIFO_THR or the end of packet is reached. De-asserted
+	// when the RX FIFO is empty
+
+	// RX: Asserted when sync word has been received and de-asserted at the
+	// end of the packet. Will de-assert when the optional address and/or
+	// length check fails or the RX FIFO overflows/underflows.
+	// TX: Asserted when sync word has been sent, and de-asserted at the end
+	// of the packet. Will de-assert if the TX FIFO underflows/overflows
+	CC1120_PKT_SYNC_RXTX = 6,
+
+	CC1120_CRC_OK = 7,
+	CC1120_PKT_CRC_OK = 19,
+
+	CC1120_LNA_PD = 24, // control external LNA. Active low.
+	CC1120_PA_PD = 25, // External PA, active low
+	CC1120_RX0TX1_CFG = 26, // 0 in idle or rx, 1 in transmit
+
+	CC1120_HIGHZ = 48 // High-impedance, if we need this to not do anything
+};
+
 /* basic set of access functions */
 uint8_t cc1120SpiReadReg(CC1120Ctrl_t* radio,uint16_t addr, uint8_t *data, uint8_t len);
 uint8_t cc1120GetTxStatus(CC1120Ctrl_t* radio);
@@ -73,6 +95,8 @@ bool cc1120_transmitPacket(CC1120Ctrl_t* radio, uint8_t * payload, uint8_t paylo
 bool cc1120_startRX(CC1120Ctrl_t* radio);
 bool cc1120_checkNewPacket(CC1120Ctrl_t* radio);
 bool cc1120_setFrequency(CC1120Ctrl_t* radio);
+
+void cc1120_configGPIO(CC1120Ctrl_t *radio, uint8_t gpio_register, uint8_t gpio_config, bool outputInverted);
 
 #ifdef  __cplusplus
 }

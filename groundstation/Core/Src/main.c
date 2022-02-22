@@ -1,26 +1,25 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with theWill it go too fast?
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with theWill it go too fast?
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
-#include "dma.h"
 #include "i2c.h"
 #include "spi.h"
 #include "tim.h"
@@ -64,6 +63,12 @@ void PeriphCommonClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+typedef struct __attribute__((__packed__)) {
+	uint8_t packetType;
+	double groundPressure;
+	double groundTemp;
+} HeartbeatData_t;
+
 /* USER CODE END 0 */
 
 /**
@@ -104,74 +109,60 @@ int main(void)
   MX_UART8_Init();
   MX_USB_DEVICE_Init();
   MX_TIM1_Init();
-  MX_DMA_Init();
   MX_ADC3_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
+	//register_HAL_UART_RxCpltCallback(GPS_HUART, callback, NULL);
+	//HAL_UART_Receive(GPS_HUART, line, sizeof(line));
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  HM_HardwareInit();
+	HM_HardwareInit();
 
-  while (1)
+	unsigned int i = 0;
 
- {
+	while (1)
+
+	{
 		HM_RadioUpdate();
 		HM_ReadSensorData();
 
-	  RadioPacket_t *radioPtr = HM_RadioGetRxPtr(RADIO_HW_433);
+		RadioPacket_t *radioPtr = HM_RadioGetRxPtr(RADIO_HW_433);
 
-	if(radioPtr == NULL) continue;
-	//char* buf = "Hell0\n";
+		if (radioPtr == NULL)
+			continue;
 
-
-//	TransmitData_t t = * ((TransmitData_t *) radioPtr);
-//
-//	char * call = t.callsign;
-//	char * ret = "\n";
-
-	//HM_UsbTransmit((uint8_t*)call, 8);
-
-	static uint8_t zeros[48] = {0x0};
-	if(memcmp(zeros, radioPtr->packetRX, 48)) {
+		static uint8_t zeros[48] = { 0x0 };
 		static uint8_t packet[50];
-		memcpy(packet, radioPtr->packetRX, sizeof(TransmitData_t));
-		packet[48] = radioPtr->RSSI;
-		packet[49] = radioPtr->CRC_LQI;
-		HM_UsbTransmit(packet, 50);
-		memset(radioPtr->packetRX, 0, sizeof(TransmitData_t));
-	}
+		static HeartbeatData_t heartbeat;
+		if (memcmp(zeros, radioPtr->packetRX, 48)) {
+			memcpy(packet, radioPtr->packetRX, sizeof(TransmitData_t));
+			packet[48] = radioPtr->RSSI;
+			packet[49] = radioPtr->CRC_LQI;
+			HM_UsbTransmit(packet, 50);
+			memset(radioPtr->packetRX, 0, sizeof(TransmitData_t));
+		}
 
-//	static int i = 0;
-//	if(i++ % 1000/50 == 0) {
-//		uint8_t pGPS[50] = {0};
-//		SensorData_t *data = HM_GetSensorData();
-//		GSData_t gps;
-//		gps.packetType = 200;
-//		gps.gps_lat = data->gps_lat;
-//		gps.gps_long = data->gps_long;
-//		gps.gps_alt = data->gps_alt;
-//		memcpy(pGPS, &gps, sizeof(GSData_t));
-//		HM_UsbTransmit(pGPS, 50);
-//	}
+		// Send barometer ~1x/5sec
+		if((i++ >= 100)) {
+			i = 0;
+			memset(packet, 0, sizeof(packet));
+			heartbeat.packetType = 100;
+			heartbeat.groundPressure = HM_GetSensorData()->baro1_pres;
+			heartbeat.groundTemp = HM_GetSensorData()->baro1_temp;
+			memcpy(packet, &heartbeat, sizeof(HeartbeatData_t));
+			HM_UsbTransmit(packet, 50);
+		}
 
-//	if(radio.CRC_LQI >> 7 == 0) {
-//		call = "CRC err\n";
-//		HM_UsbTransmit((uint8_t*)call, strlen(call));
-//	}
-
-	HAL_Delay(10);
-//	usbTransmit(&t.pos_z, 4);
-//	usbTransmit(&t.vel_z, 4);
-
+		HAL_Delay(10);
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+	}
   /* USER CODE END 3 */
 }
 
@@ -252,7 +243,7 @@ void PeriphCommonClock_Config(void)
   PeriphClkInitStruct.PLL2.PLL2M = 5;
   PeriphClkInitStruct.PLL2.PLL2N = 40;
   PeriphClkInitStruct.PLL2.PLL2P = 2;
-  PeriphClkInitStruct.PLL2.PLL2Q = 40;
+  PeriphClkInitStruct.PLL2.PLL2Q = 2;
   PeriphClkInitStruct.PLL2.PLL2R = 2;
   PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_2;
   PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
@@ -287,11 +278,10 @@ void PeriphCommonClock_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1) {
+	}
   /* USER CODE END Error_Handler_Debug */
 }
 
