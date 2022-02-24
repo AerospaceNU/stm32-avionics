@@ -111,7 +111,7 @@ void parseString(GPSCtrl_t *gps, char line[]) {
 			const struct minmea_date date = {gps->day, gps->month, gps->year};
 			const struct minmea_time time = {gps->hours, gps->minutes, gps->seconds, gps->microseconds};
 
-			if (!minmea_gettime(&ts, &date, &time)) {
+			if (!minmea_gettime(&ts, &date, &time) && gps->year > 2000 && gps->year < 2100) {
 				gps->timestamp = ts.tv_sec;
 			}
 
