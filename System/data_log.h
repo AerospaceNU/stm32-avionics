@@ -17,7 +17,7 @@ extern "C"{
 // Flight metadata shows what data will be logged in what relative location
 typedef struct __attribute__((__packed__)) FlightMetadata {
 	double pressureRef;
-	bool launched;
+	uint8_t launched;
 	uint64_t timestamp;
 } FlightMetadata;
 
@@ -28,9 +28,17 @@ typedef struct __attribute__((__packed__)) FlightMetadata {
 uint32_t data_log_get_last_flight_num();
 
 /**
+ * @brief Return the last flight number that was logged and was launched
+ * @return Last launched flight number
+ */
+uint32_t data_log_get_last_launched_flight_num();
+
+/**
  * @brief Get the metadata from the previous flight and load into the current metadata packet
  */
 void data_log_load_last_stored_flight_metadata();
+
+void data_log_get_flight_metadata(FlightMetadata *metadata, uint8_t flightNum);
 
 FlightMetadata data_log_get_metadata();
 
@@ -82,6 +90,19 @@ void data_log_write(SensorData_t* sensorData, FilterData_t* filterData, uint8_t 
  * @return Number of bytes actually read from the data log
  */
 uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata, bool reset);
+
+/**
+ * @brief Read the timestamp of the last log packet
+ * @param flightNum: Flight number to read.
+ * @return Last timestamp from given flight
+ */
+uint32_t data_log_get_last_flight_timestamp(uint32_t flightNum);
+
+/**
+ * @brief Get current flash usage relative to total flash size
+ * @return integer percentage of flash usage (e.g. 53 == 53% usage)
+ */
+uint8_t data_log_get_flash_usage();
 
 #ifdef __cplusplus
 }

@@ -5,6 +5,21 @@
 
 #include "cli.h"
 #include "hardware_manager.h"
+#include "data_log.h"
+
+static void flash_usage_bar(char *barStr, uint8_t usage, uint8_t totalBarWidth){
+    barStr[0] = '[';
+    int i;
+    for (i = 1; i <= (usage / 100.0) * totalBarWidth; ++i) {
+        barStr[i] = '#';
+    }
+    int k;
+    for (k = i; k <= totalBarWidth; ++k) {
+        barStr[k] = ' ';
+    }
+    barStr[k++] = ']';
+    barStr[k] = '\0';
+}
 
 void CliSenseState::init() {
 	// Send ack of command
@@ -57,6 +72,12 @@ EndCondition_t CliSenseState::run() {
 		sprintf(cliStr, " %i", data->pyro_continuity[i]);
 		cliSend(cliStr);
 	}
+	char flashStr[43];
+	uint8_t flash_usage_percent = data_log_get_flash_usage();
+	flash_usage_bar(flashStr, flash_usage_percent, 40);
+	sprintf(cliStr, "\r\nCurrent Flash Usage: %u%%\r\n", flash_usage_percent);
+	cliSend(cliStr);
+	cliSend(flashStr);
 	sprintf(cliStr, "\r\n");
 	cliSend(cliStr);
 
