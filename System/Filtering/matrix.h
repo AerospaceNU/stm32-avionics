@@ -31,7 +31,7 @@ template <int Rows, int Cols>
 class Matrix {
 public:
 	Matrix() {
-		  arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray);
+		arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray);
 	}
 
 	template <int N>
@@ -60,6 +60,12 @@ public:
 		return ret;
 	}
 
+	float32_t operator()(const int row, const int col) {
+		// Offset start of backing array by the size of a row
+		// times however many rows we want to go to
+		// plus the individual column index
+		return m_backingArray[row * Cols + col];
+	}
 
 	Matrix<Rows, Rows> inverse() {
 		static_assert(Rows == Cols, "Matrix must be square to invert!");
@@ -68,8 +74,44 @@ public:
 		return ret;
 	}
 
-	arm_matrix_instance_f32 m_matrix = {};
-	float32_t m_backingArray[Rows * Cols] = {};
+	float32_t norm() {
+		static_assert(Rows == 1, "Must be a single-row vector");
+		float32_t square_sum;
+		arm_power_f32(m_backingArray, Cols, &square_sum);
+		return sqrt(square_sum);
+	}
+
+	static Matrix<Rows, Rows> identity() {
+		static_assert(Rows == Cols, "Identity matrix must be square!");
+		Matrix<Rows, Rows> ret = {};
+		float32_t ident[Rows][Rows] = {0.0};
+		for (int i = 0; i < Rows; ++i) {
+			ident[i][i] = 1.0;
+		}
+		memcpy(ret.m_backingArray, &ident, sizeof(ident));
+		arm_mat_init_f32(&ret.m_matrix, Rows, Rows, ret.m_backingArray);
+		return ret;
+	}
+
+	static Matrix<Rows, Cols> zeroes() {
+		Matrix<Rows, Cols> ret = {};
+		float32_t zeroes[Rows][Cols] = {0.0};
+		memcpy(ret.m_backingArray, &zeroes, sizeof(zeroes));
+		arm_mat_init_f32(&ret.m_matrix, Rows, Cols, ret.m_backingArray);
+		return ret;
+	}
+
+	float32_t trace() {
+		static_assert(Rows == Cols, "Matrix must be square to find trace!");
+		float32_t tr = 0;
+		for (int i = 0; i < Rows; ++i) {
+			tr += m_backingArray[i * Cols];
+		}
+		return tr;
+	}
+
+	arm_matrix_instance_f32 m_matrix{};
+	float32_t m_backingArray[Rows * Cols] = {0};
 };
 
 
