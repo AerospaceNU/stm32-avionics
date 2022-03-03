@@ -33,7 +33,7 @@ EndCondition_t PreFlightState::run() {
 
 	// In sim mode, don't continue until at least 1 data point has arrived
 	if (HM_InSimMode() && !simModeStarted) {
-		if (cliGetRxBuffer()->count >= sizeof(SensorData_t)) {
+		if (cbCount(cliGetRxBuffer()) >= sizeof(SensorData_t)) {
 			simModeStarted = true;
 		}
 		else {

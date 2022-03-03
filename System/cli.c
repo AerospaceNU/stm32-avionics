@@ -69,8 +69,8 @@ CliCommand_t cliParse(CliComms_t commsType) {
 		break;
 	case CLI_USB: {
 		// Read buffer, flush if full (likely bad inputs), and copy to input buffer
-		bytesRead = HM_UsbGetRxBuffer()->count; // Each element 1 byte
-		if (bytesRead == HM_UsbGetRxBuffer()->capacity) {
+		bytesRead = cbCount(HM_UsbGetRxBuffer()); // Each element 1 byte
+		if (cbFull(HM_UsbGetRxBuffer())) {
 			cbFlush(HM_UsbGetRxBuffer());
 			bytesRead = 0;
 		}
