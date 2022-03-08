@@ -23,7 +23,7 @@ EndCondition_t PostFlightState::run() {
 	// Check if data is still coming in (sim mode)
 	uint32_t curTime = HM_Millis();
 	if (HM_InSimMode()) {
-		if (cliGetRxBuffer()->count >= sizeof(SensorData_t)) {
+		if (cbCount(cliGetRxBuffer()) >= sizeof(SensorData_t)) {
 			lastSimDataTime = curTime;
 		}
 		if (curTime - lastSimDataTime > SIM_NO_DATA_TIMEOUT_MS) {

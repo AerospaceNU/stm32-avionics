@@ -13,11 +13,9 @@ void cbInit(CircularBuffer_t *cb, void* buffer, size_t capacity, size_t size) {
 	}
 
 	cb->buffer = buffer;
-	cb->capacity = capacity;
 	cb->size = size;
 
-	cb->buffer_end = cb->buffer + cb->capacity * cb->size;
-	cb->count = 0;
+	cb->buffer_end = cb->buffer + capacity * cb->size;
 	cb->head = cb->buffer;
 	cb->tail = cb->buffer;
 }
@@ -27,52 +25,76 @@ void cbPeek(CircularBuffer_t *cb, void* outputBuffer, size_t* numElements) {
 	if (cb == NULL || outputBuffer == NULL)
 		return;
 
+	size_t count = cbCount(cb);
 	if (numElements == NULL)
-		numElements = &(cb->count);
-	else if (*numElements > cb->count)
-		*numElements = cb->count;
+		numElements = &(count);
+	else if (*numElements > count)
+		*numElements = count;
 
 	if (cb->tail + *numElements <= cb->buffer_end) {
 		// One copy to outputBuffer needed
-		memcpy(outputBuffer, cb->tail, *numElements);
+		memcpy(outputBuffer, cb->tail, *numElements * cb->size);
 	}
 	else {
 		// Two copies to outputBuffer needed
 		size_t bytesToEnd = cb->buffer_end - cb->tail;
 		memcpy(outputBuffer, cb->tail, bytesToEnd);
-		memcpy(outputBuffer + bytesToEnd, cb->buffer, *numElements - bytesToEnd);
+		memcpy(outputBuffer + bytesToEnd, cb->buffer, *numElements * cb->size - bytesToEnd);
 	}
+}
+
+size_t cbCount(CircularBuffer_t *cb) {
+	size_t ret_bytes = 0;
+	if (cb->head < cb->tail) {
+		ret_bytes += cb->buffer_end - cb->tail + cb->head - cb->buffer;
+	}
+	else {
+		ret_bytes = cb->head - cb->tail;
+	}
+	return ret_bytes / cb->size;
 }
 
 bool cbEnqueue(CircularBuffer_t *cb, const void *item) {
 
-	// Don't let circular buffer overflow
-    if(cb->count == cb->capacity)
-        return false;
-
-    memcpy(cb->head, item, cb->size);
-    cb->head += cb->size;
-    if(cb->head == cb->buffer_end) {
-    	cb->head = cb->buffer;
+	// Figure out what next spot to fill in buffer is
+	void* next = cb->head + cb->size;
+    if(next >= cb->buffer_end) {
+        next = cb->buffer;
     }
-    cb->count++;
+
+    // Don't let buffer overflow
+    if (next == cb->tail) {
+    	return false;
+    }
+
+    // Copy item to buffer
+    memcpy(cb->head, item, cb->size);
+    cb->head = next;
     return true;
 }
 
 void cbDequeue(CircularBuffer_t *cb, size_t numElements) {
 
-	if (numElements > cb->count) {
-		numElements = cb->count;
+	size_t count = cbCount(cb);
+	if (numElements > count) {
+		numElements = count;
 	}
 
     cb->tail += cb->size * numElements;
     if(cb->tail >= cb->buffer_end) {
         cb->tail = cb->buffer + (cb->tail - cb->buffer_end);
     }
-	cb->count -= numElements;
+}
+
+bool cbFull(CircularBuffer_t* cb) {
+	void* next = cb->head + cb->size;
+	if(next >= cb->buffer_end) {
+		next = cb->buffer;
+	}
+
+	return next == cb->tail;
 }
 
 void cbFlush(CircularBuffer_t *cb) {
 	cb->tail = cb->head;
-	cb->count = 0;
 }

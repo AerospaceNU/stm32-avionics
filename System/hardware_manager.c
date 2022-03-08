@@ -348,10 +348,10 @@ void HM_IWDG_Refresh() {
 }
 
 static void HM_SimReadSensorData() {
-	size_t buffCount = simRxBuffer->count; // This might change if in middle of reception, so use consistently across function
+	size_t buffCount = cbCount(simRxBuffer); // This might change if in middle of reception, so use consistently across function
 
 	// If buffer full, throw everything away since it's probably bad
-	if (buffCount == simRxBuffer->capacity) {
+	if (cbFull(simRxBuffer)) {
 		cbFlush(simRxBuffer);
 	}
 
