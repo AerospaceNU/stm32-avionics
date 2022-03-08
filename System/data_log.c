@@ -14,6 +14,8 @@ const uint8_t BOARD_VERSION = 0xff;
 #define BOARD_ID 0x01
 #define SOFTWARE_VERSION 0x01
 #define FLASH_TIMEOUT 500
+#define MAX_LOG_PACKETS \
+  FLASH_SECTOR_BYTES / sizeof(LogData)  // 1 sector's worth of log data
 
 static uint32_t flightNum = 0;
 static uint32_t curSectorNum;
@@ -42,12 +44,14 @@ typedef struct __attribute__((__packed__)) LogData {
   uint8_t state;
 } LogData;
 
-static LogData logPacket;
+static LogData logPackets[MAX_LOG_PACKETS];
+static CircularBuffer_t logPacketBuffer;
+
 static FlightMetadata metadataPacket;
 
-static const uint8_t kLogDataSize = sizeof(LogData);
+static const uint16_t kLogDataSize = sizeof(LogData);
 
-static const uint8_t kFlightMetadataSize = sizeof(FlightMetadata);
+static const uint16_t kFlightMetadataSize = sizeof(FlightMetadata);
 
 static uint32_t data_log_get_last_flight_num_type(bool launched) {
   uint32_t lastFlightNum = 0;
@@ -220,6 +224,9 @@ FlightMetadata data_log_get_metadata() { return metadataPacket; }
 void data_log_assign_flight() {
   uint32_t waitStartMS = 0;
 
+  // Initialize circular buffer of packets
+  cbInit(&logPacketBuffer, logPackets, MAX_LOG_PACKETS, kLogDataSize);
+
   // Assign flight number
   flightNum = data_log_get_last_flight_num() + 1;
   if (flightNum == 1) {
@@ -313,8 +320,12 @@ void data_log_copy_metadata(FlightMetadata *oldMetadataPacket) {
 void data_log_write(SensorData_t *sensorData, FilterData_t *filterData,
                     uint8_t state) {
   if (flightNum > 0) {
+    // Check if current sector is beyond flash capacity. If so, stop
+    if (curSectorNum >= FLASH_SIZE_BYTES / FLASH_SECTOR_BYTES) return;
+
     uint32_t waitStartMS = 0;
 
+    LogData logPacket;
     logPacket.timestamp_s = sensorData->timestamp_s;
     logPacket.timestamp_us = sensorData->timestamp_us;
     logPacket.imu1_accel_x_raw = sensorData->imu1_accel_x_raw;
@@ -365,48 +376,67 @@ void data_log_write(SensorData_t *sensorData, FilterData_t *filterData,
     logPacket.qw = filterData->qw;
     logPacket.state = state;
 
-    // Find what pages to write packet on
-    uint32_t second_page_bytes =
-        (curWriteAddress + kLogDataSize) % FLASH_PAGE_SIZE_BYTES;
-    if (second_page_bytes >= kLogDataSize) second_page_bytes = 0;
-    uint32_t first_page_bytes = kLogDataSize - second_page_bytes;
+    // Add newest log packet to buffer, overriding oldest packet
+    if (cbFull(&logPacketBuffer)) {
+      cbDequeue(&logPacketBuffer, 1);
+    }
+    cbEnqueue(&logPacketBuffer, &logPacket);
 
-    // Check if a new sector has been entered. If so, record in file system and
-    // erase the sector
-    if ((curWriteAddress + kLogDataSize) / FLASH_SECTOR_BYTES > curSectorNum) {
-      curSectorNum++;
-      // Write flight number and sector to metadata
-      uint8_t flightTxBuff[2] = {(flightNum >> 8) & 0xFF, flightNum & 0xFF};
-      HM_FlashWriteStart(curSectorNum * 2, 2, flightTxBuff);
-      waitStartMS = HM_Millis();
-      while (!HM_FlashIsWriteComplete() &&
-             HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
-      }
-      // Erase the upcoming sector
-      HM_FlashEraseSectorStart(curSectorNum);
-      waitStartMS = HM_Millis();
-      while (!HM_FlashIsEraseComplete() &&
-             HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+    static bool erasing = false;
+    if (erasing) {
+      // If currently erasing, check if erase is complete
+      erasing = !HM_FlashIsEraseComplete();
+    } else {
+      // Check if a new sector has been entered. If so, record in file system
+      // and start erasing the sector
+      if ((curWriteAddress + kLogDataSize) / FLASH_SECTOR_BYTES >
+          curSectorNum) {
+        curSectorNum++;
+        // Write flight number and sector to metadata
+        uint8_t flightTxBuff[2] = {(flightNum >> 8) & 0xFF, flightNum & 0xFF};
+        HM_FlashWriteStart(curSectorNum * 2, 2, flightTxBuff);
+        waitStartMS = HM_Millis();
+        while (!HM_FlashIsWriteComplete() &&
+               HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+        }
+        // Start erasing the upcoming sector
+        HM_FlashEraseSectorStart(curSectorNum);
+        erasing = true;
+      } else {
+        // Write whole log buffer. No need to worry about erasing future
+        // sector since log buffer is only 1 sector long.
+        LogData dequeuedData;
+        size_t numElements = 1;
+        cbPeek(&logPacketBuffer, &dequeuedData, &numElements);
+        while (numElements != 0) {
+          cbDequeue(&logPacketBuffer, 1);
+          // Find what pages to write packet on
+          uint32_t second_page_bytes =
+              (curWriteAddress + kLogDataSize) % FLASH_PAGE_SIZE_BYTES;
+          if (second_page_bytes >= kLogDataSize) second_page_bytes = 0;
+          uint32_t first_page_bytes = kLogDataSize - second_page_bytes;
+          // Write to first page and, if necessary, second page
+          HM_FlashWriteStart(curWriteAddress, first_page_bytes,
+                             (uint8_t *)&dequeuedData);
+          waitStartMS = HM_Millis();
+          while (!HM_FlashIsWriteComplete() &&
+                 HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+          }
+          if (second_page_bytes > 0) {
+            HM_FlashWriteStart(curWriteAddress + first_page_bytes,
+                               second_page_bytes,
+                               (uint8_t *)&dequeuedData + first_page_bytes);
+            waitStartMS = HM_Millis();
+            while (!HM_FlashIsWriteComplete() &&
+                   HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+            }
+          }
+          // Increment write address to be next address to write to
+          curWriteAddress += kLogDataSize;
+          cbPeek(&logPacketBuffer, &dequeuedData, &numElements);
+        }
       }
     }
-
-    // Write to first page and, if necessary, second page
-    HM_FlashWriteStart(curWriteAddress, first_page_bytes,
-                       (uint8_t *)&logPacket);
-    waitStartMS = HM_Millis();
-    while (!HM_FlashIsWriteComplete() &&
-           HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
-    }
-    if (second_page_bytes > 0) {
-      HM_FlashWriteStart(curWriteAddress + first_page_bytes, second_page_bytes,
-                         (uint8_t *)&logPacket + first_page_bytes);
-      waitStartMS = HM_Millis();
-      while (!HM_FlashIsWriteComplete() &&
-             HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
-      }
-    }
-    // Increment write address to be next address to write to
-    curWriteAddress += kLogDataSize;
   }
 }
 
