@@ -360,6 +360,8 @@ uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata, bo
 	static uint32_t readOffset;
 	// Find sectors of flight num using metadata if no offset specified
 	if ((flightNum != lastFlightNum) || reset) {
+		lastFlightNum = flightNum;
+		readOffset = 0;
 		data_log_get_flight_sectors(flightNum, &firstSector, &lastSector);
 	}
 
