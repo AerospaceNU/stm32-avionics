@@ -1,4 +1,3 @@
-
 #include "hardware_manager.h"
 #include "main.h"
 #include "LSM9DS1.h"
@@ -79,7 +78,7 @@ bool hardwareStatus[NUM_HARDWARE];
 
 /* Hardware manager sim mode trackers */
 static bool inSim = false;
-static CircularBuffer_t* simRxBuffer = NULL;
+static CircularBuffer_t *simRxBuffer = NULL;
 
 void HM_HardwareInit() {
 
@@ -111,9 +110,18 @@ void HM_HardwareInit() {
 	sensorProperties.imu2_accel_fs = 156.96; // 16 G * 9.81 mpsps/G
 #else
 	/* ICM20948 IMU 2 */
-	sensorProperties.imu2_accel_fs = 0;
+	sensorProperties.imu2_accel_fs = 16 * 9.81; // 16 gees FS
 
-	ICM20948_init(&icm20948, accel_config, gyro_config);
+	/* ICM20948 IMU 2 */
+	icm20948.spiconfig.hspi = IMU2_HSPI;
+	icm20948.spiconfig.port = IMU2_CS_GPIO_Port;
+	icm20948.spiconfig.pin = IMU2_CS_Pin;
+	ICM_20948_ACCEL_CONFIG_t icm20948AccelConfig = { .ACCEL_FS_SEL = 3,
+			.ACCEL_FCHOICE = 1, .ACCEL_DLPFCFG = 0, .reserved_0 = 0 };
+	ICM_20948_GYRO_CONFIG_t icm20948GyroConfig = { .GYRO_FS_SEL = 3,
+			.GYRO_FCHOICE = 1, .GYRO_DLPFCFG = 0, .reserved_0 = 0 };
+	hardwareStatus[IMU2] = ICM20948_init(&icm20948, icm20948AccelConfig,
+			icm20948GyroConfig);
 #endif /* FCB_VERSION */
 
 	/* MS5607 Barometer 1 */
@@ -147,22 +155,23 @@ void HM_HardwareInit() {
 	buzzerInit(&buzzer, BUZZER_HTIM, BUZZER_CHANNEL, 500);
 
 	/* ADCs */
-    // Battery voltage - 0 min, 36.3 max (110k/10k*3.3V)
-    // Pyros - 0 min, 36.3 max (110k/10k*3.3V)
-    static const float voltageDividerMax = 3.3 * (110.0 / 10.0);
+	// Battery voltage - 0 min, 36.3 max (110k/10k*3.3V)
+	// Pyros - 0 min, 36.3 max (110k/10k*3.3V)
+	static const float voltageDividerMax = 3.3 * (110.0 / 10.0);
 #if (FCB_VERSION <= 0)
     adcInit(&adcBatteryVoltage, VBAT_ADC, VBAT_ADC_RANK, 0, voltageDividerMax, true);
     adcInit(&adcCurrent, CURRENT_ADC, CURRENT_ADC_RANK, -12.5, 17.5, true);
 #endif /* FCB_VERSION */
-    adcInit(&adcPyro[0], PYRO1_ADC, PYRO1_ADC_RANK, 0, voltageDividerMax, true);
-    adcInit(&adcPyro[1], PYRO2_ADC, PYRO2_ADC_RANK, 0, voltageDividerMax, true);
-    adcInit(&adcPyro[2], PYRO3_ADC, PYRO3_ADC_RANK, 0, voltageDividerMax, true);
-    adcInit(&adcPyro[3], PYRO4_ADC, PYRO4_ADC_RANK, 0, voltageDividerMax, true);
-    adcInit(&adcPyro[4], PYRO5_ADC, PYRO5_ADC_RANK, 0, voltageDividerMax, true);
-    adcInit(&adcPyro[5], PYRO6_ADC, PYRO6_ADC_RANK, 0, voltageDividerMax, true);
+	adcInit(&adcPyro[0], PYRO1_ADC, PYRO1_ADC_RANK, 0, voltageDividerMax, true);
+	adcInit(&adcPyro[1], PYRO2_ADC, PYRO2_ADC_RANK, 0, voltageDividerMax, true);
+	adcInit(&adcPyro[2], PYRO3_ADC, PYRO3_ADC_RANK, 0, voltageDividerMax, true);
+	adcInit(&adcPyro[3], PYRO4_ADC, PYRO4_ADC_RANK, 0, voltageDividerMax, true);
+	adcInit(&adcPyro[4], PYRO5_ADC, PYRO5_ADC_RANK, 0, voltageDividerMax, true);
+	adcInit(&adcPyro[5], PYRO6_ADC, PYRO6_ADC_RANK, 0, voltageDividerMax, true);
 
 	/* Flash */
-	S25FLX_init(&s25flx1, FLASH_HSPI, FLASH_CS_GPIO_Port, FLASH_CS_Pin, FLASH_SIZE_BYTES);
+	S25FLX_init(&s25flx1, FLASH_HSPI, FLASH_CS_GPIO_Port, FLASH_CS_Pin,
+			FLASH_SIZE_BYTES);
 
 	/* GPS */
 	gps.gps_uart = GPS_HUART;
@@ -220,7 +229,6 @@ bool HM_FlashEraseChipStart() {
 	return S25FLX_erase_chip_start(&s25flx1);
 }
 
-
 bool HM_FlashIsReadComplete() {
 #ifdef USE_S25FLx_DMA
 	return S25FLX_is_read_complete(&s25flx1);
@@ -250,7 +258,7 @@ void HM_BuzzerStop() {
 }
 
 void HM_ServoSetAngle(int servoNum, float degrees) {
-	switch(servoNum) {
+	switch (servoNum) {
 	case 1:
 		servoSetAngle(&servo1, degrees);
 		break;
@@ -269,7 +277,7 @@ void HM_ServoSetAngle(int servoNum, float degrees) {
 }
 
 void HM_LedSet(int ledNum, bool set) {
-	switch(ledNum) {
+	switch (ledNum) {
 	case 1:
 		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, set);
 		break;
@@ -279,7 +287,7 @@ void HM_LedSet(int ledNum, bool set) {
 }
 
 void HM_LedToggle(int ledNum) {
-	switch(ledNum) {
+	switch (ledNum) {
 	case 1:
 		HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
 		break;
@@ -302,7 +310,7 @@ bool HM_UsbIsConnected() {
 	return usbIsConnected();
 }
 
-bool HM_UsbTransmit(uint8_t* data, uint16_t numBytes) {
+bool HM_UsbTransmit(uint8_t *data, uint16_t numBytes) {
 	return usbTransmit(data, numBytes);
 }
 
@@ -310,7 +318,7 @@ CircularBuffer_t* HM_UsbGetRxBuffer() {
 	return usbGetRxBuffer();
 }
 
-bool HM_BluetoothSend(const uint8_t* data, uint16_t numBytes) {
+bool HM_BluetoothSend(const uint8_t *data, uint16_t numBytes) {
 	// TODO: Implement HM_BluetoothSend
 	return false;
 }
@@ -489,10 +497,13 @@ void HM_ReadSensorData() {
 #endif /* FCB_VERSION */
 		}
 		if (bPyroContinuitySampling) {
-			for (int i = 0; i < sizeof(sensorData.pyro_continuity) / sizeof(bool); i++) {
+			for (int i = 0;
+					i < sizeof(sensorData.pyro_continuity) / sizeof(bool);
+					i++) {
 				adcStartSingleRead(&adcPyro[i]);
 				if (adcGetValue(&adcPyro[i], &adcVal, 5))
-					sensorData.pyro_continuity[i] = adcVal > PYRO_CONTINUITY_THRESHOLD;
+					sensorData.pyro_continuity[i] = adcVal
+							> PYRO_CONTINUITY_THRESHOLD;
 				else
 					sensorData.pyro_continuity[i] = false;
 			}
@@ -517,12 +528,12 @@ SensorProperties_t* HM_GetSensorProperties() {
 	return &sensorProperties;
 }
 
-void HM_EnableSimMode(CircularBuffer_t* rxBuffer) {
+void HM_EnableSimMode(CircularBuffer_t *rxBuffer) {
 	inSim = true;
 	simRxBuffer = rxBuffer;
 }
 
-void HM_DisableSimMode(CircularBuffer_t* rxBuffer) {
+void HM_DisableSimMode(CircularBuffer_t *rxBuffer) {
 	inSim = false;
 }
 
