@@ -9,6 +9,7 @@
 #include "adc_device.h"
 #include "S25FLx.h"
 #include "CC1120.h"
+#include "ICM20948.h"
 #include "GPS.h"
 #include "usb.h"
 #include "iwdg.h"
@@ -23,6 +24,7 @@
 /* IMUs */
 static LSM9DS1Ctrl_t lsm9ds1_1;
 static LSM9DS1Ctrl_t lsm9ds1_2;
+static ICM20948Ctrl_t icm20948;
 
 /* Barometers */
 static MS5607Ctrl_t ms5607_1;
@@ -110,6 +112,8 @@ void HM_HardwareInit() {
 #else
 	/* ICM20948 IMU 2 */
 	sensorProperties.imu2_accel_fs = 0;
+
+	ICM20948_init(&icm20948, accel_config, gyro_config);
 #endif /* FCB_VERSION */
 
 	/* MS5607 Barometer 1 */
