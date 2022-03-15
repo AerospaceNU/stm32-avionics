@@ -21,7 +21,7 @@ class MainDescentState : public State {
 		void cleanup(void) override;
 
 	private:
-		static constexpr double kTouchdownZPosChangeThreshold = 10; // meters
+		static constexpr double kTouchdownZPosChangeThreshold = 3; // meters
 		static constexpr uint32_t kTransitionResetTimeThreshold = 5000; // 5 second transition timer
 
 		uint32_t transitionResetTimer;

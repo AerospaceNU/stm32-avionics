@@ -1,5 +1,5 @@
 
-#include "state_coast_ascent.h"
+#include "state_ascent.h"
 
 #include "data_log.h"
 #include "state_log.h"
@@ -7,13 +7,14 @@
 #include "filters.h"
 #include "hardware_manager.h"
 
-void CoastAscentState::init() {
-	transitionResetTimer = HM_Millis();
+void AscentState::init() {
+	data_log_set_launched_metadata(); // Write launched status
+	data_log_write_metadata();
 	maxPosZ = 0;
 	state_log_write(this->getID());
 }
 
-EndCondition_t CoastAscentState::run() {
+EndCondition_t AscentState::run() {
 	// Collect, filter, log, and log all data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
@@ -30,19 +31,15 @@ EndCondition_t CoastAscentState::run() {
 		maxPosZ = filterData->pos_z;
 	}
 
-	// Detect apogee if under max z position for specified amount of time
-	if (filterData->pos_z < maxPosZ) {
-		if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
-			return EndCondition_t::Apogee;
-		}
-	} else {
-		transitionResetTimer = HM_Millis();
+	// Detect apogee if under max z position and negative velocity
+	if (maxPosZ - filterData->pos_z > kPosDiffThreshold && filterData->vel_z < 0) {
+		return EndCondition_t::Apogee;
 	}
 
 	return EndCondition_t::NoChange;
 }
 
-void CoastAscentState::cleanup() {
+void AscentState::cleanup() {
 	// TODO: Transmit apogee
 }
 

@@ -444,6 +444,6 @@ uint8_t data_log_get_flash_usage() {
 		data_log_get_last_flight_num();
 		curWriteAddress = curSectorNum * FLASH_SECTOR_BYTES + FLIGHT_METADATA_PAGES * FLASH_PAGE_SIZE_BYTES;
 	}
-	uint8_t usage = (uint32_t)(curWriteAddress / (FLASH_SIZE_BYTES / 100.0));
+	uint8_t usage = (uint8_t)(curWriteAddress / (FLASH_SIZE_BYTES / 100.0));
 	return usage;
 }

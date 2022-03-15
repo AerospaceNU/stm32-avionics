@@ -30,3 +30,7 @@ const AltitudeKalmanOutput_t AltitudeKalman::GetXhat() const {
 void AltitudeKalman::SetDt(double dt) {
     m_dt = dt;
 }
+
+void AltitudeKalman::Reset() {
+	xHat = {0, 0};
+}

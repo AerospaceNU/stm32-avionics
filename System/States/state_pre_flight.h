@@ -30,11 +30,13 @@ class PreFlightState : public State {
 		int bufferCounter = 0;
 
 		static constexpr double kLaunchAccelThreshold = 20.0; // m/s**2
-		static constexpr double kLaunchPosZDiffThreshold = 1.0; // m
-		static constexpr uint32_t kTransitionResetTimeThreshold = 500; // 500 ms transition timer
+		static constexpr double kLaunchPosZDiffFailsafeThreshold = 100.0; // m failsafe
+		static constexpr uint32_t kTransitionResetTimeThreshold = 150; // 150 ms transition timer
 
 		uint32_t transitionResetTimer;
-		double minPosZ = 1000000;
+
+		uint32_t prevPressureLogTime;
+
 		bool simModeStarted = false;
 
 		bool gpsTimestamp;

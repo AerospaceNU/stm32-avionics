@@ -5,6 +5,7 @@
 #include "filters.h"
 
 #include <cmath>
+#include <string.h>
 
 #include "altitude_kalman.h"
 #include "cli.h"
@@ -13,6 +14,15 @@
 #define G_ACCEL_EARTH 9.80665 // m/s**2
 
 #define ACCEL_SWITCH_MULTIPLE 0.9 // How close IMU accel should be to fullscale before switching to higher-range accelerometer
+#define kPrevPresMedianCount 10
+#define kPrevPresCount       10
+
+static double runningPresMedians[kPrevPresMedianCount];
+static CircularBuffer_t runningPresMediansBuffer;
+static uint8_t runningPresMedianCount;
+static double runningPres[kPrevPresCount];
+static CircularBuffer_t runningPresBuffer;
+static uint8_t runningPresCount;
 
 static FilterData_t filterData;
 static double presRef = 1.0; // atm
@@ -21,7 +31,13 @@ static double presRef = 1.0; // atm
 static AltitudeKalman kalman {0.015};
 
 void filterInit(double dt) {
+	kalman.Reset();
 	kalman.SetDt(dt);
+	// Initialize circular buffers for running medians/running pressure values
+	cbInit(&runningPresMediansBuffer, runningPresMedians, kPrevPresMedianCount, sizeof(double));
+	cbInit(&runningPresBuffer, runningPres, kPrevPresCount, sizeof(double));
+	runningPresMedianCount = 0;
+	runningPresCount = 0;
 }
 
 static void filterAccels(SensorData_t* curSensorVals, SensorProperties_t* sensorProperties) {
@@ -73,6 +89,75 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
 
 
 }
+
+static double median(double *input, uint8_t size) {
+	double values[size];
+	// Copy array so that we don't modify actual values
+	memcpy(&values, input, size * sizeof(double));
+	// Insertion sort
+	uint8_t i, j;
+	double tmp;
+	for (i = 1; i < size; ++i) {
+		tmp = values[i];
+		j = i - 1;
+		while (j >= 0 && tmp <= values[j]) {
+			values[j + 1] = values[j];
+			--j;
+		}
+		values[j + 1] = tmp;
+	}
+
+	if (size % 2 == 0) {
+		return (values[size / 2 - 1] + values[size / 2]) / 2.0;
+	} else {
+		return values[size / 2];
+	}
+
+}
+
+void filterAddPressureRef(double currentPres) {
+	// For the first 10 seconds (before we have any current medians
+	// just set the current pressure ref so we don't depend on
+	// a single initial value
+	if (runningPresMedianCount == 0) {
+		presRef = currentPres;
+	}
+	// Make room for new value, discarding oldest pressure stored if full
+	if (runningPresBuffer.count == kPrevPresCount) {
+		cbDequeue(&runningPresBuffer, 1);
+	}
+
+	// Add current pressure
+	cbEnqueue(&runningPresBuffer, &currentPres);
+
+	++runningPresCount;
+
+	// Add median to the running medians every n values
+	if (runningPresCount == kPrevPresCount) {
+		runningPresCount = 0;
+		if (runningPresMedianCount < kPrevPresMedianCount) ++runningPresMedianCount;
+		// Make room for new value, discarding oldest median stored if full
+		if (runningPresMediansBuffer.count == kPrevPresMedianCount) {
+			cbDequeue(&runningPresMediansBuffer, 1);
+		}
+
+		// Add median of most recent values
+		double currentMedian = median(runningPres, kPrevPresCount);
+		cbEnqueue(&runningPresMediansBuffer, &currentMedian);
+
+		// Only set pressure ref if we have enough values recorded
+		if (runningPresMedianCount == kPrevPresMedianCount) {
+			// Now, find median of the last 100 seconds of data and set that to be current ref
+			presRef = median(runningPresMedians, kPrevPresMedianCount);
+		} else {
+			// Otherwise (for the first 100 seconds) set current pressure ref to the median of the last 10 seconds
+			// so that we have at least a somewhat trustworthy reference
+			presRef = runningPresMedians[0];
+		}
+
+	}
+}
+
 
 void filterSetPressureRef(double pres) {
 	presRef = pres;
