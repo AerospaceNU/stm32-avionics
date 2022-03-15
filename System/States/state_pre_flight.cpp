@@ -12,20 +12,23 @@
 
 void PreFlightState::init() {
 	transitionResetTimer = HM_Millis();
+	prevPressureLogTime = HM_Millis();
 	data_log_assign_flight();
-	minPosZ = 1000000; // Reset min position each new time pre-flight is reached
 	simModeStarted = false;
-	// Set filter pressure reference to current pressure
-	HM_ReadSensorData();
-	filterSetPressureRef((HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
 	gpsTimestamp = false;
 
+	filterInit(this->period_ms_ / 1000.0);
 	// Send ACK to CLI if in sim mode
 	if (HM_InSimMode()) {
 		cliSendAck(true, nullptr);
 	}
+	// If we are in sim, first data packet might not have arrived yet, so don't set pres ref from it
+	else {
+		// Otherwise set initial current pressure ref
+		HM_ReadSensorData();
+		filterSetPressureRef((HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
+	}
 }
-
 
 EndCondition_t PreFlightState::run() {
 	// Produce a tone for each functioning peripheral
@@ -35,6 +38,9 @@ EndCondition_t PreFlightState::run() {
 	if (HM_InSimMode() && !simModeStarted) {
 		if (cbCount(cliGetRxBuffer()) >= sizeof(SensorData_t)) {
 			simModeStarted = true;
+			// Set pres ref now that sim has data
+			HM_ReadSensorData();
+			filterSetPressureRef((HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
 		}
 		else {
 			return EndCondition_t::NoChange;
@@ -70,20 +76,26 @@ EndCondition_t PreFlightState::run() {
 	if (bufferCounter == kBufferSize)
 		bufferCounter = 0;
 
-	// Look to see if new minimum Z position has been reached
-	if (filterData->pos_z < minPosZ) {
-		minPosZ = filterData->pos_z;
-		// Set pressure reference here because pressure may have "settled" after a bit
-		filterSetPressureRef((sensorData->baro1_pres + sensorData->baro2_pres) / 2);
+	// Check pressures once per second
+	if (HM_Millis() - prevPressureLogTime > 1000) {
+		prevPressureLogTime = HM_Millis();
+		// Add a pressure ref to the filter
+		filterAddPressureRef((HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
 	}
 
 	// Detect launch by looking for accel and z position difference thresholds
-	if (filterData->acc_z > kLaunchAccelThreshold && filterData->pos_z - minPosZ > kLaunchPosZDiffThreshold) {
+	// Either we should have large enough acceleration
+	if (filterData->acc_z > kLaunchAccelThreshold) {
 		if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
 			return EndCondition_t::Launch;
 		}
 	} else {
 		transitionResetTimer = HM_Millis();
+	}
+    // Or a significantly large enough position change to override lack of acceleration data
+	double elevRef = cliGetConfigs()->groundElevationM;
+	if (filterData->pos_z - elevRef > kLaunchPosZDiffFailsafeThreshold) {
+		return EndCondition_t::Launch;
 	}
 
 	// Detect if USB was plugged back in (not in sim mode)
@@ -101,7 +113,6 @@ void PreFlightState::cleanup() {
 		data_log_write(&sensorDataBuffer[i], &filterDataBuffer[i], this->getID());
 	}
 	data_log_set_pressure_metadata(filterGetPressureRef()); // Write pressure reference metadata
-	data_log_set_launched_metadata(); // Write launched status
 	data_log_write_metadata();
 }
 

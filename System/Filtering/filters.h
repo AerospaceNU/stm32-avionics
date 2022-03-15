@@ -40,6 +40,12 @@ void filterInit(double dt);
 void filterApplyData(SensorData_t* curSensorVals, SensorProperties_t* sensorProperties, bool hasPassedApogee);
 
 /**
+ * @brief Adds reference pressure to the running list of pressures
+ * @param pres: Must be same unit as sensor data pressure
+ */
+void filterAddPressureRef(double currentPres);
+
+/**
  * @brief Sets reference pressure used for converting pressure to altitude
  * @param pres: Must be same unit as sensor data pressure
  */

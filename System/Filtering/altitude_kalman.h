@@ -3,7 +3,7 @@
 // TODO how should we do this?
 
 // These numbers are for a dt of 0.01513 seconds, Q of diag([0.5, 1]).^2 and R of diag([10]).^2
-static constexpr double DEFAULT_KALMAN_GAIN[2] = {0.1657, 0.0934}; 
+static constexpr double DEFAULT_KALMAN_GAIN[2] = {0.03407042, 0.03685564};
 
 typedef struct {
     double estimatedVelocity;
@@ -153,6 +153,8 @@ public:
     const AltitudeKalmanOutput_t GetXhat() const;
 
     void SetDt(const double dt);
+
+    void Reset();
 
 private:
     // The estimated state of the rocket. We assume we start at (0,0).

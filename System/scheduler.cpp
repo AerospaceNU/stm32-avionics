@@ -7,13 +7,12 @@
 #include "state_cli_help.h"
 #include "state_cli_main.h"
 #include "state_cli_offload.h"
+#include "state_ascent.h"
 #include "state_cli_sense.h"
-#include "state_coast_ascent.h"
 #include "state_drogue_descent_n.h"
 #include "state_initialize.h"
 #include "state_main_descent.h"
 #include "state_post_flight.h"
-#include "state_powered_ascent.h"
 #include "state_pre_flight.h"
 #include "state_shutdown.h"
 #include "stm32h7xx_hal.h"
@@ -29,18 +28,17 @@ void Scheduler::run(void) {
 	CliMainState cliMain = CliMainState(StateId::CliMain, defaultPeriod);
 	CliSenseState cliSense = CliSenseState(StateId::CliSense, defaultPeriod);
 	CliOffloadState cliOffload = CliOffloadState(StateId::CliOffload, defaultPeriod);
-	CoastAscentState coastAscent = CoastAscentState(StateId::CoastAscent, defaultPeriod);
+	AscentState ascent = AscentState(StateId::Ascent, defaultPeriod);
 	DrogueDescentNState drogueDescentN = DrogueDescentNState(StateId::DrogueDescentN, defaultPeriod);
 	InitializeState initialize = InitializeState(StateId::Initialize, defaultPeriod);
 	MainDescentState mainDescent = MainDescentState(StateId::MainDescent, defaultPeriod);
 	PostFlightState postFlight = PostFlightState(StateId::PostFlight, defaultPeriod);
-	PoweredAscentState poweredAscent = PoweredAscentState(StateId::PoweredAscent, defaultPeriod);
 	PreFlightState preFlight = PreFlightState(StateId::PreFlight, defaultPeriod);
 	ShutdownState shutdown = ShutdownState(StateId::Shutdown, defaultPeriod);
 
 	State* states[] = {&cliCalibrate, &cliConfig, &cliEraseFlash, &cliHelp, &cliMain, &cliOffload, &cliSense,
-			&coastAscent, &drogueDescentN, &initialize, &mainDescent,
-			&postFlight, &poweredAscent, &preFlight, &shutdown};
+			&ascent, &drogueDescentN, &initialize, &mainDescent,
+			&postFlight, &preFlight, &shutdown};
 
 	// Initialize the current and next states
 	pCurrentState_ = nullptr;
@@ -129,7 +127,7 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 			break;
 		}
 		break;
-	case StateId::CoastAscent:
+	case StateId::Ascent:
 		switch(endCondition) {
 		case EndCondition_t::Apogee:
 			return StateId::DrogueDescentN;
@@ -156,8 +154,7 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 			StateId storedStateId = static_cast<Scheduler::StateId>(storedStateInt);
 			// Only resume from the 4 flight states
 			// (They *should* be the only states written in the state log regardless)
-			if (storedStateId == StateId::PoweredAscent ||
-				storedStateId == StateId::CoastAscent ||
+			if (storedStateId == StateId::Ascent ||
 				storedStateId == StateId::DrogueDescentN ||
 				storedStateId == StateId::MainDescent) {
 				state_log_reload_flight();
@@ -186,18 +183,10 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 			break;
 		}
 		break;
-	case StateId::PoweredAscent:
-		switch(endCondition) {
-		case EndCondition_t::MotorBurnout:
-			return StateId::CoastAscent;
-		default:
-			break;
-		}
-		break;
 	case StateId::PreFlight:
 		switch(endCondition) {
 		case EndCondition_t::Launch:
-			return StateId::PoweredAscent;
+			return StateId::Ascent;
 		case EndCondition_t::UsbConnect:
 			return StateId::CliMain;
 		default:
