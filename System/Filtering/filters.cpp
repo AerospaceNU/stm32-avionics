@@ -123,7 +123,7 @@ void filterAddPressureRef(double currentPres) {
 		presRef = currentPres;
 	}
 	// Make room for new value, discarding oldest pressure stored if full
-	if (runningPresBuffer.count == kPrevPresCount) {
+	if (cbCount(&runningPresBuffer) == kPrevPresCount) {
 		cbDequeue(&runningPresBuffer, 1);
 	}
 
@@ -137,7 +137,7 @@ void filterAddPressureRef(double currentPres) {
 		runningPresCount = 0;
 		if (runningPresMedianCount < kPrevPresMedianCount) ++runningPresMedianCount;
 		// Make room for new value, discarding oldest median stored if full
-		if (runningPresMediansBuffer.count == kPrevPresMedianCount) {
+		if (cbCount(&runningPresMediansBuffer) == kPrevPresMedianCount) {
 			cbDequeue(&runningPresMediansBuffer, 1);
 		}
 
