@@ -22,6 +22,7 @@ class Scheduler {
 			CliMain,
 			CliOffload,
 			CliSense,
+			CliVersion,
 			Ascent,
 			DrogueDescentN,
 			Initialize,

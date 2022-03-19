@@ -16,3 +16,6 @@
 *.su
 *.o
 *.d
+
+# git version info
+*git_info.h

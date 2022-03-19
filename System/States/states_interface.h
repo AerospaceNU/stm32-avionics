@@ -20,6 +20,7 @@ typedef enum {
 	MotorBurnout,
 	OffloadCommand,
 	SenseCommand,
+	VersionCommand,
 	SimCommand,
 	ShutdownCommand,
 	Touchdown,

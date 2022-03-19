@@ -34,6 +34,7 @@ typedef enum CliCommand_t {
 	ERASE_FLASH,
 	OFFLOAD,
 	SENSE,
+	VERSION,
 	SIM,
 	SHUTDOWN,
 	HELP

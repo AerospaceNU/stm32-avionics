@@ -7,8 +7,9 @@
 #include "state_cli_help.h"
 #include "state_cli_main.h"
 #include "state_cli_offload.h"
-#include "state_ascent.h"
+#include "state_cli_version.h"
 #include "state_cli_sense.h"
+#include "state_ascent.h"
 #include "state_drogue_descent_n.h"
 #include "state_initialize.h"
 #include "state_main_descent.h"
@@ -27,6 +28,7 @@ void Scheduler::run(void) {
 	CliHelpState cliHelp = CliHelpState(StateId::CliHelp, defaultPeriod);
 	CliMainState cliMain = CliMainState(StateId::CliMain, defaultPeriod);
 	CliSenseState cliSense = CliSenseState(StateId::CliSense, defaultPeriod);
+	CliVersionState cliVersion = CliVersionState(StateId::CliVersion, defaultPeriod);
 	CliOffloadState cliOffload = CliOffloadState(StateId::CliOffload, defaultPeriod);
 	AscentState ascent = AscentState(StateId::Ascent, defaultPeriod);
 	DrogueDescentNState drogueDescentN = DrogueDescentNState(StateId::DrogueDescentN, defaultPeriod);
@@ -36,7 +38,7 @@ void Scheduler::run(void) {
 	PreFlightState preFlight = PreFlightState(StateId::PreFlight, defaultPeriod);
 	ShutdownState shutdown = ShutdownState(StateId::Shutdown, defaultPeriod);
 
-	State* states[] = {&cliCalibrate, &cliConfig, &cliEraseFlash, &cliHelp, &cliMain, &cliOffload, &cliSense,
+	State* states[] = {&cliCalibrate, &cliConfig, &cliEraseFlash, &cliHelp, &cliMain, &cliOffload, &cliSense, &cliVersion,
 			&ascent, &drogueDescentN, &initialize, &mainDescent,
 			&postFlight, &preFlight, &shutdown};
 
@@ -96,6 +98,7 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 	case StateId::CliHelp:
 	case StateId::CliOffload:
 	case StateId::CliSense:
+	case StateId::CliVersion:
 		switch(endCondition) {
 		case EndCondition_t::CliCommandComplete:
 			return StateId::CliMain;
@@ -119,6 +122,8 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 			return StateId::CliOffload;
 		case EndCondition_t::SenseCommand:
 			return StateId::CliSense;
+		case EndCondition_t::VersionCommand:
+			return StateId::CliVersion;
 		case EndCondition_t::SimCommand:
 			return StateId::PreFlight;
 		case EndCondition_t::ShutdownCommand:

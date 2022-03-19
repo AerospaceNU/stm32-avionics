@@ -37,6 +37,8 @@ EndCondition_t CliMainState::run() {
 		return EndCondition_t::SimCommand;
 	case CliCommand_t::SENSE:
 		return EndCondition_t::SenseCommand;
+	case CliCommand_t::VERSION:
+			return EndCondition_t::VersionCommand;
 	case CliCommand_t::SHUTDOWN:
 		return EndCondition_t::ShutdownCommand;
 	default:

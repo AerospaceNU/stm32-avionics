@@ -34,6 +34,7 @@ static struct option longOptions[] = {
 		{"offload", no_argument, &primaryCommand, OFFLOAD},
 		{"sim", no_argument, &primaryCommand, SIM},
 		{"sense", no_argument, &primaryCommand, SENSE},
+		{"version", no_argument, &primaryCommand, VERSION},
 		{"shutdown", no_argument, &primaryCommand, SHUTDOWN},
 		{0, 0, 0, 0}
 };
