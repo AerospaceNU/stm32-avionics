@@ -217,6 +217,8 @@ void Error_Handler(void);
 
 #define PYRO6_ADC			&hadc1
 #define PYRO6_ADC_RANK		4
+
+#define IWDG_HANDLE			&hiwdg1
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

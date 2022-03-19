@@ -344,7 +344,7 @@ void HM_SetPyroContinuitySampling(bool enable) {
 }
 
 void HM_IWDG_Refresh() {
-	HAL_IWDG_Refresh(&hiwdg1);
+	HAL_IWDG_Refresh(IWDG_HANDLE);
 }
 
 static void HM_SimReadSensorData() {
