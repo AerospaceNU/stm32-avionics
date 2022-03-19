@@ -18,7 +18,7 @@ void CliVersionState::init() {
 
 EndCondition_t CliVersionState::run() {
 	// Send git version info
-	char cliStr[80];
+	char cliStr[95];
 
 	sprintf(cliStr, "Build Version Info:\r\n");
 	cliSend(cliStr);
