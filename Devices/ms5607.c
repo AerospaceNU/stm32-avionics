@@ -81,7 +81,24 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl) {
 	volatile int64_t Temp = 2000 + (((int64_t) (promVals[5]) * dT) >> 23);
 	volatile int64_t OFF = ((int64_t) (promVals[1]) << 17) + (((int64_t)(promVals[3]) * dT) >> 6);
 	volatile int64_t SENS = ((int64_t) (promVals[0]) << 16) + (((int64_t) (promVals[2]) * dT) >> 7);
-	volatile int64_t P = ((D1*((SENS >> 21)) - OFF) >> 15);
+
+	// perform higher order corrections
+	int64_t T2 = 0, OFF2 = 0, SENS2 = 0;
+	if (Temp < 2000) {
+		T2 = (dT * dT) >> 31;
+		OFF2 = (61 * (Temp - 2000) * (Temp - 2000)) >> 4;
+		SENS2 = 2 * (Temp - 2000) * (Temp - 2000);
+		if (Temp < -1500) {
+		  OFF2 += 15 * (Temp + 1500) * (Temp + 1500);
+		  SENS2 += 8 * (Temp + 1500) * (Temp + 1500);
+		}
+	}
+
+	Temp -= T2;
+	OFF -= OFF2;
+	SENS -= SENS2;
+
+	volatile int64_t P = ((((D1*SENS) >> 21) - OFF) >> 15);
 
 	volatile double Tfinal = Temp / 100.0;
 	altCtrl->altData.temp = Tfinal;
