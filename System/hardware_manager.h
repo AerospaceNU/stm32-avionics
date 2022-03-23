@@ -9,6 +9,7 @@ extern "C" {
 #include <stdint.h>
 
 #include "circular_buffer.h"
+#include "data_structures.h"
 
 /* Useful defines for files that need to know some info about hardware it works
  * with */
@@ -114,6 +115,17 @@ typedef enum hardware_t {
   NUM_HARDWARE
 } Hardware_t;
 
+// Addresses
+typedef enum {
+  ADDR_NRF_FCB = 0,  // the NRF on the FCB
+  ADDR_PHONE = 1,    // A phone
+  ADDR_CUTTER1 = 2,  // LC 1
+  ADDR_CUTTER2 = 3,  // LC 2
+
+  MAX_ADDRESS = ADDR_CUTTER2,
+  NUM_ADDRESSES = ADDR_CUTTER2 + 1
+} BluetoothAddresses_e;
+
 void HM_HardwareInit();
 
 bool* HM_GetHardwareStatus();
@@ -154,7 +166,15 @@ bool HM_UsbTransmit(uint8_t* data, uint16_t numBytes);
 CircularBuffer_t* HM_UsbGetRxBuffer();
 
 /* Bluetooth functions */
-bool HM_BluetoothSend(const uint8_t* data, uint16_t numBytes);
+//! Return if a phone is connected
+bool Hm_BluetoothCliConnected();
+bool HM_BluetoothSend(uint8_t address, const uint8_t* data, uint16_t numBytes);
+CircularBuffer_t* Hm_BleConsoleGetRxBuffer();
+
+void HM_BluetoothTick();
+
+LineCutterData_t* HM_GetLineCutterData(BluetoothAddresses_e address);
+bool HM_LineCutterSendString(int id, char* string);
 
 /* Outputs */
 void HM_PyroFire(int channel, uint32_t duration);

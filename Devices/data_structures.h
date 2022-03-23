@@ -20,4 +20,22 @@ typedef struct __attribute__((packed)) {
   uint8_t lqi;
 } RecievedPacket_t;
 
+// The data struct from the line cutter
+typedef struct __attribute__((__packed__)) {
+  uint8_t lineCutterNumber;  // ID programmed into the line cutter. Maybe CRC of
+                             // name?
+  uint8_t state;
+  uint32_t timestamp;
+  uint32_t pressure;
+  float altitude;
+  float deltaAltitude;
+  float temperature;
+  float accelNorm;
+  float battery;
+  uint16_t cutSense1;
+  uint16_t cutSense2;
+  uint16_t currentSense;
+  uint16_t photoresistor;
+} LineCutterData_t;
+
 #endif  // DEVICES_DATA_STRUCTURES_H_

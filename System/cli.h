@@ -21,10 +21,10 @@ extern "C" {
  * Ways the command line can receive information
  */
 typedef enum CliComms_t {
-  CLI_BLUETOOTH,
-  CLI_RADIO,
-  CLI_USB,
-  NUM_CLI_COMMS
+	CLI_PHONE,
+	CLI_RADIO,
+	CLI_USB,
+	NUM_CLI_COMMS
 } CliComms_t;
 
 /**
@@ -37,6 +37,7 @@ typedef enum CliCommand_t {
   CREATE_NEW_FLIGHT,
   ERASE_FLASH,
   OFFLOAD,
+  LINECUTTER,
   SENSE,
   SIM,
   HELP,
@@ -57,6 +58,8 @@ typedef struct {
   char* t;  // ground temperature
   bool h;   // help flag
   char* c;  // Radio channel, can be negative
+  char* lcCmd; // Line cuttter command
+  char* lcId; // Line cuttter id
 } CliOptionVals_t;
 
 /**

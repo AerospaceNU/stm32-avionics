@@ -160,29 +160,16 @@ void RadioManager_transmitData(SensorData_t *sensorData,
                  RADIO_PACKET_SIZE);
   }
 
-  /*
   if (currentTime - lastSent.lineCutterLastSent >= 1000) {
-    LineCutterPacket_t data = {sensorData->lineCutterNumber,
-                               sensorData->state,
-                               sensorData->battSense,
-                               sensorData->cutSense1,
-                               sensorData->cutSense2,
-                               sensorData->currentSense,
-                               sensorData->photoresistor,
-                               sensorData->timestamp,
-                               sensorData->pressure,
-                               sensorData->altitude,
-                               sensorData->avgAltitude,
-                               sensorData->deltaAltitude,
-                               sensorData->avgDeltaAltitude,
-                               sensorData->temperature,
-                               sensorData->accelX,
-                               sensorData->accelY,
-                               sensorData->accelZ};
-    transmitPacket.packetType = 4;
-    transmitPacket.payload.lineCutter = data;
-    lastSent.lineCutterLastSent = currentTime;
-  */
+    for (int i = ADDR_CUTTER1; i <= ADDR_CUTTER2; i++) {
+      transmitPacket.packetType = TELEMETRY_ID_LINECUTTER;
+      transmitPacket.payload.lineCutter.data = *HM_GetLineCutterData(i);
+      lastSent.lineCutterLastSent = currentTime;
+
+      HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
+                   RADIO_PACKET_SIZE);
+    }
+  }
 }
 
 #endif

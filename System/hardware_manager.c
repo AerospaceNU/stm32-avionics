@@ -1,5 +1,9 @@
 #include "hardware_manager.h"
 
+#include <ble_console.h>
+#include <ble_interface.h>
+#include <ble_linecutter.h>
+
 #include "board_config.h"
 #include "main.h"
 #include "sensor_types.h"
@@ -134,6 +138,14 @@ static S25FLXCtrl_t s25flx1;
 static GPSCtrl_t gps;
 #endif
 
+#ifdef HAS_BLE
+/* BLE */
+static BluetoothInterface_t ble;
+static LineCutterCtrl_t lineCutter1;
+static LineCutterCtrl_t lineCutter2;
+static BleConsole_t bleConsole;
+#endif
+
 #ifdef HAS_PYRO
 /* Pyro */
 PyroCtrl_t pyroCtrl[MAX_PYRO];
@@ -152,6 +164,14 @@ static TiRadioCtrl_t radio915;
 static SensorProperties_t sensorProperties;
 static SensorData_t sensorData;
 static size_t SENSOR_DATA_SIZE = sizeof(SensorData_t);
+
+#ifdef HAS_BLE
+/* BLE */
+static BluetoothInterface_t ble;
+static LineCutterCtrl_t lineCutter1;
+static LineCutterCtrl_t lineCutter2;
+static BleConsole_t bleConsole;
+#endif
 
 /* Sensor states */
 static bool bImu1Sampling = true;
@@ -384,6 +404,14 @@ void HM_HardwareInit() {
 #endif  // HAS 915 and has cc1200
 
 #endif  // has_radio_915
+
+#ifdef HAS_BLE
+  /* BLE */
+  Bluetooth_Init(&ble, BLUETOOTH_HUART);
+  LineCutter_Init(&lineCutter1, &ble, ADDR_CUTTER1);
+  LineCutter_Init(&lineCutter2, &ble, ADDR_CUTTER2);
+  BleConsole_Init(&bleConsole, &ble, ADDR_PHONE);
+#endif
 
 #ifdef HAS_PYRO
   /* Pyros */
@@ -654,9 +682,64 @@ CircularBuffer_t *HM_UsbGetRxBuffer() {
 #endif
 }
 
-bool HM_BluetoothSend(const uint8_t *data, uint16_t numBytes) {
-  // TODO: Implement HM_BluetoothSend
+bool Hm_BluetoothCliConnected() {
+#ifdef HAS_BLE
+  return Bluetooth_IsAddressConnected(&ble, ADDR_PHONE);
+#endif
   return false;
+}
+
+bool HM_BluetoothSend(uint8_t address, const uint8_t *data, uint16_t numBytes) {
+#ifdef HAS_BLE
+  return HAL_OK == Bluetooth_SendRequest(&ble, address, data, numBytes);
+#endif
+  return false;
+}
+
+CircularBuffer_t *Hm_BleConsoleGetRxBuffer() {
+#ifdef HAS_BLE
+  return &bleConsole.parsedBuffer;
+#endif
+  return NULL;
+}
+
+void HM_BluetoothTick() {
+#ifdef HAS_BLE
+  Bluetooth_Tick(&ble);
+  LineCutter_Tick(&lineCutter1);
+  LineCutter_Tick(&lineCutter2);
+  BleConsole_Tick(&bleConsole);
+#endif
+}
+
+LineCutterData_t *HM_GetLineCutterData(BluetoothAddresses_e address) {
+#ifdef HAS_BLE
+  if (address == ADDR_CUTTER1)
+    return &lineCutter1.lastData;
+  else if (address == ADDR_CUTTER2)
+    return &lineCutter2.lastData;
+  else
+#endif
+    return NULL;
+}
+
+bool HM_LineCutterSendString(int id, char *string) {
+#ifdef HAS_BLE
+  if (!string) return false;
+
+  LineCutterCtrl_t *cutter;
+  if (id == lineCutter1.lastData.lineCutterNumber) {
+    cutter = &lineCutter1;
+  } else if (id == lineCutter2.lastData.lineCutterNumber) {
+    cutter = &lineCutter2;
+  } else {
+    return false;
+  }
+
+  return LineCutter_SendString(cutter, string);
+#else
+      return false;
+#endif
 }
 
 void HM_SetImu1Sampling(bool enable) { bImu1Sampling = enable; }

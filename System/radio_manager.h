@@ -55,11 +55,7 @@ PositionPacket_t;
 // Line cutter (x2)
 #define TELEMETRY_ID_LINECUTTER 4
 PACKED_STRUCT {
-  uint8_t lineCutterNumber, state;
-  uint16_t battSense, cutSense1, cutSense2, currentSense, photoresistor;
-  uint32_t timestamp, pressure;
-  float altitude, avgAltitude, deltaAltitude, avgDeltaAltitude, temperature,
-      accelX, accelY, accelZ;
+  LineCutterData_t data;
 }
 LineCutterPacket_t;
 
