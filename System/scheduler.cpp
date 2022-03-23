@@ -66,7 +66,7 @@ void Scheduler::run(void) {
     if (pCurrentState_) endCondition = pCurrentState_->run_state();
 
     // Find and set the next state
-    StateId nextState = getNextState(endCondition);
+    StateId nextState = getNextState(endCondition, states);
     for (State* state : states) {
       if (state->getID() == nextState) {
         pNextState = state;
@@ -76,7 +76,8 @@ void Scheduler::run(void) {
   }
 }
 
-Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
+Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition,
+                                           State* states[]) {
   // Return the current state if there's no change
   if (endCondition == EndCondition_t::NoChange) {
     return static_cast<Scheduler::StateId>(pCurrentState_->getID());

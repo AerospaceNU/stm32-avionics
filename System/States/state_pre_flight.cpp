@@ -29,10 +29,15 @@ void PreFlightState::init() {
   PyroManager_Init();
   filterInit(this->period_ms_ / 1000.0);
   HM_ReadSensorData();
+#ifdef BARO_1
   filterSetPressureRef(
       (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
+#else
+  filterSetPressureRef(HM_GetSensorData()->baro2_pres);
+#endif
 
   cli_tasks::ConfigureForGround();
+  doCleanup = false;
 }
 
 EndCondition_t PreFlightState::run() {
@@ -66,8 +71,12 @@ EndCondition_t PreFlightState::run() {
   if (HM_Millis() - prevPressureLogTime > 1000) {
     prevPressureLogTime = HM_Millis();
     // Add a pressure ref to the filter
+#ifdef BARO_1
     filterAddPressureRef(
         (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
+#else
+    filterAddPressureRef(HM_GetSensorData()->baro2_pres);
+#endif
   }
   if (HM_Millis() - prefGravityRefTime > 1000) {
     prefGravityRefTime = HM_Millis();

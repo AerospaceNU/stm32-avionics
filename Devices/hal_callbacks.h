@@ -27,6 +27,9 @@ void register_HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart,
                                           void *userData);
 void register_HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,
                                       void (*callback)(void *), void *userData);
+void register_HAL_UART_RxIdleCallback(UART_HandleTypeDef *huart,
+                                      void (*callback)(void *, size_t),
+                                      void *userData);
 #endif
 
 #endif  // DEVICES_HAL_CALLBACKS_H_

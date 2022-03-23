@@ -14,6 +14,8 @@ void cliConfig();
 void cliSense();
 void cliHelp();
 void cliPyroFire();
+void cliSendBTstring();  // Send a string to a line cutter
+
 }  // namespace cli_tasks
 
 #endif  // SYSTEM_TASKS_CLI_CLI_TASKS_H_

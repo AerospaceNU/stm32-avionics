@@ -110,6 +110,9 @@ EndCondition_t cli_tasks::cliTick() {
           ILLEGAL_TRANSITION
         }
         break;
+      case CliCommand_t::LINECUTTER:
+        if (allowedTransitions[CliCommand_t::LINECUTTER]) cliSendBTstring();
+        break;
       default:
         break;
     }

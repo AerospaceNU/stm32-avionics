@@ -68,6 +68,10 @@ void Error_Handler(void);
 #define SENSE_SCL_GPIO_Port GPIOF
 #define SENSE_ALERT_Pin GPIO_PIN_2
 #define SENSE_ALERT_GPIO_Port GPIOF
+#define BLUETOOTH_RX_Pin GPIO_PIN_6
+#define BLUETOOTH_RX_GPIO_Port GPIOF
+#define BLUETOOTH_TX_Pin GPIO_PIN_7
+#define BLUETOOTH_TX_GPIO_Port GPIOF
 #define BLUETOOTH_CS_Pin GPIO_PIN_10
 #define BLUETOOTH_CS_GPIO_Port GPIOF
 #define GPS_TX_Pin GPIO_PIN_0
@@ -221,6 +225,8 @@ void Error_Handler(void);
 #define PYRO6_ADC_RANK		4
 
 #define IWDG_HANDLE			&hiwdg1
+
+#define BLUETOOTH_HUART		&huart7
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

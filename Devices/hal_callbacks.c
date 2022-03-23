@@ -84,12 +84,15 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 #endif
 
 #ifdef HAS_UART
+
 typedef struct {
   UART_HandleTypeDef *huart;
   void (*rxHalfCallback)(void *);
   void (*rxCallback)(void *);
+  void (*rxIdleCallback)(void *, size_t);  // user data, size
   void *rxHalfCallbackUserData;
   void *rxCallbackUserData;
+  void *rxIdleCallbackUserData;
 } UARTCallbackProperty_t;
 
 static UARTCallbackProperty_t uartCallbacks[MAX_UART_HANDLES];
@@ -150,6 +153,37 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (uartCallbacks[i].huart == huart) {
       if (uartCallbacks[i].rxCallback != NULL) {
         uartCallbacks[i].rxCallback(uartCallbacks[i].rxCallbackUserData);
+      }
+      return;  // No need to keep searching if callback was found
+    }
+  }
+}
+
+void register_HAL_UART_RxIdleCallback(UART_HandleTypeDef *huart,
+                                      void (*callback)(void *, size_t),
+                                      void *userData) {
+  // See if handle already has callback registered to it
+  for (int i = 0; i < numUartCallbacksRegistered; i++) {
+    if (uartCallbacks[i].huart == huart) {
+      uartCallbacks[i].rxIdleCallback = callback;
+      uartCallbacks[i].rxIdleCallbackUserData = userData;
+      return;  // No need to keep going if handle already found to be registered
+    }
+  }
+
+  // If reached, handle hasn't been registered, so create a new association
+  uartCallbacks[numUartCallbacksRegistered].huart = huart;
+  uartCallbacks[numUartCallbacksRegistered].rxIdleCallback = callback;
+  uartCallbacks[numUartCallbacksRegistered].rxIdleCallbackUserData = userData;
+  numUartCallbacksRegistered++;
+}
+
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
+  for (int i = 0; i < numUartCallbacksRegistered; i++) {
+    if (uartCallbacks[i].huart == huart) {
+      if (uartCallbacks[i].rxIdleCallback != NULL) {
+        uartCallbacks[i].rxIdleCallback(uartCallbacks[i].rxIdleCallbackUserData,
+                                        size);
       }
       return;  // No need to keep searching if callback was found
     }
