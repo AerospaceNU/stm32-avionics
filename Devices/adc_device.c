@@ -3,6 +3,9 @@
  */
 
 #include "adc_device.h"
+
+#ifdef HAS_ADC_DEVICE
+
 #include "hal_callbacks.h"
 
 static void adcConversionCpltCallback(void *adc) {
@@ -82,3 +85,5 @@ bool adcGetValue(AdcCtrl_t *adc, float *pval, uint32_t timeoutMS) {
 	// If conversion isn't complete, the value in the register would be wrong, so return false
 	return false;
 }
+
+#endif //HAS_ADC_DEVICE

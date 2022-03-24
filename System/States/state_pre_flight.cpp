@@ -5,7 +5,6 @@
 
 #include "cli.h"
 #include "data_log.h"
-#include "data_transmission.h"
 #include "filters.h"
 #include "hardware_manager.h"
 #include "buzzer_report_scheme.h"
@@ -48,7 +47,6 @@ EndCondition_t PreFlightState::run() {
 	}
 
 	// Collect, and filter data
-	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
 	if (!gpsTimestamp && sensorData->gps_timestamp > 0) {
 		data_log_set_timestamp_metadata(sensorData->gps_timestamp);
@@ -57,13 +55,8 @@ EndCondition_t PreFlightState::run() {
 	}
 
 	memcpy(&sensorDataBuffer[bufferCounter], sensorData, sizeof(SensorData_t));
-	filterApplyData(sensorData, HM_GetSensorProperties(), false);
 	FilterData_t* filterData = filterGetData();
 	memcpy(&filterDataBuffer[bufferCounter], filterData, sizeof(FilterData_t));
-	// Transmit at 1/100th rate
-	if (this->getRunCounter() % 100 == 0) {
-		transmitData(sensorData, filterData, this->getID());
-	}
 
 	// Log at normal rate until launch detect is proven. TODO: Log when buffer is reset
 	//data_log_write(sensorData, filterData, this->getID());

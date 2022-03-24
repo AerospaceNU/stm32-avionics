@@ -7,6 +7,8 @@
 
 #include "LSM9DS1.h"
 
+#ifdef HAS_LSM9DS1
+
 uint8_t AG_whoAmI(AG_LSM9DS1Ctrl_t* sensor) {
 	return SPI_ReadRegister(&sensor->LSM9DS1SPI, (1 << 7) | REG_WHO_AM_I_AG);
 }
@@ -160,3 +162,5 @@ void LSM9DS1_calcRes(LSM9DS1Ctrl_t* sensor) {
 			break;
 	}
 }
+
+#endif

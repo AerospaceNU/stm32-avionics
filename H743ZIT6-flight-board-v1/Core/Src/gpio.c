@@ -74,10 +74,10 @@ void MX_GPIO_Init(void)
                           |LED4_Pin|LED5_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(RADIO_CS_GPIO_Port, RADIO_CS_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(RAD915_CS_GPIO_Port, RAD915_CS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, RADIO_RST_Pin|HGM_Pin|HIGH_G_INT1_Pin|HIGH_G_INT2_Pin
+  HAL_GPIO_WritePin(GPIOD, RAD915_RST_Pin|HGM_Pin|HIGH_G_INT1_Pin|HIGH_G_INT2_Pin
                           |IMU1_AG_INT2_Pin|IMU1_AG_INT1_Pin|IMU1_M_INT_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -140,21 +140,21 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(PPS_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin */
-  GPIO_InitStruct.Pin = RADIO_CS_Pin|IMU2_FSYNC_Pin;
+  GPIO_InitStruct.Pin = RAD915_CS_Pin|IMU2_FSYNC_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin */
-  GPIO_InitStruct.Pin = RADIO_GP2_Pin|RADIO_GP0_Pin|RADIO_GP3_Pin|IMU1_M_DRDY_Pin;
+  GPIO_InitStruct.Pin = RAD915_GP2_Pin|RAD915_GP0_Pin|RAD915_GP3_Pin|IMU1_M_DRDY_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin
                            PDPin PDPin PDPin PDPin */
-  GPIO_InitStruct.Pin = RADIO_RST_Pin|HGM_Pin|HIGH_G_INT1_Pin|HIGH_G_INT2_Pin
+  GPIO_InitStruct.Pin = RAD915_RST_Pin|HGM_Pin|HIGH_G_INT1_Pin|HIGH_G_INT2_Pin
                           |HIGH_G_CS_Pin|IMU1_AG_INT2_Pin|IMU1_AG_INT1_Pin|IMU1_M_INT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;

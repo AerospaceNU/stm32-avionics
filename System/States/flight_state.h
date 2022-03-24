@@ -1,0 +1,22 @@
+/*
+ * flight_state.h
+ *
+ *  Created on: Mar 12, 2022
+ *      Author: matth
+ */
+
+#ifndef STATES_FLIGHT_STATES_INTERFACE_H_
+#define STATES_FLIGHT_STATES_INTERFACE_H_
+
+#include "states_interface.h"
+
+class FlightState: public State {
+public:
+	FlightState(int id, uint32_t period_ms) : State(id, period_ms) {}
+	~FlightState() = default;
+
+	EndCondition_t run_state() override;
+};
+
+
+#endif /* STATES_FLIGHT_STATES_INTERFACE_H_ */

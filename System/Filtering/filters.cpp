@@ -57,7 +57,7 @@ static void filterAccels(SensorData_t* curSensorVals, SensorProperties_t* sensor
 		numAccelsValid++;
 		accelSum += curSensorVals->high_g_accel_x;
 	}
-	filterData.acc_z = abs(accelSum / numAccelsValid);
+	filterData.acc_z = fabs(accelSum / numAccelsValid);
 }
 
 static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {

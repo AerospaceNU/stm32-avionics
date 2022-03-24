@@ -5,8 +5,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "hardware_manager.h"
 
 #include "cli.h"
+#include "errno.h"
+#include "board_config.h"
 
 static void generateConfigHelp(const char* name, const char* value) {
 	char msg[50 + 4];
@@ -76,6 +79,18 @@ EndCondition_t CliConfigState::run() {
 			return EndCondition_t::CliCommandComplete;
 		}
 		cliGetConfigs()->groundTemperatureC = temperature;
+	}
+
+	// Configure radio channel
+	if (options.c) {
+		char* endPtr;
+		errno = 0;
+		int channel = strtol(options.c, &endPtr, 0);
+		if (*endPtr != '\0' || (errno != 0 && channel == 0)) {
+			cliSendAck(false, "Invalid channel integer");
+			return EndCondition_t::CliCommandComplete;
+		}
+		HM_RadioSetChannel(TELEMETRY_RADIO, channel);
 	}
 
 	// Send positive ACK (all inputs have been appropriately processed)

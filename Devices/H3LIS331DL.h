@@ -12,8 +12,8 @@
 extern "C" {
 #endif
 
-#include "main.h"
 #include "SPIDriver.h"
+#include "board_config.h"
 
 static const uint8_t HIGH_G_ACC_ADDR = 0x19 << 1;
 static const uint8_t REG_WHO_AM_I = 0x0F;

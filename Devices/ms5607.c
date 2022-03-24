@@ -1,5 +1,7 @@
 #include "ms5607.h"
 
+#ifdef HAS_MS5607
+
 static uint16_t promVals[6];
 
 /*
@@ -105,3 +107,5 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl) {
 	volatile double Pfinal = P / 101325.0;
 	altCtrl->altData.baro = Pfinal;
 }
+
+#endif

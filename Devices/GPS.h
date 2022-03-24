@@ -1,21 +1,27 @@
 #include "minmea.h"
 #include "string.h"
-#include "stm32h7xx_hal.h"
-#include "hardware_manager.h"
+#include "board_config.h"
+
 #include "stdbool.h"
 
 #define GPS_RX_BUF_SIZE			4096
 #define GPS_RX_BUF_HALF			2048
+
+typedef enum {
+	GPS_TYPE_UBLOX = 0
+} GPSType_e;
 
 typedef struct GPSCtrl_s{
 
     UART_HandleTypeDef* gps_uart;
     DMA_HandleTypeDef* gpa_dma_rx;
 
+    GPSType_e type;
+
     float latitude;
     float longitude;
-    float speed;
-    float course;
+    float speed; // knots
+    float course; // True course, degrees
     float altitude;
     float latitude_deviation;
     float longitude_deviation;

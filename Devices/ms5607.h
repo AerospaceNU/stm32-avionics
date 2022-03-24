@@ -9,6 +9,7 @@ extern "C" {
 #include <stdbool.h>
 #include "spi.h"
 #include "gpio.h"
+#include "board_config.h"
 
 /**
  * Different OSR resolutions for MS5607 ADCs, mapped to their conversion times in ms

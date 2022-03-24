@@ -48,7 +48,7 @@ class State {
 		/**
 		 * @brief Runs this state and increments the counter
 		 */
-		EndCondition_t run_state() {
+		virtual EndCondition_t run_state() {
 			EndCondition_t result = run();
 			run_counter_++;
 			return result;

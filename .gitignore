@@ -16,3 +16,7 @@
 *.su
 *.o
 *.d
+
+**/Debug/*
+**/.idea/*
+**/.vscode/*

@@ -15,7 +15,6 @@
 #include "state_post_flight.h"
 #include "state_pre_flight.h"
 #include "state_shutdown.h"
-#include "stm32h7xx_hal.h"
 
 void Scheduler::run(void) {
 

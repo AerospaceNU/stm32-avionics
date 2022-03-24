@@ -47,6 +47,13 @@ void cbPeek(CircularBuffer_t *cb, void* outputBuffer, size_t* numElements);
 size_t cbCount(CircularBuffer_t *cb);
 
 /**
+ * @brief Get the maximum number of items this buffer can hold
+ * @param cb: Circular buffer to get capacity of
+ * @return Max items it can hold
+ */
+size_t cbCapacity(CircularBuffer_t *cb);
+
+/**
  * @brief Adds an item to the queue if there's room. If buffer is at capacity, will not overwrite existing values.
  * @param cb: Circular buffer to enqueue
  * @param item: Item to enqueue. Assumed to be same byte size as initialized cb size

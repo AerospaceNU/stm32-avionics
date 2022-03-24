@@ -3,8 +3,8 @@
  */
 
 #include "internal_flash.h"
-#include "stm32h7xx_hal.h"
 #include <string.h>
+#include "board_config.h"
 
 #define FLASH_TIMEOUT_VALUE              50000U /* 50 s */
 
@@ -22,8 +22,7 @@
   *
   * @retval HAL_StatusTypeDef HAL Status
   */
-HAL_StatusTypeDef Internal_Flash_Program(uint32_t TypeProgram, uint32_t FlashAddress, uint32_t DataAddress)
-{
+HAL_StatusTypeDef Internal_Flash_Program(uint32_t TypeProgram, uint32_t FlashAddress, uint32_t DataAddress) {
 	#if (FCB_VERSION == 1)
 	return HAL_FLASH_Program(TypeProgram, FlashAddress, DataAddress);
 	#else

@@ -116,16 +116,18 @@ void Error_Handler(void);
 #define LED4_GPIO_Port GPIOE
 #define LED5_Pin GPIO_PIN_14
 #define LED5_GPIO_Port GPIOE
-#define RADIO_CS_Pin GPIO_PIN_12
-#define RADIO_CS_GPIO_Port GPIOB
-#define RADIO_GP2_Pin GPIO_PIN_8
-#define RADIO_GP2_GPIO_Port GPIOD
-#define RADIO_GP0_Pin GPIO_PIN_9
-#define RADIO_GP0_GPIO_Port GPIOD
-#define RADIO_GP3_Pin GPIO_PIN_10
-#define RADIO_GP3_GPIO_Port GPIOD
-#define RADIO_RST_Pin GPIO_PIN_11
-#define RADIO_RST_GPIO_Port GPIOD
+#define RAD915_CS_Pin GPIO_PIN_12
+#define RAD915_CS_GPIO_Port GPIOB
+#define RAD915_MISO_Pin GPIO_PIN_14
+#define RAD915_MISO_GPIO_Port GPIOB
+#define RAD915_GP2_Pin GPIO_PIN_8
+#define RAD915_GP2_GPIO_Port GPIOD
+#define RAD915_GP0_Pin GPIO_PIN_9
+#define RAD915_GP0_GPIO_Port GPIOD
+#define RAD915_GP3_Pin GPIO_PIN_10
+#define RAD915_GP3_GPIO_Port GPIOD
+#define RAD915_RST_Pin GPIO_PIN_11
+#define RAD915_RST_GPIO_Port GPIOD
 #define HGM_Pin GPIO_PIN_12
 #define HGM_GPIO_Port GPIOD
 #define SERVO_EN_Pin GPIO_PIN_8
@@ -196,9 +198,7 @@ void Error_Handler(void);
 
 #define GPS_HUART			&huart4
 
-#define RADIO_HSPI			&hspi2
-#define RADIO_RDY_GPIO_Port GPIOB
-#define RADIO_RDY_Pin		GPIO_PIN_14
+#define RAD915_HSPI			&hspi2
 
 #define PYRO1_ADC			&hadc1
 #define PYRO1_ADC_RANK		2

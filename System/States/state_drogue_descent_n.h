@@ -5,14 +5,12 @@
 extern "C"{
 #endif
 
-#include "states_interface.h"
+#include "flight_state.h"
 
-class DrogueDescentNState : public State {
+class DrogueDescentNState : public FlightState {
 
 	public:
-		using State::State;
-		using State::getID;
-		using State::getPeriodMS;
+		using FlightState::FlightState;
 
 		void init(void) override;
 

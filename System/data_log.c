@@ -6,7 +6,11 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define BOARD_VERSION 		FCB_VERSION
+#ifdef FCB_VERSION
+const uint8_t BOARD_VERSION = FCB_VERSION;
+#else
+const uint8_t BOARD_VERSION = 0xff;
+#endif
 #define BOARD_ID 			0x01
 #define SOFTWARE_VERSION 	0x01
 #define FLASH_TIMEOUT       500

@@ -12,7 +12,6 @@ extern "C"{
 #include <stdbool.h>
 #include <stdint.h>
 
-
 #if (FCB_VERSION == 0)
 #define INTERNAL_FLASH_START 0x08020000
 #define INTERNAL_FLASH_END 0x080FFFFF

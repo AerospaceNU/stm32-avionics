@@ -4,6 +4,8 @@
 
 #include "servo.h"
 
+#ifdef HAS_SERVO
+
 bool servoInit(ServoCtrl_t *servo, TIM_HandleTypeDef *htim, uint32_t channel, uint32_t periodMS, float minPulseMS, float maxPulseMS, float minAngle, float maxAngle) {
 
 	// Set servo struct values
@@ -45,3 +47,5 @@ void servoSetAngle(ServoCtrl_t *servo, float degrees) {
 	// Set timer pulse
 	__HAL_TIM_SET_COMPARE(servo->htim, servo->channel, pulse);
 }
+
+#endif

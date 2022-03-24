@@ -13,7 +13,6 @@ extern "C"{
 #include "hardware_manager.h"
 #include "filters.h"
 
-
 // Flight metadata shows what data will be logged in what relative location
 typedef struct __attribute__((__packed__)) FlightMetadata {
 	double pressureRef;

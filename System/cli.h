@@ -11,8 +11,8 @@ extern "C"{
 
 #include <stdbool.h>
 #include <stdint.h>
-
 #include "circular_buffer.h"
+#include "data_structures.h"
 
 /**
  * Ways the command line can receive information
@@ -49,6 +49,8 @@ typedef struct {
 	char* e; // ground elevation
 	char* t; // ground temperature
 	bool h;  // help flag
+
+	char* c; // Radio channel, can be negative
 } CliOptionVals_t;
 
 /**

@@ -5,17 +5,15 @@
 extern "C"{
 #endif
 
-#include "states_interface.h"
+#include "flight_state.h"
 
 #include "filters.h"
 #include "hardware_manager.h"
 
-class PreFlightState : public State {
+class PreFlightState : public FlightState {
 
 	public:
-		using State::State;
-		using State::getID;
-		using State::getPeriodMS;
+		using FlightState::FlightState;
 
 		void init(void) override;
 

@@ -15,6 +15,7 @@ extern "C"{
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "board_config.h"
 #include "circular_buffer.h"
 
 /**

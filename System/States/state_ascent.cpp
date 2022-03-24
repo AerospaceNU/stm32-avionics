@@ -3,7 +3,6 @@
 
 #include "data_log.h"
 #include "state_log.h"
-#include "data_transmission.h"
 #include "filters.h"
 #include "hardware_manager.h"
 
@@ -21,10 +20,6 @@ EndCondition_t AscentState::run() {
 	filterApplyData(sensorData, HM_GetSensorProperties(), false);
 	FilterData_t* filterData = filterGetData();
 	data_log_write(sensorData, filterData, this->getID());
-
-	// Transmit at 1/100th rate
-	if (this->getRunCounter() % 100 == 0)
-		transmitData(sensorData, filterData, this->getID());
 
 	// Detect if new maximum Z position has been reached and record the time
 	if (filterData->pos_z > maxPosZ) {

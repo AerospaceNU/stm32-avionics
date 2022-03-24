@@ -1,9 +1,12 @@
 #include "GPS.h"
 
+#ifdef HAS_GPS
+
 #include "minmea.h"
 #include "string.h"
 #include "hal_callbacks.h"
 #include "stdbool.h"
+
 
 void parseString(GPSCtrl_t *gps, char line[]) {
 	switch (minmea_sentence_id(line, false)) {
@@ -169,28 +172,27 @@ bool gps_new_data(GPSCtrl_t *gps) {
 }
 
 void gps_init(GPSCtrl_t *gps) {
-	HAL_UART_Receive_DMA(gps->gps_uart, (uint8_t*) gps->rx_buff, 4096);
-
 	register_HAL_UART_RxHalfCpltCallback(gps->gps_uart, gps_RxHalfCpltCallback,
 			gps);
 	register_HAL_UART_RxCpltCallback(gps->gps_uart, gps_RxCpltCallback, gps);
 
-	uint8_t nmea[16] = {0xB5, // CFG-MSG Header
-						0x62,
-						0x06,
-						0x01,
-						0x08, // Payload length
-						0x00,
-						0xF0, // ZDA
-						0x08,
-						0x01, // Enable on I2C
-						0x01, // Enable on UART1
-						0x00, // Disable on UART2
-						0x01, // Enable on USB
-						0x01, // Enable on SPI
-						0x00, // Always 0x00
-						0x0B, // Checksum
-						0x6B};
-	// Transmit configuration over UART
-	HAL_UART_Transmit(gps->gps_uart, nmea, sizeof(nmea), 500);
+	HAL_UART_Receive_DMA(gps->gps_uart, (uint8_t*) gps->rx_buff, 4096);
+
+	if(gps->type == GPS_TYPE_UBLOX) {
+		uint8_t nmea[16] = { 0xB5, // CFG-MSG Header
+				0x62, 0x06, 0x01, 0x08, // Payload length
+				0x00, 0xF0, // ZDA
+				0x08, 0x01, // Enable on I2C
+				0x01, // Enable on UART1
+				0x00, // Disable on UART2
+				0x01, // Enable on USB
+				0x01, // Enable on SPI
+				0x00, // Always 0x00
+				0x0B, // Checksum
+				0x6B };
+		// Transmit configuration over UART
+		HAL_UART_Transmit(gps->gps_uart, nmea, sizeof(nmea), 500);
+	}
 }
+
+#endif

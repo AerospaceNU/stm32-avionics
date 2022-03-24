@@ -3,7 +3,6 @@
 #include "buzzer_heartbeat.h"
 #include "cli.h"
 #include "data_log.h"
-#include "data_transmission.h"
 #include "state_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
@@ -32,18 +31,12 @@ EndCondition_t PostFlightState::run() {
 	}
 
 	// Collect and transmit data
-	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
-	filterApplyData(sensorData, HM_GetSensorProperties(), true);
 	FilterData_t* filterData = filterGetData();
 
 	// Log data at 1/10th rate for now in case this state is reached before it is supposed to
 	if (this->getRunCounter() % 10 == 0)
 		data_log_write(sensorData, filterData, this->getID());
-
-	// Transmit at 1/100th rate
-	if (this->getRunCounter() % 100 == 0)
-		transmitData(sensorData, filterData, this->getID());
 
 	// Detect if USB has been plugged in (non-sim mode)
 	if (!HM_InSimMode() && HM_UsbIsConnected()) {

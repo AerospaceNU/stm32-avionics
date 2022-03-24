@@ -1,6 +1,7 @@
 #ifndef _DC_MOTOR_H
 #define _DC_MOTOR_H
 
+#include "board_config.h"
 #include "tim.h"
 
 /*

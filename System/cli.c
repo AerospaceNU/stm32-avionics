@@ -9,11 +9,15 @@
 
 #include "cli.h"
 #include "hardware_manager.h"
+#include "radio_manager.h"
 
 #define INPUT_BUFFER_SIZE 2048
 #define MAX_ARGS 50
 
 static char inputBuffer[INPUT_BUFFER_SIZE + 1];  // +1 accounts for null terminator required for strtok
+
+static uint8_t radioRxBuffer[INPUT_BUFFER_SIZE];
+static CircularBuffer_t radioRxCircBuffer;
 
 static CliOptionVals_t cliOptionVals = {
 		.d = NULL,
@@ -48,8 +52,28 @@ static CliConfigs_t cliConfigs = {
 
 static CliComms_t lastCommsType; // Used to help send ack to right places
 
+static void cliParseRadio(RecievedPacket_t *packet) {
+	// Only accept packets with good CRC
+	RadioPacket_t *parsedPacket = (RadioPacket_t*) &packet->data;
+	if (parsedPacket->packetType == TELEMETRY_ID_STRING) {
+		if(packet->crc) {
+			const uint8_t len = parsedPacket->payload.cliString.len;
+			const uint8_t *pdata = parsedPacket->payload.cliString.string;
+			for (size_t i = 0; i < len; i++) {
+				cbEnqueue(cliGetRxBuffer(), pdata + i);
+			}
+		} else {
+			cliSendAck(false, "Bad CRC!");
+		}
+	}
+}
+
 void cliInit() {
 	opterr = 0; // Don't print any messages to standard error stream since this is embedded device
+
+	RadioManager_addMessageCallback(cliParseRadio);
+
+	cbInit(&radioRxCircBuffer, radioRxBuffer, sizeof(radioRxBuffer), 1);
 }
 
 CliConfigs_t* cliGetConfigs() {
@@ -62,24 +86,29 @@ CliCommand_t cliParse(CliComms_t commsType) {
 
 	// Get buffer from hardware manager
 	uint32_t bytesRead = 0; // Raw bytes read from hardware manager to be discarded, eventually including \r\n
+
+	// Find the appropriate circular buffer for our medium
+	CircularBuffer_t *selectedRxBuffer;
 	switch (commsType) {
 	case CLI_BLUETOOTH:
-		break;
+		return NONE; // TODO
 	case CLI_RADIO:
-		break;
+		selectedRxBuffer = &radioRxCircBuffer;
 	case CLI_USB: {
-		// Read buffer, flush if full (likely bad inputs), and copy to input buffer
-		bytesRead = cbCount(HM_UsbGetRxBuffer()); // Each element 1 byte
-		if (cbFull(HM_UsbGetRxBuffer())) {
-			cbFlush(HM_UsbGetRxBuffer());
-			bytesRead = 0;
-		}
-		cbPeek(HM_UsbGetRxBuffer(), inputBuffer, NULL);
+		selectedRxBuffer = HM_UsbGetRxBuffer();
 		break;
 	}
 	default:
 		return NONE;
 	}
+
+	// Read buffer, flush if full (likely bad inputs), and copy to input buffer
+	bytesRead = cbCount(selectedRxBuffer); // Each element 1 byte
+	if (cbFull(selectedRxBuffer)) {
+		cbFlush(selectedRxBuffer);
+		bytesRead = 0;
+	}
+	cbPeek(selectedRxBuffer, inputBuffer, NULL);
 
 	// Only keep buffer through first \n in this iteration
 	bool endFound = false;
@@ -126,7 +155,7 @@ CliCommand_t cliParse(CliComms_t commsType) {
 	int optionIndex = 0;
 	optind = 0;
 	primaryCommand = NONE;
-	while ((opt = getopt_long(argc, argv, "d:m:e:t:f:h", longOptions, &optionIndex)) != -1) {
+	while ((opt = getopt_long(argc, argv, "d:m:e:t:f:c:h", longOptions, &optionIndex)) != -1) {
 		switch(opt) {
 		case 0:
 			// New primary command was set
@@ -136,6 +165,7 @@ CliCommand_t cliParse(CliComms_t commsType) {
 			cliOptionVals.e = NULL;
 			cliOptionVals.t = NULL;
 			cliOptionVals.h = false;
+			cliOptionVals.c = NULL;
 			break;
 		case 'f':
 			if (primaryCommand == OFFLOAD) {
@@ -167,23 +197,19 @@ CliCommand_t cliParse(CliComms_t commsType) {
 				cliOptionVals.t = optarg;
 			}
 			break;
+		case 'c':
+			// Radio channel
+			if (primaryCommand == CONFIG) {
+				cliOptionVals.c = optarg;
+			}
+			break;
 		default:
 			break;
 		}
 	}
 
 	// Flush input buffer
-	switch (commsType) {
-	case CLI_BLUETOOTH:
-		break;
-	case CLI_RADIO:
-		break;
-	case CLI_USB:
-		cbDequeue(HM_UsbGetRxBuffer(), bytesRead);
-		break;
-	default:
-		break;
-	}
+	cbDequeue(selectedRxBuffer, bytesRead);
 
 	// If end-of-command found but primary command doesn't exist, send NACK
 	if (primaryCommand == NONE) {
@@ -200,7 +226,8 @@ void cliSend(const char* msg) {
 		HM_BluetoothSend((uint8_t*) msg, (uint16_t) strlen(msg));
 		break;
 	case CLI_RADIO:
-		HM_RadioSend((uint8_t*) msg, (uint16_t) strlen(msg));
+		// TODO frequency
+		//HM_RadioSend(RADIO_HW_433, (uint8_t*) msg, (uint16_t) strlen(msg));
 		break;
 	case CLI_USB:
 		HM_UsbTransmit((uint8_t*) msg, (uint16_t) strlen(msg));

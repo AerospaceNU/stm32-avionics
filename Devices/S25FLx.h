@@ -11,7 +11,7 @@ extern "C"{
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "stm32h7xx_hal.h"
+#include "board_config.h"
 
 // #define USE_S25FLx_DMA
 // NOTE: DMA is not yet functional. Leave the define commented and remove this comment when DMA works

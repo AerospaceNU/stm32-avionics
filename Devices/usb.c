@@ -7,9 +7,10 @@
 
 #include "usb.h"
 
+#ifdef HAS_USB
+
 #include <stdbool.h>
 
-#include "stm32h7xx_hal.h"
 #include "usbd_cdc_if.h"
 
 #define TIME_BETWEEN_TRANSMITS_MS 1
@@ -63,3 +64,5 @@ int _write(int file, char *ptr, int len) {
 	if(USBD_OK == CDC_Transmit_FS((uint8_t *) ptr, len)) return len;
 	return 0;
 }
+
+#endif

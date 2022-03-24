@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#include "main.h"
+#include "board_config.h"
 #include "SPIDriver.h"
 
 // Accelerometer-Gyroscope Registers

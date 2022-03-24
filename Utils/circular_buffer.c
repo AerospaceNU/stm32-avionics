@@ -54,6 +54,10 @@ size_t cbCount(CircularBuffer_t *cb) {
 	return ret_bytes / cb->size;
 }
 
+size_t cbCapacity(CircularBuffer_t *cb) {
+	return (cb->buffer_end - cb->buffer) / cb->size;
+}
+
 bool cbEnqueue(CircularBuffer_t *cb, const void *item) {
 
 	// Figure out what next spot to fill in buffer is

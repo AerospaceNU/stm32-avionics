@@ -18,6 +18,12 @@ extern "C"{
 #define FLASH_TIMEOUT_MS 		500
 #define PYRO_CONTINUITY_THRESHOLD 3
 
+#define KHZ_TO_HZ 					1000
+#define MHZ_TO_HZ 					1000000
+#define RADIO_CHANNEL_BANDWIDTH 	150 * KHZ_TO_HZ
+#define RAD433_CHAN0 				433 * MHZ_TO_HZ
+#define RAD915_CHAN0 				914 * MHZ_TO_HZ
+
 typedef struct __attribute__((__packed__)) {
 	uint32_t timestamp_s;
 	uint32_t timestamp_us;
@@ -96,14 +102,15 @@ typedef struct {
 } SensorProperties_t;
 
 typedef enum hardware_t{
-	CC1120 = 0,
+	RADIO_433 = 0,
+	RADIO_915,
 	IMU1,
 	IMU2,
 	BAROMETER1,
 	BAROMETER2,
 	HIGH_G_ACCELEROMETER,
 	NUM_HARDWARE
-} hardware_t;
+} Hardware_t;
 
 void HM_HardwareInit();
 
@@ -132,7 +139,10 @@ void HM_LedSet(int ledNum, bool on);
 void HM_LedToggle(int ledNum);
 
 /* Radio functions */
-bool HM_RadioSend(const uint8_t *data, uint16_t numBytes);
+bool HM_RadioSend(Hardware_t radio, uint8_t *data, uint16_t numBytes);
+void HM_RadioRegisterConsumer(Hardware_t radio, CircularBuffer_t *rxBuffer);
+void HM_RadioUpdate();
+void HM_RadioSetChannel(Hardware_t radio, int channel);
 
 /* USB functions */
 bool HM_UsbIsConnected();

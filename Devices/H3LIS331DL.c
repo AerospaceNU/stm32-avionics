@@ -7,6 +7,8 @@
 
 #include "H3LIS331DL.h"
 
+#ifdef HAS_H3LIS331DL
+
 uint8_t whoAmI(H3LIS331DLCtrl_t* sensor) {
 	return SPI_ReadRegister(&sensor->H3LIS331DLSPI, (1 << 7) | REG_WHO_AM_I);
 }
@@ -65,3 +67,5 @@ void H3LIS331DL_get_adj(H3LIS331DLCtrl_t* sensor) {
 void H3LIS331DL_get_gain(H3LIS331DLCtrl_t* sensor) {
 	sensor->gain = 0.02942;
 }
+
+#endif

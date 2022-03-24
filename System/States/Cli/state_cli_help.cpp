@@ -31,6 +31,7 @@ EndCondition_t CliHelpState::run() {
 	generateDoc("", "-e float*1", "Configure ground elevation (in meters)");
 	generateDoc("", "-t float*1", "Configure ground temperature (in celsius)");
 	generateDoc("", "-m float*1", "Configure main cut altitude (in meters)");
+	generateDoc("", "-c int*1", "Configure radio channel (in multiples of bandwidth), negative numbers allowed");
 	generateDoc("", "-h", "Help for config. Prints current configuration values");
 	generateDoc("--erase", "", "Fully erases on-board flash");
 	generateDoc("--help", "", "FCB produces standard command line help string");
