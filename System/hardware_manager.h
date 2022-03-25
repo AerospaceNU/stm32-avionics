@@ -114,6 +114,8 @@ typedef enum hardware_t{
 
 void HM_HardwareInit();
 
+bool* HM_GetHardwareStatus();
+
 /* Microcontroller timer functions */
 uint32_t HM_Millis();
 

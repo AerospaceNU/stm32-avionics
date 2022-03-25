@@ -9,6 +9,7 @@
 
 #include "altitude_kalman.h"
 #include "cli.h"
+#include "hardware_manager.h"
 
 #define R_DRY_AIR 287.0474909 // J/K/kg
 #define G_ACCEL_EARTH 9.80665 // m/s**2
@@ -40,24 +41,37 @@ void filterInit(double dt) {
 	runningPresCount = 0;
 }
 
-static void filterAccels(SensorData_t* curSensorVals, SensorProperties_t* sensorProperties) {
+static double filterAccelOneAxis(const double imu1reading, const double imu2reading, const double highGreading,
+		SensorProperties_t *sensorProperties, bool imu1sampling, bool imu2sampling, bool highGsampling) {
 
-	// For now, just worry about z accel
 	int numAccelsValid = 0;
 	double accelSum = 0;
-	if (fabs(curSensorVals->imu1_accel_y) < ACCEL_SWITCH_MULTIPLE * sensorProperties->imu1_accel_fs) {
+
+	// Only pull from IMUs if accel below fullscale and if they're working
+	if (fabs(imu1sampling) < ACCEL_SWITCH_MULTIPLE * sensorProperties->imu1_accel_fs
+			&& imu1sampling) {
 		numAccelsValid++;
-		accelSum += -curSensorVals->imu1_accel_y;
+		accelSum += imu1reading;
 	}
-	if (fabs(curSensorVals->imu2_accel_y) < ACCEL_SWITCH_MULTIPLE * sensorProperties->imu2_accel_fs) {
+	if (fabs(imu2sampling) < ACCEL_SWITCH_MULTIPLE * sensorProperties->imu2_accel_fs
+			&& imu2sampling) {
 		numAccelsValid++;
-		accelSum += -curSensorVals->imu2_accel_y;
+		accelSum += imu2reading;
 	}
-	if (numAccelsValid == 0) {
+
+	// If our IMUs are fullscaled, pull from high-G
+	if (numAccelsValid == 0 && highGsampling) {
 		numAccelsValid++;
-		accelSum += curSensorVals->high_g_accel_x;
+		accelSum += highGreading;
 	}
-	filterData.acc_z = fabs(accelSum / numAccelsValid);
+	return accelSum / numAccelsValid;
+}
+
+static void filterAccels(SensorData_t* curSensorVals, SensorProperties_t* sensorProperties) {
+
+	bool *status = HM_GetHardwareStatus();
+	filterData.acc_z = fabs(filterAccelOneAxis(-currentSensorVals->imu1_accel_y, -currentSensorVals->imu2_accel_y,
+			currentSensorVals->high_g_accel_x, sensorProperties, status[IMU1], status[IMU2], status[HIGH_G_ACCELEROMETER]));
 }
 
 static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {

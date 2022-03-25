@@ -155,6 +155,10 @@ bool hardwareStatus[NUM_HARDWARE];
 static bool inSim = false;
 static CircularBuffer_t *simRxBuffer = NULL;
 
+bool* HM_GetHardwareStatus() {
+	return hardwareStatus;
+}
+
 void HM_HardwareInit() {
 #if (IMU_1 == IMU_LSM9DS1)
 	/* LSM9DS1 IMU 1 */
