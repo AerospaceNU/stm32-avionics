@@ -24,7 +24,7 @@ extern "C"{
 // Prop data, from the link budget Google sheet
 #define TELEMETRY_ID_PROPSTUFF 1
 PACKED_STRUCT {
-	float loxTankDucer, kerTankDucer, purgeDucer, loxInletDucer, kerInletDucer, loxVenturi, kerVenturi, loadcell, loxTank, injector, engine;
+	//float loxTankDucer, kerTankDucer, purgeDucer, loxInletDucer, kerInletDucer, loxVenturi, kerVenturi, loadcell, loxTank, injector, engine;
 	// etc
 } PropulsionPacket_t;
 
@@ -32,7 +32,8 @@ PACKED_STRUCT {
 #define TELEMETRY_ID_ORIENTATION 2
 PACKED_STRUCT {
 	uint8_t state;
-	float qw, qx, qy, qz, wx, wy, wz, ax, ay, az, bx, by, bz;
+	int8_t qw, qx, qy, qz;
+	float wx, wy, wz, ax, ay, az, bx, by, bz;
 } OrientationPacket_t;
 
 // Location data?? from the link budget Google sheet
@@ -62,12 +63,13 @@ PACKED_STRUCT {
 	uint8_t string[RADIO_MAX_STRING];
 } CliStringPacket_t;
 
-//#define TELEMETRY_ID_BOARDCONFIG 5
-//PACKED_STRUCT {
-//	uint8_t drogueCuts;
-//	float drogueCutAltitudesM;
-//	double mainCutAltitudeM, groundElevationM, groundTemperatureC;
-//} BoardConfig_t;
+#define TELEMETRY_ID_ALT_INFO 6
+PACKED_STRUCT {
+	float pressure1, pressure2, pressureRef,
+		groundElevation, groundTemp, mainCutAlt;
+} AltInfoPacket_t;
+
+
 
 typedef union {
 	PropulsionPacket_t propStuff;
@@ -75,6 +77,7 @@ typedef union {
 	PositionPacket_t positionData;
 	LineCutterPacket_t lineCutter;
 	CliStringPacket_t cliString;
+	AltInfoPacket_t altitudeInfo;
 } PayloadPacket_u;
 
 PACKED_STRUCT {
@@ -93,7 +96,7 @@ typedef struct {
 	uint32_t orientationLastSent;
 	uint32_t positionLastSent;
 	uint32_t lineCutterLastSent;
-	uint32_t cliStringLastSent;
+	uint32_t altInfoLastSent;
 } DataTransmitState_t;
 
 #define RADIO_MAX_CALLBACKS 10
