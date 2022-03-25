@@ -6,6 +6,7 @@
 #include "stdio.h"
 #include "board_config.h"
 #include "string.h"
+#include "cli.h"
 
 static DataRecieveState_t dataRx;
 
@@ -24,6 +25,10 @@ void RadioManager_init() {
 	transmitPacket.softwareVersion = SOFTWARE_VERSION; // TODO set this;
 #endif
 	transmitPacket.board_serial_num = 0; // TODO set this;
+
+#ifdef TELEMETRY_RADIO
+	HM_RadioSetChannel(TELEMETRY_RADIO, 2);
+#endif
 }
 
 //! Must be called periodically to output data over CLI or USB
@@ -118,6 +123,24 @@ void RadioManager_transmitData(SensorData_t *sensorData,
 		HM_RadioSend(TELEMETRY_RADIO, (uint8_t*) &transmitPacket,
 				RADIO_PACKET_SIZE);
 	}
+
+	if (currentTime - lastSent.altInfoLastSent >= 1213) {
+			AltInfoPacket_t data = {
+				sensorData->baro1_pres,
+				sensorData->baro2_pres,
+				filterGetPressureRef(),
+				cliGetConfigs()->groundElevationM,
+				cliGetConfigs()->groundTemperatureC,
+				cliGetConfigs()->mainCutAltitudeM
+			};
+
+			transmitPacket.packetType = TELEMETRY_ID_ALT_INFO;
+			transmitPacket.payload.altitudeInfo = data;
+			lastSent.altInfoLastSent = currentTime;
+
+			HM_RadioSend(TELEMETRY_RADIO, (uint8_t*) &transmitPacket,
+					RADIO_PACKET_SIZE);
+		}
 
 //	if (currentTime - lastSent.lineCutterLastSent >= 1000) {
 //		LineCutterPacket_t data = {
