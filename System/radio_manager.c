@@ -89,8 +89,9 @@ void RadioManager_transmitData(SensorData_t *sensorData,
 	// } else
 
 	if (currentTime - lastSent.orientationLastSent >= 1000 / ORIENTATION_RATE) {
-		OrientationPacket_t data = { state, filterData->qw, filterData->qx,
-				filterData->qy, filterData->qz, sensorData->imu1_gyro_x,
+		OrientationPacket_t data = { state, (filterData->qw * 100.0),
+				(filterData->qx * 100.0), filterData->qy * 100.0,
+				(filterData->qz * 100.0), sensorData->imu1_gyro_x,
 				sensorData->imu1_gyro_y, sensorData->imu1_gyro_z,
 				filterData->acc_x, filterData->acc_y, filterData->acc_z,
 				sensorData->imu1_mag_x, sensorData->imu1_mag_y,
