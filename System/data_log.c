@@ -154,7 +154,7 @@ void data_log_load_last_stored_flight_metadata() {
 	flightNum = data_log_get_last_flight_num(); // Load the previous flight number and sector
 	uint8_t metadataBuff[kFlightMetadataSize]; // Create a buffer for the metadata
 	uint32_t prevFirstSector, prevLastSector;
-	data_log_get_flight_sectors(flightNum - 1, &prevFirstSector, &prevLastSector);
+	data_log_get_flight_sectors(flightNum, &prevFirstSector, &prevLastSector);
 	uint32_t metadataReadAddress = prevFirstSector * FLASH_SECTOR_BYTES;
 	HM_FlashReadStart(metadataReadAddress, kFlightMetadataSize, metadataBuff); // Read the metadata
 	uint32_t waitStartMS = HM_Millis();
