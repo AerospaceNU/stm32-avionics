@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "iwdg.h"
 #include "spi.h"
 #include "usart.h"
@@ -88,11 +89,12 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_SPI2_Init();
   MX_SPI3_Init();
   MX_USART1_UART_Init();
-  MX_USB_Device_Init();
   MX_IWDG_Init();
+  MX_USB_Device_Init();
   /* USER CODE BEGIN 2 */
 
   HM_HardwareInit();
