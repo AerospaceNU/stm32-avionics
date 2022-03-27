@@ -35,35 +35,34 @@ static const uint8_t Z_AXIS_ENABLE = (1 << 2);
 static const uint8_t Y_AXIS_ENABLE = (1 << 1);
 static const uint8_t X_AXIS_ENABLE = (1 << 0);
 
+typedef struct raw_data_s {
+  int16_t x;
+  int16_t y;
+  int16_t z;
+} raw_data_t;
 
-typedef struct raw_data_s{
-    int16_t x;
-    int16_t y;
-    int16_t z;
-}raw_data_t;
+typedef struct data_s {
+  uint32_t t;
+  double x;
+  double y;
+  double z;
+} data_t;
 
-typedef struct data_s{
-    uint32_t t;
-    double x;
-    double y;
-    double z;
-}data_t;
+typedef struct H3LIS331DLCtrl_s {
+  SPICtrld_t H3LIS331DLSPI;
+  data_t adjVal;
+  double gain;
+  raw_data_t rawVal;
+  data_t val;
+} H3LIS331DLCtrl_t;
 
-typedef struct H3LIS331DLCtrl_s{
-    SPICtrld_t H3LIS331DLSPI;
-    data_t adjVal;
-    double gain;
-    raw_data_t rawVal;
-    data_t val;
-}H3LIS331DLCtrl_t;
-
-uint8_t whoAmI(H3LIS331DLCtrl_t* sensor);
-uint8_t readCtrl1(H3LIS331DLCtrl_t* sensor);
-void H3LIS331DL_init(H3LIS331DLCtrl_t* sensor);
-void H3LIS331DL_get_data_raw(H3LIS331DLCtrl_t* sensor);
-void H3LIS331DL_get_data(H3LIS331DLCtrl_t* sensor);
-void H3LIS331DL_get_adj(H3LIS331DLCtrl_t* sensor);
-void H3LIS331DL_get_gain(H3LIS331DLCtrl_t* sensor);
+uint8_t whoAmI(H3LIS331DLCtrl_t *sensor);
+uint8_t readCtrl1(H3LIS331DLCtrl_t *sensor);
+void H3LIS331DL_init(H3LIS331DLCtrl_t *sensor);
+void H3LIS331DL_get_data_raw(H3LIS331DLCtrl_t *sensor);
+void H3LIS331DL_get_data(H3LIS331DLCtrl_t *sensor);
+void H3LIS331DL_get_adj(H3LIS331DLCtrl_t *sensor);
+void H3LIS331DL_get_gain(H3LIS331DLCtrl_t *sensor);
 
 #ifdef __cplusplus
 }

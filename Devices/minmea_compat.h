@@ -9,8 +9,8 @@
 
 #if !defined(HAVE_STRUCT_TIMESPEC)
 struct timespec {
-    time_t tv_sec;
-    long tv_nsec;
+  time_t tv_sec;
+  long tv_nsec;
 };
 #endif
 

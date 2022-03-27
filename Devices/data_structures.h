@@ -13,11 +13,11 @@
 
 #define RADIO_MAX_LEN 128
 typedef struct __attribute__((packed)) {
-	uint8_t data[RADIO_MAX_LEN];
-	uint8_t radioId;
-	int8_t rssi;
-	bool crc;
-	uint8_t lqi;
+  uint8_t data[RADIO_MAX_LEN];
+  uint8_t radioId;
+  int8_t rssi;
+  bool crc;
+  uint8_t lqi;
 } RecievedPacket_t;
 
 #endif /* DATA_STRUCTURES_H_ */

@@ -2,7 +2,7 @@
 #define HARDWARE_MANAGER_H_
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 #include <stdbool.h>
@@ -10,106 +10,107 @@ extern "C"{
 
 #include "circular_buffer.h"
 
-/* Useful defines for files that need to know some info about hardware it works with */
-#define FLASH_SECTOR_BYTES 		0x40000
-#define FLIGHT_METADATA_PAGES 	2
-#define FLASH_SIZE_BYTES 		0x4000000
-#define FLASH_PAGE_SIZE_BYTES	0x200
-#define FLASH_TIMEOUT_MS 		500
+/* Useful defines for files that need to know some info about hardware it works
+ * with */
+#define FLASH_SECTOR_BYTES 0x40000
+#define FLIGHT_METADATA_PAGES 2
+#define FLASH_SIZE_BYTES 0x4000000
+#define FLASH_PAGE_SIZE_BYTES 0x200
+#define FLASH_TIMEOUT_MS 500
 #define PYRO_CONTINUITY_THRESHOLD 3
 
-#define KHZ_TO_HZ 					1000
-#define MHZ_TO_HZ 					1000000
-#define RADIO_CHANNEL_BANDWIDTH 	150 * KHZ_TO_HZ
-#define RAD433_CHAN0 				433 * MHZ_TO_HZ
-#define RAD915_CHAN0 				914 * MHZ_TO_HZ
+#define KHZ_TO_HZ 1000
+#define MHZ_TO_HZ 1000000
+#define RADIO_CHANNEL_BANDWIDTH 150 * KHZ_TO_HZ
+#define RAD433_CHAN0 433 * MHZ_TO_HZ
+#define RAD915_CHAN0 914 * MHZ_TO_HZ
 
 typedef struct __attribute__((__packed__)) {
-	uint32_t timestamp_s;
-	uint32_t timestamp_us;
-	int16_t imu1_accel_x_raw;
-	int16_t imu1_accel_y_raw;
-	int16_t imu1_accel_z_raw;
-	double imu1_accel_x;
-	double imu1_accel_y;
-	double imu1_accel_z;
-	int16_t imu1_gyro_x_raw;
-	int16_t imu1_gyro_y_raw;
-	int16_t imu1_gyro_z_raw;
-	double imu1_gyro_x;
-	double imu1_gyro_y;
-	double imu1_gyro_z;
-	int16_t imu1_mag_x_raw;
-	int16_t imu1_mag_y_raw;
-	int16_t imu1_mag_z_raw;
-	double imu1_mag_x;
-	double imu1_mag_y;
-	double imu1_mag_z;
-	int16_t imu2_accel_x_raw;
-	int16_t imu2_accel_y_raw;
-	int16_t imu2_accel_z_raw;
-	double imu2_accel_x;
-	double imu2_accel_y;
-	double imu2_accel_z;
-	int16_t imu2_gyro_x_raw;
-	int16_t imu2_gyro_y_raw;
-	int16_t imu2_gyro_z_raw;
-	double imu2_gyro_x;
-	double imu2_gyro_y;
-	double imu2_gyro_z;
-	int16_t imu2_mag_x_raw;
-	int16_t imu2_mag_y_raw;
-	int16_t imu2_mag_z_raw;
-	double imu2_mag_x;
-	double imu2_mag_y;
-	double imu2_mag_z;
-	int16_t high_g_accel_x_raw;
-	int16_t high_g_accel_y_raw;
-	int16_t high_g_accel_z_raw;
-	double high_g_accel_x;
-	double high_g_accel_y;
-	double high_g_accel_z;
-	double baro1_pres;
-	double baro1_temp;
-	double baro2_pres;
-	double baro2_temp;
-	float gps_lat;
-	float gps_long;
-	float gps_alt;
-	float gps_speed;
-	float gps_course;
-	float gps_latitude_deviation;
-	float gps_longitude_deviation;
-	float gps_altitude_deviation;
-	float gps_speed_kph;
-	float gps_speed_knots;
-	uint64_t gps_timestamp;
-	int gps_seconds;
-	int gps_minutes;
-	int gps_hours;
-	int gps_day;
-	int gps_month;
-	int gps_year;
-	int gps_num_sats;
-	char gps_status;
-	double battery_voltage;
-	bool pyro_continuity[6];
+  uint32_t timestamp_s;
+  uint32_t timestamp_us;
+  int16_t imu1_accel_x_raw;
+  int16_t imu1_accel_y_raw;
+  int16_t imu1_accel_z_raw;
+  double imu1_accel_x;
+  double imu1_accel_y;
+  double imu1_accel_z;
+  int16_t imu1_gyro_x_raw;
+  int16_t imu1_gyro_y_raw;
+  int16_t imu1_gyro_z_raw;
+  double imu1_gyro_x;
+  double imu1_gyro_y;
+  double imu1_gyro_z;
+  int16_t imu1_mag_x_raw;
+  int16_t imu1_mag_y_raw;
+  int16_t imu1_mag_z_raw;
+  double imu1_mag_x;
+  double imu1_mag_y;
+  double imu1_mag_z;
+  int16_t imu2_accel_x_raw;
+  int16_t imu2_accel_y_raw;
+  int16_t imu2_accel_z_raw;
+  double imu2_accel_x;
+  double imu2_accel_y;
+  double imu2_accel_z;
+  int16_t imu2_gyro_x_raw;
+  int16_t imu2_gyro_y_raw;
+  int16_t imu2_gyro_z_raw;
+  double imu2_gyro_x;
+  double imu2_gyro_y;
+  double imu2_gyro_z;
+  int16_t imu2_mag_x_raw;
+  int16_t imu2_mag_y_raw;
+  int16_t imu2_mag_z_raw;
+  double imu2_mag_x;
+  double imu2_mag_y;
+  double imu2_mag_z;
+  int16_t high_g_accel_x_raw;
+  int16_t high_g_accel_y_raw;
+  int16_t high_g_accel_z_raw;
+  double high_g_accel_x;
+  double high_g_accel_y;
+  double high_g_accel_z;
+  double baro1_pres;
+  double baro1_temp;
+  double baro2_pres;
+  double baro2_temp;
+  float gps_lat;
+  float gps_long;
+  float gps_alt;
+  float gps_speed;
+  float gps_course;
+  float gps_latitude_deviation;
+  float gps_longitude_deviation;
+  float gps_altitude_deviation;
+  float gps_speed_kph;
+  float gps_speed_knots;
+  uint64_t gps_timestamp;
+  int gps_seconds;
+  int gps_minutes;
+  int gps_hours;
+  int gps_day;
+  int gps_month;
+  int gps_year;
+  int gps_num_sats;
+  char gps_status;
+  double battery_voltage;
+  bool pyro_continuity[6];
 } SensorData_t;
 
 typedef struct {
-	double imu1_accel_fs;
-	double imu2_accel_fs;
+  double imu1_accel_fs;
+  double imu2_accel_fs;
 } SensorProperties_t;
 
-typedef enum hardware_t{
-	RADIO_433 = 0,
-	RADIO_915,
-	IMU1,
-	IMU2,
-	BAROMETER1,
-	BAROMETER2,
-	HIGH_G_ACCELEROMETER,
-	NUM_HARDWARE
+typedef enum hardware_t {
+  RADIO_433 = 0,
+  RADIO_915,
+  IMU1,
+  IMU2,
+  BAROMETER1,
+  BAROMETER2,
+  HIGH_G_ACCELEROMETER,
+  NUM_HARDWARE
 } Hardware_t;
 
 void HM_HardwareInit();
@@ -118,8 +119,8 @@ void HM_HardwareInit();
 uint32_t HM_Millis();
 
 /* Flash functions */
-bool HM_FlashReadStart(uint32_t startLoc, uint32_t numBytes, uint8_t *pData);
-bool HM_FlashWriteStart(uint32_t startLoc, uint32_t numBytes, uint8_t *data);
+bool HM_FlashReadStart(uint32_t startLoc, uint32_t numBytes, uint8_t* pData);
+bool HM_FlashWriteStart(uint32_t startLoc, uint32_t numBytes, uint8_t* data);
 bool HM_FlashEraseSectorStart(uint32_t sectorNum);
 bool HM_FlashEraseChipStart();
 bool HM_FlashIsReadComplete();
@@ -139,8 +140,8 @@ void HM_LedSet(int ledNum, bool on);
 void HM_LedToggle(int ledNum);
 
 /* Radio functions */
-bool HM_RadioSend(Hardware_t radio, uint8_t *data, uint16_t numBytes);
-void HM_RadioRegisterConsumer(Hardware_t radio, CircularBuffer_t *rxBuffer);
+bool HM_RadioSend(Hardware_t radio, uint8_t* data, uint16_t numBytes);
+void HM_RadioRegisterConsumer(Hardware_t radio, CircularBuffer_t* rxBuffer);
 void HM_RadioUpdate();
 void HM_RadioSetChannel(Hardware_t radio, int channel);
 
@@ -178,7 +179,8 @@ SensorData_t* HM_GetSensorData();
 
 /**
  * @brief Returns a pointer to the current sensor properties
- * @return Pointer to statically-allocated struct where sensor properties are stored
+ * @return Pointer to statically-allocated struct where sensor properties are
+ * stored
  */
 SensorProperties_t* HM_GetSensorProperties();
 

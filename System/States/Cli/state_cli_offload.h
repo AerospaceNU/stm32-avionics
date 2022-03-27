@@ -2,26 +2,25 @@
 #define STATE_CLI_OFFLOAD_H_
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 #include "states_interface.h"
 
 class CliOffloadState : public State {
+ public:
+  using State::getID;
+  using State::getPeriodMS;
+  using State::State;
 
-	public:
-		using State::State;
-		using State::getID;
-		using State::getPeriodMS;
+  void init(void) override;
 
-		void init(void) override;
+  EndCondition_t run(void) override;
 
-		EndCondition_t run(void) override;
+  void cleanup(void) override;
 
-		void cleanup(void) override;
-
-	private:
-		bool initSuccess_;
+ private:
+  bool initSuccess_;
 };
 
 #ifdef __cplusplus
@@ -29,4 +28,3 @@ class CliOffloadState : public State {
 #endif
 
 #endif /* STATE_CLI_OFFLOAD_H_ */
-

@@ -3,17 +3,10 @@
 
 #include "cli.h"
 
-void CliCalibrateState::init() {
-	cliSendAck(true, nullptr);
-}
+void CliCalibrateState::init() { cliSendAck(true, nullptr); }
 
 EndCondition_t CliCalibrateState::run() {
-	return EndCondition_t::CliCommandComplete;
+  return EndCondition_t::CliCommandComplete;
 }
 
-void CliCalibrateState::cleanup() {
-	cliSendComplete(true, nullptr);
-}
-
-
-
+void CliCalibrateState::cleanup() { cliSendComplete(true, nullptr); }

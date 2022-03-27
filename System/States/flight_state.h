@@ -10,17 +10,16 @@
 
 #include "states_interface.h"
 
-class FlightState: public State {
-public:
-	FlightState(int id, uint32_t period_ms, bool hasPastApogee) : State(id, period_ms),
-		m_hasPastApogee(hasPastApogee) {}
-	~FlightState() = default;
+class FlightState : public State {
+ public:
+  FlightState(int id, uint32_t period_ms, bool hasPastApogee)
+      : State(id, period_ms), m_hasPastApogee(hasPastApogee) {}
+  ~FlightState() = default;
 
-	EndCondition_t run_state() override;
+  EndCondition_t run_state() override;
 
-protected:
-	bool m_hasPastApogee;
+ protected:
+  bool m_hasPastApogee;
 };
-
 
 #endif /* STATES_FLIGHT_STATES_INTERFACE_H_ */

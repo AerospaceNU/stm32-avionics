@@ -10,13 +10,28 @@ First, pull this git repository using the following command from a directory of 
 
 `git clone https://gitlab.com/aeronu/dollar-per-foot/stm32-avionics`
 
-**Note:** you must have git installed. You can install git bash [here](https://gitforwindows.org/).
+**Note:** you must have git installed. You can install git for windows [here](https://gitforwindows.org/).
 
-Next, open STM32 Cube IDE. If you do not have Cube you can install it from this [link](https://www.st.com/en/development-tools/stm32cubeide.html). Please download version 1.7.0 for compatibility with our code. The default installation options should work.
+Next, open STM32 Cube IDE. If you do not have Cube you can install it from this [link](https://www.st.com/en/development-tools/stm32cubeide.html). Please download version 1.7.0 for compatibility with our code.
 
 When opening the IDE, you can use the default workspace. Using the cloned directory may cause problems.
 
-Once the IDE is open, you can import the project. Navigate to `File -> Import -> General -> Existing Projects into Workspace`. Browse for the `H750VBT6-flight-board-v0` folder (or another board version) in `stm32-avionics`. Make sure `Search for nested projects` is checked and that none of the other options are checked. The code should build at this point by clicking on the hammer icon.
+Once the IDE is open, you can import the project. Navigate to `File -> Import -> General -> Existing Projects into Workspace`. Browse for the `stm32-avionics` folder. Make sure `Search for nested projects` is checked and that none of the other options are checked, then import all projects. All projects should build at this point by clicking on the hammer icon when one of their files is open.
+
+## Installing Formatting & Linting
+
+To keep commonality among code, we will be using both a formatter and a linter for C/C++. The formatter is called clang-format, and the linter is called Cpplint.
+
+### Clang/LLVM
+1. Navigate to https://github.com/llvm/llvm-project/releases
+2. Download "LLVM-xxxx-win64.exe" (or the one for your correct operating system)
+3. Install executable using almost all defaults, with one exception. When a checkbox shows up asking whether to add clang-format to your PATH, check it
+
+### CppStyle STM32CubeIDE/Eclipse Plugin
+1. In IDE, click *Help->Eclipse Marketplace*
+2. Search for "CppStyle" extension and install it
+3. Go to *Window->Preferences->C/C++->Code Style->Formatter->Code Formatter*. Change to *CppStyle (clang-format)*
+4. Go to *Window->Preferences->C/C++->CppStyle*. Change *Clang-format Path* to correct executable (C:\Program Files\LLVM\bin\clang-format.exe by default). Check *Run clang-format on file save*
 
 ## Running Code Using Debug
 

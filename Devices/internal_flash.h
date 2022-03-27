@@ -6,7 +6,7 @@
 #define INTERNAL_FLASH_H_
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 #include <stdbool.h>
@@ -20,11 +20,13 @@ extern "C"{
 #define INTERNAL_FLASH_END 0x081FFFFF
 #endif
 
-#define MAX_FLASH_ADDRESS        INTERNAL_FLASH_END - INTERNAL_FLASH_START
+#define MAX_FLASH_ADDRESS INTERNAL_FLASH_END - INTERNAL_FLASH_START
 
-bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data, uint32_t numBytes);
+bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data,
+                          uint32_t numBytes);
 
-bool internal_flash_read(uint32_t RelFlashAddress, uint8_t *pData, uint32_t numBytes);
+bool internal_flash_read(uint32_t RelFlashAddress, uint8_t *pData,
+                         uint32_t numBytes);
 
 #ifdef __cplusplus
 }

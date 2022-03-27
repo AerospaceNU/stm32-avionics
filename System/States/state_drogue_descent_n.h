@@ -2,28 +2,29 @@
 #define STATE_DROGUE_DESCENT_N_H_
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 #include "flight_state.h"
 
 class DrogueDescentNState : public FlightState {
+ public:
+  DrogueDescentNState(int id, uint32_t period_ms)
+      : FlightState(id, period_ms, true) {}
 
-	public:
-		DrogueDescentNState(int id, uint32_t period_ms) : FlightState(id, period_ms, true) {}
+  void init(void) override;
 
-		void init(void) override;
+  EndCondition_t run(void) override;
 
-		EndCondition_t run(void) override;
+  void cleanup(void) override;
 
-		void cleanup(void) override;
+ private:
+  static constexpr uint32_t kTransitionResetTimeThreshold =
+      500;  // 500 ms transition timer
 
-	private:
-		static constexpr uint32_t kTransitionResetTimeThreshold = 500; // 500 ms transition timer
+  uint32_t transitionResetTimer;
 
-		uint32_t transitionResetTimer;
-
-		uint8_t completeDrogueCuts_ = 0;
+  uint8_t completeDrogueCuts_ = 0;
 };
 
 #ifdef __cplusplus
@@ -31,4 +32,3 @@ class DrogueDescentNState : public FlightState {
 #endif
 
 #endif /* STATE_DROGUE_DESCENT_N_H_ */
-

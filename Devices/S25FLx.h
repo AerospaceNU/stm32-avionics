@@ -6,32 +6,37 @@
 #define S25FLX_H_
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
+
 #include "board_config.h"
 
 // #define USE_S25FLx_DMA
-// NOTE: DMA is not yet functional. Leave the define commented and remove this comment when DMA works
+// NOTE: DMA is not yet functional. Leave the define commented and remove this
+// comment when DMA works
 // TODO: Make DMA functional
 
 typedef struct {
-	SPI_HandleTypeDef *hspi;
-	GPIO_TypeDef *csPort;
-	uint16_t csPin;
-	uint32_t flashSizeBytes;
-	bool bWIP; // Write in progress
+  SPI_HandleTypeDef *hspi;
+  GPIO_TypeDef *csPort;
+  uint16_t csPin;
+  uint32_t flashSizeBytes;
+  bool bWIP;  // Write in progress
 #ifdef USE_S25FLx_DMA
-	bool bTxComplete;
-	bool bRxComplete;
+  bool bTxComplete;
+  bool bRxComplete;
 #endif
 } S25FLXCtrl_t;
 
-void S25FLX_init(S25FLXCtrl_t *s25flx, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csPort, uint16_t csPin, uint32_t flashSizeBytes);
-bool S25FLX_read_start(S25FLXCtrl_t *s25flx, uint32_t startLoc, uint32_t numBytes, uint8_t *pData);
-bool S25FLX_write_start(S25FLXCtrl_t *s25flx, uint32_t startLoc, uint32_t numBytes, uint8_t *data);
+void S25FLX_init(S25FLXCtrl_t *s25flx, SPI_HandleTypeDef *hspi,
+                 GPIO_TypeDef *csPort, uint16_t csPin, uint32_t flashSizeBytes);
+bool S25FLX_read_start(S25FLXCtrl_t *s25flx, uint32_t startLoc,
+                       uint32_t numBytes, uint8_t *pData);
+bool S25FLX_write_start(S25FLXCtrl_t *s25flx, uint32_t startLoc,
+                        uint32_t numBytes, uint8_t *data);
 bool S25FLX_erase_sector_start(S25FLXCtrl_t *s25flx, uint32_t sectorNum);
 bool S25FLX_erase_chip_start(S25FLXCtrl_t *s25flx);
 #ifdef USE_S25FLx_DMA
