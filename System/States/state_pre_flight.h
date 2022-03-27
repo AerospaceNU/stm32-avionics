@@ -13,7 +13,7 @@ extern "C"{
 class PreFlightState : public FlightState {
 
 	public:
-		using FlightState::FlightState;
+		PreFlightState(int id, uint32_t period_ms) : FlightState(id, period_ms, false) {}
 
 		void init(void) override;
 

@@ -12,10 +12,14 @@
 
 class FlightState: public State {
 public:
-	FlightState(int id, uint32_t period_ms) : State(id, period_ms) {}
+	FlightState(int id, uint32_t period_ms, bool hasPastApogee) : State(id, period_ms),
+		m_hasPastApogee(hasPastApogee) {}
 	~FlightState() = default;
 
 	EndCondition_t run_state() override;
+
+protected:
+	bool m_hasPastApogee;
 };
 
 

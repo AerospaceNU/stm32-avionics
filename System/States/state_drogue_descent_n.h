@@ -10,7 +10,7 @@ extern "C"{
 class DrogueDescentNState : public FlightState {
 
 	public:
-		using FlightState::FlightState;
+		DrogueDescentNState(int id, uint32_t period_ms) : FlightState(id, period_ms, true) {}
 
 		void init(void) override;
 

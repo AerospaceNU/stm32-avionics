@@ -14,7 +14,7 @@ EndCondition_t FlightState::run_state() {
 	// Collect, filter, and log all sensor data
 	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
-	filterApplyData(sensorData, HM_GetSensorProperties(), true);
+	filterApplyData(sensorData, HM_GetSensorProperties(), m_hasPastApogee);
 	FilterData_t* filterData = filterGetData();
 	RadioManager_transmitData(sensorData, filterData, this->getID());
 

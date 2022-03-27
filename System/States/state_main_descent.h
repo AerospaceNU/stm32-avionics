@@ -10,7 +10,7 @@ extern "C"{
 class MainDescentState : public FlightState {
 
 	public:
-		using FlightState::FlightState;
+		MainDescentState(int id, uint32_t period_ms) : FlightState(id, period_ms, true) {}
 
 		void init(void) override;
 
