@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "hardware_manager.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -95,12 +95,21 @@ int main(void)
   MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 
+  HM_HardwareInit();
+  RadioManager_init();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
+	HM_IWDG_Refresh();
+	HM_ReadSensorData();
+	HM_RadioUpdate();
+	RadioManager_tick();
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
