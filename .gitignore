@@ -20,3 +20,6 @@
 **/Debug/*
 **/.idea/*
 **/.vscode/*
+
+cmake-build-debug/*
+build/*

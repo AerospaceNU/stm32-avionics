@@ -12,6 +12,8 @@ extern "C"{
 #include <stdint.h>
 #include "board_config.h"
 
+#ifdef HAS_BUZZER
+
 typedef struct {
 	TIM_HandleTypeDef *htim;
 	uint32_t channel;
@@ -26,5 +28,7 @@ void buzzerStop(BuzzerCtrl_t *buzzer);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // HAS_BUZZER
 
 #endif /* BUZZER_H_ */

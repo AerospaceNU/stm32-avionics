@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 // Forward declarations for all internal register read/writes
 static uint8_t cc1120SpiReadReg(TiRadioCtrl_t *radio, uint16_t addr,

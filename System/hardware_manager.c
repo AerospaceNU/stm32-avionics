@@ -536,6 +536,7 @@ void HM_RadioUpdate() {
 
 void HM_RadioRegisterConsumer(Hardware_t radio,
 		CircularBuffer_t *rxBuffer) {
+#if defined(HAS_CC1120) || defined(HAS_CC1200)
 	TiRadioCtrl_t *pRadio;
 	switch (radio) {
 #ifdef HAS_RADIO_433
@@ -553,9 +554,11 @@ void HM_RadioRegisterConsumer(Hardware_t radio,
 	}
 
 	tiRadio_RegisterConsumer(pRadio, rxBuffer);
+#endif
 }
 
 void HM_RadioSetChannel(Hardware_t radio, int channel) {
+#if defined(HAS_CC1120) || defined(HAS_CC1200)
 	// We set channels by starting from channel 0's frequency and incrementing by a fixed
 	// bandwidth between channels
 
@@ -582,6 +585,7 @@ void HM_RadioSetChannel(Hardware_t radio, int channel) {
 
 	if(rad != NULL)
 		tiRadio_SetRadioFrequency(rad, band, centerFrequency);
+#endif
 }
 
 bool HM_UsbIsConnected() {

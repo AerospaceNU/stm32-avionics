@@ -6,8 +6,6 @@
 #include <string.h>
 #include "board_config.h"
 
-#define FLASH_TIMEOUT_VALUE              50000U /* 50 s */
-
 /**
   * @brief  Duplicate of HAL_FLASH_Program but without checking for a valid flash address
   * @param  TypeProgram Indicate the way to program at a specified address.
@@ -23,9 +21,12 @@
   * @retval HAL_StatusTypeDef HAL Status
   */
 HAL_StatusTypeDef Internal_Flash_Program(uint32_t TypeProgram, uint32_t FlashAddress, uint32_t DataAddress) {
-	#if (FCB_VERSION == 1)
+	#if (FCB_VERSION == 1 || !defined(STM32H7))
 	return HAL_FLASH_Program(TypeProgram, FlashAddress, DataAddress);
 	#else
+
+#define FLASH_TIMEOUT_VALUE 50000U /* 50 s */
+
 	HAL_StatusTypeDef status;
 	__IO uint32_t *dest_addr = (__IO uint32_t *)FlashAddress;
 	__IO uint32_t *src_addr = (__IO uint32_t*)DataAddress;
@@ -108,7 +109,16 @@ bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data, uint32_t numB
 
 		sofar += copyBytes;
 
-		Internal_Flash_Program(FLASH_TYPEPROGRAM_FLASHWORD, writeAddress, (uint32_t)&flashWriteBuffer); // Write to the flash
+		unsigned long typeprog;
+#ifdef STM32H7
+		typeprog = FLASH_TYPEPROGRAM_FLASHWORD;
+#else
+		// TODO this behavior is incorrect!
+		typeprog = FLASH_CR_PG;
+#endif
+
+		Internal_Flash_Program(typeprog, writeAddress, (uint32_t)&flashWriteBuffer); // Write to the flash
+
 		writeAddress += 32;
 	}
 	HAL_FLASH_Lock();

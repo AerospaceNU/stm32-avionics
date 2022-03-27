@@ -7,6 +7,8 @@
 
 #include "board_config.h"
 
+#ifdef HAS_ADC
+
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -46,5 +48,7 @@ bool adcGetValue(AdcCtrl_t *adc, float *pval, uint32_t timeoutMS);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // HAS_ADC
 
 #endif /* ADC_DEVICE_H_ */

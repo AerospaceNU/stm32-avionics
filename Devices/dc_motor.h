@@ -2,6 +2,9 @@
 #define _DC_MOTOR_H
 
 #include "board_config.h"
+
+#ifdef HAS_SERVO
+
 #include "tim.h"
 
 /*
@@ -39,6 +42,8 @@ void DC_motor_stop(pwm_control_t *pwmObj);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // HAS_SERVO
 
 
 #endif /* _DC_MOTOR_H */
