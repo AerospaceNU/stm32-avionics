@@ -1,5 +1,5 @@
-#ifndef _DC_MOTOR_H
-#define _DC_MOTOR_H
+#ifndef DEVICES_DC_MOTOR_H_
+#define DEVICES_DC_MOTOR_H_
 
 #include "board_config.h"
 #include "tim.h"
@@ -40,4 +40,4 @@ void DC_motor_stop(pwm_control_t *pwmObj);
 }
 #endif
 
-#endif /* _DC_MOTOR_H */
+#endif  // DEVICES_DC_MOTOR_H_

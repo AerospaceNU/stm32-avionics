@@ -640,10 +640,8 @@ static void HM_SimReadSensorData() {
   // If buffer full, throw everything away since it's probably bad
   if (cbFull(simRxBuffer)) {
     cbFlush(simRxBuffer);
-  }
-
-  // Buffer isn't full, continue as normal
-  else {
+  } else {
+    // Buffer isn't full, continue as normal
     // First throw away any old data that wasn't processed in time
     if (buffCount > SENSOR_DATA_SIZE) {
       cbDequeue(simRxBuffer, buffCount - SENSOR_DATA_SIZE);
@@ -796,10 +794,8 @@ void HM_ReadSensorData() {
     // Timestamp data
     // TODO: Make sensor data timestamp get time from PPS-updated timer
     sensorData.timestamp_s = HM_Millis();
-  }
-
-  // Simming
-  else {
+  } else {
+    // Simming
     HM_SimReadSensorData();
   }
 }

@@ -1,5 +1,5 @@
-#ifndef STATE_SHUTDOWN_H_
-#define STATE_SHUTDOWN_H_
+#ifndef SYSTEM_STATES_STATE_SHUTDOWN_H_
+#define SYSTEM_STATES_STATE_SHUTDOWN_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,4 +24,4 @@ class ShutdownState : public State {
 }
 #endif
 
-#endif /* STATE_SHUTDOWN_H_ */
+#endif  // SYSTEM_STATES_STATE_SHUTDOWN_H_

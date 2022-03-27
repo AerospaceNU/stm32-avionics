@@ -6,8 +6,8 @@
  * published by Sam Hocevar. See the COPYING file for more details.
  */
 
-#ifndef MINMEA_H
-#define MINMEA_H
+#ifndef DEVICES_MINMEA_H_
+#define DEVICES_MINMEA_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -255,6 +255,6 @@ static inline float minmea_tocoord(struct minmea_float *f) {
 }
 #endif
 
-#endif /* MINMEA_H */
+#endif  // DEVICES_MINMEA_H_
 
 /* vim: set ts=4 sw=4 et: */

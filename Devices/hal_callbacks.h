@@ -2,8 +2,8 @@
  * hal_callbacks.h
  */
 
-#ifndef HAL_CALLBACKS_H_
-#define HAL_CALLBACKS_H_
+#ifndef DEVICES_HAL_CALLBACKS_H_
+#define DEVICES_HAL_CALLBACKS_H_
 
 #include "board_config.h"
 
@@ -29,4 +29,4 @@ void register_HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,
                                       void (*callback)(void *), void *userData);
 #endif
 
-#endif /* HAL_CALLBACKS_H_ */
+#endif  // DEVICES_HAL_CALLBACKS_H_

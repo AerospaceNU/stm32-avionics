@@ -46,8 +46,8 @@ void usbInit() {
 
 bool usbTransmit(uint8_t *buf, uint16_t len) {
   // Wait for time since last transmit
-  while (HAL_GetTick() - lastTransmit < TIME_BETWEEN_TRANSMITS_MS)
-    ;
+  while (HAL_GetTick() - lastTransmit < TIME_BETWEEN_TRANSMITS_MS) {
+  }
   lastTransmit = HAL_GetTick();
   return CDC_Transmit_FS(buf, len) == USBD_OK;
 }

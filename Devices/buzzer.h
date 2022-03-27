@@ -2,8 +2,8 @@
  * buzzer.h
  */
 
-#ifndef BUZZER_H_
-#define BUZZER_H_
+#ifndef DEVICES_BUZZER_H_
+#define DEVICES_BUZZER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,4 +29,4 @@ void buzzerStop(BuzzerCtrl_t *buzzer);
 }
 #endif
 
-#endif /* BUZZER_H_ */
+#endif  // DEVICES_BUZZER_H_

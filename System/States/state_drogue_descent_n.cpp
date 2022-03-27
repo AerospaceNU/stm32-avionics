@@ -29,9 +29,8 @@ EndCondition_t DrogueDescentNState::run() {
       // TODO: Actuate drogue cut
       completeDrogueCuts_ += 1;
     }
-  }
-  // Detect if main cut altitude has been reached
-  else if (filterData->pos_z < cliGetConfigs()->mainCutAltitudeM) {
+  } else if (filterData->pos_z < cliGetConfigs()->mainCutAltitudeM) {
+    // Detect if main cut altitude has been reached
     if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
       return EndCondition_t::MainCutAltitude;
     }

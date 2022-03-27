@@ -8,8 +8,8 @@
  *
  ***************************************************************/
 
-#ifndef SMARTRF_CC1120_H
-#define SMARTRF_CC1120_H
+#ifndef DEVICES_RADIOCONFIG_SMARTRF_CC1120_CFG_434_38_4KBPS_H_
+#define DEVICES_RADIOCONFIG_SMARTRF_CC1120_CFG_434_38_4KBPS_H_
 
 #include "cc1120_cc1200_defs.h"
 #include "smartrf_registersettings.h"
@@ -87,4 +87,4 @@ static const RegisterSetting_t cc1120_433_1_2kbps_cfg[] = {
 
 #endif
 
-#endif
+#endif  // DEVICES_RADIOCONFIG_SMARTRF_CC1120_CFG_434_38_4KBPS_H_

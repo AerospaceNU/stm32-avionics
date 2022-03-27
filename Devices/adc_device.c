@@ -8,6 +8,12 @@
 
 #include "hal_callbacks.h"
 
+#define MAX_RAW_VAL_16B 2 << 16
+#define MAX_RAW_VAL_14B 2 << 14
+#define MAX_RAW_VAL_12B 2 << 12
+#define MAX_RAW_VAL_10B 2 << 10
+#define MAX_RAW_VAL_8B 2 << 8
+
 static void adcConversionCpltCallback(void *adc) {
   ((AdcCtrl_t *)adc)->bConvCplt = true;
 }
@@ -24,23 +30,23 @@ void adcInit(AdcCtrl_t *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
   float maxRawVal = 0;
   switch (hadc->Init.Resolution) {
     case ADC_RESOLUTION_16B:
-      maxRawVal = 65535;  // 2 << 16
+      maxRawVal = MAX_RAW_VAL_16B;
       break;
 
     case ADC_RESOLUTION_14B:
-      maxRawVal = 16384;  // 2 << 14
+      maxRawVal = MAX_RAW_VAL_14B;
       break;
 
     case ADC_RESOLUTION_12B:
-      maxRawVal = 4096;  // 2 << 12
+      maxRawVal = MAX_RAW_VAL_12B;
       break;
 
     case ADC_RESOLUTION_10B:
-      maxRawVal = 1024;  // 2 << 10
+      maxRawVal = MAX_RAW_VAL_10B;
       break;
 
     case ADC_RESOLUTION_8B:
-      maxRawVal = 256;  // 2 << 8
+      maxRawVal = MAX_RAW_VAL_8B;
       break;
 
     default:
@@ -72,8 +78,8 @@ void adcStartSingleRead(AdcCtrl_t *adc) {
 bool adcGetValue(AdcCtrl_t *adc, float *pval, uint32_t timeoutMS) {
   // Wait for something to happen
   uint32_t startTime = HAL_GetTick();
-  while (!adc->bConvCplt && HAL_GetTick() - startTime < timeoutMS)
-    ;
+  while (!adc->bConvCplt && HAL_GetTick() - startTime < timeoutMS) {
+  }
 
   // Get ADC value if conversion complete
   if (adc->bConvCplt) {

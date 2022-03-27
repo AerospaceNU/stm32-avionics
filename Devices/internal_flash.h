@@ -2,8 +2,8 @@
  * internal_flash.h
  */
 
-#ifndef INTERNAL_FLASH_H_
-#define INTERNAL_FLASH_H_
+#ifndef DEVICES_INTERNAL_FLASH_H_
+#define DEVICES_INTERNAL_FLASH_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,4 +32,4 @@ bool internal_flash_read(uint32_t RelFlashAddress, uint8_t *pData,
 }
 #endif
 
-#endif /* INTERNAL_FLASH_H_ */
+#endif  // DEVICES_INTERNAL_FLASH_H_

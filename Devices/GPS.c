@@ -7,6 +7,11 @@
 #include "stdbool.h"
 #include "string.h"
 
+#define GPS_MIN_VALID_YEAR 2000
+#define GPS_MAX_VALID_YEAR 2100
+
+#define GPS_UART_TIMEOUT_MS 50
+
 void parseString(GPSCtrl_t *gps, char line[]) {
   switch (minmea_sentence_id(line, false)) {
     case MINMEA_SENTENCE_RMC: {
@@ -108,8 +113,8 @@ void parseString(GPSCtrl_t *gps, char line[]) {
         const struct minmea_time time = {gps->hours, gps->minutes, gps->seconds,
                                          gps->microseconds};
 
-        if (!minmea_gettime(&ts, &date, &time) && gps->year > 2000 &&
-            gps->year < 2100) {
+        if (!minmea_gettime(&ts, &date, &time) &&
+            gps->year > GPS_MIN_VALID_YEAR && gps->year < GPS_MAX_VALID_YEAR) {
           gps->timestamp = ts.tv_sec;
         }
       }
@@ -169,7 +174,8 @@ void gps_init(GPSCtrl_t *gps) {
                                        gps);
   register_HAL_UART_RxCpltCallback(gps->gps_uart, gps_RxCpltCallback, gps);
 
-  HAL_UART_Receive_DMA(gps->gps_uart, (uint8_t *)gps->rx_buff, 4096);
+  HAL_UART_Receive_DMA(gps->gps_uart, (uint8_t *)gps->rx_buff,
+                       sizeof(gps->rx_buff));
 
   if (gps->type == GPS_TYPE_UBLOX) {
     uint8_t nmea[16] = {0xB5,                    // CFG-MSG Header
@@ -184,7 +190,7 @@ void gps_init(GPSCtrl_t *gps) {
                         0x0B,                    // Checksum
                         0x6B};
     // Transmit configuration over UART
-    HAL_UART_Transmit(gps->gps_uart, nmea, sizeof(nmea), 500);
+    HAL_UART_Transmit(gps->gps_uart, nmea, sizeof(nmea), GPS_UART_TIMEOUT_MS);
   }
 }
 

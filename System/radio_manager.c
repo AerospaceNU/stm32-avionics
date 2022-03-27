@@ -1,5 +1,5 @@
 /*
- * data_transmission.c
+ * radio_manager.c
  */
 
 #include "radio_manager.h"
@@ -69,24 +69,20 @@ void RadioManager_transmitData(SensorData_t *sensorData,
   uint32_t currentTime = HM_Millis();
   transmitPacket.timestampMs = currentTime;
 
-  // if (currentTime - lastSent.propStuffLastSent >= 500) {
-  // 	PropulsionPacket_t data = {
-  // 		sensorData->loxTankDucer,
-  // 		sensorData->kerTankDucer,
-  // 		sensorData->purgeDucer,
-  // 		sensorData->loxInletDucer,
-  // 		sensorData->kerInletDucer,
-  // 		sensorData->loxVenturi,
-  // 		sensorData->kerVenturi,
-  // 		sensorData->loadcell,
-  // 		sensorData->loxTank,
-  // 		sensorData->injector,
-  // 		sensorData->engine
-  // 	};
-  // 	transmitPacket.packetType = 1;
-  // 	transmitPacket.payload = data;
-  // 	lastSent.propStuffLastSent = 0;
-  // } else
+  /*
+  if (currentTime - lastSent.propStuffLastSent >= 500) {
+    PropulsionPacket_t data = {
+        sensorData->loxTankDucer,  sensorData->kerTankDucer,
+        sensorData->purgeDucer,    sensorData->loxInletDucer,
+        sensorData->kerInletDucer, sensorData->loxVenturi,
+        sensorData->kerVenturi,    sensorData->loadcell,
+        sensorData->loxTank,       sensorData->injector,
+        sensorData->engine};
+    transmitPacket.packetType = 1;
+    transmitPacket.payload = data;
+    lastSent.propStuffLastSent = 0;
+  }
+  */
 
   if (currentTime - lastSent.orientationLastSent >= 1000 / ORIENTATION_RATE) {
     OrientationPacket_t data = {state,
@@ -157,30 +153,29 @@ void RadioManager_transmitData(SensorData_t *sensorData,
                  RADIO_PACKET_SIZE);
   }
 
-  //	if (currentTime - lastSent.lineCutterLastSent >= 1000) {
-  //		LineCutterPacket_t data = {
-  //			sensorData->lineCutterNumber,
-  //			sensorData->state,
-  //			sensorData->battSense,
-  //			sensorData->cutSense1,
-  //			sensorData->cutSense2,
-  //			sensorData->currentSense,
-  //			sensorData->photoresistor,
-  //			sensorData->timestamp,
-  //			sensorData->pressure,
-  //			sensorData->altitude,
-  //			sensorData->avgAltitude,
-  //			sensorData->deltaAltitude,
-  //			sensorData->avgDeltaAltitude,
-  //			sensorData->temperature,
-  //			sensorData->accelX,
-  //			sensorData->accelY,
-  //			sensorData->accelZ
-  //		};
-  //		transmitPacket.packetType = 4;
-  //		transmitPacket.payload.lineCutter = data;
-  //		lastSent.lineCutterLastSent = currentTime;
-  //
+  /*
+  if (currentTime - lastSent.lineCutterLastSent >= 1000) {
+    LineCutterPacket_t data = {sensorData->lineCutterNumber,
+                               sensorData->state,
+                               sensorData->battSense,
+                               sensorData->cutSense1,
+                               sensorData->cutSense2,
+                               sensorData->currentSense,
+                               sensorData->photoresistor,
+                               sensorData->timestamp,
+                               sensorData->pressure,
+                               sensorData->altitude,
+                               sensorData->avgAltitude,
+                               sensorData->deltaAltitude,
+                               sensorData->avgDeltaAltitude,
+                               sensorData->temperature,
+                               sensorData->accelX,
+                               sensorData->accelY,
+                               sensorData->accelZ};
+    transmitPacket.packetType = 4;
+    transmitPacket.payload.lineCutter = data;
+    lastSent.lineCutterLastSent = currentTime;
+  */
 }
 
 #endif
@@ -195,8 +190,8 @@ void RadioManager_transmitString(Hardware_t radio, uint8_t *data, size_t len) {
     transmitPacket.packetType = TELEMETRY_ID_STRING;
 
     // copy txLen many bytes into the string, and set the rest to null chars
-    memset(transmitPacket.payload.cliString.string, 0, RADIO_MAX_STRING);
-    memcpy(transmitPacket.payload.cliString.string, data, txLen);
+    memset(transmitPacket.payload.cliString.message, 0, RADIO_MAX_STRING);
+    memcpy(transmitPacket.payload.cliString.message, data, txLen);
     transmitPacket.payload.cliString.len = txLen;
 
     HM_RadioSend(radio, (uint8_t *)&transmitPacket, RADIO_PACKET_SIZE);

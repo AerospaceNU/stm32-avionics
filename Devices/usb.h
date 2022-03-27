@@ -5,8 +5,8 @@
  *      Author: Ben Fox
  */
 
-#ifndef USB_H_
-#define USB_H_
+#ifndef DEVICES_USB_H_
+#define DEVICES_USB_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,4 +47,4 @@ bool usbIsConnected();
 }
 #endif
 
-#endif /* USB_H_ */
+#endif  // DEVICES_USB_H_

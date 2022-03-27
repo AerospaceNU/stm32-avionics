@@ -2,8 +2,8 @@
  * radio_manager.h
  */
 
-#ifndef DATA_TRANSMISSION_H_
-#define DATA_TRANSMISSION_H_
+#ifndef SYSTEM_RADIO_MANAGER_H_
+#define SYSTEM_RADIO_MANAGER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,7 +68,7 @@ LineCutterPacket_t;
 #define RADIO_MAX_STRING 48
 PACKED_STRUCT {
   uint8_t len;
-  uint8_t string[RADIO_MAX_STRING];
+  uint8_t message[RADIO_MAX_STRING];
 }
 CliStringPacket_t;
 
@@ -133,4 +133,4 @@ void RadioManager_addMessageCallback(RadioCallback_t callback);
 }
 #endif
 
-#endif /* DATA_TRANSMISSION_H_ */
+#endif  // SYSTEM_RADIO_MANAGER_H_

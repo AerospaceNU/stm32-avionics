@@ -5,8 +5,8 @@
  *      Author: John
  */
 
-#ifndef SRC_SPIDRIVER_H_
-#define SRC_SPIDRIVER_H_
+#ifndef DEVICES_SPIDRIVER_H_
+#define DEVICES_SPIDRIVER_H_
 
 #include "board_config.h"
 
@@ -27,4 +27,4 @@ void SPI_WriteRegister(SPICtrld_t *sensor, uint8_t reg, uint8_t val);
 }
 #endif
 
-#endif /* SRC_SPIDRIVER_H_ */
+#endif  // DEVICES_SPIDRIVER_H_

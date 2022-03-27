@@ -2,8 +2,8 @@
  * filters.h
  */
 
-#ifndef FILTERS_H_
-#define FILTERS_H_
+#ifndef SYSTEM_FILTERING_FILTERS_H_
+#define SYSTEM_FILTERING_FILTERS_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,4 +68,4 @@ FilterData_t* filterGetData();
 }
 #endif
 
-#endif /* FILTERS_H_ */
+#endif  // SYSTEM_FILTERING_FILTERS_H_

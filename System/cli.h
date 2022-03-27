@@ -2,8 +2,8 @@
  * cli.h
  */
 
-#ifndef CLI_H_
-#define CLI_H_
+#ifndef SYSTEM_CLI_H_
+#define SYSTEM_CLI_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,7 +50,6 @@ typedef struct {
   char* e;  // ground elevation
   char* t;  // ground temperature
   bool h;   // help flag
-
   char* c;  // Radio channel, can be negative
 } CliOptionVals_t;
 
@@ -127,4 +126,4 @@ CircularBuffer_t* cliGetRxBuffer();
 }
 #endif
 
-#endif /* CLI_H_ */
+#endif  // SYSTEM_CLI_H_

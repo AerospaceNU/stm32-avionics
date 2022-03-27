@@ -7,17 +7,17 @@
 
 #include "buzzer_heartbeat.h"
 #include "cli.h"
-#include "data_log.h"  //This include is only needed to pass a flightID to userSetFlightID before command line implementation
+#include "data_log.h"  // This include is only needed to pass a flightID to userSetFlightID before command line implementation
 #include "data_offload.h"
 
-static void format_time_seconds(char *result, uint32_t seconds) {
+static void format_time_seconds(char *result, int resultLen, uint32_t seconds) {
   uint32_t minutes = seconds / 60;
   seconds %= 60;
 
   uint32_t hours = minutes / 60;
   minutes %= 60;
 
-  sprintf(result, "%02lu:%02lu:%02lu", hours, minutes, seconds);
+  snprintf(result, resultLen, "%02lu:%02lu:%02lu", hours, minutes, seconds);
 }
 
 void CliOffloadState::init() {
@@ -38,10 +38,8 @@ void CliOffloadState::init() {
       return;
     }
     dataOffloadSetFlightId(flightNum);
-  }
-
-  // Otherwise, offload most recent launched flight
-  else {
+  } else {
+    // Otherwise, offload most recent launched flight
     uint32_t lastLaunched = data_log_get_last_launched_flight_num();
     // Offload the last launched flight if it exists, or else the last flight if
     // none are launched
@@ -67,20 +65,24 @@ EndCondition_t CliOffloadState::run() {
     char sendString[80];
     uint32_t lastFlightNum = data_log_get_last_flight_num();
     if (lastFlightNum == 0) {
-      sprintf(sendString, "\r\nNo flights exist to offload\r\n");
+      snprintf(sendString, sizeof(sendString),
+               "\r\nNo flights exist to offload\r\n");
       cliSend(sendString);
     } else {
       FlightMetadata metadataPacket;
       time_t flight_timestamp;
       char timeString[25];
-      sprintf(sendString, "Available flights to offload: \r\n");
+      snprintf(sendString, sizeof(sendString),
+               "Available flights to offload: \r\n");
       cliSend(sendString);
-      sprintf(sendString, "Last: %ld      Last Launched: %ld\r\n",
-              data_log_get_last_flight_num(),
-              data_log_get_last_launched_flight_num());
+      snprintf(sendString, sizeof(sendString),
+               "Last: %ld      Last Launched: %ld\r\n",
+               data_log_get_last_flight_num(),
+               data_log_get_last_launched_flight_num());
       cliSend(sendString);
-      sprintf(sendString, "| %8s | %8s | %-25s | %-15s |\r\n", "Flight #",
-              "Launched", "Timestamp", "Flight Duration");
+      snprintf(sendString, sizeof(sendString),
+               "| %8s | %8s | %-25s | %-15s |\r\n", "Flight #", "Launched",
+               "Timestamp", "Flight Duration");
       cliSend(sendString);
       for (uint8_t num = 1; num <= lastFlightNum; ++num) {
         data_log_get_flight_metadata(&metadataPacket, num);
@@ -90,17 +92,18 @@ EndCondition_t CliOffloadState::run() {
             metadataPacket.timestamp < 4102462800) {
           strftime(timeString, 25, "%c", localtime(&flight_timestamp));
         } else {
-          sprintf(timeString, "None");
+          snprintf(timeString, sizeof(timeString), "None");
         }
 
         char launchedString[6];
-        sprintf(launchedString,
-                metadataPacket.launched == 1 ? "true" : "false");
+        snprintf(launchedString, sizeof(launchedString),
+                 metadataPacket.launched == 1 ? "true" : "false");
         char durationString[9];
-        format_time_seconds(durationString,
+        format_time_seconds(durationString, sizeof(durationString),
                             data_log_get_last_flight_timestamp(num) / 1000);
-        sprintf(sendString, "| %8d | %8s | %-25s | %-15s |\r\n", num,
-                launchedString, timeString, durationString);
+        snprintf(sendString, sizeof(sendString),
+                 "| %8d | %8s | %-25s | %-15s |\r\n", num, launchedString,
+                 timeString, durationString);
         cliSend(sendString);
       }
     }

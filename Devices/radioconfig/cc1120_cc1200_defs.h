@@ -5,8 +5,8 @@
  *      Author: matth
  */
 
-#ifndef RADIOCONFIG_CC1120_CC1200_DEFS_H_
-#define RADIOCONFIG_CC1120_CC1200_DEFS_H_
+#ifndef DEVICES_RADIOCONFIG_CC1120_CC1200_DEFS_H_
+#define DEVICES_RADIOCONFIG_CC1120_CC1200_DEFS_H_
 
 /******************************************************************************
  * CONSTANTS
@@ -231,40 +231,39 @@ typedef enum {
 
 /* DATA FIFO Access */
 #define TIRADIO_SINGLE_TXFIFO \
-  0x003F /*  TXFIFO  - Single accecss to Transmit FIFO */
+  0x003F  //  TXFIFO  - Single accecss to Transmit FIFO
 #define TIRADIO_BURST_TXFIFO \
-  0x007F /*  TXFIFO  - Burst accecss to Transmit FIFO  */
+  0x007F  //  TXFIFO  - Burst accecss to Transmit FIFO
 #define TIRADIO_SINGLE_RXFIFO \
-  0x00BF /*  RXFIFO  - Single accecss to Receive FIFO  */
+  0x00BF  //  RXFIFO  - Single accecss to Receive FIFO
 #define TIRADIO_BURST_RXFIFO \
-  0x00FF /*  RXFIFO  - Busrrst ccecss to Receive FIFO  */
+  0x00FF  //  RXFIFO  - Busrrst ccecss to Receive FIFO
 
 #define TIRADIO_LQI_CRC_OK_BM 0x80
 #define TIRADIO_LQI_EST_BM 0x7F
 
 /* Command strobe registers */
-#define TIRADIO_SRES 0x30 /*  SRES    - Reset chip. */
+#define TIRADIO_SRES 0x30  // SRES    - Reset chip.
 #define TIRADIO_SFSTXON \
-  0x31 /*  SFSTXON - Enable and calibrate frequency synthesizer. */
-#define TIRADIO_SXOFF 0x32 /*  SXOFF   - Turn off crystal oscillator. */
+  0x31  // SFSTXON - Enable and calibrate frequency synthesizer.
+#define TIRADIO_SXOFF 0x32  // SXOFF   - Turn off crystal oscillator.
 #define TIRADIO_SCAL \
-  0x33 /*  SCAL    - Calibrate frequency synthesizer and turn it off. */
+  0x33  // SCAL    - Calibrate frequency synthesizer and turn it off.
 #define TIRADIO_SRX \
-  0x34 /*  SRX     - Enable RX. Perform calibration if enabled. */
-#define TIRADIO_STX                                                           \
-  0x35 /*  STX     - Enable TX. If in RX state, only enable TX if CCA passes. \
-        */
+  0x34  // SRX     - Enable RX. Perform calibration if enabled.
+#define TIRADIO_STX \
+  0x35  // STX     - Enable TX. If in RX state, only enable TX if CCA passes.
 #define TIRADIO_SIDLE \
-  0x36 /*  SIDLE   - Exit RX / TX, turn off frequency synthesizer. */
+  0x36  // SIDLE   - Exit RX / TX, turn off frequency synthesizer.
 #define TIRADIO_SWOR \
-  0x38 /*  SWOR    - Start automatic RX polling sequence (Wake-on-Radio) */
+  0x38  // SWOR    - Start automatic RX polling sequence (Wake-on-Radio)
 #define TIRADIO_SPWD \
-  0x39 /*  SPWD    - Enter power down mode when CSn goes high. */
-#define TIRADIO_SFRX 0x3A    /*  SFRX    - Flush the RX FIFO buffer. */
-#define TIRADIO_SFTX 0x3B    /*  SFTX    - Flush the TX FIFO buffer. */
-#define TIRADIO_SWORRST 0x3C /*  SWORRST - Reset real time clock. */
-#define TIRADIO_SNOP 0x3D    /*  SNOP    - No operation. Returns status byte. */
-#define TIRADIO_AFC 0x37     /*  AFC     - Automatic Frequency Correction */
+  0x39  // SPWD    - Enter power down mode when CSn goes high.
+#define TIRADIO_SFRX 0x3A     // SFRX    - Flush the RX FIFO buffer.
+#define TIRADIO_SFTX 0x3B     // SFTX    - Flush the TX FIFO buffer.
+#define TIRADIO_SWORRST 0x3C  // SWORRST - Reset real time clock.
+#define TIRADIO_SNOP 0x3D     // SNOP    - No operation. Returns status byte.
+#define TIRADIO_AFC 0x37      // AFC     - Automatic Frequency Correction
 
 /* Chip states returned in status byte */
 #define TIRADIO_STATE_IDLE 0x00
@@ -459,25 +458,22 @@ typedef enum {
 #define TIRADIO_TXFIRST 0x2FD3
 #define TIRADIO_RXLAST 0x2FD4
 #define TIRADIO_TXLAST 0x2FD5
-#define TIRADIO_NUM_TXBYTES 0x2FD6 /* Number of bytes in TXFIFO */
-#define TIRADIO_NUM_RXBYTES 0x2FD7 /* Number of bytes in RXFIFO */
+#define TIRADIO_NUM_TXBYTES 0x2FD6  // Number of bytes in TXFIFO
+#define TIRADIO_NUM_RXBYTES 0x2FD7  // Number of bytes in RXFIFO
 #define TIRADIO_FIFO_NUM_TXBYTES 0x2FD8
 #define TIRADIO_FIFO_NUM_RXBYTES 0x2FD9
 #define TIRADIO_RXFIFO_PRE_BUF 0x2FDA
 
 /* DATA FIFO Access */
 #define TIRADIO_SINGLE_TXFIFO \
-  0x003F /*  TXFIFO  - Single accecss to Transmit FIFO */
-#define TIRADIO_BURST_TXFIFO \
-  0x007F /*  TXFIFO  - Burst accecss to Transmit FIFO  */
-#define TIRADIO_SINGLE_RXFIFO \
-  0x00BF /*  RXFIFO  - Single accecss to Receive FIFO  */
-#define TIRADIO_BURST_RXFIFO \
-  0x00FF /*  RXFIFO  - Busrrst ccecss to Receive FIFO  */
+  0x003F                             // TXFIFO  - Single access to Transmit FIFO
+#define TIRADIO_BURST_TXFIFO 0x007F  // TXFIFO  - Burst access to Transmit FIFO
+#define TIRADIO_SINGLE_RXFIFO 0x00BF  // RXFIFO  - Single access to Receive FIFO
+#define TIRADIO_BURST_RXFIFO 0x00FF   // RXFIFO  - Burst ccecss to Receive FIFO
 
 /* AES Workspace */
 /* AES Key */
-#define TIRADIO_AES_KEY 0x2FE0 /*  AES_KEY    - Address for AES key input  */
+#define TIRADIO_AES_KEY 0x2FE0  // AES_KEY    - Address for AES key input
 #define TIRADIO_AES_KEY15 0x2FE0
 #define TIRADIO_AES_KEY14 0x2FE1
 #define TIRADIO_AES_KEY13 0x2FE2
@@ -496,7 +492,7 @@ typedef enum {
 #define TIRADIO_AES_KEY0 0x2FE15
 
 /* AES Buffer */
-#define TIRADIO_AES_BUFFER 0x2FF0 /*  AES_BUFFER - Address for AES Buffer */
+#define TIRADIO_AES_BUFFER 0x2FF0  // AES_BUFFER - Address for AES Buffer
 #define TIRADIO_AES_BUFFER15 0x2FF0
 #define TIRADIO_AES_BUFFER14 0x2FF1
 #define TIRADIO_AES_BUFFER13 0x2FF2
@@ -518,28 +514,27 @@ typedef enum {
 #define TIRADIO_LQI_EST_BM 0x7F
 
 /* Command strobe registers */
-#define TIRADIO_SRES 0x30 /*  SRES    - Reset chip. */
+#define TIRADIO_SRES 0x30  // SRES    - Reset chip.
 #define TIRADIO_SFSTXON \
-  0x31 /*  SFSTXON - Enable and calibrate frequency synthesizer. */
-#define TIRADIO_SXOFF 0x32 /*  SXOFF   - Turn off crystal oscillator. */
+  0x31  // SFSTXON - Enable and calibrate frequency synthesizer.
+#define TIRADIO_SXOFF 0x32  // SXOFF   - Turn off crystal oscillator.
 #define TIRADIO_SCAL \
-  0x33 /*  SCAL    - Calibrate frequency synthesizer and turn it off. */
+  0x33  // SCAL    - Calibrate frequency synthesizer and turn it off.
 #define TIRADIO_SRX \
-  0x34 /*  SRX     - Enable RX. Perform calibration if enabled. */
-#define TIRADIO_STX                                                           \
-  0x35 /*  STX     - Enable TX. If in RX state, only enable TX if CCA passes. \
-        */
+  0x34  // SRX     - Enable RX. Perform calibration if enabled.
+#define TIRADIO_STX \
+  0x35  // STX     - Enable TX. If in RX state, only enable TX if CCA passes.
 #define TIRADIO_SIDLE \
-  0x36 /*  SIDLE   - Exit RX / TX, turn off frequency synthesizer. */
-#define TIRADIO_SAFC 0x37 /*  AFC     - Automatic Frequency Correction */
+  0x36  // SIDLE   - Exit RX / TX, turn off frequency synthesizer.
+#define TIRADIO_SAFC 0x37  // AFC     - Automatic Frequency Correction
 #define TIRADIO_SWOR \
-  0x38 /*  SWOR    - Start automatic RX polling sequence (Wake-on-Radio) */
+  0x38  // SWOR    - Start automatic RX polling sequence (Wake-on-Radio)
 #define TIRADIO_SPWD \
-  0x39 /*  SPWD    - Enter power down mode when CSn goes high. */
-#define TIRADIO_SFRX 0x3A    /*  SFRX    - Flush the RX FIFO buffer. */
-#define TIRADIO_SFTX 0x3B    /*  SFTX    - Flush the TX FIFO buffer. */
-#define TIRADIO_SWORRST 0x3C /*  SWORRST - Reset real time clock. */
-#define TIRADIO_SNOP 0x3D    /*  SNOP    - No operation. Returns status byte. */
+  0x39  // SPWD    - Enter power down mode when CSn goes high.
+#define TIRADIO_SFRX 0x3A     //  SFRX    - Flush the RX FIFO buffer.
+#define TIRADIO_SFTX 0x3B     //  SFTX    - Flush the TX FIFO buffer.
+#define TIRADIO_SWORRST 0x3C  //  SWORRST - Reset real time clock.
+#define TIRADIO_SNOP 0x3D     //  SNOP    - No operation. Returns status byte.
 
 /* Chip states returned in status byte */
 #define TIRADIO_STATE_IDLE 0x00
@@ -588,4 +583,4 @@ typedef enum {
  * PROTPTYPES
  */
 
-#endif /* RADIOCONFIG_CC1120_CC1200_DEFS_H_ */
+#endif  // DEVICES_RADIOCONFIG_CC1120_CC1200_DEFS_H_

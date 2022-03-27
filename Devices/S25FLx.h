@@ -2,8 +2,8 @@
  * S25FLx2.h
  */
 
-#ifndef S25FLX_H_
-#define S25FLX_H_
+#ifndef DEVICES_S25FLX_H_
+#define DEVICES_S25FLX_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,4 +49,4 @@ bool S25FLX_is_erase_complete(S25FLXCtrl_t *s25flx);
 }
 #endif
 
-#endif /* S25FLX_H_ */
+#endif  // DEVICES_S25FLX_H_

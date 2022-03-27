@@ -1,5 +1,5 @@
-#ifndef SCHEDULER_H_
-#define SCHEDULER_H_
+#ifndef SYSTEM_SCHEDULER_H_
+#define SYSTEM_SCHEDULER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,4 +41,4 @@ class Scheduler {
 }
 #endif
 
-#endif /* SCHEDULER_H_ */
+#endif  // SYSTEM_SCHEDULER_H_

@@ -1,5 +1,5 @@
-#ifndef STATE_POST_FLIGHT_H_
-#define STATE_POST_FLIGHT_H_
+#ifndef SYSTEM_STATES_STATE_POST_FLIGHT_H_
+#define SYSTEM_STATES_STATE_POST_FLIGHT_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,4 +26,4 @@ class PostFlightState : public FlightState {
 }
 #endif
 
-#endif /* STATE_POST_FLIGHT_H_ */
+#endif  // SYSTEM_STATES_STATE_POST_FLIGHT_H_

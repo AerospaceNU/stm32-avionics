@@ -14,7 +14,7 @@
 
 static void generateConfigHelp(const char* name, const char* value) {
   char msg[50 + 4];
-  sprintf(msg, "%-30s %-20s\r\n", name, value);
+  snprintf(msg, sizeof(msg), "%-30s %-20s\r\n", name, value);
   cliSend(msg);
 }
 
@@ -94,7 +94,9 @@ EndCondition_t CliConfigState::run() {
       cliSendAck(false, "Invalid channel integer");
       return EndCondition_t::CliCommandComplete;
     }
+#ifdef TELEMETRY_RADIO
     HM_RadioSetChannel(TELEMETRY_RADIO, channel);
+#endif  // TELEMETRY_RADIO
   }
 
   // Send positive ACK (all inputs have been appropriately processed)
@@ -108,18 +110,19 @@ EndCondition_t CliConfigState::run() {
     cliSend("\r\n");
     // Drogue cut
     for (int i = 0; i < cliGetConfigs()->drogueCuts; i++) {
-      sprintf(name, "Drogue Cut %i Altitude (m):", i + 1);
-      sprintf(val, "%.3f", cliGetConfigs()->drogueCutAltitudesM[i]);
+      snprintf(name, sizeof(name), "Drogue Cut %i Altitude (m):", i + 1);
+      snprintf(val, sizeof(val), "%.3f",
+               cliGetConfigs()->drogueCutAltitudesM[i]);
       generateConfigHelp(name, val);
     }
     // Main cut
-    sprintf(val, "%.3f", cliGetConfigs()->mainCutAltitudeM);
+    snprintf(val, sizeof(val), "%.3f", cliGetConfigs()->mainCutAltitudeM);
     generateConfigHelp("Main Cut Altitude (m):", val);
     // Ground elevation
-    sprintf(val, "%.3f", cliGetConfigs()->groundElevationM);
+    snprintf(val, sizeof(val), "%.3f", cliGetConfigs()->groundElevationM);
     generateConfigHelp("Ground Elevation (m):", val);
     // Ground temperature
-    sprintf(val, "%.3f", cliGetConfigs()->groundTemperatureC);
+    snprintf(val, sizeof(val), "%.3f", cliGetConfigs()->groundTemperatureC);
     generateConfigHelp("Ground Temperature (C):", val);
   }
 

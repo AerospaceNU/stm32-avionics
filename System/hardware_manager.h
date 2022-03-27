@@ -1,5 +1,5 @@
-#ifndef HARDWARE_MANAGER_H_
-#define HARDWARE_MANAGER_H_
+#ifndef SYSTEM_HARDWARE_MANAGER_H_
+#define SYSTEM_HARDWARE_MANAGER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -205,4 +205,4 @@ bool HM_InSimMode();
 }
 #endif
 
-#endif /* HARDWARE_MANAGER_H_ */
+#endif  // SYSTEM_HARDWARE_MANAGER_H_

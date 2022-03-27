@@ -30,6 +30,8 @@ static uint8_t runningPresCount;
 static FilterData_t filterData;
 static double presRef = 1.0;  // atm
 
+static double medianArray[kPrevPresMedianCount + kPrevPresCount];
+
 // Sane default
 static AltitudeKalman kalman{0.015};
 
@@ -105,26 +107,29 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
 }
 
 static double median(double* input, uint8_t size) {
-  double values[size];
+  // If size > max size, stop
+  if (size > sizeof(medianArray) / sizeof(double)) {
+    return 0;
+  }
   // Copy array so that we don't modify actual values
-  memcpy(&values, input, size * sizeof(double));
+  memcpy(&medianArray, input, size * sizeof(double));
   // Insertion sort
   uint8_t i, j;
   double tmp;
   for (i = 1; i < size; ++i) {
-    tmp = values[i];
+    tmp = medianArray[i];
     j = i - 1;
-    while (j >= 0 && tmp <= values[j]) {
-      values[j + 1] = values[j];
+    while (j >= 0 && tmp <= medianArray[j]) {
+      medianArray[j + 1] = medianArray[j];
       --j;
     }
-    values[j + 1] = tmp;
+    medianArray[j + 1] = tmp;
   }
 
   if (size % 2 == 0) {
-    return (values[size / 2 - 1] + values[size / 2]) / 2.0;
+    return (medianArray[size / 2 - 1] + medianArray[size / 2]) / 2.0;
   } else {
-    return values[size / 2];
+    return medianArray[size / 2];
   }
 }
 

@@ -1,6 +1,6 @@
 
-#ifndef TASKS_DATA_OFFLOAD_H_
-#define TASKS_DATA_OFFLOAD_H_
+#ifndef SYSTEM_TASKS_DATA_OFFLOAD_H_
+#define SYSTEM_TASKS_DATA_OFFLOAD_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,4 +25,4 @@ void dataOffloadSetFlightId(uint32_t flightId);
 }
 #endif
 
-#endif /* TASKS_DATA_OFFLOAD_H_ */
+#endif  // SYSTEM_TASKS_DATA_OFFLOAD_H_

@@ -2,8 +2,8 @@
  * state_cli_sense.h
  */
 
-#ifndef STATES_CLI_STATE_CLI_SENSE_H_
-#define STATES_CLI_STATE_CLI_SENSE_H_
+#ifndef SYSTEM_STATES_CLI_STATE_CLI_SENSE_H_
+#define SYSTEM_STATES_CLI_STATE_CLI_SENSE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,4 +28,4 @@ class CliSenseState : public State {
 }
 #endif
 
-#endif /* STATES_CLI_STATE_CLI_SENSE_H_ */
+#endif  // SYSTEM_STATES_CLI_STATE_CLI_SENSE_H_

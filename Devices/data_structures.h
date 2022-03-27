@@ -5,8 +5,8 @@
  *      Author: matth
  */
 
-#ifndef DATA_STRUCTURES_H_
-#define DATA_STRUCTURES_H_
+#ifndef DEVICES_DATA_STRUCTURES_H_
+#define DEVICES_DATA_STRUCTURES_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -20,4 +20,4 @@ typedef struct __attribute__((packed)) {
   uint8_t lqi;
 } RecievedPacket_t;
 
-#endif /* DATA_STRUCTURES_H_ */
+#endif  // DEVICES_DATA_STRUCTURES_H_

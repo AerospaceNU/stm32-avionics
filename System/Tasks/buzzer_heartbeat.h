@@ -1,6 +1,6 @@
 
-#ifndef BUZZERHEARTBEAT_H_
-#define BUZZERHEARTBEAT_H_
+#ifndef SYSTEM_TASKS_BUZZER_HEARTBEAT_H_
+#define SYSTEM_TASKS_BUZZER_HEARTBEAT_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,4 +12,4 @@ void buzzerHeartbeat();
 }
 #endif
 
-#endif /* BUZZERHEARTBEAT_H_ */
+#endif  // SYSTEM_TASKS_BUZZER_HEARTBEAT_H_

@@ -59,8 +59,8 @@ void Scheduler::run(void) {
   while (1) {
     // Limit rate scheduler runs at
     if (pCurrentState_)
-      while ((HM_Millis() - lastTime_) < pCurrentState_->getPeriodMS())
-        ;
+      while ((HM_Millis() - lastTime_) < pCurrentState_->getPeriodMS()) {
+      }
     lastTime_ = HM_Millis();
     // Visually show how fast scheduler is running using LED
     HM_LedToggle(1);

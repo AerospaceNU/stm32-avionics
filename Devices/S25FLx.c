@@ -37,8 +37,6 @@ static bool write_disable(S25FLXCtrl_t *s25flx) {
   // Write-disable command is too short to require DMA
   bool bSuccess =
       HAL_SPI_Transmit(s25flx->hspi, &tx, 1, SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
-  while (HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY)
-    ;
   cs_pull(s25flx, GPIO_PIN_SET);
   return bSuccess;
 }
@@ -49,8 +47,6 @@ static bool write_enable(S25FLXCtrl_t *s25flx) {
   // Write-enable command is too short to require DMA
   bool bSuccess =
       HAL_SPI_Transmit(s25flx->hspi, &tx, 1, SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
-  while (HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY)
-    ;
   cs_pull(s25flx, GPIO_PIN_SET);
   return bSuccess;
 }
@@ -62,8 +58,6 @@ static void check_write_in_progress(S25FLXCtrl_t *s25flx) {
   // Read status register once
   bool bSuccess = HAL_SPI_TransmitReceive(s25flx->hspi, tx, rx, 2,
                                           SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
-  while (HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY)
-    ;
   if (bSuccess)
     s25flx->bWIP =
         ((rx[1] & 0x01) == 0x01);  // Write in progress is LSB of status
@@ -144,12 +138,9 @@ bool S25FLX_read_start(S25FLXCtrl_t *s25flx, uint32_t startLoc,
     cs_pull(s25flx, GPIO_PIN_SET);
     return false;
   }
-  while (HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY)
-    ;
 
   // Read into given buffer pData
-  uint8_t txBuf2[numBytes];
-  memset(txBuf2, 0, numBytes);
+  uint8_t txBuf2[numBytes] = {0};
 #ifdef USE_S25FLx_DMA
   s25flx->bRxComplete = false;
   if (HAL_SPI_TransmitReceive_DMA(s25flx->hspi, txBuf2, pData, numBytes) !=
@@ -162,8 +153,6 @@ bool S25FLX_read_start(S25FLXCtrl_t *s25flx, uint32_t startLoc,
     cs_pull(s25flx, GPIO_PIN_SET);
     return false;
   }
-  while (HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY)
-    ;
 
 #ifndef USE_S25FLx_DMA
   // Pull CS high if not using DMA because read is complete
@@ -207,29 +196,30 @@ bool S25FLX_write_start(S25FLXCtrl_t *s25flx, uint32_t startLoc,
 #endif
   cs_pull(s25flx, GPIO_PIN_RESET);
 
-  // Fill in TX buffer
-  uint8_t txBuf[numBytes + 5];
+  // Fill in TX buffer for page program command and send
+  uint8_t txBuf[5];
+  bool success = false;
   txBuf[0] = PAGE_PROGRAM_CMD;
   for (int i = 1; i < 5; i++) {
     txBuf[i] = (startLoc >> (8 * (4 - i))) & 0xFF;
   }
-  memcpy(txBuf + 5, data, numBytes);
+  success = HAL_SPI_Transmit(s25flx->hspi, txBuf, 5, SPI_TX_RX_TIMEOUT_MS);
 
   // Perform transmit
 #ifdef USE_S25FLx_DMA
-  if (HAL_SPI_Transmit_DMA(s25flx->hspi, txBuf, numBytes + 5) != HAL_OK) {
+  if (HAL_SPI_Transmit_DMA(s25flx->hspi, data, numBytes) != HAL_OK ||
+      !success) {
     s25flx->bTxComplete = true;
 #else
-  if (HAL_SPI_Transmit(s25flx->hspi, txBuf, numBytes + 5,
-                       SPI_TX_RX_TIMEOUT_MS) != HAL_OK) {
+  if (HAL_SPI_Transmit(s25flx->hspi, data, numBytes, SPI_TX_RX_TIMEOUT_MS) !=
+          HAL_OK ||
+      !success) {
 #endif
     s25flx->bWIP = false;
     cs_pull(s25flx, GPIO_PIN_SET);
     write_disable(s25flx);
     return false;
   }
-  while (HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY)
-    ;
 
 #ifndef USE_S25FLx_DMA
   // Pull CS high if not using DMA because write transmission is complete
@@ -270,8 +260,6 @@ bool S25FLX_erase_sector_start(S25FLXCtrl_t *s25flx, uint32_t sectorNum) {
     s25flx->bWIP = false;
     return false;
   }
-  while (HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY)
-    ;
 
   // Latch the erase command so it starts
   cs_pull(s25flx, GPIO_PIN_SET);
@@ -295,8 +283,6 @@ bool S25FLX_erase_chip_start(S25FLXCtrl_t *s25flx) {
     s25flx->bWIP = false;
     return false;
   }
-  while (HAL_SPI_GetState(s25flx->hspi) != HAL_SPI_STATE_READY)
-    ;
 
   // Latch the full erase command so it starts
   cs_pull(s25flx, GPIO_PIN_SET);

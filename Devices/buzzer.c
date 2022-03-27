@@ -6,6 +6,8 @@
 
 #ifdef HAS_BUZZER
 
+#define TWO_POWER_SIXTEEN 65535
+
 void buzzerInit(BuzzerCtrl_t *buzzer, TIM_HandleTypeDef *htim, uint32_t channel,
                 float minFrequency) {
   // Set buzzer struct values
@@ -16,13 +18,13 @@ void buzzerInit(BuzzerCtrl_t *buzzer, TIM_HandleTypeDef *htim, uint32_t channel,
   // a signal at (minFrequency / 2) Division by 2 is a safety factor, with the
   // tradeoff being inability to produce very high frequency signals
   buzzer->htim->Init.Prescaler =
-      (uint32_t)((SystemCoreClock / minFrequency / 65535) -
+      (uint32_t)((SystemCoreClock / minFrequency / TWO_POWER_SIXTEEN) -
                  1);  // * 2 and / 2 cancel out
 
   // Calculation of actually max frequency needed because prescaler could be
   // rounded a lot, resulting in different number than input
   buzzer->minFrequency =
-      SystemCoreClock / ((htim->Init.Prescaler + 1) * 65535 * 2);
+      SystemCoreClock / ((htim->Init.Prescaler + 1) * TWO_POWER_SIXTEEN * 2);
 }
 
 void buzzerSetFrequency(BuzzerCtrl_t *buzzer, float fHz) {
@@ -30,7 +32,7 @@ void buzzerSetFrequency(BuzzerCtrl_t *buzzer, float fHz) {
   if (fHz < buzzer->minFrequency) {
     buzzer->htim->Init.Period = 0;
   } else {
-    buzzer->htim->Init.Period = 65535 * buzzer->minFrequency / fHz;
+    buzzer->htim->Init.Period = TWO_POWER_SIXTEEN * buzzer->minFrequency / fHz;
   }
 
   // Ensure prescaler and period are set

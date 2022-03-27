@@ -93,4 +93,4 @@ void cbFlush(CircularBuffer_t *cb);
 }
 #endif
 
-#endif /* UTILS_CIRCULAR_BUFFER_H_ */
+#endif  // UTILS_CIRCULAR_BUFFER_H_

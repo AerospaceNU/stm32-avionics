@@ -9,6 +9,8 @@
 #include "board_config.h"
 
 #define FLASH_TIMEOUT_VALUE 50000U /* 50 s */
+#define FLASH_BYTE_INCREMENT 32
+#define ERASED 0xFF
 
 /**
  * @brief  Duplicate of HAL_FLASH_Program but without checking for a valid flash
@@ -90,35 +92,37 @@ HAL_StatusTypeDef Internal_Flash_Program(uint32_t TypeProgram,
  */
 bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data,
                           uint32_t numBytes) {
-  if (RelFlashAddress % 32 ||
+  if (RelFlashAddress % FLASH_BYTE_INCREMENT ||
       RelFlashAddress >
           MAX_FLASH_ADDRESS) {  // Relative address must be a multiple of 32 and
                                 // within bounds
     return false;
-  };
+  }
 
   uint32_t writeAddress = INTERNAL_FLASH_START + RelFlashAddress;
 
-  uint8_t flashWriteBuffer[32];  // Flash writes only in increments of 32 bytes
+  uint8_t flashWriteBuffer[FLASH_BYTE_INCREMENT];  // Flash writes only in
+                                                   // increments of 32 bytes
 
   HAL_FLASH_Unlock();
   uint32_t sofar = 0;
   uint32_t copyBytes;
   while (sofar < numBytes) {
-    copyBytes = (numBytes - sofar < 32)
+    copyBytes = (numBytes - sofar < FLASH_BYTE_INCREMENT)
                     ? numBytes - sofar
-                    : 32;  // Copy either 32 bytes, or less if we don't need to
-                           // copy that many
+                    : FLASH_BYTE_INCREMENT;  // Copy either 32 bytes, or less if
+                                             // we don't need to copy that many
     memcpy(flashWriteBuffer, data + sofar, copyBytes);
 
-    memset(flashWriteBuffer + copyBytes, 0xFF,
-           32 - copyBytes);  // Set any remaining bytes to 0xFF
+    memset(
+        flashWriteBuffer + copyBytes, ERASED,
+        FLASH_BYTE_INCREMENT - copyBytes);  // Set any remaining bytes to 0xFF
 
     sofar += copyBytes;
 
     Internal_Flash_Program(FLASH_TYPEPROGRAM_FLASHWORD, writeAddress,
                            (uint32_t)&flashWriteBuffer);  // Write to the flash
-    writeAddress += 32;
+    writeAddress += FLASH_BYTE_INCREMENT;
   }
   HAL_FLASH_Lock();
   return true;

@@ -1,3 +1,6 @@
+#ifndef DEVICES_GPS_H_
+#define DEVICES_GPS_H_
+
 #include "board_config.h"
 #include "minmea.h"
 #include "stdbool.h"
@@ -35,14 +38,13 @@ typedef struct GPSCtrl_s {
   int num_sats;
   char status;
 
-  char rx_buff[4096];
-  char line[2048];
+  char rx_buff[GPS_RX_BUF_SIZE];
+  char line[GPS_RX_BUF_HALF];
 
   int place;
 
   bool data_available;
   bool half;
-
 } GPSCtrl_t;
 
 void parseString(GPSCtrl_t *gps, char line[]);
@@ -52,3 +54,5 @@ void gps_process_data(GPSCtrl_t *gps);
 void gps_init(GPSCtrl_t *gps);
 
 bool gps_new_data(GPSCtrl_t *gps);
+
+#endif  // DEVICES_GPS_H_

@@ -1,6 +1,5 @@
-#ifndef MS5607_H_
-
-#define MS5607_H_
+#ifndef DEVICES_MS5607_H_
+#define DEVICES_MS5607_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,4 +46,4 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl);
 }
 #endif
 
-#endif
+#endif  // DEVICES_MS5607_H_

@@ -54,7 +54,7 @@ static void cliParseRadio(RecievedPacket_t* packet) {
   if (parsedPacket->packetType == TELEMETRY_ID_STRING) {
     if (packet->crc) {
       const uint8_t len = parsedPacket->payload.cliString.len;
-      const uint8_t* pdata = parsedPacket->payload.cliString.string;
+      const uint8_t* pdata = parsedPacket->payload.cliString.message;
       for (size_t i = 0; i < len; i++) {
         cbEnqueue(cliGetRxBuffer(), pdata + i);
       }
@@ -90,6 +90,7 @@ CliCommand_t cliParse(CliComms_t commsType) {
       return NONE;  // TODO
     case CLI_RADIO:
       selectedRxBuffer = &radioRxCircBuffer;
+      break;
     case CLI_USB: {
       selectedRxBuffer = HM_UsbGetRxBuffer();
       break;
@@ -123,9 +124,9 @@ CliCommand_t cliParse(CliComms_t commsType) {
   // Bytes extracted counts number of bytes minus stripped \r\n from the end (\r
   // might not be there depending on input)
   uint8_t bytesExtracted = 0;
-  if (bytesRead >= 2 && inputBuffer[bytesRead - 2] == '\r')
+  if (bytesRead >= 2 && inputBuffer[bytesRead - 2] == '\r') {
     bytesExtracted = bytesRead - 2;
-  else if (bytesRead >= 1 && inputBuffer[bytesRead - 1] == '\n') {
+  } else if (bytesRead >= 1 && inputBuffer[bytesRead - 1] == '\n') {
     bytesExtracted = bytesRead - 1;
   }
 

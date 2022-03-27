@@ -2,8 +2,8 @@
  * data_log.h
  */
 
-#ifndef DATA_LOG_H_
-#define DATA_LOG_H_
+#ifndef SYSTEM_DATA_LOG_H_
+#define SYSTEM_DATA_LOG_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -113,4 +113,4 @@ uint8_t data_log_get_flash_usage();
 }
 #endif
 
-#endif /* DATA_LOG_H_ */
+#endif  // SYSTEM_DATA_LOG_H_

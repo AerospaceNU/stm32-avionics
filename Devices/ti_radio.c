@@ -126,8 +126,8 @@ void tiRadio_Update(TiRadioCtrl_t *radio) {
   // it doesn't hurt since the cost for each check
   // is a GPIO read
   int i = 0;
-  while (tiRadio_CheckNewPacket(radio) && (i++ < 10))
-    ;
+  while (tiRadio_CheckNewPacket(radio) && (i++ < 10)) {
+  }
 
   // Attempt to transmit one packet, since we don't want to
   // overflow the TX FIFO. Alternately, we could write bytes
@@ -332,10 +332,12 @@ bool tiRadio_CheckNewPacket(TiRadioCtrl_t *radio) {
     // TODO this variable-length packet implementation seems wrong
     if ((radio->packetCfg & CC1120_LENGTH_CONFIG_MASK) ==
         TIRADIO_PKTLEN_VARIABLE) {
-      //            cc1120SpiReadRxFifo(radio, rxBuffer, rxbytes);
-      //			memcpy(radio->packetRX, rxBuffer, rxbytes-2);
-      //			radio->RSSI = rxBuffer[rxbytes-2];
-      //			radio->CRC_LQI = rxBuffer[rxbytes-1];
+      /*
+      cc1120SpiReadRxFifo(radio, rxBuffer, rxbytes);
+      memcpy(radio->packetRX, rxBuffer, rxbytes - 2);
+      radio->RSSI = rxBuffer[rxbytes - 2];
+      radio->CRC_LQI = rxBuffer[rxbytes - 1];
+      */
     } else {
       // Fixed means we have payloadSize many data bytes, then RSSI and CRC_LQI
       // appended
@@ -631,8 +633,8 @@ uint8_t trx8BitRegAccess(TiRadioCtrl_t *radio, uint8_t accessType,
 
   // Wait for SO to go low (radio ready)
   while (HAL_GPIO_ReadPin(radio->MISO_port, radio->MISO_pin) == 1 &&
-         HAL_GetTick() - startMS < TIRADIO_MAX_DELAY)
-    ;
+         HAL_GetTick() - startMS < TIRADIO_MAX_DELAY) {
+  }
 
   HAL_SPI_TransmitReceive(radio->radhspi, &txBuf, &readValue, 0x01,
                           TIRADIO_MAX_DELAY);
@@ -653,8 +655,8 @@ uint8_t trx16BitRegAccess(TiRadioCtrl_t *radio, uint8_t accessType,
   HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, RESET);
   uint32_t startMS = HAL_GetTick();
   while (HAL_GPIO_ReadPin(radio->MISO_port, radio->MISO_pin) == 1 &&
-         HAL_GetTick() - startMS < TIRADIO_MAX_DELAY)
-    ;
+         HAL_GetTick() - startMS < TIRADIO_MAX_DELAY) {
+  }
   // Wait for SO to go low
   // while(TRXEM_PORT_IN & TRXEM_SPI_MISO_PIN);
 
@@ -679,8 +681,8 @@ uint8_t cc1120TrxSpiCmdStrobe(TiRadioCtrl_t *radio, uint8_t cmd) {
   HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, RESET);
   uint32_t startMS = HAL_GetTick();
   while (HAL_GPIO_ReadPin(radio->MISO_port, radio->MISO_pin) == 1 &&
-         HAL_GetTick() - startMS < TIRADIO_MAX_DELAY)
-    ;
+         HAL_GetTick() - startMS < TIRADIO_MAX_DELAY) {
+  }
   // Wait for SO to go low
 
   HAL_SPI_TransmitReceive(radio->radhspi, &cmd, &rc, 1, TIRADIO_MAX_DELAY);
@@ -698,8 +700,7 @@ void cc1120TrxReadWriteBurstSingle(TiRadioCtrl_t *radio, uint8_t addr,
 
   if (addr & RADIO_READ_ACCESS) {  // if reading from radio registers
     if (addr & RADIO_BURST_ACCESS) {
-      for (i = 0; i < len; i++)  // push zeros to push out data
-      {
+      for (i = 0; i < len; i++) {  // push zeros to push out data
         HAL_SPI_TransmitReceive(radio->radhspi, &pushByte, pData, 1,
                                 TIRADIO_MAX_DELAY);
         pData++;
@@ -759,13 +760,15 @@ uint8_t cc1120SpiWriteReg(TiRadioCtrl_t *radio, uint16_t addr, uint8_t *pData,
                           tempAddr, pData, len);
 
     // DEBUG todo what does this do?
-    //  uint8_t readByte = 0;
-    //  uint8_t writeByte = *pData;
-    //  cc1120SpiReadReg(radio, addr, &readByte, 0x01);
-    //  testread = readByte;
-    //  if (readByte != writeByte) {
-    //  	readByte = 0;
-    //  }
+    /*
+    uint8_t readByte = 0;
+    uint8_t writeByte = *pData;
+    cc1120SpiReadReg(radio, addr, &readByte, 0x01);
+    testread = readByte;
+    if (readByte != writeByte) {
+      readByte = 0;
+    }
+    */
 
   } else if (tempExt == EXTENDED_REGISTER_TOP_BYTE) {
     rc = trx16BitRegAccess(radio, (RADIO_BURST_ACCESS | RADIO_WRITE_ACCESS),

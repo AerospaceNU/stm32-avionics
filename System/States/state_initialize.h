@@ -1,5 +1,5 @@
-#ifndef STATE_INITIALIZE_H_
-#define STATE_INITIALIZE_H_
+#ifndef SYSTEM_STATES_STATE_INITIALIZE_H_
+#define SYSTEM_STATES_STATE_INITIALIZE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,4 +24,4 @@ class InitializeState : public State {
 }
 #endif
 
-#endif /* STATE_INITIALIZE_H_ */
+#endif  // SYSTEM_STATES_STATE_INITIALIZE_H_

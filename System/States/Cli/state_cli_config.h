@@ -1,5 +1,5 @@
-#ifndef STATE_CLI_CONFIG_H_
-#define STATE_CLI_CONFIG_H_
+#ifndef SYSTEM_STATES_CLI_STATE_CLI_CONFIG_H_
+#define SYSTEM_STATES_CLI_STATE_CLI_CONFIG_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,4 +24,4 @@ class CliConfigState : public State {
 }
 #endif
 
-#endif /* STATE_CLI_CONFIG_H */
+#endif  // SYSTEM_STATES_CLI_STATE_CLI_CONFIG_H_

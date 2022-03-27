@@ -1,5 +1,5 @@
-#ifndef STATE_CLI_ERASE_FLASH_H_
-#define STATE_CLI_ERASE_FLASH_H_
+#ifndef SYSTEM_STATES_CLI_STATE_CLI_ERASE_FLASH_H_
+#define SYSTEM_STATES_CLI_STATE_CLI_ERASE_FLASH_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,4 +24,4 @@ class CliEraseFlashState : public State {
 }
 #endif
 
-#endif /* STATE_CLI_ERASE_FLASH_H */
+#endif  // SYSTEM_STATES_CLI_STATE_CLI_ERASE_FLASH_H_

@@ -192,7 +192,7 @@ bool minmea_scan(const char *sentence, const char *format, ...) {
         if (sign) value *= sign;
 
         *va_arg(ap, struct minmea_float *) =
-            (struct minmea_float){value, scale};
+            (struct minmea_float){value, scale};  // NOLINT
       } break;
 
       case 'i': {  // Integer value, default 0 (int).

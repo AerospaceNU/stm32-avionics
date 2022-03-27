@@ -1,5 +1,5 @@
-#ifndef STATE_INTERFACE_H_
-#define STATE_INTERFACE_H_
+#ifndef SYSTEM_STATES_STATES_INTERFACE_H_
+#define SYSTEM_STATES_STATES_INTERFACE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +30,7 @@ typedef enum {
 class State {
  public:
   State(int id, uint32_t period_ms) : id_(id), period_ms_(period_ms) {}
-  ~State() = default;
+  virtual ~State() {}
 
   /**
    * @brief Returns given ID of this state so higher level can track State
@@ -52,7 +52,7 @@ class State {
     EndCondition_t result = run();
     run_counter_++;
     return result;
-  };
+  }
 
   /**
    * @brief Actions that occur on initialization of state
@@ -87,4 +87,4 @@ class State {
 }
 #endif
 
-#endif /* STATE_INTERFACE_H_ */
+#endif  // SYSTEM_STATES_STATES_INTERFACE_H_

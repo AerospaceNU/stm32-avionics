@@ -2,8 +2,8 @@
  * adc_device.h
  */
 
-#ifndef ADC_DEVICE_H_
-#define ADC_DEVICE_H_
+#ifndef DEVICES_ADC_DEVICE_H_
+#define DEVICES_ADC_DEVICE_H_
 
 #include "board_config.h"
 
@@ -51,4 +51,4 @@ bool adcGetValue(AdcCtrl_t *adc, float *pval, uint32_t timeoutMS);
 }
 #endif
 
-#endif /* ADC_DEVICE_H_ */
+#endif  // DEVICES_ADC_DEVICE_H_

@@ -9,12 +9,16 @@
 
 #ifdef HAS_H3LIS331DL
 
+#define H3LIS331DL_SPI_REG_MASK (1 << 7)
+
 uint8_t whoAmI(H3LIS331DLCtrl_t *sensor) {
-  return SPI_ReadRegister(&sensor->H3LIS331DLSPI, (1 << 7) | REG_WHO_AM_I);
+  return SPI_ReadRegister(&sensor->H3LIS331DLSPI,
+                          H3LIS331DL_SPI_REG_MASK | REG_WHO_AM_I);
 }
 
 uint8_t readCtrl1(H3LIS331DLCtrl_t *sensor) {
-  return SPI_ReadRegister(&sensor->H3LIS331DLSPI, (1 << 7) | REG_CTRL1);
+  return SPI_ReadRegister(&sensor->H3LIS331DLSPI,
+                          H3LIS331DL_SPI_REG_MASK | REG_CTRL1);
 }
 
 void H3LIS331DL_init(H3LIS331DLCtrl_t *sensor) {
@@ -29,18 +33,18 @@ void H3LIS331DL_init(H3LIS331DLCtrl_t *sensor) {
 
 void H3LIS331DL_get_data_raw(H3LIS331DLCtrl_t *sensor) {
   // Takes x, y, and z axis readings
-  uint8_t x_l =
-      SPI_ReadRegister(&sensor->H3LIS331DLSPI, (1 << 7) | REG_OUT_X_L);
-  uint8_t x_h =
-      SPI_ReadRegister(&sensor->H3LIS331DLSPI, (1 << 7) | REG_OUT_X_H);
-  uint8_t y_l =
-      SPI_ReadRegister(&sensor->H3LIS331DLSPI, (1 << 7) | REG_OUT_Y_L);
-  uint8_t y_h =
-      SPI_ReadRegister(&sensor->H3LIS331DLSPI, (1 << 7) | REG_OUT_Y_H);
-  uint8_t z_l =
-      SPI_ReadRegister(&sensor->H3LIS331DLSPI, (1 << 7) | REG_OUT_Z_L);
-  uint8_t z_h =
-      SPI_ReadRegister(&sensor->H3LIS331DLSPI, (1 << 7) | REG_OUT_Z_H);
+  uint8_t x_l = SPI_ReadRegister(&sensor->H3LIS331DLSPI,
+                                 H3LIS331DL_SPI_REG_MASK | REG_OUT_X_L);
+  uint8_t x_h = SPI_ReadRegister(&sensor->H3LIS331DLSPI,
+                                 H3LIS331DL_SPI_REG_MASK | REG_OUT_X_H);
+  uint8_t y_l = SPI_ReadRegister(&sensor->H3LIS331DLSPI,
+                                 H3LIS331DL_SPI_REG_MASK | REG_OUT_Y_L);
+  uint8_t y_h = SPI_ReadRegister(&sensor->H3LIS331DLSPI,
+                                 H3LIS331DL_SPI_REG_MASK | REG_OUT_Y_H);
+  uint8_t z_l = SPI_ReadRegister(&sensor->H3LIS331DLSPI,
+                                 H3LIS331DL_SPI_REG_MASK | REG_OUT_Z_L);
+  uint8_t z_h = SPI_ReadRegister(&sensor->H3LIS331DLSPI,
+                                 H3LIS331DL_SPI_REG_MASK | REG_OUT_Z_H);
 
   // Writes combined h and l byte to struct
   sensor->rawVal.x = ((int16_t)x_h << 8) | (x_l);

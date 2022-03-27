@@ -1,5 +1,5 @@
-#ifndef STATE_DROGUE_DESCENT_N_H_
-#define STATE_DROGUE_DESCENT_N_H_
+#ifndef SYSTEM_STATES_STATE_DROGUE_DESCENT_N_H_
+#define SYSTEM_STATES_STATE_DROGUE_DESCENT_N_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,7 +22,7 @@ class DrogueDescentNState : public FlightState {
   static constexpr uint32_t kTransitionResetTimeThreshold =
       500;  // 500 ms transition timer
 
-  uint32_t transitionResetTimer;
+  uint32_t transitionResetTimer = 0;
 
   uint8_t completeDrogueCuts_ = 0;
 };
@@ -31,4 +31,4 @@ class DrogueDescentNState : public FlightState {
 }
 #endif
 
-#endif /* STATE_DROGUE_DESCENT_N_H_ */
+#endif  // SYSTEM_STATES_STATE_DROGUE_DESCENT_N_H_

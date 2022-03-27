@@ -1,5 +1,5 @@
-#ifndef STATE_ASCENT_H_
-#define STATE_ASCENT_H_
+#ifndef SYSTEM_STATES_STATE_ASCENT_H_
+#define SYSTEM_STATES_STATE_ASCENT_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,4 +26,4 @@ class AscentState : public FlightState {
 }
 #endif
 
-#endif /* STATE_ASCENT_H_ */
+#endif  // SYSTEM_STATES_STATE_ASCENT_H_

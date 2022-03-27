@@ -1,10 +1,13 @@
+#ifndef SYSTEM_FILTERING_ALTITUDE_KALMAN_H_
+#define SYSTEM_FILTERING_ALTITUDE_KALMAN_H_
+
 // All these are from Python
 // and are fixed per-DT
 // TODO how should we do this?
 
 // These numbers are for a dt of 0.01513 seconds, Q of diag([0.5, 1]).^2 and R
 // of diag([10]).^2
-static constexpr double DEFAULT_KALMAN_GAIN[2] = {0.03407042, 0.03685564};
+constexpr double DEFAULT_KALMAN_GAIN[2] = {0.03407042, 0.03685564};
 
 typedef struct {
   double estimatedVelocity;
@@ -153,7 +156,7 @@ to incorperate our measurement of where we actually are
 */
 class AltitudeKalman {
  public:
-  AltitudeKalman(double dt);
+  explicit AltitudeKalman(double dt);
 
   // Project our state estimate x forward in time by one timestep
   // See above, but this does x_new = Ax_old + Bu
@@ -177,3 +180,5 @@ class AltitudeKalman {
   // TODO should we calculate this every loop?
   double m_dt = 0.015;
 };
+
+#endif  // SYSTEM_FILTERING_ALTITUDE_KALMAN_H_

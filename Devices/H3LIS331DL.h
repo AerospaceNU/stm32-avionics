@@ -5,8 +5,8 @@
  *      Author: John
  */
 
-#ifndef SRC_H3LIS331DL_H_
-#define SRC_H3LIS331DL_H_
+#ifndef DEVICES_H3LIS331DL_H_
+#define DEVICES_H3LIS331DL_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,25 +15,25 @@ extern "C" {
 #include "SPIDriver.h"
 #include "board_config.h"
 
-static const uint8_t HIGH_G_ACC_ADDR = 0x19 << 1;
-static const uint8_t REG_WHO_AM_I = 0x0F;
-static const uint8_t REG_OUT_X_L = 0x28;
-static const uint8_t REG_OUT_X_H = 0x29;
-static const uint8_t REG_OUT_Y_L = 0x2A;
-static const uint8_t REG_OUT_Y_H = 0x2B;
-static const uint8_t REG_OUT_Z_L = 0x2C;
-static const uint8_t REG_OUT_Z_H = 0x2D;
-static const uint8_t REG_CTRL1 = 0x20;
+#define HIGH_G_ACC_ADDR 0x19 << 1
+#define REG_WHO_AM_I 0x0F
+#define REG_OUT_X_L 0x28
+#define REG_OUT_X_H 0x29
+#define REG_OUT_Y_L 0x2A
+#define REG_OUT_Y_H 0x2B
+#define REG_OUT_Z_L 0x2C
+#define REG_OUT_Z_H 0x2D
+#define REG_CTRL1 0x20
 
 // CTRL_REG1 Values
-static const uint8_t PWR_MODE_ON = (1 << 5);
-static const uint8_t DATA_RATE_50HZ = (0 << 3);
-static const uint8_t DATA_RATE_100HZ = (1 << 3);
-static const uint8_t DATA_RATE_400HZ = (2 << 3);
-static const uint8_t DATA_RATE_1000HZ = (3 << 3);
-static const uint8_t Z_AXIS_ENABLE = (1 << 2);
-static const uint8_t Y_AXIS_ENABLE = (1 << 1);
-static const uint8_t X_AXIS_ENABLE = (1 << 0);
+#define PWR_MODE_ON (1 << 5)
+#define DATA_RATE_50HZ (0 << 3)
+#define DATA_RATE_100HZ (1 << 3)
+#define DATA_RATE_400HZ (2 << 3)
+#define DATA_RATE_1000HZ (3 << 3)
+#define Z_AXIS_ENABLE (1 << 2)
+#define Y_AXIS_ENABLE (1 << 1)
+#define X_AXIS_ENABLE (1 << 0)
 
 typedef struct raw_data_s {
   int16_t x;
@@ -68,4 +68,4 @@ void H3LIS331DL_get_gain(H3LIS331DLCtrl_t *sensor);
 }
 #endif
 
-#endif /* SRC_H3LIS331DL_H_ */
+#endif  // DEVICES_H3LIS331DL_H_

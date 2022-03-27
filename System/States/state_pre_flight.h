@@ -1,5 +1,5 @@
-#ifndef STATE_PRE_FLIGHT_H_
-#define STATE_PRE_FLIGHT_H_
+#ifndef SYSTEM_STATES_STATE_PRE_FLIGHT_H_
+#define SYSTEM_STATES_STATE_PRE_FLIGHT_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,17 +32,17 @@ class PreFlightState : public FlightState {
   static constexpr uint32_t kTransitionResetTimeThreshold =
       150;  // 150 ms transition timer
 
-  uint32_t transitionResetTimer;
+  uint32_t transitionResetTimer = 0;
 
-  uint32_t prevPressureLogTime;
+  uint32_t prevPressureLogTime = 0;
 
   bool simModeStarted = false;
 
-  bool gpsTimestamp;
+  bool gpsTimestamp = false;
 };
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* STATE_PRE_FLIGHT_H_ */
+#endif  // SYSTEM_STATES_STATE_PRE_FLIGHT_H_

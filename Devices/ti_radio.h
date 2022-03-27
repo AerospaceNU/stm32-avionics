@@ -5,8 +5,8 @@
  *      Author: bph71
  */
 
-#ifndef INC_tiRadio_H_
-#define INC_tiRadio_H_
+#ifndef DEVICES_TI_RADIO_H_
+#define DEVICES_TI_RADIO_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -136,4 +136,4 @@ bool tiRadio_Calibrate(TiRadioCtrl_t *radio);
 }
 #endif
 
-#endif /* INC_tiRadio_H_ */
+#endif  // DEVICES_TI_RADIO_H_

@@ -1,5 +1,5 @@
-#ifndef STATE_MAIN_DESCENT_H_
-#define STATE_MAIN_DESCENT_H_
+#ifndef SYSTEM_STATES_STATE_MAIN_DESCENT_H_
+#define SYSTEM_STATES_STATE_MAIN_DESCENT_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,13 +23,13 @@ class MainDescentState : public FlightState {
   static constexpr uint32_t kTransitionResetTimeThreshold =
       5000;  // 5 second transition timer
 
-  uint32_t transitionResetTimer;
+  uint32_t transitionResetTimer = 0;
 
-  double altitude;
+  double altitude = 0;
 };
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* STATE_MAIN_DESCENT_H_ */
+#endif  // SYSTEM_STATES_STATE_MAIN_DESCENT_H_

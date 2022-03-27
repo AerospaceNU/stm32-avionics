@@ -1,5 +1,5 @@
-#ifndef SMARTRF_CC1200_H
-#define SMARTRF_CC1200_H
+#ifndef DEVICES_RADIOCONFIG_SMARTRF_CC1200_CFG_434_38_4KBPS_H_
+#define DEVICES_RADIOCONFIG_SMARTRF_CC1200_CFG_434_38_4KBPS_H_
 
 #include "cc1120_cc1200_defs.h"
 #include "smartrf_registersettings.h"
@@ -20,7 +20,7 @@
 
 #ifdef HAS_CC1200
 
-static const RegisterSetting_t cc1200_433_1_2kbps_cfg[] = {
+const RegisterSetting_t cc1200_433_1_2kbps_cfg[] = {
     {TIRADIO_IOCFG3,
      0x06},  // asserted when sync word, de-asserted at end of packet (in RX)
     {TIRADIO_IOCFG2, 0x01},
@@ -86,4 +86,4 @@ static const RegisterSetting_t cc1200_433_1_2kbps_cfg[] = {
 
 #endif
 
-#endif
+#endif  // DEVICES_RADIOCONFIG_SMARTRF_CC1200_CFG_434_38_4KBPS_H_

@@ -2,8 +2,8 @@
  * servo.h
  */
 
-#ifndef SERVO_H_
-#define SERVO_H_
+#ifndef DEVICES_SERVO_H_
+#define DEVICES_SERVO_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,4 +33,4 @@ void servoSetAngle(ServoCtrl_t *servo, float degrees);
 }
 #endif
 
-#endif /* SERVO_H_ */
+#endif  // DEVICES_SERVO_H_

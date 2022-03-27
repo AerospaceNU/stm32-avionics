@@ -55,8 +55,9 @@ static uint32_t data_log_get_last_flight_num_type(bool launched) {
   uint8_t rxBuffVersions[2] = {0};
   HM_FlashReadStart(0, 2, rxBuffVersions);
   uint32_t waitStartMS = HM_Millis();
-  while (!HM_FlashIsReadComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT)
-    ;
+  while (!HM_FlashIsReadComplete() &&
+         HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+  }
   uint8_t boardVersion = (rxBuffVersions[0] >> 4) & 0x0F;
   uint8_t boardID = rxBuffVersions[0] & 0x0F;
   uint8_t softwareVersion = rxBuffVersions[1];
@@ -78,8 +79,8 @@ static uint32_t data_log_get_last_flight_num_type(bool launched) {
       HM_FlashReadStart(curSectorNum * 2, 2, sectorRxBuff);
       waitStartMS = HM_Millis();
       while (!HM_FlashIsReadComplete() &&
-             HM_Millis() - waitStartMS < FLASH_TIMEOUT)
-        ;
+             HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+      }
       uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
       if (tempFlightNum == 0xFFFF) {
         flightNumFound = true;
@@ -90,8 +91,8 @@ static uint32_t data_log_get_last_flight_num_type(bool launched) {
                             metadataBuff);  // Read the metadata
           waitStartMS = HM_Millis();
           while (!HM_FlashIsReadComplete() &&
-                 HM_Millis() - waitStartMS < FLASH_TIMEOUT)
-            ;
+                 HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+          }
           metadataPacket = *(FlightMetadata *)&metadataBuff;
           if (metadataPacket.launched ==
               1) {  // Only update last if it was launched
@@ -129,8 +130,8 @@ static void data_log_get_flight_sectors(uint32_t flightNum,
     HM_FlashReadStart(tempCurSectorNum * 2, 2, sectorRxBuff);
     waitStartMS = HM_Millis();
     while (!HM_FlashIsReadComplete() &&
-           HM_Millis() - waitStartMS < FLASH_TIMEOUT)
-      ;
+           HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+    }
     uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
     if (tempFlightNum == flightNum) {
       *firstSector = tempCurSectorNum;
@@ -150,8 +151,8 @@ static void data_log_get_flight_sectors(uint32_t flightNum,
     HM_FlashReadStart(tempCurSectorNum * 2, 2, sectorRxBuff);
     waitStartMS = HM_Millis();
     while (!HM_FlashIsReadComplete() &&
-           HM_Millis() - waitStartMS < FLASH_TIMEOUT)
-      ;
+           HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+    }
     uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
     if (tempFlightNum != flightNum) {
       *lastSector = tempCurSectorNum - 1;
@@ -177,8 +178,9 @@ void data_log_load_last_stored_flight_metadata() {
   HM_FlashReadStart(metadataReadAddress, kFlightMetadataSize,
                     metadataBuff);  // Read the metadata
   uint32_t waitStartMS = HM_Millis();
-  while (!HM_FlashIsReadComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT)
-    ;
+  while (!HM_FlashIsReadComplete() &&
+         HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+  }
   metadataPacket = *(FlightMetadata *)&metadataBuff;
 }
 
@@ -191,8 +193,8 @@ void data_log_get_flight_metadata(FlightMetadata *metadata, uint8_t flightNum) {
     HM_FlashReadStart(sectorNum * 2, 2, sectorRxBuff);
     waitStartMS = HM_Millis();
     while (!HM_FlashIsReadComplete() &&
-           HM_Millis() - waitStartMS < FLASH_TIMEOUT)
-      ;
+           HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+    }
     uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
     if (tempFlightNum == flightNum) {
       flightNumFound = true;
@@ -206,8 +208,9 @@ void data_log_get_flight_metadata(FlightMetadata *metadata, uint8_t flightNum) {
   HM_FlashReadStart(metadataReadAddress, kFlightMetadataSize,
                     metadataBuff);  // Read the metadata
   waitStartMS = HM_Millis();
-  while (!HM_FlashIsReadComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT)
-    ;
+  while (!HM_FlashIsReadComplete() &&
+         HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+  }
   metadataPacket = *(FlightMetadata *)&metadataBuff;
   *metadata = *(FlightMetadata *)&metadataBuff;
 }
@@ -224,26 +227,24 @@ void data_log_assign_flight() {
     HM_FlashEraseSectorStart(0);
     waitStartMS = HM_Millis();
     while (!HM_FlashIsEraseComplete() &&
-           HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS)
-      ;
+           HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+    }
     // Write board version, id, and software version
     uint8_t txBuffVersions[] = {BOARD_VERSION << 4 | BOARD_ID,
                                 SOFTWARE_VERSION};
     HM_FlashWriteStart(0, 2, txBuffVersions);
     waitStartMS = HM_Millis();
     while (!HM_FlashIsWriteComplete() &&
-           HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS)
-      ;
+           HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+    }
   }
 
   // Erase sector where flight metadata will go
   HM_FlashEraseSectorStart(curSectorNum);
   waitStartMS = HM_Millis();
   while (!HM_FlashIsEraseComplete() &&
-         HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS)
-    ;
-
-  // TODO: Write flight metadata
+         HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+  }
 
   // Empty metadata packet
   memset(&metadataPacket, 0xFF, kFlightMetadataSize);
@@ -255,12 +256,13 @@ void data_log_assign_flight() {
   HM_FlashWriteStart(curSectorNum * 2, 2, flightTxBuff);
   waitStartMS = HM_Millis();
   while (!HM_FlashIsWriteComplete() &&
-         HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS)
-    ;
+         HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+  }
   HM_FlashReadStart(curSectorNum * 2, 2, flightTxBuff);
   waitStartMS = HM_Millis();
-  while (!HM_FlashIsReadComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT)
-    ;
+  while (!HM_FlashIsReadComplete() &&
+         HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+  }
 
   flightFirstSectorNum = curSectorNum;
   curWriteAddress = curSectorNum * FLASH_SECTOR_BYTES +
@@ -297,8 +299,8 @@ void data_log_write_metadata() {
         (uint8_t *)&metadataPacket);  // Write the metadata packet
     uint32_t waitStartMS = HM_Millis();
     while (!HM_FlashIsWriteComplete() &&
-           HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS)
-      ;
+           HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+    }
   }
 }
 
@@ -378,14 +380,14 @@ void data_log_write(SensorData_t *sensorData, FilterData_t *filterData,
       HM_FlashWriteStart(curSectorNum * 2, 2, flightTxBuff);
       waitStartMS = HM_Millis();
       while (!HM_FlashIsWriteComplete() &&
-             HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS)
-        ;
+             HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+      }
       // Erase the upcoming sector
       HM_FlashEraseSectorStart(curSectorNum);
       waitStartMS = HM_Millis();
       while (!HM_FlashIsEraseComplete() &&
-             HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS)
-        ;
+             HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+      }
     }
 
     // Write to first page and, if necessary, second page
@@ -393,15 +395,15 @@ void data_log_write(SensorData_t *sensorData, FilterData_t *filterData,
                        (uint8_t *)&logPacket);
     waitStartMS = HM_Millis();
     while (!HM_FlashIsWriteComplete() &&
-           HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS)
-      ;
+           HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+    }
     if (second_page_bytes > 0) {
       HM_FlashWriteStart(curWriteAddress + first_page_bytes, second_page_bytes,
                          (uint8_t *)&logPacket + first_page_bytes);
       waitStartMS = HM_Millis();
       while (!HM_FlashIsWriteComplete() &&
-             HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS)
-        ;
+             HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+      }
     }
     // Increment write address to be next address to write to
     curWriteAddress += kLogDataSize;
@@ -427,8 +429,9 @@ uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata,
                          readOffset;
   HM_FlashReadStart(readAddress, maxBytes, pdata);
   uint32_t waitStartMS = HM_Millis();
-  while (!HM_FlashIsReadComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT)
-    ;
+  while (!HM_FlashIsReadComplete() &&
+         HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+  }
   // If the last sector has been passed, return only the bytes that count
   if ((readAddress + maxBytes) > FLASH_SECTOR_BYTES * (lastSector + 1)) {
     uint32_t bytesRead = (lastSector + 1) * FLASH_SECTOR_BYTES - readAddress;
@@ -470,8 +473,9 @@ void data_log_get_last_data_packet(uint32_t flightNum, LogData *flightPacket) {
                          mid * kLogDataSize;
   HM_FlashReadStart(readAddress, kLogDataSize, logPacketBuffer);
   uint32_t waitStartMS = HM_Millis();
-  while (!HM_FlashIsReadComplete() && HM_Millis() - waitStartMS < FLASH_TIMEOUT)
-    ;
+  while (!HM_FlashIsReadComplete() &&
+         HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+  }
   LogData *tempPacket = (LogData *)logPacketBuffer;
 
   while (low < mid) {
@@ -489,8 +493,8 @@ void data_log_get_last_data_packet(uint32_t flightNum, LogData *flightPacket) {
     HM_FlashReadStart(readAddress, kLogDataSize, logPacketBuffer);
     waitStartMS = HM_Millis();
     while (!HM_FlashIsReadComplete() &&
-           HM_Millis() - waitStartMS < FLASH_TIMEOUT)
-      ;
+           HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+    }
     tempPacket = (LogData *)logPacketBuffer;
   }
 

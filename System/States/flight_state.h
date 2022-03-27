@@ -5,8 +5,8 @@
  *      Author: matth
  */
 
-#ifndef STATES_FLIGHT_STATES_INTERFACE_H_
-#define STATES_FLIGHT_STATES_INTERFACE_H_
+#ifndef SYSTEM_STATES_FLIGHT_STATE_H_
+#define SYSTEM_STATES_FLIGHT_STATE_H_
 
 #include "states_interface.h"
 
@@ -22,4 +22,4 @@ class FlightState : public State {
   bool m_hasPastApogee;
 };
 
-#endif /* STATES_FLIGHT_STATES_INTERFACE_H_ */
+#endif  // SYSTEM_STATES_FLIGHT_STATE_H_

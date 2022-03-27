@@ -20,10 +20,9 @@ void PreFlightState::init() {
   // Send ACK to CLI if in sim mode
   if (HM_InSimMode()) {
     cliSendAck(true, nullptr);
-  }
-  // If we are in sim, first data packet might not have arrived yet, so don't
-  // set pres ref from it
-  else {
+    // If we are in sim, first data packet might not have arrived yet, so don't
+    // set pres ref from it
+  } else {
     // Otherwise set initial current pressure ref
     HM_ReadSensorData();
     filterSetPressureRef(

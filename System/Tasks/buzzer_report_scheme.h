@@ -1,5 +1,5 @@
-#ifndef TASKS_BUZZER_REPORT_SCHEME_H_
-#define TASKS_BUZZER_REPORT_SCHEME_H_
+#ifndef SYSTEM_TASKS_BUZZER_REPORT_SCHEME_H_
+#define SYSTEM_TASKS_BUZZER_REPORT_SCHEME_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,4 +11,4 @@ void buzzerReport();
 }
 #endif
 
-#endif /* TASKS_BUZZER_REPORT_SCHEME_H_ */
+#endif  // SYSTEM_TASKS_BUZZER_REPORT_SCHEME_H_

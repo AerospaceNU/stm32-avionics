@@ -2,6 +2,8 @@
 
 #ifdef HAS_MS5607
 
+#define SPI_TIMEOUT_MS 50
+
 static uint16_t promVals[6];
 
 /*
@@ -17,7 +19,7 @@ bool MS5607_init(MS5607Ctrl_t *altCtrl) {
                     GPIO_PIN_RESET);
 
   // Send the initialization command and delay for 3ms
-  HAL_SPI_Transmit(altCtrl->spiconfig.hspi, &init, 1, 1000000);
+  HAL_SPI_Transmit(altCtrl->spiconfig.hspi, &init, 1, SPI_TIMEOUT_MS);
   HAL_Delay(3);
 
   // Pull CS High
@@ -33,7 +35,7 @@ bool MS5607_init(MS5607Ctrl_t *altCtrl) {
     HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin,
                       GPIO_PIN_RESET);
     HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, txBuffer, rxBuffer, 3,
-                            100000);
+                            SPI_TIMEOUT_MS);
     HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin,
                       GPIO_PIN_SET);
     promVals[i] = rxBuffer[1] << 8 | rxBuffer[2];
@@ -62,27 +64,29 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl) {
 
   HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin,
                     GPIO_PIN_RESET);
-  HAL_SPI_Transmit(altCtrl->spiconfig.hspi, &convertD1_512, 1, 1000);
+  HAL_SPI_Transmit(altCtrl->spiconfig.hspi, &convertD1_512, 1, SPI_TIMEOUT_MS);
   HAL_Delay(OSR_512);
   HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin,
                     GPIO_PIN_SET);
 
   HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin,
                     GPIO_PIN_RESET);
-  HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, read, presStore, 4, 1000);
+  HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, read, presStore, 4,
+                          SPI_TIMEOUT_MS);
   HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin,
                     GPIO_PIN_SET);
 
   HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin,
                     GPIO_PIN_RESET);
-  HAL_SPI_Transmit(altCtrl->spiconfig.hspi, &convertD2_512, 1, 1000);
+  HAL_SPI_Transmit(altCtrl->spiconfig.hspi, &convertD2_512, 1, SPI_TIMEOUT_MS);
   HAL_Delay(OSR_512);
   HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin,
                     GPIO_PIN_SET);
 
   HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin,
                     GPIO_PIN_RESET);
-  HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, read, tempStore, 4, 1000);
+  HAL_SPI_TransmitReceive(altCtrl->spiconfig.hspi, read, tempStore, 4,
+                          SPI_TIMEOUT_MS);
   HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin,
                     GPIO_PIN_SET);
 
