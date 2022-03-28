@@ -15,7 +15,6 @@ void AscentState::init() {
 
 EndCondition_t AscentState::run() {
 	// Collect, filter, log, and log all data
-	HM_ReadSensorData();
 	SensorData_t* sensorData = HM_GetSensorData();
 	FilterData_t* filterData = filterGetData();
 	data_log_write(sensorData, filterData, this->getID());
