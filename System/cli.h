@@ -34,13 +34,15 @@ typedef enum CliCommand_t {
   NONE = 0,
   CALIBRATE,
   CONFIG,
+  CREATE_NEW_FLIGHT,
   ERASE_FLASH,
   OFFLOAD,
   SENSE,
   SIM,
   SHUTDOWN,
   HELP,
-  PYROFIRE
+  PYROFIRE,
+  NUM_CLI_COMMANDS,
 } CliCommand_t;
 
 /**

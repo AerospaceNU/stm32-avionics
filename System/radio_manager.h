@@ -68,7 +68,7 @@ LineCutterPacket_t;
 #define RADIO_MAX_STRING 48
 PACKED_STRUCT {
   uint8_t len;
-  uint8_t message[RADIO_MAX_STRING];
+  uint8_t string[RADIO_MAX_STRING];
 }
 CliStringPacket_t;
 
@@ -114,6 +114,7 @@ typedef struct {
   uint32_t lineCutterLastSent;
   uint32_t altInfoLastSent;
   uint32_t pyroInfoLastSent;
+  uint32_t cliStringLastSent;
 } DataTransmitState_t;
 
 #define RADIO_MAX_CALLBACKS 10

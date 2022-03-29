@@ -1,12 +1,10 @@
-
-#include "state_cli_config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "board_config.h"
 #include "cli.h"
+#include "cli_tasks.h"
 #include "data_log.h"
 #include "errno.h"
 #include "hardware_manager.h"
@@ -17,11 +15,7 @@ static void generateConfigHelp(const char* name, const char* value) {
   cliSend(msg);
 }
 
-void CliConfigState::init() {
-  // No action
-}
-
-EndCondition_t CliConfigState::run() {
+void cli_tasks::cliConfig() {
   // Get command line options
   CliOptionVals_t options = cliGetOptions();
 #ifdef HAS_PYRO
@@ -31,7 +25,7 @@ EndCondition_t CliConfigState::run() {
     int pyroNum = strtol(options.p, &endPtr, 10) - 1;
     if (*endPtr != '\0' || pyroNum < 0 || pyroNum >= MAX_PYRO) {
       cliSendAck(false, "Invalid pyro number");
-      return EndCondition_t::CliCommandComplete;
+      return;
     }
     if (options.A) {
       (cliGetConfigs()->pyroConfiguration + pyroNum)->flags = FLAG_APOGEE;
@@ -41,7 +35,7 @@ EndCondition_t CliConfigState::run() {
       double pyroAlt = strtod(options.H, &endPtr);
       if (*endPtr != '\0') {
         cliSendAck(false, "Pyro deploy altitude invalid float");
-        return EndCondition_t::CliCommandComplete;
+        return;
       }
       (cliGetConfigs()->pyroConfiguration + pyroNum)->flags =
           FLAG_ALT_DURING_DESCENT;
@@ -52,7 +46,7 @@ EndCondition_t CliConfigState::run() {
       double apogeeDelay = strtod(options.D, &endPtr);
       if (*endPtr != '\0') {
         cliSendAck(false, "Apogee delay invalid float");
-        return EndCondition_t::CliCommandComplete;
+        return;
       }
       (cliGetConfigs()->pyroConfiguration + pyroNum)->flags = FLAG_APOGEE_DELAY;
       (cliGetConfigs()->pyroConfiguration + pyroNum)->configValue = apogeeDelay;
@@ -62,7 +56,7 @@ EndCondition_t CliConfigState::run() {
       cliSendAck(false,
                  "Pyro config must either specify -A, -D, or -H (see --help "
                  "for details)");
-      return EndCondition_t::CliCommandComplete;
+      return;
     }
   }
 #endif
@@ -73,7 +67,7 @@ EndCondition_t CliConfigState::run() {
     double elevation = strtod(options.e, &endPtr);
     if (*endPtr != '\0') {
       cliSendAck(false, "Ground elevation invalid float");
-      return EndCondition_t::CliCommandComplete;
+      return;
     }
     cliGetConfigs()->groundElevationM = elevation;
     // Write new cli configs to flash
@@ -86,7 +80,7 @@ EndCondition_t CliConfigState::run() {
     double temperature = strtod(options.t, &endPtr);
     if (*endPtr != '\0') {
       cliSendAck(false, "Ground temperature invalid float");
-      return EndCondition_t::CliCommandComplete;
+      return;
     }
     cliGetConfigs()->groundTemperatureC = temperature;
     // Write new cli configs to flash
@@ -100,14 +94,14 @@ EndCondition_t CliConfigState::run() {
     int channel = strtol(options.c, &endPtr, 0);
     if (*endPtr != '\0' || (errno != 0 && channel == 0)) {
       cliSendAck(false, "Invalid channel integer");
-      return EndCondition_t::CliCommandComplete;
+      return;
     }
     cliGetConfigs()->radioChannel = channel;
     // Write new cli configs to flash
     data_log_write_cli_configs();
 #ifdef TELEMETRY_RADIO
     HM_RadioSetChannel(TELEMETRY_RADIO, channel);
-#endif  // TELEMETRY_RADIO
+#endif
   }
 
   // Send positive ACK (all inputs have been appropriately processed)
@@ -152,9 +146,5 @@ EndCondition_t CliConfigState::run() {
 
   // If reached, send complete message to CLI
   cliSendComplete(true, nullptr);
-  return EndCondition_t::CliCommandComplete;
-}
-
-void CliConfigState::cleanup() {
-  // No action
+  return;
 }

@@ -5,6 +5,7 @@
 
 #include "buzzer_report_scheme.h"
 #include "cli.h"
+#include "cli_tasks.h"
 #include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
@@ -22,6 +23,8 @@ void PreFlightState::init() {
   HM_ReadSensorData();
   filterSetPressureRef(
       (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
+
+  cli_tasks::ConfigureForGround();
 }
 
 EndCondition_t PreFlightState::run() {

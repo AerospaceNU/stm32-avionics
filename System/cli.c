@@ -36,6 +36,7 @@ static int primaryCommand = 0;
 static struct option longOptions[] = {
     {"calibrate", no_argument, &primaryCommand, CALIBRATE},
     {"config", no_argument, &primaryCommand, CONFIG},
+    {"createFlight", no_argument, &primaryCommand, CREATE_NEW_FLIGHT},
     {"erase", no_argument, &primaryCommand, ERASE_FLASH},
     {"help", no_argument, &primaryCommand, HELP},
     {"offload", no_argument, &primaryCommand, OFFLOAD},
@@ -55,9 +56,9 @@ static void cliParseRadio(RecievedPacket_t* packet) {
   if (parsedPacket->packetType == TELEMETRY_ID_STRING) {
     if (packet->crc) {
       const uint8_t len = parsedPacket->payload.cliString.len;
-      const uint8_t* pdata = parsedPacket->payload.cliString.message;
+      const uint8_t* pdata = parsedPacket->payload.cliString.string;
       for (size_t i = 0; i < len; i++) {
-        cbEnqueue(cliGetRxBuffer(), pdata + i);
+        cbEnqueue(&radioRxCircBuffer, pdata + i);
       }
     } else {
       cliSendAck(false, "Bad CRC!");
@@ -69,9 +70,8 @@ void cliInit() {
   opterr = 0;  // Don't print any messages to standard error stream since this
                // is embedded device
 
-  RadioManager_addMessageCallback(cliParseRadio);
-
   cbInit(&radioRxCircBuffer, radioRxBuffer, sizeof(radioRxBuffer), 1);
+  RadioManager_addMessageCallback(cliParseRadio);
 }
 
 CliConfigs_t* cliGetConfigs() { return &cliConfigs; }
@@ -88,9 +88,6 @@ void cliSetDefaultConfig() {
 }
 
 CliCommand_t cliParse(CliComms_t commsType) {
-  // Set last comms type
-  lastCommsType = commsType;
-
   // Get buffer from hardware manager
   uint32_t bytesRead = 0;  // Raw bytes read from hardware manager to be
                            // discarded, eventually including \r\n
@@ -100,6 +97,7 @@ CliCommand_t cliParse(CliComms_t commsType) {
   switch (commsType) {
     case CLI_BLUETOOTH:
       return NONE;  // TODO
+      break;
     case CLI_RADIO:
       selectedRxBuffer = &radioRxCircBuffer;
       break;
@@ -110,6 +108,8 @@ CliCommand_t cliParse(CliComms_t commsType) {
     default:
       return NONE;
   }
+
+  if (!cbCount(selectedRxBuffer)) return NONE;
 
   // Read buffer, flush if full (likely bad inputs), and copy to input buffer
   bytesRead = cbCount(selectedRxBuffer);  // Each element 1 byte
@@ -136,9 +136,9 @@ CliCommand_t cliParse(CliComms_t commsType) {
   // Bytes extracted counts number of bytes minus stripped \r\n from the end (\r
   // might not be there depending on input)
   uint8_t bytesExtracted = 0;
-  if (bytesRead >= 2 && inputBuffer[bytesRead - 2] == '\r') {
+  if (bytesRead >= 2 && inputBuffer[bytesRead - 2] == '\r')
     bytesExtracted = bytesRead - 2;
-  } else if (bytesRead >= 1 && inputBuffer[bytesRead - 1] == '\n') {
+  else if (bytesRead >= 1 && inputBuffer[bytesRead - 1] == '\n') {
     bytesExtracted = bytesRead - 1;
   }
 
@@ -230,6 +230,10 @@ CliCommand_t cliParse(CliComms_t commsType) {
     }
   }
 
+  // Set last comms type (at the end, so we only change to a comm type that gave
+  // us a command)
+  lastCommsType = commsType;
+
   // Flush input buffer
   cbDequeue(selectedRxBuffer, bytesRead);
 
@@ -248,8 +252,10 @@ void cliSend(const char* msg) {
       HM_BluetoothSend((uint8_t*)msg, (uint16_t)strlen(msg));
       break;
     case CLI_RADIO:
-      // TODO frequency
-      // HM_RadioSend(RADIO_HW_433, (uint8_t*) msg, (uint16_t) strlen(msg));
+#ifdef TELEMETRY_RADIO
+      RadioManager_transmitString(TELEMETRY_RADIO, (uint8_t*)msg, strlen(msg));
+
+#endif
       break;
     case CLI_USB:
       HM_UsbTransmit((uint8_t*)msg, (uint16_t)strlen(msg));
@@ -291,7 +297,7 @@ CircularBuffer_t* cliGetRxBuffer() {
     case CLI_BLUETOOTH:
       return NULL;
     case CLI_RADIO:
-      return NULL;
+      return &radioRxCircBuffer;
     case CLI_USB:
       return HM_UsbGetRxBuffer();
     default:

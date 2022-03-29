@@ -42,6 +42,9 @@ void PyroManager_SetPyroFireStatus(uint8_t status) {
 }
 
 void PyroManager_Update(FilterData_t* filterData, bool hasPastApogee) {
+  // Turns off expired pyros
+  HM_PyroUpdate();
+
   PyroConfig_t* pyroConfiguration = cliGetConfigs()->pyroConfiguration;
   for (int i = 0; i < MAX_PYRO; i++) {
     if (!pyroFireStatus[i]) {

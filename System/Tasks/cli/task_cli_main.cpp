@@ -1,0 +1,107 @@
+#include "buzzer_heartbeat.h"
+#include "cli.h"
+#include "cli_tasks.h"
+#include "hardware_manager.h"
+#include "state_log.h"
+
+static bool simModeStarted = false;
+static bool allowedTransitions[CliCommand_t::NUM_CLI_COMMANDS] = {0};
+
+void cli_tasks::ConfigureForFlight() {
+  // Allow all transitions, then mask out
+  for (int i = 0; i < NUM_CLI_COMMANDS; i++) {
+    allowedTransitions[i] = true;
+  }
+
+  // Disable state transition commands in flight
+  allowedTransitions[CliCommand_t::ERASE_FLASH] = false;
+  allowedTransitions[CliCommand_t::CALIBRATE] = false;
+  allowedTransitions[CliCommand_t::SHUTDOWN] = false;
+  allowedTransitions[CliCommand_t::SIM] = false;
+}
+void cli_tasks::ConfigureForGround() {
+  // allow all transitions on ground
+  for (int i = 0; i < NUM_CLI_COMMANDS; i++) {
+    allowedTransitions[i] = true;
+  }
+}
+
+EndCondition_t cli_tasks::cliTick() {
+  // Run buzzer heartbeat
+  buzzerHeartbeat();
+
+  // Check if sim is ready to start, if we're waiting for it to
+  if (simModeStarted) {
+    if (cbCount(HM_UsbGetRxBuffer()) >= sizeof(SensorData_t)) {
+      return EndCondition_t::SimCommand;
+    }
+    // else {
+    //   return EndCondition_t::NoChange;
+  }
+
+  // Check for CLI input, and parse the first that has a command for us to parse
+  for (int i = 0; i < CliComms_t::NUM_CLI_COMMS; i++) {
+    // Special case: in sim mode, don't parse data coming in over USB
+    if (HM_InSimMode() && i == CliComms_t::CLI_USB) continue;
+
+    CliCommand_t command = cliParse((CliComms_t)i);
+    if (command == NONE) continue;
+
+    // If the command is a task, do it
+    // If not, return the appropriate end condition to get us
+    // into the correct State (if we can)
+    switch (command) {
+      case CliCommand_t::CALIBRATE:
+        if (allowedTransitions[CliCommand_t::CALIBRATE])
+          return EndCondition_t::CalibrateCommand;
+        else
+          break;
+      case CliCommand_t::CONFIG:
+        if (allowedTransitions[CliCommand_t::CONFIG]) cliConfig();
+        return EndCondition_t::NoChange;
+      case CliCommand_t::ERASE_FLASH:
+        if (allowedTransitions[CliCommand_t::ERASE_FLASH])
+          return EndCondition_t::EraseFlashCommand;
+        else
+          break;
+      case CliCommand_t::HELP:
+        if (allowedTransitions[CliCommand_t::HELP]) cliHelp();
+        return EndCondition_t::NoChange;
+      case CliCommand_t::OFFLOAD:
+        if (allowedTransitions[CliCommand_t::OFFLOAD])
+          return EndCondition_t::OffloadCommand;
+        else
+          break;
+      case CliCommand_t::SIM:
+        if (allowedTransitions[CliCommand_t::SIM]) {
+          // We still need to wait for all the data to come in
+          HM_EnableSimMode(cliGetRxBuffer());
+          simModeStarted = true;
+          cliSendAck(true, nullptr);
+        }
+
+        // If enabled, we'll transition into Sim later once we get data
+        return EndCondition_t::NoChange;
+      case CliCommand_t::SENSE:
+        if (allowedTransitions[CliCommand_t::SENSE]) cliSense();
+        return EndCondition_t::NoChange;
+      case CliCommand_t::CREATE_NEW_FLIGHT:
+        if (allowedTransitions[CliCommand_t::CREATE_NEW_FLIGHT]) {
+          // Clear state log so that future runs won't try to resume
+          state_log_write_complete();
+          cliSendAck(true, nullptr);
+          return EndCondition_t::NewFlight;
+        } else {
+          break;
+        }
+      case CliCommand_t::PYROFIRE:
+        if (allowedTransitions[CliCommand_t::PYROFIRE]) {
+          cliPyroFire();
+        }
+      default:
+        break;
+    }
+  }
+
+  return EndCondition_t::NoChange;
+}
