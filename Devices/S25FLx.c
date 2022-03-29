@@ -140,7 +140,8 @@ bool S25FLX_read_start(S25FLXCtrl_t *s25flx, uint32_t startLoc,
   }
 
   // Read into given buffer pData
-  uint8_t txBuf2[numBytes] = {0};
+  uint8_t txBuf2[numBytes];  // NOLINT
+  memset(txBuf2, 0, numBytes);
 #ifdef USE_S25FLx_DMA
   s25flx->bRxComplete = false;
   if (HAL_SPI_TransmitReceive_DMA(s25flx->hspi, txBuf2, pData, numBytes) !=
