@@ -1,0 +1,33 @@
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+image: python:3.10.2
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  FF_ENABLE_BASH_EXIT_CODE_CHECK: "true"
+
+
+cache:
+  paths:
+    - .cache/pip
+    - .venv/
+
+before_script:
+  - apt-get update
+  - apt-get install -y clang-format git
+  - python --version
+  - python -m venv .venv/
+  - source .venv/bin/activate
+  - python -m pip install --upgrade pip
+  - pip install cpplint
+
+stages:
+  - lint
+
+lint-job:
+  stage: lint
+  script:
+    - chmod -R +x ci/run_lint.sh
+    - ./ci/run_lint.sh

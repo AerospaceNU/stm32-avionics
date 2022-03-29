@@ -47,47 +47,55 @@ void filterInit(double dt) {
   runningPresCount = 0;
 }
 
-static double filterAccelOneAxis(const double imu1reading, const double imu2reading, const double highGreading,
-		SensorProperties_t *sensorProperties, bool imu1sampling, bool imu2sampling, bool highGsampling) {
+static double filterAccelOneAxis(const double imu1reading,
+                                 const double imu2reading,
+                                 const double highGreading,
+                                 SensorProperties_t* sensorProperties,
+                                 bool imu1sampling, bool imu2sampling,
+                                 bool highGsampling) {
+  int numAccelsValid = 0;
+  double accelSum = 0;
 
-	int numAccelsValid = 0;
-	double accelSum = 0;
+  // Only pull from IMUs if accel below fullscale and if they're working
+  if (fabs(imu1reading) <
+          ACCEL_SWITCH_MULTIPLE * sensorProperties->imu1_accel_fs &&
+      imu1sampling) {
+    numAccelsValid++;
+    accelSum += imu1reading;
+  }
+  if (fabs(imu2reading) <
+          ACCEL_SWITCH_MULTIPLE * sensorProperties->imu2_accel_fs &&
+      imu2sampling) {
+    numAccelsValid++;
+    accelSum += imu2reading;
+  }
 
-	// Only pull from IMUs if accel below fullscale and if they're working
-	if (fabs(imu1reading) < ACCEL_SWITCH_MULTIPLE * sensorProperties->imu1_accel_fs
-			&& imu1sampling) {
-		numAccelsValid++;
-		accelSum += imu1reading;
-	}
-	if (fabs(imu2reading) < ACCEL_SWITCH_MULTIPLE * sensorProperties->imu2_accel_fs
-			&& imu2sampling) {
-		numAccelsValid++;
-		accelSum += imu2reading;
-	}
-
-	// If our IMUs are fullscaled, pull from high-G
-	if (numAccelsValid == 0 && highGsampling) {
-		numAccelsValid++;
-		accelSum += highGreading;
-	}
-	return accelSum / (double)numAccelsValid;
+  // If our IMUs are fullscaled, pull from high-G
+  if (numAccelsValid == 0 && highGsampling) {
+    numAccelsValid++;
+    accelSum += highGreading;
+  }
+  return accelSum / (double)numAccelsValid;
 }
 
-static void filterAccels(SensorData_t* curSensorVals, SensorProperties_t* sensorProperties) {
+static void filterAccels(SensorData_t* curSensorVals,
+                         SensorProperties_t* sensorProperties) {
+  bool* status = HM_GetHardwareStatus();
 
-	bool *status = HM_GetHardwareStatus();
+  filterData.acc_x = (filterAccelOneAxis(
+      -curSensorVals->imu1_accel_x, -curSensorVals->imu2_accel_x,
+      -curSensorVals->high_g_accel_y, sensorProperties, status[IMU1],
+      status[IMU2], status[HIGH_G_ACCELEROMETER]));
 
-	filterData.acc_x = (filterAccelOneAxis(
-      -curSensorVals->imu1_accel_x, -curSensorVals->imu2_accel_x, -curSensorVals->high_g_accel_y,
-      sensorProperties, status[IMU1], status[IMU2], status[HIGH_G_ACCELEROMETER]));
+  filterData.acc_y = (filterAccelOneAxis(
+      -curSensorVals->imu1_accel_z, -curSensorVals->imu2_accel_z,
+      -curSensorVals->high_g_accel_z, sensorProperties, status[IMU1],
+      status[IMU2], status[HIGH_G_ACCELEROMETER]));
 
-	filterData.acc_y = (filterAccelOneAxis(
-      -curSensorVals->imu1_accel_z, -curSensorVals->imu2_accel_z, -curSensorVals->high_g_accel_z,
-      sensorProperties, status[IMU1], status[IMU2], status[HIGH_G_ACCELEROMETER]));
-
-	filterData.acc_z = (filterAccelOneAxis(
-      curSensorVals->imu1_accel_y, curSensorVals->imu2_accel_y, -curSensorVals->high_g_accel_x,
-      sensorProperties, status[IMU1], status[IMU2], status[HIGH_G_ACCELEROMETER]));
+  filterData.acc_z = (filterAccelOneAxis(
+      curSensorVals->imu1_accel_y, curSensorVals->imu2_accel_y,
+      -curSensorVals->high_g_accel_x, sensorProperties, status[IMU1],
+      status[IMU2], status[HIGH_G_ACCELEROMETER]));
 
   // TODO hack
   filterData.acc_z *= -1;
