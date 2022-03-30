@@ -18,6 +18,8 @@ class CliMainState : public State {
   EndCondition_t run(void) override;
 
   void cleanup(void) override;
+
+  bool simModeStarted = false;
 };
 
 #ifdef __cplusplus

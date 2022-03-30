@@ -114,7 +114,7 @@ static double median(double* input, uint8_t size) {
   // Copy array so that we don't modify actual values
   memcpy(&medianArray, input, size * sizeof(double));
   // Insertion sort
-  uint8_t i, j;
+  int8_t i, j;
   double tmp;
   for (i = 1; i < size; ++i) {
     tmp = medianArray[i];

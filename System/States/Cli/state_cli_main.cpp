@@ -5,7 +5,10 @@
 #include "cli.h"
 #include "hardware_manager.h"
 
-void CliMainState::init() { cliInit(); }
+void CliMainState::init() {
+  cliInit();
+  simModeStarted = false;
+}
 
 EndCondition_t CliMainState::run() {
   // Run buzzer heartbeat
@@ -14,6 +17,15 @@ EndCondition_t CliMainState::run() {
   // Check if USB is disconnected
   if (!HM_UsbIsConnected()) {
     return EndCondition_t::UsbDisconnect;
+  }
+
+  // Wait for sim data
+  if (simModeStarted) {
+    if (cbCount(cliGetRxBuffer()) >= sizeof(SensorData_t)) {
+      return EndCondition_t::SimCommand;
+    } else {
+      return EndCondition_t::NoChange;
+    }
   }
 
   // Check for CLI input over USB
@@ -32,7 +44,9 @@ EndCondition_t CliMainState::run() {
       return EndCondition_t::OffloadCommand;
     case CliCommand_t::SIM:
       HM_EnableSimMode(cliGetRxBuffer());
-      return EndCondition_t::SimCommand;
+      simModeStarted = true;
+      cliSendAck(true, nullptr);
+      return EndCondition_t::NoChange;
     case CliCommand_t::SENSE:
       return EndCondition_t::SenseCommand;
     case CliCommand_t::SHUTDOWN:
@@ -40,7 +54,6 @@ EndCondition_t CliMainState::run() {
     default:
       break;
   }
-
   return EndCondition_t::NoChange;
 }
 

@@ -17,36 +17,14 @@ void PreFlightState::init() {
   gpsTimestamp = false;
 
   filterInit(this->period_ms_ / 1000.0);
-  // Send ACK to CLI if in sim mode
-  if (HM_InSimMode()) {
-    cliSendAck(true, nullptr);
-    // If we are in sim, first data packet might not have arrived yet, so don't
-    // set pres ref from it
-  } else {
-    // Otherwise set initial current pressure ref
-    HM_ReadSensorData();
-    filterSetPressureRef(
-        (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
-  }
+  HM_ReadSensorData();
+  filterSetPressureRef(
+      (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
 }
 
 EndCondition_t PreFlightState::run() {
   // Produce a tone for each functioning peripheral
   buzzerReport();
-
-  // In sim mode, don't continue until at least 1 data point has arrived
-  if (HM_InSimMode() && !simModeStarted) {
-    if (cbCount(cliGetRxBuffer()) >= sizeof(SensorData_t)) {
-      simModeStarted = true;
-      // Set pres ref now that sim has data
-      HM_ReadSensorData();
-      filterSetPressureRef(
-          (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) /
-          2);
-    } else {
-      return EndCondition_t::NoChange;
-    }
-  }
 
   // Collect, and filter data
   SensorData_t* sensorData = HM_GetSensorData();

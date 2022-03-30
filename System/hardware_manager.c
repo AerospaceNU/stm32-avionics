@@ -56,7 +56,7 @@
 #include <radioconfig/smartrf_CC1200_cfg_915_38_4kbps.h>
 #endif
 #ifdef HAS_CC1120
-#include <radioconfig/smartrf_cc1120_cfg_434_38_4kbps.h>
+#include <radioconfig/smartrf_CC1120_cfg_434_38_4kbps.h>
 #endif
 
 #ifdef HAS_GPS
