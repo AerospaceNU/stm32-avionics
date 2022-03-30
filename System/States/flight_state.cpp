@@ -12,6 +12,10 @@
 #include "radio_manager.h"
 
 EndCondition_t FlightState::run_state() {
+  // We also should run periodic updates
+  HM_RadioUpdate();
+  RadioManager_tick();
+
   // Collect, filter, and log all sensor data
   HM_ReadSensorData();
   SensorData_t* sensorData = HM_GetSensorData();
@@ -20,10 +24,6 @@ EndCondition_t FlightState::run_state() {
   RadioManager_transmitData(sensorData, filterData, this->getID());
 
   EndCondition_t end = State::run_state();
-
-  // We also should run periodic updates last
-  HM_RadioUpdate();
-  RadioManager_tick();
 
   return end;
 }
