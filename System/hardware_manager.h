@@ -153,6 +153,10 @@ CircularBuffer_t* HM_UsbGetRxBuffer();
 /* Bluetooth functions */
 bool HM_BluetoothSend(const uint8_t* data, uint16_t numBytes);
 
+/* Outputs */
+void HM_PyroFire(int channel, uint32_t duration);
+void HM_PyroUpdate();
+
 /* Sensor functions */
 
 /* Sensor sampling enable/disable functions. All true initially */

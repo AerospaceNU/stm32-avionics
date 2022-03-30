@@ -67,6 +67,10 @@
 #include "usb.h"
 #endif
 
+#ifdef HAS_PYRO
+#include "pyro.h"
+#endif
+
 #include "iwdg.h"
 #include "radio_manager.h"
 
@@ -122,6 +126,11 @@ static S25FLXCtrl_t s25flx1;
 /* GPS */
 #ifdef HAS_GPS
 static GPSCtrl_t gps;
+#endif
+
+#ifdef HAS_PYRO
+/* Pyro */
+PyroCtrl_t pyroCtrl[MAX_PYRO];
 #endif
 
 /* Radio */
@@ -354,6 +363,17 @@ void HM_HardwareInit() {
 #endif  // HAS 915 and has cc1200
 
 #endif  // has_radio_915
+
+#ifdef HAS_PYRO
+  /* Pyros */
+  pyroCtrl[0].port = FIRE1_GPIO_Port;
+  pyroCtrl[0].pin = FIRE1_Pin;
+  pyroCtrl[1].port = FIRE2_GPIO_Port;
+  pyroCtrl[1].pin = FIRE2_Pin;
+
+  Pyro_init(&pyroCtrl[0]);
+  Pyro_init(&pyroCtrl[1]);
+#endif
 
 #ifdef HAS_LED_1
   /* LED 1 */
@@ -631,6 +651,20 @@ void HM_SetPyroContinuitySampling(bool enable) {
 }
 
 void HM_IWDG_Refresh() { HAL_IWDG_Refresh(IWDG_HANDLE); }
+
+void HM_PyroFire(int channel, uint32_t duration) {
+#ifdef HAS_PYRO
+  Pyro_start(&pyroCtrl[channel], duration);
+#endif
+}
+
+void HM_PyroUpdate() {
+#ifdef HAS_PYRO
+  for (int i = 0; i < MAX_PYRO; i++) {
+    Pyro_tick(&pyroCtrl[i]);
+  }
+#endif
+}
 
 static void HM_SimReadSensorData() {
   size_t buffCount =

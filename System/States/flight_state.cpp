@@ -15,6 +15,7 @@ EndCondition_t FlightState::run_state() {
   // We also should run periodic updates
   HM_RadioUpdate();
   RadioManager_tick();
+  HM_PyroUpdate();
 
   // Collect, filter, and log all sensor data
   HM_ReadSensorData();

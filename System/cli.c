@@ -39,11 +39,11 @@ static struct option longOptions[] = {
     {0, 0, 0, 0}};
 
 static CliConfigs_t cliConfigs = {
-    0,        // drogueCuts
-    {0},      // drogueCutAltitudesM
-    1000000,  // mainCutAltitude
-    0,        // groundElevationM
-    14.85     // groundTemperatureC
+    0,     // drogueCuts
+    {0},   // drogueCutAltitudesM
+    230,   // mainCutAltitude
+    0,     // groundElevationM
+    14.85  // groundTemperatureC
 };
 
 static CliComms_t lastCommsType;  // Used to help send ack to right places

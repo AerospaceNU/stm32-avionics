@@ -12,6 +12,9 @@ void DrogueDescentNState::init() {
   completeDrogueCuts_ = 0;
   // TODO: Actuate separation
   state_log_write(this->getID());
+  // Fire drogue
+  // TODO put constant somewhere reasonable???
+  HM_PyroFire(0, 1000);
 }
 
 EndCondition_t DrogueDescentNState::run() {

@@ -13,6 +13,7 @@ void MainDescentState::init() {
   altitude = 0;
   // TODO: Deploy main parachute
   state_log_write(this->getID());
+  HM_PyroFire(1, 1000);
 }
 
 EndCondition_t MainDescentState::run() {

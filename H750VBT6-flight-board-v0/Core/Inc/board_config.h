@@ -27,6 +27,9 @@
 #define HAS_ADC
 #define HAS_UART
 
+#define HAS_PYRO
+#define MAX_PYRO 2
+
 /*
  * IMU Types, of which there are 2
  */
