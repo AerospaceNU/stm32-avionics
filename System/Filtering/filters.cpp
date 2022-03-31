@@ -20,10 +20,10 @@
 #define kPrevPresMedianCount 10
 #define kPrevPresCount 10
 
-static double runningPresMedians[kPrevPresMedianCount];
+static double runningPresMedians[kPrevPresMedianCount + 1];
 static CircularBuffer_t runningPresMediansBuffer;
 static uint8_t runningPresMedianCount;
-static double runningPres[kPrevPresCount];
+static double runningPres[kPrevPresCount + 1];
 static CircularBuffer_t runningPresBuffer;
 static uint8_t runningPresCount;
 
@@ -39,9 +39,9 @@ void filterInit(double dt) {
   kalman.Reset();
   kalman.SetDt(dt);
   // Initialize circular buffers for running medians/running pressure values
-  cbInit(&runningPresMediansBuffer, runningPresMedians, kPrevPresMedianCount,
-         sizeof(double));
-  cbInit(&runningPresBuffer, runningPres, kPrevPresCount, sizeof(double));
+  cbInit(&runningPresMediansBuffer, runningPresMedians,
+         kPrevPresMedianCount + 1, sizeof(double));
+  cbInit(&runningPresBuffer, runningPres, kPrevPresCount + 1, sizeof(double));
   runningPresMedianCount = 0;
   runningPresCount = 0;
 }
@@ -106,30 +106,24 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
   filterData.vel_z = kalmanOutput.estimatedVelocity;
 }
 
-static double median(double* input, uint8_t size) {
-  // If size > max size, stop
-  if (size > sizeof(medianArray) / sizeof(double)) {
-    return 0;
-  }
-  // Copy array so that we don't modify actual values
-  memcpy(&medianArray, input, size * sizeof(double));
+static double median(double* input, uint8_t count) {
   // Insertion sort
   int8_t i, j;
   double tmp;
-  for (i = 1; i < size; ++i) {
-    tmp = medianArray[i];
+  for (i = 1; i < count; ++i) {
+    tmp = input[i];
     j = i - 1;
-    while (j >= 0 && tmp <= medianArray[j]) {
-      medianArray[j + 1] = medianArray[j];
+    while (j >= 0 && tmp <= input[j]) {
+      input[j + 1] = input[j];
       --j;
     }
-    medianArray[j + 1] = tmp;
+    input[j + 1] = tmp;
   }
 
-  if (size % 2 == 0) {
-    return (medianArray[size / 2 - 1] + medianArray[size / 2]) / 2.0;
+  if (count % 2 == 0) {
+    return (input[count / 2 - 1] + input[count / 2]) / 2.0;
   } else {
-    return medianArray[size / 2];
+    return input[count / 2];
   }
 }
 
@@ -141,7 +135,7 @@ void filterAddPressureRef(double currentPres) {
     presRef = currentPres;
   }
   // Make room for new value, discarding oldest pressure stored if full
-  if (cbCount(&runningPresBuffer) == kPrevPresCount) {
+  if (cbFull(&runningPresBuffer)) {
     cbDequeue(&runningPresBuffer, 1);
   }
 
@@ -155,19 +149,23 @@ void filterAddPressureRef(double currentPres) {
     runningPresCount = 0;
     if (runningPresMedianCount < kPrevPresMedianCount) ++runningPresMedianCount;
     // Make room for new value, discarding oldest median stored if full
-    if (cbCount(&runningPresMediansBuffer) == kPrevPresMedianCount) {
+    if (cbFull(&runningPresMediansBuffer)) {
       cbDequeue(&runningPresMediansBuffer, 1);
     }
 
     // Add median of most recent values
-    double currentMedian = median(runningPres, kPrevPresCount);
+    size_t numElements = kPrevPresCount;
+    cbPeek(&runningPresBuffer, medianArray, &numElements);
+    double currentMedian = median(medianArray, kPrevPresCount);
     cbEnqueue(&runningPresMediansBuffer, &currentMedian);
 
     // Only set pressure ref if we have enough values recorded
     if (runningPresMedianCount == kPrevPresMedianCount) {
       // Now, find median of the last 100 seconds of data and set that to be
       // current ref
-      presRef = median(runningPresMedians, kPrevPresMedianCount);
+      size_t numMedElements = kPrevPresMedianCount;
+      cbPeek(&runningPresMediansBuffer, medianArray, &numMedElements);
+      presRef = median(medianArray, kPrevPresMedianCount);
     } else {
       // Otherwise (for the first 100 seconds) set current pressure ref to the
       // median of the last 10 seconds so that we have at least a somewhat

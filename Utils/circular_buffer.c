@@ -28,7 +28,7 @@ void cbPeek(CircularBuffer_t *cb, void *outputBuffer, size_t *numElements) {
   else if (*numElements > count)
     *numElements = count;
 
-  if (cb->tail + *numElements <= cb->buffer_end) {
+  if (cb->tail + *numElements * cb->size <= cb->buffer_end) {
     // One copy to outputBuffer needed
     memcpy(outputBuffer, cb->tail, *numElements * cb->size);
   } else {
@@ -51,7 +51,7 @@ size_t cbCount(CircularBuffer_t *cb) {
 }
 
 size_t cbCapacity(CircularBuffer_t *cb) {
-  return (cb->buffer_end - cb->buffer) / cb->size;
+  return ((cb->buffer_end - cb->buffer) / cb->size) - 1;
 }
 
 bool cbEnqueue(CircularBuffer_t *cb, const void *item) {

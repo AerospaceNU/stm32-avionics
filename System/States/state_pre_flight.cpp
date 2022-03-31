@@ -12,10 +12,9 @@
 void PreFlightState::init() {
   transitionResetTimer = HM_Millis();
   prevPressureLogTime = HM_Millis();
-  data_log_assign_flight();
+  if (!HM_InSimMode()) data_log_assign_flight();
   simModeStarted = false;
   gpsTimestamp = false;
-
   filterInit(this->period_ms_ / 1000.0);
   HM_ReadSensorData();
   filterSetPressureRef(

@@ -3,6 +3,7 @@
 
 #include "buzzer_heartbeat.h"
 #include "cli.h"
+#include "data_log.h"
 #include "hardware_manager.h"
 
 void CliMainState::init() {
@@ -45,6 +46,7 @@ EndCondition_t CliMainState::run() {
     case CliCommand_t::SIM:
       HM_EnableSimMode(cliGetRxBuffer());
       simModeStarted = true;
+      data_log_assign_flight();
       cliSendAck(true, nullptr);
       return EndCondition_t::NoChange;
     case CliCommand_t::SENSE:
