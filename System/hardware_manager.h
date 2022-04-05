@@ -97,6 +97,7 @@ typedef struct __attribute__((__packed__)) {
   bool pyro_continuity[6];
 } SensorData_t;
 
+// Sensor fullscales, in m/s/s
 typedef struct {
   double imu1_accel_fs;
   double imu2_accel_fs;
@@ -114,6 +115,8 @@ typedef enum hardware_t {
 } Hardware_t;
 
 void HM_HardwareInit();
+
+bool* HM_GetHardwareStatus();
 
 /* Microcontroller timer functions */
 uint32_t HM_Millis();

@@ -164,6 +164,10 @@ bool hardwareStatus[NUM_HARDWARE];
 static bool inSim = false;
 static CircularBuffer_t *simRxBuffer = NULL;
 
+bool* HM_GetHardwareStatus() {
+	return hardwareStatus;
+}
+
 void HM_HardwareInit() {
 #if (IMU_1 == IMU_LSM9DS1)
   /* LSM9DS1 IMU 1 */
@@ -177,7 +181,7 @@ void HM_HardwareInit() {
   lsm9ds1_1.ag.gFs = FS_G_500;
   lsm9ds1_1.m.mFs = FS_M_8;
   LSM9DS1_init(&lsm9ds1_1);
-  sensorProperties.imu1_accel_fs = 156.96;  // 16 G * 9.81 mpsps/G
+  sensorProperties.imu1_accel_fs = 156.96;  // 16 G * 9.81 m/s/s/G
 #else
   sensorProperties.imu2_accel_fs = 0;
 #endif
