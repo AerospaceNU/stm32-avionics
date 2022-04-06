@@ -248,12 +248,18 @@ void HM_HardwareInit() {
 
 #ifdef HAS_ADC_DEVICE
   /* ADCs */
-  // Battery voltage - 0 min, 36.3 max (110k/10k*3.3V)
-  // Pyros - 0 min, 36.3 max (110k/10k*3.3V)
-  static const float voltageDividerMax = 3.3 * (110.0 / 10.0);
+  // Battery voltage - 0 min, seems like 10v in = 2.4v on the voltage divider?
+  // Pyros - 0 min, (127k/27k*3.3V) max
+
+  // I had to multiply by 10/3 on my V0 to get these to make sense. TODO Why???
+  static const float voltageDividerMax = 3.3 * (127.0 / 27.0) * 10 / 3;
 #if (FCB_VERSION <= 0)
-  adcInit(&adcBatteryVoltage, VBAT_ADC, VBAT_ADC_RANK, 0, voltageDividerMax,
-          true);
+  static const float vbattMax = 67;  // 4.72 Volts/volt, 67v fullscale??
+  // Also the scale seems non linear: at 10vin this is right, but at 13vin it
+  // reads 0.25 above the true number. Apparently this is coz our ADCs aren't
+  // buffered
+  // TODO why does 67 make things work?
+  adcInit(&adcBatteryVoltage, VBAT_ADC, VBAT_ADC_RANK, 0, vbattMax, true);
   adcInit(&adcCurrent, CURRENT_ADC, CURRENT_ADC_RANK, -12.5, 17.5, true);
 #endif /* FCB_VERSION */
   adcInit(&adcPyro[0], PYRO1_ADC, PYRO1_ADC_RANK, 0, voltageDividerMax, true);
