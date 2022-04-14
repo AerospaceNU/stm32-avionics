@@ -1,5 +1,5 @@
 
-#include "state_main_descent.h"
+#include "state_descent.h"
 
 #include <math.h>
 
@@ -8,15 +8,13 @@
 #include "hardware_manager.h"
 #include "state_log.h"
 
-void MainDescentState::init() {
+void DescentState::init() {
   transitionResetTimer = HM_Millis();
   altitude = 0;
-  // TODO: Deploy main parachute
   state_log_write(this->getID());
-  HM_PyroFire(1, 1000);
 }
 
-EndCondition_t MainDescentState::run() {
+EndCondition_t DescentState::run() {
   // Collect, filter, and log all sensor data
   SensorData_t* sensorData = HM_GetSensorData();
   FilterData_t* filterData = filterGetData();
@@ -36,6 +34,6 @@ EndCondition_t MainDescentState::run() {
   return EndCondition_t::NoChange;
 }
 
-void MainDescentState::cleanup() {
+void DescentState::cleanup() {
   // Empty
 }

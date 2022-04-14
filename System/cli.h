@@ -12,8 +12,10 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "board_config.h"
 #include "circular_buffer.h"
 #include "data_structures.h"
+#include "pyro_manager.h"
 
 /**
  * Ways the command line can receive information
@@ -37,7 +39,8 @@ typedef enum CliCommand_t {
   SENSE,
   SIM,
   SHUTDOWN,
-  HELP
+  HELP,
+  PYROFIRE
 } CliCommand_t;
 
 /**
@@ -45,8 +48,10 @@ typedef enum CliCommand_t {
  */
 typedef struct {
   char* f;  // flight number
-  char* d;  // drogue altitude
-  char* m;  // main altitude
+  char* p;  // pyro number
+  char* H;  // pyro deploy altitude
+  char* D;  // pyro deploy apogee delay
+  bool A;   // pyro mode
   char* e;  // ground elevation
   char* t;  // ground temperature
   bool h;   // help flag
@@ -56,13 +61,11 @@ typedef struct {
 /**
  * Configs that can be changed via CLI
  */
-#define MAX_DROGUE_CUTS 4
 typedef struct {
-  uint8_t drogueCuts;  // Excludes initial separation and main descent
-  double drogueCutAltitudesM[MAX_DROGUE_CUTS];
-  double mainCutAltitudeM;
+  PyroConfig_t pyroConfiguration[MAX_PYRO];
   double groundElevationM;
   double groundTemperatureC;
+  int radioChannel;
 } CliConfigs_t;
 
 /**
@@ -75,6 +78,11 @@ void cliInit();
  * @return Pointer to statically-allocated CLI configs
  */
 CliConfigs_t* cliGetConfigs();
+
+/**
+ * @brief Set CLI config values to defaults
+ */
+void cliSetDefaultConfig();
 
 /**
  * @brief Parses all bytes that have come in through the specified comms type

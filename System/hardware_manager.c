@@ -378,9 +378,12 @@ void HM_HardwareInit() {
   pyroCtrl[0].pin = FIRE1_Pin;
   pyroCtrl[1].port = FIRE2_GPIO_Port;
   pyroCtrl[1].pin = FIRE2_Pin;
+  pyroCtrl[2].port = FIRE3_GPIO_Port;
+  pyroCtrl[2].pin = FIRE3_Pin;
 
   Pyro_init(&pyroCtrl[0]);
   Pyro_init(&pyroCtrl[1]);
+  Pyro_init(&pyroCtrl[2]);
 #endif
 
 #ifdef HAS_LED_1

@@ -22,8 +22,14 @@ static char
 static uint8_t radioRxBuffer[INPUT_BUFFER_SIZE];
 static CircularBuffer_t radioRxCircBuffer;
 
-static CliOptionVals_t cliOptionVals = {
-    .d = NULL, .e = NULL, .t = NULL, .f = NULL, .m = NULL, .h = false};
+static CliOptionVals_t cliOptionVals = {.p = NULL,
+                                        .H = NULL,
+                                        .D = NULL,
+                                        .e = NULL,
+                                        .t = NULL,
+                                        .f = NULL,
+                                        .A = false,
+                                        .h = false};
 
 static int primaryCommand = 0;
 
@@ -36,15 +42,10 @@ static struct option longOptions[] = {
     {"sim", no_argument, &primaryCommand, SIM},
     {"sense", no_argument, &primaryCommand, SENSE},
     {"shutdown", no_argument, &primaryCommand, SHUTDOWN},
+    {"pyrofire", no_argument, &primaryCommand, PYROFIRE},
     {0, 0, 0, 0}};
 
-static CliConfigs_t cliConfigs = {
-    0,     // drogueCuts
-    {0},   // drogueCutAltitudesM
-    230,   // mainCutAltitude
-    0,     // groundElevationM
-    14.85  // groundTemperatureC
-};
+static CliConfigs_t cliConfigs;
 
 static CliComms_t lastCommsType;  // Used to help send ack to right places
 
@@ -74,6 +75,17 @@ void cliInit() {
 }
 
 CliConfigs_t* cliGetConfigs() { return &cliConfigs; }
+
+void cliSetDefaultConfig() {
+#if MAX_PYRO >= 2
+  cliConfigs.pyroConfiguration[0].flags = 0b1;   // FLAG_APOGEE
+  cliConfigs.pyroConfiguration[1].flags = 0b10;  // FLAG_DESCENT_ALT_THRESHOLD
+  cliConfigs.pyroConfiguration[1].configValue = 230;  // 230 m deploy
+  cliConfigs.groundElevationM = 0;
+  cliConfigs.groundTemperatureC = 14.85;
+  cliConfigs.radioChannel = 1;
+#endif
+}
 
 CliCommand_t cliParse(CliComms_t commsType) {
   // Set last comms type
@@ -153,13 +165,14 @@ CliCommand_t cliParse(CliComms_t commsType) {
   int optionIndex = 0;
   optind = 0;
   primaryCommand = NONE;
-  while ((opt = getopt_long(argc, argv, "d:m:e:t:f:c:h", longOptions,
+  while ((opt = getopt_long(argc, argv, "p:H:D:e:t:f:c:Ah", longOptions,
                             &optionIndex)) != -1) {
     switch (opt) {
       case 0:
         // New primary command was set
-        cliOptionVals.d = NULL;
-        cliOptionVals.m = NULL;
+        cliOptionVals.p = NULL;
+        cliOptionVals.H = NULL;
+        cliOptionVals.A = false;
         cliOptionVals.f = NULL;
         cliOptionVals.e = NULL;
         cliOptionVals.t = NULL;
@@ -176,14 +189,24 @@ CliCommand_t cliParse(CliComms_t commsType) {
           cliOptionVals.h = true;
         }
         break;
-      case 'd':
-        if (primaryCommand == CONFIG) {
-          cliOptionVals.d = optarg;
+      case 'p':
+        if (primaryCommand == CONFIG || primaryCommand == PYROFIRE) {
+          cliOptionVals.p = optarg;
         }
         break;
-      case 'm':
+      case 'A':
         if (primaryCommand == CONFIG) {
-          cliOptionVals.m = optarg;
+          cliOptionVals.A = true;
+        }
+        break;
+      case 'H':
+        if (primaryCommand == CONFIG) {
+          cliOptionVals.H = optarg;
+        }
+        break;
+      case 'D':
+        if (primaryCommand == CONFIG) {
+          cliOptionVals.D = optarg;
         }
         break;
       case 'e':

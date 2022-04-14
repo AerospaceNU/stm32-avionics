@@ -8,6 +8,7 @@
 #include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
+#include "pyro_manager.h"
 
 void PreFlightState::init() {
   transitionResetTimer = HM_Millis();
@@ -15,6 +16,7 @@ void PreFlightState::init() {
   if (!HM_InSimMode()) data_log_assign_flight();
   simModeStarted = false;
   gpsTimestamp = false;
+  PyroManager_Init();
   filterInit(this->period_ms_ / 1000.0);
   HM_ReadSensorData();
   filterSetPressureRef(
@@ -28,8 +30,8 @@ EndCondition_t PreFlightState::run() {
   // Collect, and filter data
   SensorData_t* sensorData = HM_GetSensorData();
   if (!gpsTimestamp && sensorData->gps_timestamp > 0) {
-    data_log_set_timestamp_metadata(sensorData->gps_timestamp);
-    data_log_write_metadata();
+    data_log_get_flight_metadata()->gpsTimestamp = sensorData->gps_timestamp;
+    data_log_write_flight_metadata();
     gpsTimestamp = true;
   }
 
@@ -87,7 +89,6 @@ void PreFlightState::cleanup() {
   for (int i = 0; i < kBufferSize; i++) {
     data_log_write(&sensorDataBuffer[i], &filterDataBuffer[i], this->getID());
   }
-  data_log_set_pressure_metadata(
-      filterGetPressureRef());  // Write pressure reference metadata
-  data_log_write_metadata();
+  data_log_get_flight_metadata()->pressureRef = filterGetPressureRef();
+  data_log_write_flight_metadata();
 }

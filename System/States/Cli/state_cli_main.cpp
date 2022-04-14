@@ -41,6 +41,8 @@ EndCondition_t CliMainState::run() {
       return EndCondition_t::EraseFlashCommand;
     case CliCommand_t::HELP:
       return EndCondition_t::HelpCommand;
+    case CliCommand_t::PYROFIRE:
+      return EndCondition_t::PyroFireCommand;
     case CliCommand_t::OFFLOAD:
       return EndCondition_t::OffloadCommand;
     case CliCommand_t::SIM:

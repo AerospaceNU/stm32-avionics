@@ -3,6 +3,14 @@
  */
 #include "state_log.h"
 
+#include <stdint.h>
+
+#include "data_log.h"
+#include "filters.h"
+#include "hardware_manager.h"
+#include "internal_flash.h"
+#include "pyro_manager.h"
+
 #define STATE_START_ADDRESS \
   0x00000000;  // Starting flash location for the state log, relative to start
                // of internal flash
@@ -12,28 +20,25 @@ uint32_t readAddress = STATE_START_ADDRESS;
 uint8_t curRead;
 uint8_t prevRead;
 
-/*
- * @brief Reinitializes needed parameters for an in-flight restart
- */
 void state_log_reload_flight() {
   data_log_load_last_stored_flight_metadata();  // Load the previous flight
                                                 // metadata into the data log
-  FlightMetadata oldMetadataPacket =
-      data_log_get_metadata();  // Get the previous flight metadata
-  filterSetPressureRef(
-      oldMetadataPacket
-          .pressureRef);     // Set the ground pressure to the recovered value
-  data_log_assign_flight();  // Start a new flight
-  data_log_copy_metadata(
-      &oldMetadataPacket);  // Write a new metadata packet with the current
-                            // flight metadata
-  data_log_write_metadata();
+  FlightMetadata oldMetadataPacket = *data_log_get_flight_metadata();
+
+  // Load in recovered values
+  filterSetPressureRef(oldMetadataPacket.pressureRef);
+  PyroManager_Init();
+  PyroManager_SetApogeeTime(HM_Millis());
+  PyroManager_SetPyroFireStatus(~oldMetadataPacket.pyroFireStatus);
+
+  // Assign a new flight
+  data_log_assign_flight();
+
+  // Set new metadata to values in old packet
+  *data_log_get_flight_metadata() = oldMetadataPacket;
+  data_log_write_flight_metadata();
 }
 
-/*
- * @brief Writes an integer state id to the state log
- * @param currentState: int representation of the state id
- */
 void state_log_write(int currentState) {
   uint8_t stateWriteBuffer;  // Buffer to store the byte that needs to be
                              // written to flash
@@ -68,12 +73,9 @@ void state_log_write_complete() {
                           // ended and nothing should be resumed
 }
 
-/*
- * @brief reads the most recent state from the state log
- * @return int representing the state id
- */
 int state_log_read() {
   uint8_t stateReadBuffer;
+  readAddress = STATE_START_ADDRESS;
   internal_flash_read(readAddress, &stateReadBuffer, 1);
   prevRead = stateReadBuffer;
 
@@ -89,7 +91,7 @@ int state_log_read() {
 
     // If we reach an empty state or are going to read past the last address
     if (curRead == 255 || readAddress > MAX_FLASH_ADDRESS) {
-      if (curRead == 0xEE) {  // Nothing to resume if the last data is 0xEE
+      if (prevRead == 0xEE) {  // Nothing to resume if the last data is 0xEE
         return -1;
       }
       return prevRead;  // Otherwise return the state id to resume

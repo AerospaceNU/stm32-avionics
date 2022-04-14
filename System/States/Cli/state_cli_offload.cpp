@@ -69,7 +69,6 @@ EndCondition_t CliOffloadState::run() {
                "\r\nNo flights exist to offload\r\n");
       cliSend(sendString);
     } else {
-      FlightMetadata metadataPacket;
       time_t flight_timestamp;
       char timeString[25];
       snprintf(sendString, sizeof(sendString),
@@ -85,11 +84,11 @@ EndCondition_t CliOffloadState::run() {
                "Timestamp", "Flight Duration");
       cliSend(sendString);
       for (uint8_t num = 1; num <= lastFlightNum; ++num) {
-        data_log_get_flight_metadata(&metadataPacket, num);
-        flight_timestamp = (time_t)metadataPacket.timestamp;
+        data_log_read_flight_num_metadata(num);
+        FlightMetadata *metadataPacket = data_log_get_flight_metadata();
+        flight_timestamp = (time_t)metadataPacket->gpsTimestamp;
         // Check timestamp between 2000 and 2100
-        if (metadataPacket.timestamp > 946702800 &&
-            metadataPacket.timestamp < 4102462800) {
+        if (flight_timestamp > 946702800 && flight_timestamp < 4102462800) {
           strftime(timeString, 25, "%c", localtime(&flight_timestamp));
         } else {
           snprintf(timeString, sizeof(timeString), "None");
@@ -97,7 +96,7 @@ EndCondition_t CliOffloadState::run() {
 
         char launchedString[6];
         snprintf(launchedString, sizeof(launchedString),
-                 metadataPacket.launched == 1 ? "true" : "false");
+                 metadataPacket->launched == 1 ? "true" : "false");
         char durationString[9];
         format_time_seconds(durationString, sizeof(durationString),
                             data_log_get_last_flight_timestamp(num) / 1000);

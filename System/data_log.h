@@ -15,11 +15,18 @@ extern "C" {
 #include "hardware_manager.h"
 
 // Flight metadata shows what data will be logged in what relative location
-typedef struct __attribute__((__packed__)) FlightMetadata {
+typedef struct __attribute__((__packed__)) {
   double pressureRef;
   uint8_t launched;
-  uint64_t timestamp;
+  uint64_t gpsTimestamp;
+  uint64_t apogeeTimestamp;
+  uint8_t pyroFireStatus;
 } FlightMetadata;
+
+/**
+ * @brief Erases the entire S25FLx chip
+ */
+void data_log_flash_erase();
 
 /**
  * @brief Return the last flight number that was logged
@@ -34,44 +41,31 @@ uint32_t data_log_get_last_flight_num();
 uint32_t data_log_get_last_launched_flight_num();
 
 /**
- * @brief Get the metadata from the previous flight and load into the current
- * metadata packet
- */
-void data_log_load_last_stored_flight_metadata();
-
-void data_log_get_flight_metadata(FlightMetadata *metadata, uint8_t flightNum);
-
-FlightMetadata data_log_get_metadata();
-
-/**
  * @brief Start a new flight in the log
  */
 void data_log_assign_flight();
 
 /**
- * @brief Set the metadata stored pressure
+ * @brief Get the metadata from the previous flight and load into the current
+ * metadata packet
  */
-void data_log_set_pressure_metadata(double presRef);
+void data_log_load_last_stored_flight_metadata();
 
 /**
- * @brief Set the metadata launched field to true
+ * @brief Get current flight metadata
+ * @return Pointer to current FlightMetadata
  */
-void data_log_set_launched_metadata();
+FlightMetadata *data_log_get_flight_metadata();
 
 /**
- * @brief Set the metadata timestamp to current timestamp
+ * @brief Load metadata from a flight load into the current packet
  */
-void data_log_set_timestamp_metadata(uint64_t timestamp);
+void data_log_read_flight_num_metadata(uint8_t flightNum);
 
 /**
  * @brief Write metadata to flash
  */
-void data_log_write_metadata();
-
-/**
- * @brief Copy an entire metadata packet into current metadata
- */
-void data_log_copy_metadata(FlightMetadata *oldMetadataPacket);
+void data_log_write_flight_metadata();
 
 /**
  * @brief Write new packet of data to the data log
@@ -108,6 +102,16 @@ uint32_t data_log_get_last_flight_timestamp(uint32_t flightNum);
  * @return integer percentage of flash usage (e.g. 53 == 53% usage)
  */
 uint8_t data_log_get_flash_usage();
+
+/**
+ * @brief Get most recent stored flash configs and load into cli
+ */
+void data_log_load_cli_configs();
+
+/**
+ * @brief Write current flash configs to metadata sector of flash
+ */
+void data_log_write_cli_configs();
 
 #ifdef __cplusplus
 }

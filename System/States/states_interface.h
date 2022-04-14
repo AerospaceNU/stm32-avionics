@@ -5,7 +5,9 @@
 extern "C" {
 #endif
 
-#include <cstdint>
+#include <stdint.h>
+
+#include "hardware_manager.h"
 
 typedef enum {
   NoChange,
@@ -15,6 +17,7 @@ typedef enum {
   ConfigCommand,
   EraseFlashCommand,
   HelpCommand,
+  PyroFireCommand,
   Launch,
   MainCutAltitude,
   MotorBurnout,
@@ -50,6 +53,11 @@ class State {
    */
   virtual EndCondition_t run_state() {
     EndCondition_t result = run();
+    // Refresh watchdog
+    HM_IWDG_Refresh();
+
+    // Update pyros
+    HM_PyroUpdate();
     run_counter_++;
     return result;
   }

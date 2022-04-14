@@ -47,7 +47,7 @@ PACKED_STRUCT {
   float temp, pos_z, vel_z, lat, lon, gps_alt, batt_volts, speedKnots,
       courseDeg;
   uint32_t gpsTime;
-  uint8_t sats, pyro_cont, state, btClients;
+  uint8_t sats, state, btClients;
   // etc
 }
 PositionPacket_t;
@@ -74,10 +74,16 @@ CliStringPacket_t;
 
 #define TELEMETRY_ID_ALT_INFO 6
 PACKED_STRUCT {
-  float pressure1, pressure2, pressureRef, groundElevation, groundTemp,
-      mainCutAlt;
+  float pressure1, pressure2, pressureRef, groundElevation, groundTemp;
 }
 AltInfoPacket_t;
+
+#define TELEMETRY_ID_PYRO_INFO 7
+PACKED_STRUCT {
+  uint8_t pyroContinuity;
+  uint8_t pyroFireStatus;
+}
+PyroInfoPacket_t;
 
 typedef union {
   PropulsionPacket_t propStuff;
@@ -86,6 +92,7 @@ typedef union {
   LineCutterPacket_t lineCutter;
   CliStringPacket_t cliString;
   AltInfoPacket_t altitudeInfo;
+  PyroInfoPacket_t pyroInfo;
 } PayloadPacket_u;
 
 PACKED_STRUCT {
@@ -106,6 +113,7 @@ typedef struct {
   uint32_t positionLastSent;
   uint32_t lineCutterLastSent;
   uint32_t altInfoLastSent;
+  uint32_t pyroInfoLastSent;
 } DataTransmitState_t;
 
 #define RADIO_MAX_CALLBACKS 10

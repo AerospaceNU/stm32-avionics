@@ -2,16 +2,19 @@
 #include "state_cli_erase_flash.h"
 
 #include "cli.h"
+#include "data_log.h"
 #include "hardware_manager.h"
 
 void CliEraseFlashState::init() {
   // Send initial ack to CLI and start erasing chip
   cliSendAck(true, nullptr);
-  HM_FlashEraseChipStart();
+  data_log_flash_erase();
 }
 
 EndCondition_t CliEraseFlashState::run() {
   if (HM_FlashIsEraseComplete()) {
+    // Re-write current configs so that they persist
+    data_log_write_cli_configs();
     return EndCondition_t::CliCommandComplete;
   }
   return EndCondition_t::NoChange;

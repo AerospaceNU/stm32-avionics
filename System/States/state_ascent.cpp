@@ -4,11 +4,13 @@
 #include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
+#include "pyro_manager.h"
 #include "state_log.h"
 
 void AscentState::init() {
-  data_log_set_launched_metadata();  // Write launched status
-  data_log_write_metadata();
+  // Write launched status
+  data_log_get_flight_metadata()->launched = 1;
+  data_log_write_flight_metadata();
   maxPosZ = 0;
   state_log_write(this->getID());
 }
@@ -33,6 +35,4 @@ EndCondition_t AscentState::run() {
   return EndCondition_t::NoChange;
 }
 
-void AscentState::cleanup() {
-  // TODO: Transmit apogee
-}
+void AscentState::cleanup() { PyroManager_SetApogeeTime(HM_Millis()); }

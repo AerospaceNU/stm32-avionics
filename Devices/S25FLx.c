@@ -204,7 +204,8 @@ bool S25FLX_write_start(S25FLXCtrl_t *s25flx, uint32_t startLoc,
   for (int i = 1; i < 5; i++) {
     txBuf[i] = (startLoc >> (8 * (4 - i))) & 0xFF;
   }
-  success = HAL_SPI_Transmit(s25flx->hspi, txBuf, 5, SPI_TX_RX_TIMEOUT_MS);
+  success =
+      HAL_SPI_Transmit(s25flx->hspi, txBuf, 5, SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
 
   // Perform transmit
 #ifdef USE_S25FLx_DMA

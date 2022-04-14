@@ -1,6 +1,7 @@
 
 #include "state_initialize.h"
 
+#include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
 #include "radio_manager.h"
@@ -13,6 +14,8 @@ void InitializeState::init() {
 
   // Initiliaze radio circular buffers and things
   RadioManager_init();
+
+  data_log_load_cli_configs();
 }
 
 EndCondition_t InitializeState::run() {

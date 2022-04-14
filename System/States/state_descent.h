@@ -1,5 +1,5 @@
-#ifndef SYSTEM_STATES_STATE_MAIN_DESCENT_H_
-#define SYSTEM_STATES_STATE_MAIN_DESCENT_H_
+#ifndef SYSTEM_STATES_STATE_DESCENT_H_
+#define SYSTEM_STATES_STATE_DESCENT_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -7,10 +7,9 @@ extern "C" {
 
 #include "flight_state.h"
 
-class MainDescentState : public FlightState {
+class DescentState : public FlightState {
  public:
-  MainDescentState(int id, uint32_t period_ms)
-      : FlightState(id, period_ms, true) {}
+  DescentState(int id, uint32_t period_ms) : FlightState(id, period_ms, true) {}
 
   void init(void) override;
 
@@ -32,4 +31,4 @@ class MainDescentState : public FlightState {
 }
 #endif
 
-#endif  // SYSTEM_STATES_STATE_MAIN_DESCENT_H_
+#endif  // SYSTEM_STATES_STATE_DESCENT_H_

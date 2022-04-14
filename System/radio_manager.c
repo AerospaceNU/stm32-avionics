@@ -61,6 +61,7 @@ void RadioManager_addMessageCallback(RadioCallback_t callback) {
 // Packet rates, in hz
 #define ORIENTATION_RATE 1
 #define POSITION_RATE 10
+#define PYRO_INFO_RATE 1
 
 #ifdef TELEMETRY_RADIO
 static DataTransmitState_t lastSent;
@@ -108,10 +109,6 @@ void RadioManager_transmitData(SensorData_t *sensorData,
   }
 
   if (currentTime - lastSent.positionLastSent >= 1000 / POSITION_RATE) {
-    uint8_t pyroCont = 0;
-    for (int i = 0; i < sizeof(sensorData->pyro_continuity); i++)
-      pyroCont |= ((sensorData->pyro_continuity[i] & 0x01) << i);
-
     PositionPacket_t data = {
         sensorData->baro1_temp,
         filterData->pos_z,
@@ -124,7 +121,6 @@ void RadioManager_transmitData(SensorData_t *sensorData,
         sensorData->gps_course,
         sensorData->gps_timestamp,
         sensorData->gps_num_sats,
-        pyroCont,  // filled in in a second
         state,
         0  // TODO bluetooth clients
     };
@@ -138,16 +134,27 @@ void RadioManager_transmitData(SensorData_t *sensorData,
   }
 
   if (currentTime - lastSent.altInfoLastSent >= 1213) {
-    AltInfoPacket_t data = {sensorData->baro1_pres,
-                            sensorData->baro2_pres,
-                            filterGetPressureRef(),
-                            cliGetConfigs()->groundElevationM,
-                            cliGetConfigs()->groundTemperatureC,
-                            cliGetConfigs()->mainCutAltitudeM};
+    AltInfoPacket_t data = {
+        sensorData->baro1_pres, sensorData->baro2_pres, filterGetPressureRef(),
+        cliGetConfigs()->groundElevationM, cliGetConfigs()->groundTemperatureC};
 
     transmitPacket.packetType = TELEMETRY_ID_ALT_INFO;
     transmitPacket.payload.altitudeInfo = data;
     lastSent.altInfoLastSent = currentTime;
+
+    HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
+                 RADIO_PACKET_SIZE);
+  }
+
+  if (currentTime - lastSent.pyroInfoLastSent >= 1000 / PYRO_INFO_RATE) {
+    uint8_t pyroCont = 0;
+    for (int i = 0; i < sizeof(sensorData->pyro_continuity); i++)
+      pyroCont |= ((sensorData->pyro_continuity[i] & 0x01) << i);
+    PyroInfoPacket_t data = {pyroCont, PyroManager_Status()};
+
+    transmitPacket.packetType = TELEMETRY_ID_PYRO_INFO;
+    transmitPacket.payload.pyroInfo = data;
+    lastSent.pyroInfoLastSent = currentTime;
 
     HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
                  RADIO_PACKET_SIZE);
