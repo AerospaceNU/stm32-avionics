@@ -14,6 +14,8 @@
 #define HAS_SPI
 #define HAS_MS5607
 
+#define MAX_PYRO 1
+
 /*
  * Baro Types: (up to 2 baros)
  * 0: No Baro
