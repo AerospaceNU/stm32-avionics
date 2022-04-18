@@ -3,9 +3,8 @@
  *
  */
 
-
-#ifndef BOARD_CONFIG
-#define BOARD_CONFIG
+#ifndef H743ZIT6_FLIGHT_BOARD_V1_CORE_INC_BOARD_CONFIG_H_
+#define H743ZIT6_FLIGHT_BOARD_V1_CORE_INC_BOARD_CONFIG_H_
 
 #include "stm32h7xx.h"
 
@@ -28,7 +27,7 @@
 #define HAS_UART
 
 #define HAS_PYRO
-#define MAX_PYRO 2
+#define MAX_PYRO 3
 
 /*
  * IMU Types:
@@ -44,8 +43,8 @@
  * either cc1200 or cc1120
  */
 
-//#define HAS_RADIO_433
-#define HAS_RADIO_915 // This one will always have a CC1190 attached
+// #define HAS_RADIO_433
+#define HAS_RADIO_915  // This one will always have a CC1190 attached
 
 // Baro, 1 for MS5607 over SPI
 #define BARO_1 BARO_MS5607_SPI
@@ -55,4 +54,4 @@
 
 #define HAS_RADIO_CLI
 
-#endif
+#endif  // H743ZIT6_FLIGHT_BOARD_V1_CORE_INC_BOARD_CONFIG_H_
