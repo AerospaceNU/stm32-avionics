@@ -5,8 +5,9 @@
  *      Author: matth
  */
 
-#include "data_log.h"
 #include "flight_state.h"
+
+#include "data_log.h"
 #include "hardware_manager.h"
 #include "pyro_manager.h"
 #include "radio_manager.h"
@@ -24,7 +25,7 @@ EndCondition_t FlightState::run_state() {
   RadioManager_transmitData(sensorData, filterData, this->getID());
 
   PyroManager_Update(filterData, m_hasPastApogee);
-  
+
   // Update pyros
   HM_PyroUpdate();
 
