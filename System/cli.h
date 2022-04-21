@@ -133,7 +133,7 @@ CliOptionVals_t cliGetOptions();
  */
 CircularBuffer_t* cliGetRxBuffer();
 
-CircularBuffer_t* cliGetRxBuffer(CliComms_t source);
+CircularBuffer_t* cliGetRxBufferFor(CliComms_t source);
 
 #ifdef __cplusplus
 }

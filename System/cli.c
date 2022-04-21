@@ -135,9 +135,9 @@ CliCommand_t cliParse(CliComms_t commsType) {
   // Bytes extracted counts number of bytes minus stripped \r\n from the end (\r
   // might not be there depending on input)
   uint8_t bytesExtracted = 0;
-  if (bytesRead >= 2 && inputBuffer[bytesRead - 2] == '\r')
+  if (bytesRead >= 2 && inputBuffer[bytesRead - 2] == '\r') {
     bytesExtracted = bytesRead - 2;
-  else if (bytesRead >= 1 && inputBuffer[bytesRead - 1] == '\n') {
+  } else if (bytesRead >= 1 && inputBuffer[bytesRead - 1] == '\n') {
     bytesExtracted = bytesRead - 1;
   }
 
@@ -291,7 +291,7 @@ void cliSendComplete(bool completeSuccess, const char* errMsg) {
 
 CliOptionVals_t cliGetOptions() { return cliOptionVals; }
 
-CircularBuffer_t* cliGetRxBuffer(CliComms_t source) {
+CircularBuffer_t* cliGetRxBufferFor(CliComms_t source) {
   switch (source) {
     case CLI_BLUETOOTH:
       return NULL;
@@ -304,6 +304,4 @@ CircularBuffer_t* cliGetRxBuffer(CliComms_t source) {
   }
 }
 
-CircularBuffer_t* cliGetRxBuffer() {
-  cliGetRxBuffer(lastCommsType);
-}
+CircularBuffer_t* cliGetRxBuffer() { return cliGetRxBuffer(lastCommsType); }

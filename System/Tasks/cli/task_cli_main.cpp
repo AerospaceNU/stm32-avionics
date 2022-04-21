@@ -8,7 +8,9 @@ static bool simModeStarted = false;
 static CliComms_t simModeSource;
 static bool allowedTransitions[CliCommand_t::NUM_CLI_COMMANDS] = {0};
 
-#define ILLEGAL_TRANSITION cliSendAck(false, "Transition disallowed!"); break;
+#define ILLEGAL_TRANSITION                     \
+  cliSendAck(false, "Transition disallowed!"); \
+  break;
 
 void cli_tasks::ConfigureForFlight() {
   // Allow all transitions, then mask out
@@ -19,7 +21,6 @@ void cli_tasks::ConfigureForFlight() {
   // Disable state transition commands in flight
   allowedTransitions[CliCommand_t::ERASE_FLASH] = false;
   allowedTransitions[CliCommand_t::CALIBRATE] = false;
-  allowedTransitions[CliCommand_t::SHUTDOWN] = false;
   allowedTransitions[CliCommand_t::SIM] = false;
   allowedTransitions[CliCommand_t::OFFLOAD] = false;
 }
@@ -35,7 +36,8 @@ EndCondition_t cli_tasks::cliTick() {
   buzzerHeartbeat();
 
   // Check if sim is ready to start, if we're waiting for it to
-  if (simModeStarted && cbCount(cliGetRxBuffer(simModeSource)) >= sizeof(SensorData_t)) {
+  if (simModeStarted &&
+      cbCount(cliGetRxBufferFor(simModeSource)) >= sizeof(SensorData_t)) {
     simModeStarted = false;
     return EndCondition_t::SimCommand;
   }
@@ -53,27 +55,27 @@ EndCondition_t cli_tasks::cliTick() {
     // into the correct State (if we can)
     switch (command) {
       case CliCommand_t::CALIBRATE:
-        if (allowedTransitions[CliCommand_t::CALIBRATE])
+        if (allowedTransitions[CliCommand_t::CALIBRATE]) {
           return EndCondition_t::CalibrateCommand;
-        else {
+        } else {
           ILLEGAL_TRANSITION
         }
       case CliCommand_t::CONFIG:
         if (allowedTransitions[CliCommand_t::CONFIG]) cliConfig();
         return EndCondition_t::NoChange;
       case CliCommand_t::ERASE_FLASH:
-        if (allowedTransitions[CliCommand_t::ERASE_FLASH])
+        if (allowedTransitions[CliCommand_t::ERASE_FLASH]) {
           return EndCondition_t::EraseFlashCommand;
-        else {
+        } else {
           ILLEGAL_TRANSITION
         }
       case CliCommand_t::HELP:
         if (allowedTransitions[CliCommand_t::HELP]) cliHelp();
         return EndCondition_t::NoChange;
       case CliCommand_t::OFFLOAD:
-        if (allowedTransitions[CliCommand_t::OFFLOAD])
+        if (allowedTransitions[CliCommand_t::OFFLOAD]) {
           return EndCondition_t::OffloadCommand;
-        else {
+        } else {
           ILLEGAL_TRANSITION
         }
       case CliCommand_t::SIM:
