@@ -41,6 +41,10 @@ void cbPeek(CircularBuffer_t *cb, void *outputBuffer, size_t *numElements) {
 }
 
 size_t cbCount(CircularBuffer_t *cb) {
+  if (!cb) {
+    return 0;
+  }
+
   size_t ret_bytes = 0;
   if (cb->head < cb->tail) {
     ret_bytes += cb->buffer_end - cb->tail + cb->head - cb->buffer;

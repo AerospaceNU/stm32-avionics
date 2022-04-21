@@ -6,8 +6,8 @@
 #include "state_cli_calibrate.h"
 #include "state_cli_erase_flash.h"
 #include "state_cli_offload.h"
-#include "state_descent.h"
 #include "state_cli_temp.h"
+#include "state_descent.h"
 #include "state_initialize.h"
 #include "state_log.h"
 #include "state_post_flight.h"
@@ -31,9 +31,9 @@ void Scheduler::run(void) {
   PreFlightState preFlight = PreFlightState(StateId::PreFlight, defaultPeriod);
   CliTempState tempState = CliTempState(StateId::SimTempState, defaultPeriod);
 
-  State* states[] = {&cliCalibrate,   &cliEraseFlash, &cliOffload,  &ascent,
-                     &initialize,    &descent, &postFlight,
-                     &preFlight,      &tempState};
+  State* states[] = {&cliCalibrate, &cliEraseFlash, &cliOffload,
+                     &ascent,       &initialize,    &descent,
+                     &postFlight,   &preFlight,     &tempState};
 
   // Initialize the current and next states
   pCurrentState_ = nullptr;

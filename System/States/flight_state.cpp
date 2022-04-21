@@ -24,10 +24,8 @@ EndCondition_t FlightState::run_state() {
   FilterData_t* filterData = filterGetData();
   RadioManager_transmitData(sensorData, filterData, this->getID());
 
-  PyroManager_Update(filterData, m_hasPastApogee);
-
   // Update pyros
-  HM_PyroUpdate();
+  PyroManager_Update(filterData, m_hasPastApogee);
 
   EndCondition_t end = State::run_state();
 

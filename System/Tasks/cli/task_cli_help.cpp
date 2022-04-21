@@ -49,5 +49,6 @@ void cli_tasks::cliHelp() {
   generateDoc("", "-h", "Help for offload. Prints info about each flight");
   generateDoc("--sense", "", "Reads back most recent sensor data");
   generateDoc("--sim", "", "Simulate past flights in hardware");
-  return;
+  generateDoc("--create_flight", "", "Clear state log and move back to preflight");
+  cliSendComplete(true, nullptr);
 }

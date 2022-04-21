@@ -19,9 +19,9 @@ void cli_tasks::cliPyroFire() {
     HM_RadioUpdate();
 
     PyroManager_PyroFire(pyroNum, 1000, false);
+
     // Send success ack to CLI
     cliSendAck(true, nullptr);
-    return;
   }
   cliSendAck(false, "You must specify a pyro number to fire with -p");
 }

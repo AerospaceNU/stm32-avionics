@@ -202,7 +202,10 @@ void RadioManager_transmitString(Hardware_t radio, uint8_t *data, size_t len) {
     transmitPacket.payload.cliString.len = txLen;
 
     HM_RadioSend(radio, (uint8_t *)&transmitPacket, RADIO_PACKET_SIZE);
-    for (int i = 0; i < 20; i++) {
+    
+    // The radio seems to not actually send the packet unless we actually call RadioUpdate a bunch
+    // TODO: This is a HACK
+    for (int i = 0; i < 10; i++) {
       HM_RadioUpdate();
       HAL_Delay(15);
       HM_IWDG_Refresh();

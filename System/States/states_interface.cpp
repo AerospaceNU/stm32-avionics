@@ -5,13 +5,9 @@
  *      Author: matth
  */
 
-#include "states_interface.h"
-
 #include "cli.h"
-
-namespace cli_tasks {
-EndCondition_t cliTick();
-}
+#include "cli_tasks.h"
+#include "states_interface.h"
 
 EndCondition_t State::run_state() {
   EndCondition_t result = run();

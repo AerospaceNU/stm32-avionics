@@ -16,9 +16,6 @@ class CliTempState : public State {
   EndCondition_t run(void) override;
   void init(void) override {}
   void cleanup(void) override {}
-
- private:
-  int m_nextId;
 };
 
 #ifdef __cplusplus

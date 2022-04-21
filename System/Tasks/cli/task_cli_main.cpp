@@ -5,7 +5,10 @@
 #include "state_log.h"
 
 static bool simModeStarted = false;
+static CliComms_t simModeSource;
 static bool allowedTransitions[CliCommand_t::NUM_CLI_COMMANDS] = {0};
+
+#define ILLEGAL_TRANSITION cliSendAck(false, "Transition disallowed!"); break;
 
 void cli_tasks::ConfigureForFlight() {
   // Allow all transitions, then mask out
@@ -18,6 +21,7 @@ void cli_tasks::ConfigureForFlight() {
   allowedTransitions[CliCommand_t::CALIBRATE] = false;
   allowedTransitions[CliCommand_t::SHUTDOWN] = false;
   allowedTransitions[CliCommand_t::SIM] = false;
+  allowedTransitions[CliCommand_t::OFFLOAD] = false;
 }
 void cli_tasks::ConfigureForGround() {
   // allow all transitions on ground
@@ -31,12 +35,9 @@ EndCondition_t cli_tasks::cliTick() {
   buzzerHeartbeat();
 
   // Check if sim is ready to start, if we're waiting for it to
-  if (simModeStarted) {
-    if (cbCount(HM_UsbGetRxBuffer()) >= sizeof(SensorData_t)) {
-      return EndCondition_t::SimCommand;
-    }
-    // else {
-    //   return EndCondition_t::NoChange;
+  if (simModeStarted && cbCount(cliGetRxBuffer(simModeSource)) >= sizeof(SensorData_t)) {
+    simModeStarted = false;
+    return EndCondition_t::SimCommand;
   }
 
   // Check for CLI input, and parse the first that has a command for us to parse
@@ -54,30 +55,36 @@ EndCondition_t cli_tasks::cliTick() {
       case CliCommand_t::CALIBRATE:
         if (allowedTransitions[CliCommand_t::CALIBRATE])
           return EndCondition_t::CalibrateCommand;
-        else
-          break;
+        else {
+          ILLEGAL_TRANSITION
+        }
       case CliCommand_t::CONFIG:
         if (allowedTransitions[CliCommand_t::CONFIG]) cliConfig();
         return EndCondition_t::NoChange;
       case CliCommand_t::ERASE_FLASH:
         if (allowedTransitions[CliCommand_t::ERASE_FLASH])
           return EndCondition_t::EraseFlashCommand;
-        else
-          break;
+        else {
+          ILLEGAL_TRANSITION
+        }
       case CliCommand_t::HELP:
         if (allowedTransitions[CliCommand_t::HELP]) cliHelp();
         return EndCondition_t::NoChange;
       case CliCommand_t::OFFLOAD:
         if (allowedTransitions[CliCommand_t::OFFLOAD])
           return EndCondition_t::OffloadCommand;
-        else
-          break;
+        else {
+          ILLEGAL_TRANSITION
+        }
       case CliCommand_t::SIM:
         if (allowedTransitions[CliCommand_t::SIM]) {
           // We still need to wait for all the data to come in
           HM_EnableSimMode(cliGetRxBuffer());
           simModeStarted = true;
+          simModeSource = static_cast<CliComms_t>(i);
           cliSendAck(true, nullptr);
+        } else {
+          ILLEGAL_TRANSITION
         }
 
         // If enabled, we'll transition into Sim later once we get data
@@ -92,11 +99,13 @@ EndCondition_t cli_tasks::cliTick() {
           cliSendAck(true, nullptr);
           return EndCondition_t::NewFlight;
         } else {
-          break;
+          ILLEGAL_TRANSITION
         }
       case CliCommand_t::PYROFIRE:
         if (allowedTransitions[CliCommand_t::PYROFIRE]) {
           cliPyroFire();
+        } else {
+          ILLEGAL_TRANSITION
         }
       default:
         break;

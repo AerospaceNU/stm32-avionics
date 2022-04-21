@@ -9,8 +9,6 @@ extern "C" {
 
 #include "hardware_manager.h"
 
-// Create new flight needs to be new end condition
-
 typedef enum {
   NoChange,
   Apogee,
@@ -30,13 +28,12 @@ typedef enum {
   Touchdown,
   UsbConnect,
   UsbDisconnect,
-  NumEndConditions,
 } EndCondition_t;
 
 class State {
  public:
   State(int id, uint32_t period_ms) : id_(id), period_ms_(period_ms) {}
-  ~State() = default;
+  virtual ~State() {}
 
   /**
    * @brief Returns given ID of this state so higher level can track State
@@ -54,7 +51,7 @@ class State {
   /**
    * @brief Runs this state and increments the counter
    */
-  virtual EndCondition_t run_state();
+  virtual EndCondition_t run_state() = 0;
 
   /**
    * @brief Actions that occur on initialization of state

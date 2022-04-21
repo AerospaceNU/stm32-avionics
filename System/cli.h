@@ -39,7 +39,6 @@ typedef enum CliCommand_t {
   OFFLOAD,
   SENSE,
   SIM,
-  SHUTDOWN,
   HELP,
   PYROFIRE,
   NUM_CLI_COMMANDS,
@@ -133,6 +132,8 @@ CliOptionVals_t cliGetOptions();
  * @return Pointer to circular buffer
  */
 CircularBuffer_t* cliGetRxBuffer();
+
+CircularBuffer_t* cliGetRxBuffer(CliComms_t source);
 
 #ifdef __cplusplus
 }

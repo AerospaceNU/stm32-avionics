@@ -36,13 +36,12 @@ static int primaryCommand = 0;
 static struct option longOptions[] = {
     {"calibrate", no_argument, &primaryCommand, CALIBRATE},
     {"config", no_argument, &primaryCommand, CONFIG},
-    {"createFlight", no_argument, &primaryCommand, CREATE_NEW_FLIGHT},
+    {"create_flight", no_argument, &primaryCommand, CREATE_NEW_FLIGHT},
     {"erase", no_argument, &primaryCommand, ERASE_FLASH},
     {"help", no_argument, &primaryCommand, HELP},
     {"offload", no_argument, &primaryCommand, OFFLOAD},
     {"sim", no_argument, &primaryCommand, SIM},
     {"sense", no_argument, &primaryCommand, SENSE},
-    {"shutdown", no_argument, &primaryCommand, SHUTDOWN},
     {"pyrofire", no_argument, &primaryCommand, PYROFIRE},
     {0, 0, 0, 0}};
 
@@ -292,8 +291,8 @@ void cliSendComplete(bool completeSuccess, const char* errMsg) {
 
 CliOptionVals_t cliGetOptions() { return cliOptionVals; }
 
-CircularBuffer_t* cliGetRxBuffer() {
-  switch (lastCommsType) {
+CircularBuffer_t* cliGetRxBuffer(CliComms_t source) {
+  switch (source) {
     case CLI_BLUETOOTH:
       return NULL;
     case CLI_RADIO:
@@ -303,4 +302,8 @@ CircularBuffer_t* cliGetRxBuffer() {
     default:
       return NULL;
   }
+}
+
+CircularBuffer_t* cliGetRxBuffer() {
+  cliGetRxBuffer(lastCommsType);
 }

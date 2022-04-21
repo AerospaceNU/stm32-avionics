@@ -1,8 +1,8 @@
 
 #include "state_initialize.h"
 
-#include "data_log.h"
 #include "cli.h"
+#include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
 #include "radio_manager.h"

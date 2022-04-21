@@ -134,6 +134,9 @@ void RadioManager_tick();
 
 void RadioManager_transmitData(SensorData_t* sensorData,
                                FilterData_t* filterData, uint8_t state);
+
+// Send a string over CLI
+// Note that this BLOCKS for up to 150ms!!
 void RadioManager_transmitString(Hardware_t radio, uint8_t* data, size_t len);
 
 void RadioManager_addMessageCallback(RadioCallback_t callback);

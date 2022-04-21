@@ -1,11 +1,10 @@
 
-#include "state_ascent.h"
-
 #include "cli_tasks.h"
 #include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
 #include "pyro_manager.h"
+#include "state_ascent.h"
 #include "state_log.h"
 
 void AscentState::init() {
