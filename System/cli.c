@@ -326,4 +326,4 @@ CircularBuffer_t* cliGetRxBufferFor(CliComms_t source) {
   }
 }
 
-CircularBuffer_t* cliGetRxBuffer() { return cliGetRxBuffer(lastCommsType); }
+CircularBuffer_t* cliGetRxBuffer() { return cliGetRxBufferFor(lastCommsType); }
