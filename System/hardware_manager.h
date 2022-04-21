@@ -175,6 +175,7 @@ void HM_BluetoothTick();
 
 LineCutterData_t* HM_GetLineCutterData(BluetoothAddresses_e address);
 bool HM_LineCutterSendString(int id, char* string);
+bool HM_LineCuttersSendCut(int chan);
 
 /* Outputs */
 void HM_PyroFire(int channel, uint32_t duration);
