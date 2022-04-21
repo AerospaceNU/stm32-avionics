@@ -57,7 +57,9 @@ static const RegisterSetting_t cc1120_433_1_2kbps_cfg[] = {
     {TIRADIO_FS_CFG, 0x14},      // Frequency Synthesizer Configuration
     {TIRADIO_PKT_CFG2,
      CCA_MODE_RSSI_LBT << CCA_MODE_SHIFT},  // Packet Configuration Reg. 2
-    {TIRADIO_PKT_CFG0, 0x20},               // Packet Configuration Reg. 0
+    {TIRADIO_PKT_CFG1,
+     0x45},  // Whiten data, CRC yes in default mode, append status
+    {TIRADIO_PKT_CFG0, 0x20},    // Packet Configuration Reg. 0
     {TIRADIO_PA_CFG0, 0x7B},     // Power Amplifier Configuration Reg. 0
     {TIRADIO_PKT_LEN, 0xFF},     // Packet Length Configuration
     {TIRADIO_IF_MIX_CFG, 0x00},  // IF Mix Configuration
