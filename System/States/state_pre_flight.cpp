@@ -11,11 +11,21 @@
 #include "hardware_manager.h"
 #include "pyro_manager.h"
 
+void PreFlightState::SetCreateNewFlight(bool create) {
+  this->createNewFlight = create;
+}
+
 void PreFlightState::init() {
   transitionResetTimer = HM_Millis();
   prevPressureLogTime = HM_Millis();
   prefGravityRefTime = HM_Millis();
-  if (!HM_InSimMode()) data_log_assign_flight();
+
+  if (!HM_InSimMode() && createNewFlight) {
+    data_log_assign_flight();
+    // Set the default back to true
+    SetCreateNewFlight(true);
+  }
+
   simModeStarted = false;
   gpsTimestamp = false;
   PyroManager_Init();

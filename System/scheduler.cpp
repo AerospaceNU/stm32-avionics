@@ -66,7 +66,7 @@ void Scheduler::run(void) {
     if (pCurrentState_) endCondition = pCurrentState_->run_state();
 
     // Find and set the next state
-    StateId nextState = getNextState(endCondition);
+    StateId nextState = getNextState(endCondition, states);
     for (State* state : states) {
       if (state->getID() == nextState) {
         pNextState = state;
@@ -76,7 +76,8 @@ void Scheduler::run(void) {
   }
 }
 
-Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
+Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition,
+                                           State* states[]) {
   // Return the current state if there's no change
   if (endCondition == EndCondition_t::NoChange) {
     return static_cast<Scheduler::StateId>(pCurrentState_->getID());
@@ -88,12 +89,23 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
 
   // Look for next state based on current state and end condition
   switch (pCurrentState_->getID()) {
+    // Coming from any CLI state, we want to end up back in
+    // preflight
     case StateId::CliCalibrate:
     case StateId::CliEraseFlash:
     case StateId::CliOffload:
       switch (endCondition) {
-        case EndCondition_t::CliCommandComplete:
+        case EndCondition_t::CliCommandComplete: {
+          // HOWEVER, we should only create a new flight coming from erase
+          // flash, I think. Offloading should NOT CLI I don't know what the
+          // plan is yet, so I'm gunna ignore that
+          PreFlightState* preFlight =
+              static_cast<PreFlightState*>(states[StateId::PreFlight]);
+          preFlight->SetCreateNewFlight(pCurrentState_->getID() ==
+                                        CliEraseFlash);
+
           return StateId::PreFlight;  // TODO should we go back to initialize?
+        }
         default:
           break;
       }
@@ -111,7 +123,7 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
       // Resumes a flight from the state log if there is a state to resume
       if (storedStateInt >= 0) {
         StateId storedStateId = static_cast<Scheduler::StateId>(storedStateInt);
-        // Only resume from the 4 flight states
+        // Only resume from the 2 flight states
         // (They *should* be the only states written in the state log
         // regardless)
         if (storedStateId == StateId::Ascent ||

@@ -737,9 +737,8 @@ bool HM_LineCutterSendString(int id, char *string) {
   }
 
   return LineCutter_SendString(cutter, string);
-#else
-  return false;
 #endif
+  return false;
 }
 
 bool HM_LineCuttersSendCut(int chan) {
@@ -751,9 +750,8 @@ bool HM_LineCuttersSendCut(int chan) {
     return LineCutter_Cut2(&lineCutter1) || LineCutter_Cut2(&lineCutter2);
   }
 
-#else
-  return false;
 #endif
+  return false;
 }
 
 void HM_SetImu1Sampling(bool enable) { bImu1Sampling = enable; }

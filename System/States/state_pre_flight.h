@@ -20,6 +20,9 @@ class PreFlightState : public FlightState {
 
   void cleanup(void) override;
 
+  //! If we should assign a new flight in the data log next time init runs. Set back to true after init.
+  void SetCreateNewFlight(bool create);
+
  private:
   static constexpr int kBufferSize = 7;
   SensorData_t sensorDataBuffer[kBufferSize];
@@ -42,6 +45,7 @@ class PreFlightState : public FlightState {
   bool gpsTimestamp = false;
 
   bool doCleanup = false;
+  bool createNewFlight = true;
 };
 
 #ifdef __cplusplus
