@@ -36,7 +36,17 @@
  */
 
 #define IMU_1 IMU_LSM9DS1
-#define IMU_2 IMU_ICM20948
+
+typedef enum { AXIS_X = 0, AXIS_Y, AXIS_Z } Axis_e;
+
+typedef struct {
+  Axis_e axis;
+  int8_t direction;
+} Orientation_s;
+
+extern Orientation_s IMU1_ACCEL_BOARD_TO_LOCAL[3];
+extern Orientation_s IMU2_ACCEL_BOARD_TO_LOCAL[3];
+extern Orientation_s HIGH_G_ACCEL_BOARD_TO_LOCAL[3];
 
 /*
  * Radio. We assume we can only have 433 or 915, and they're both

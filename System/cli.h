@@ -62,7 +62,9 @@ typedef struct {
  * Configs that can be changed via CLI
  */
 typedef struct {
+#ifdef HAS_PYRO
   PyroConfig_t pyroConfiguration[MAX_PYRO];
+#endif
   double groundElevationM;
   double groundTemperatureC;
   int radioChannel;

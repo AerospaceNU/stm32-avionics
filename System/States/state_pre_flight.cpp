@@ -13,6 +13,7 @@
 void PreFlightState::init() {
   transitionResetTimer = HM_Millis();
   prevPressureLogTime = HM_Millis();
+  prefGravityRefTime = HM_Millis();
   if (!HM_InSimMode()) data_log_assign_flight();
   simModeStarted = false;
   gpsTimestamp = false;
@@ -56,6 +57,10 @@ EndCondition_t PreFlightState::run() {
     // Add a pressure ref to the filter
     filterAddPressureRef(
         (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
+  }
+  if (HM_Millis() - prefGravityRefTime > 1000) {
+    prefGravityRefTime = HM_Millis();
+    filterAddGravityRef();
   }
 
   // Detect launch by looking for accel and z position difference thresholds

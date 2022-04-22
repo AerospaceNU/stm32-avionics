@@ -2,8 +2,8 @@
  * board_config for groundstation v1
  */
 
-#ifndef INC_BOARD_CONFIG_H_
-#define INC_BOARD_CONFIG_H_
+#ifndef GROUNDSTATION_CORE_INC_BOARD_CONFIG_H_
+#define GROUNDSTATION_CORE_INC_BOARD_CONFIG_H_
 
 #include "stm32h7xx.h"
 
@@ -32,4 +32,4 @@
 
 #define TELEMETRY_OUTPUT_USB
 
-#endif /* INC_BOARD_CONFIG_H_ */
+#endif  // GROUNDSTATION_CORE_INC_BOARD_CONFIG_H_

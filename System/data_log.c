@@ -47,6 +47,7 @@ typedef struct __attribute__((__packed__)) LogData {
   double heading, vtg;
   double pos_x, pos_y, pos_z;
   double vel_x, vel_y, vel_z;
+  double acc_x, acc_y, acc_z;
   double qx, qy, qz, qw;
   uint8_t state;
 } LogData;
@@ -317,6 +318,9 @@ void data_log_write(SensorData_t *sensorData, FilterData_t *filterData,
     logPacket.vel_x = filterData->vel_x;
     logPacket.vel_y = filterData->vel_y;
     logPacket.vel_z = filterData->vel_z;
+    logPacket.acc_x = filterData->acc_x;
+    logPacket.acc_y = filterData->acc_y;
+    logPacket.acc_z = filterData->acc_z;
     logPacket.qx = filterData->qx;
     logPacket.qy = filterData->qy;
     logPacket.qz = filterData->qz;
@@ -480,6 +484,9 @@ void data_log_load_cli_configs() {
   if (packet_is_empty((uint8_t *)cliConfig, kCliConfigSize)) {
     cliSetDefaultConfig();
   }
+#ifdef TELEMETRY_RADIO
+  HM_RadioSetChannel(TELEMETRY_RADIO, cliConfig->radioChannel);
+#endif
 }
 
 void data_log_write_cli_configs() {
