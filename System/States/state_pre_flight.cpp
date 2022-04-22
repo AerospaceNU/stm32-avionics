@@ -25,6 +25,7 @@ void PreFlightState::init() {
       (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
 
   cli_tasks::ConfigureForGround();
+  doCleanup = false;
 }
 
 EndCondition_t PreFlightState::run() {
@@ -79,6 +80,7 @@ EndCondition_t PreFlightState::run() {
   // acceleration data
   double elevRef = cliGetConfigs()->groundElevationM;
   if (filterData->pos_z - elevRef > kLaunchPosZDiffFailsafeThreshold) {
+    doCleanup = true;
     return EndCondition_t::Launch;
   }
 
@@ -91,12 +93,14 @@ EndCondition_t PreFlightState::run() {
 }
 
 void PreFlightState::cleanup() {
-  // Write buffer onto data log. No need to add more code to stay in order since
-  // timestamps exist It won't hurt to write if some buffer values weren't
-  // filled or if USB was plugged back in
-  for (int i = 0; i < kBufferSize; i++) {
-    data_log_write(&sensorDataBuffer[i], &filterDataBuffer[i], this->getID());
+  if (doCleanup) {
+    // Write buffer onto data log. No need to add more code to stay in order
+    // since timestamps exist It won't hurt to write if some buffer values
+    // weren't filled or if USB was plugged back in
+    for (int i = 0; i < kBufferSize; i++) {
+      data_log_write(&sensorDataBuffer[i], &filterDataBuffer[i], this->getID());
+    }
+    data_log_get_flight_metadata()->pressureRef = filterGetPressureRef();
+    data_log_write_flight_metadata();
   }
-  data_log_get_flight_metadata()->pressureRef = filterGetPressureRef();
-  data_log_write_flight_metadata();
 }

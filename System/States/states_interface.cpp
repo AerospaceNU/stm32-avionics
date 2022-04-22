@@ -5,17 +5,10 @@
  *      Author: matth
  */
 
-#include "cli.h"
-#include "cli_tasks.h"
 #include "states_interface.h"
 
 EndCondition_t State::run_state() {
   EndCondition_t result = run();
-
-  auto endCon = cli_tasks::cliTick();
-  if (endCon != NoChange) {
-    return endCon;
-  }
 
   // Refresh watchdog
   HM_IWDG_Refresh();

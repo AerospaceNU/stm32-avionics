@@ -7,6 +7,8 @@
 
 #include "flight_state.h"
 
+#include "cli.h"
+#include "cli_tasks.h"
 #include "data_log.h"
 #include "hardware_manager.h"
 #include "pyro_manager.h"
@@ -27,6 +29,11 @@ EndCondition_t FlightState::run_state() {
 
   // Update pyros
   PyroManager_Update(filterData, m_hasPastApogee);
+
+  auto endCon = cli_tasks::cliTick();
+  if (endCon != NoChange) {
+    return endCon;
+  }
 
   EndCondition_t end = State::run_state();
 

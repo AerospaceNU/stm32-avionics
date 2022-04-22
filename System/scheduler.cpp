@@ -93,7 +93,7 @@ Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
     case StateId::CliOffload:
       switch (endCondition) {
         case EndCondition_t::CliCommandComplete:
-          return StateId::Initialize;  // TODO should we go back to initialize?
+          return StateId::PreFlight;  // TODO should we go back to initialize?
         default:
           break;
       }

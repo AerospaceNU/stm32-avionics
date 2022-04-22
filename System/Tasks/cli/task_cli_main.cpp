@@ -38,6 +38,7 @@ EndCondition_t cli_tasks::cliTick() {
   // Check if sim is ready to start, if we're waiting for it to
   if (simModeStarted &&
       cbCount(cliGetRxBufferFor(simModeSource)) >= sizeof(SensorData_t)) {
+    HM_EnableSimMode(cliGetRxBuffer());
     simModeStarted = false;
     return EndCondition_t::SimCommand;
   }
@@ -81,7 +82,6 @@ EndCondition_t cli_tasks::cliTick() {
       case CliCommand_t::SIM:
         if (allowedTransitions[CliCommand_t::SIM]) {
           // We still need to wait for all the data to come in
-          HM_EnableSimMode(cliGetRxBuffer());
           simModeStarted = true;
           simModeSource = static_cast<CliComms_t>(i);
           cliSendAck(true, nullptr);
