@@ -58,7 +58,6 @@ extern Orientation_s HIGH_G_ACCEL_BOARD_TO_LOCAL[3];
 #define HAS_RADIO_915  // This one will always have a CC1190 attached
 
 // Baro, 1 for MS5607 over SPI
-#define BARO_1 BARO_MS5607_SPI
 #define BARO_2 BARO_MS5607_SPI
 
 #define TELEMETRY_RADIO RADIO_915

@@ -138,7 +138,12 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
                                // rate when altitude is higher
   double tempRef = cliGetConfigs()->groundTemperatureC + 273.15;  // C to K
   double elevRef = cliGetConfigs()->groundElevationM;
+
+#ifdef BARO_1
   double presAvg = (curSensorVals->baro1_pres + curSensorVals->baro2_pres) / 2;
+#else
+  double presAvg = curSensorVals->baro2_pres;
+#endif
   double baroAlt =
       fabs(presAvg) < 0.001
           ? 0
