@@ -20,6 +20,7 @@
 #define HAS_H3LIS331DL
 #define HAS_DC_MOTOR
 #define HAS_USB
+// #define HAS_INA226
 
 #define HAS_LED_1
 
