@@ -48,20 +48,13 @@ float INA226_getMaxCurrent(INA226Ctrl_t* ina226) {
   float maxCurrent = (ina226->currentLSB * 32767);
   float maxPossible = INA226_getMaxCurrentPossible(ina226);
 
-  if (maxCurrent > maxPossible) {
-    return maxPossible;
-  } else {
-    return maxCurrent;
-  }
+  return fmin(maxCurrent, maxPossible);
 }
 
 float INA226_getMaxShuntVoltage(INA226Ctrl_t* ina226) {
   float maxVoltage = INA226_getMaxCurrent(ina226) * ina226->rShuntVal;
-  if (maxVoltage >= INA226_VSHUNTMAX) {
-    return INA226_VSHUNTMAX;
-  } else {
-    return maxVoltage;
-  }
+
+  return fmin(INA226_VSHUNTMAX, maxVoltage);
 }
 
 float INA226_getMaxPower(INA226Ctrl_t* ina226) {
