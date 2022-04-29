@@ -14,7 +14,7 @@
 #include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
-
+#ifdef HAS_PYRO
 static bool pyroFireStatus[MAX_PYRO] = {0};
 static uint64_t apogeeTimestamp;
 
@@ -74,3 +74,4 @@ void PyroManager_PyroFire(uint8_t pyroNum, uint32_t fireTime, bool logFire) {
   data_log_get_flight_metadata()->pyroFireStatus = ~PyroManager_Status();
   data_log_write_flight_metadata();
 }
+#endif  // HAS_PYRO

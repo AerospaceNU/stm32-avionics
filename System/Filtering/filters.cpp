@@ -6,9 +6,8 @@
 
 #include <string.h>
 
-#include <cmath>
-
 #include "altitude_kalman.h"
+#include "board_config.h"
 #include "cli.h"
 #include "hardware_manager.h"
 
@@ -20,6 +19,7 @@
        // higher-range accelerometer
 #define kPrevPresMedianCount 10
 #define kPrevPresCount 10
+#define kGravityRefCount 10
 
 static double runningPresMedians[kPrevPresMedianCount + 1];
 static CircularBuffer_t runningPresMediansBuffer;
@@ -28,8 +28,13 @@ static double runningPres[kPrevPresCount + 1];
 static CircularBuffer_t runningPresBuffer;
 static uint8_t runningPresCount;
 
+static double gravityRefBuffer[kGravityRefCount];
+static double runningGravityRef[kGravityRefCount + 1];
+static CircularBuffer_t runningGravityRefBuffer;
+
 static FilterData_t filterData;
-static double presRef = 1.0;  // atm
+static double presRef = 1.0;   // atm
+static int8_t gravityRef = 1;  // direction of gravity
 
 static double medianArray[kPrevPresMedianCount + kPrevPresCount];
 
@@ -43,6 +48,8 @@ void filterInit(double dt) {
   cbInit(&runningPresMediansBuffer, runningPresMedians,
          kPrevPresMedianCount + 1, sizeof(double));
   cbInit(&runningPresBuffer, runningPres, kPrevPresCount + 1, sizeof(double));
+  cbInit(&runningGravityRefBuffer, runningGravityRef, kGravityRefCount + 1,
+         sizeof(double));
   runningPresMedianCount = 0;
   runningPresCount = 0;
 }
@@ -78,27 +85,53 @@ static double filterAccelOneAxis(const double imu1reading,
   return accelSum / (double)numAccelsValid;
 }
 
+static double getSensorAccelAxis(const Axis_t boardAxis,
+                                 const Orientation_t* sensorOrientation,
+                                 double* sensorAccels) {
+  Orientation_t sensorOrient = sensorOrientation[boardAxis];
+  double multiplier = sensorOrient.direction;
+  // The gravity ref tells us whether or not we need to rotate our coordinate
+  // system around the x axis to flip the gravity (z) direction. We're assuming
+  // that the z axis is always the correct axis, just possibly reversed. To flip
+  // around the x axis, we need to negate y and z, but not x
+  if (boardAxis != AXIS_X) {
+    multiplier *= gravityRef;
+  }
+
+  return multiplier * sensorAccels[sensorOrient.axis];
+}
+
 static void filterAccels(SensorData_t* curSensorVals,
                          SensorProperties_t* sensorProperties) {
   bool* status = HM_GetHardwareStatus();
 
+  double imu1_data[3] = {0};
+  memcpy(imu1_data, &curSensorVals->imu1_accel_x, 3 * sizeof(double));
+  double imu2_data[3] = {0};
+  memcpy(imu2_data, &curSensorVals->imu2_accel_x, 3 * sizeof(double));
+  double high_g_data[3] = {0};
+  memcpy(high_g_data, &curSensorVals->high_g_accel_x, 3 * sizeof(double));
+
   filterData.acc_x = (filterAccelOneAxis(
-      -curSensorVals->imu1_accel_x, -curSensorVals->imu2_accel_x,
-      -curSensorVals->high_g_accel_y, sensorProperties, status[IMU1],
-      status[IMU2], status[HIGH_G_ACCELEROMETER]));
+      getSensorAccelAxis(AXIS_X, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
+      getSensorAccelAxis(AXIS_X, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
+      getSensorAccelAxis(AXIS_X, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
+      sensorProperties, status[IMU1], status[IMU2],
+      status[HIGH_G_ACCELEROMETER]));
 
   filterData.acc_y = (filterAccelOneAxis(
-      -curSensorVals->imu1_accel_z, -curSensorVals->imu2_accel_z,
-      -curSensorVals->high_g_accel_z, sensorProperties, status[IMU1],
-      status[IMU2], status[HIGH_G_ACCELEROMETER]));
+      getSensorAccelAxis(AXIS_Y, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
+      getSensorAccelAxis(AXIS_Y, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
+      getSensorAccelAxis(AXIS_Y, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
+      sensorProperties, status[IMU1], status[IMU2],
+      status[HIGH_G_ACCELEROMETER]));
 
   filterData.acc_z = (filterAccelOneAxis(
-      curSensorVals->imu1_accel_y, curSensorVals->imu2_accel_y,
-      -curSensorVals->high_g_accel_x, sensorProperties, status[IMU1],
-      status[IMU2], status[HIGH_G_ACCELEROMETER]));
-
-  // TODO hack
-  filterData.acc_z *= -1;
+      getSensorAccelAxis(AXIS_Z, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
+      getSensorAccelAxis(AXIS_Z, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
+      getSensorAccelAxis(AXIS_Z, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
+      sensorProperties, status[IMU1], status[IMU2],
+      status[HIGH_G_ACCELEROMETER]));
 }
 
 static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
@@ -157,6 +190,34 @@ static double median(double* input, uint8_t count) {
     return (input[count / 2 - 1] + input[count / 2]) / 2.0;
   } else {
     return input[count / 2];
+  }
+}
+
+void filterAddGravityRef() {
+  if (cbFull(&runningGravityRefBuffer)) {
+    cbDequeue(&runningGravityRefBuffer, 1);
+  }
+  cbEnqueue(&runningGravityRefBuffer, &(filterData.acc_z));
+
+  cbPeek(&runningGravityRefBuffer, gravityRefBuffer, nullptr);
+
+  uint8_t gravCount = cbCount(&runningGravityRefBuffer);
+
+  double accelSum = 0;
+  for (uint8_t i = 0; i < gravCount; ++i) {
+    accelSum += gravityRefBuffer[i];
+  }
+
+  // Check that we are mostly in the direction of gravity in some direction.
+  // If the sum of our accelerations averages out to less than half G per
+  // reaing, don't flip gravity
+  if (fabs(accelSum) < 0.5 * G_ACCEL_EARTH * gravCount) return;
+
+  // If the sum is negative, we should flip, switch gravity ref and flush
+  // buffer
+  if (accelSum < 0) {
+    gravityRef *= -1;
+    cbFlush(&runningGravityRefBuffer);
   }
 }
 

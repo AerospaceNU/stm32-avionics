@@ -3,9 +3,8 @@
  *
  */
 
-
-#ifndef BOARD_CONFIG
-#define BOARD_CONFIG
+#ifndef H750VBT6_FLIGHT_BOARD_V0_CORE_INC_BOARD_CONFIG_H_
+#define H750VBT6_FLIGHT_BOARD_V0_CORE_INC_BOARD_CONFIG_H_
 
 #include "stm32h7xx.h"
 
@@ -38,6 +37,16 @@
 #define IMU_1 IMU_LSM9DS1
 #define IMU_2 IMU_LSM9DS1
 
+typedef enum { AXIS_X = 0, AXIS_Y, AXIS_Z } Axis_t;
+
+typedef struct {
+  Axis_t axis;
+  int8_t direction;
+} Orientation_t;
+
+extern Orientation_t IMU1_ACCEL_BOARD_TO_LOCAL[3];
+extern Orientation_t IMU2_ACCEL_BOARD_TO_LOCAL[3];
+extern Orientation_t HIGH_G_ACCEL_BOARD_TO_LOCAL[3];
 /*
  * Baro Types: (up to 2 baros)
  */
@@ -56,4 +65,4 @@
 
 #define HAS_RADIO_CLI
 
-#endif
+#endif  // H750VBT6_FLIGHT_BOARD_V0_CORE_INC_BOARD_CONFIG_H_

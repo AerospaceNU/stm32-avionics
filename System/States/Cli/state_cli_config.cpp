@@ -24,7 +24,7 @@ void CliConfigState::init() {
 EndCondition_t CliConfigState::run() {
   // Get command line options
   CliOptionVals_t options = cliGetOptions();
-
+#ifdef HAS_PYRO
   // Configure pyro
   if (options.p) {
     char* endPtr;
@@ -65,6 +65,7 @@ EndCondition_t CliConfigState::run() {
       return EndCondition_t::CliCommandComplete;
     }
   }
+#endif
 
   // Configure ground elevation
   if (options.e) {
@@ -118,6 +119,7 @@ EndCondition_t CliConfigState::run() {
     char val[40];
     // New line
     cliSend("\r\n");
+#ifdef HAS_PYRO
     // Pyros
     for (int i = 0; i < MAX_PYRO; i++) {
       snprintf(name, sizeof(name), "Pyro %i Configuration:", i + 1);
@@ -136,6 +138,7 @@ EndCondition_t CliConfigState::run() {
       }
       generateConfigHelp(name, val);
     }
+#endif
     // Ground elevation
     snprintf(val, sizeof(val), "%.3f", cliGetConfigs()->groundElevationM);
     generateConfigHelp("Ground Elevation (m):", val);

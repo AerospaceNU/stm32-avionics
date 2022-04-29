@@ -408,12 +408,17 @@ void HM_HardwareInit() {
   /* USB */
   usbInit();
 #endif
-
+#ifdef IMU_1
   hardwareStatus[IMU1] = true;
+#endif
+#ifdef IMU_2
   hardwareStatus[IMU2] = true;
+#endif
   hardwareStatus[BAROMETER1] = true;
   hardwareStatus[BAROMETER2] = true;
+#ifdef HAS_H3LIS331DL
   hardwareStatus[HIGH_G_ACCELEROMETER] = true;
+#endif
 }
 
 uint32_t HM_Millis() { return HAL_GetTick(); }

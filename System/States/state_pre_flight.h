@@ -35,6 +35,7 @@ class PreFlightState : public FlightState {
   uint32_t transitionResetTimer = 0;
 
   uint32_t prevPressureLogTime = 0;
+  uint32_t prefGravityRefTime = 0;
 
   bool simModeStarted = false;
 

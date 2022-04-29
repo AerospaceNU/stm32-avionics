@@ -49,6 +49,14 @@ void filterApplyData(SensorData_t* curSensorVals,
 void filterAddPressureRef(double currentPres);
 
 /**
+ * @brief Adds a reference acceleration value to calculate gravity direction
+ * (board orientation) on the pad
+ * Does not take in any values, just controls when the filter fetches them
+ */
+
+void filterAddGravityRef();
+
+/**
  * @brief Sets reference pressure used for converting pressure to altitude
  * @param pres: Must be same unit as sensor data pressure
  */
