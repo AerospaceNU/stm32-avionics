@@ -40,6 +40,8 @@ class PreFlightState : public FlightState {
   bool simModeStarted = false;
 
   bool gpsTimestamp = false;
+
+  bool doCleanup = false;
 };
 
 #ifdef __cplusplus

@@ -197,11 +197,20 @@ void RadioManager_transmitString(Hardware_t radio, uint8_t *data, size_t len) {
     transmitPacket.packetType = TELEMETRY_ID_STRING;
 
     // copy txLen many bytes into the string, and set the rest to null chars
-    memset(transmitPacket.payload.cliString.message, 0, RADIO_MAX_STRING);
-    memcpy(transmitPacket.payload.cliString.message, data, txLen);
+    memset(transmitPacket.payload.cliString.string, 0, RADIO_MAX_STRING);
+    memcpy(transmitPacket.payload.cliString.string, data, txLen);
     transmitPacket.payload.cliString.len = txLen;
 
     HM_RadioSend(radio, (uint8_t *)&transmitPacket, RADIO_PACKET_SIZE);
+
+    // The radio seems to not actually send the packet unless we actually call
+    // RadioUpdate a bunch
+    // TODO: This is a HACK
+    for (int i = 0; i < 10; i++) {
+      HM_RadioUpdate();
+      HAL_Delay(15);
+      HM_IWDG_Refresh();
+    }
 
     len -= txLen;
     data += txLen;

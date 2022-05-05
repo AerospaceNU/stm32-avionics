@@ -1,6 +1,7 @@
 
 #include "state_ascent.h"
 
+#include "cli_tasks.h"
 #include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
@@ -13,6 +14,7 @@ void AscentState::init() {
   data_log_write_flight_metadata();
   maxPosZ = 0;
   state_log_write(this->getID());
+  cli_tasks::ConfigureForFlight();
 }
 
 EndCondition_t AscentState::run() {

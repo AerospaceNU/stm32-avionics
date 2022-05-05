@@ -13,13 +13,17 @@
 class FlightState : public State {
  public:
   FlightState(int id, uint32_t period_ms, bool hasPastApogee)
-      : State(id, period_ms), m_hasPastApogee(hasPastApogee) {}
+      : State(id, period_ms), m_hasPastApogee{hasPastApogee} {}
+
   ~FlightState() = default;
 
   EndCondition_t run_state() override;
 
  protected:
   bool m_hasPastApogee;
+
+ public:
+  static EndCondition_t m_lastCliEndConn;
 };
 
 #endif  // SYSTEM_STATES_FLIGHT_STATE_H_

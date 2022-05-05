@@ -34,13 +34,14 @@ typedef enum CliCommand_t {
   NONE = 0,
   CALIBRATE,
   CONFIG,
+  CREATE_NEW_FLIGHT,
   ERASE_FLASH,
   OFFLOAD,
   SENSE,
   SIM,
-  SHUTDOWN,
   HELP,
-  PYROFIRE
+  PYROFIRE,
+  NUM_CLI_COMMANDS,
 } CliCommand_t;
 
 /**
@@ -131,6 +132,8 @@ CliOptionVals_t cliGetOptions();
  * @return Pointer to circular buffer
  */
 CircularBuffer_t* cliGetRxBuffer();
+
+CircularBuffer_t* cliGetRxBufferFor(CliComms_t source);
 
 #ifdef __cplusplus
 }

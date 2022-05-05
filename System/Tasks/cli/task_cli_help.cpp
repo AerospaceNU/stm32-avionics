@@ -1,9 +1,7 @@
-
-#include "state_cli_help.h"
-
 #include <stdio.h>
 
 #include "cli.h"
+#include "cli_tasks.h"
 #include "hardware_manager.h"
 
 /**
@@ -21,12 +19,10 @@ static void generateDoc(const char* primaryCommand, const char* args,
   cliSend(doc);
 }
 
-void CliHelpState::init() {
+void cli_tasks::cliHelp() {
   // Send initial ACK to CLI
   cliSendAck(true, nullptr);
-}
 
-EndCondition_t CliHelpState::run() {
   // Send help docs to user
   cliSend("\r\n");
   generateDoc("--calibrate", "TBD",
@@ -53,13 +49,7 @@ EndCondition_t CliHelpState::run() {
   generateDoc("", "-h", "Help for offload. Prints info about each flight");
   generateDoc("--sense", "", "Reads back most recent sensor data");
   generateDoc("--sim", "", "Simulate past flights in hardware");
-  generateDoc("--shutdown", "",
-              "Prevent FCB from doing anything else. FCB won't actually shut "
-              "off, but it won't do or respond to anything");
-  return EndCondition_t::CliCommandComplete;
-}
-
-void CliHelpState::cleanup() {
-  // Send complete message to CLI
+  generateDoc("--create_flight", "",
+              "Clear state log and move back to preflight");
   cliSendComplete(true, nullptr);
 }

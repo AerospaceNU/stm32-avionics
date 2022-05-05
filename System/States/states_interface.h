@@ -21,10 +21,10 @@ typedef enum {
   Launch,
   MainCutAltitude,
   MotorBurnout,
+  NewFlight,
   OffloadCommand,
   SenseCommand,
   SimCommand,
-  ShutdownCommand,
   Touchdown,
   UsbConnect,
   UsbDisconnect,
@@ -51,16 +51,7 @@ class State {
   /**
    * @brief Runs this state and increments the counter
    */
-  virtual EndCondition_t run_state() {
-    EndCondition_t result = run();
-    // Refresh watchdog
-    HM_IWDG_Refresh();
-
-    // Update pyros
-    HM_PyroUpdate();
-    run_counter_++;
-    return result;
-  }
+  virtual EndCondition_t run_state();
 
   /**
    * @brief Actions that occur on initialization of state

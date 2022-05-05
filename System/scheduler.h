@@ -15,19 +15,14 @@ class Scheduler {
  private:
   typedef enum StateId {
     CliCalibrate = 0,
-    CliConfig,
     CliEraseFlash,
-    CliHelp,
-    CliPyroFire,
-    CliMain,
     CliOffload,
-    CliSense,
     Ascent,
     Initialize,
     Descent,
     PostFlight,
     PreFlight,
-    Shutdown,
+    SimTempState,
     NUM_STATES,
     UNKNOWN
   } StateId;

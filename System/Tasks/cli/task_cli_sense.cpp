@@ -1,9 +1,7 @@
-
-#include "state_cli_sense.h"
-
 #include <stdio.h>
 
 #include "cli.h"
+#include "cli_tasks.h"
 #include "data_log.h"
 #include "hardware_manager.h"
 
@@ -22,12 +20,10 @@ static void flash_usage_bar(char* barStr, uint8_t usage,
   barStr[k] = '\0';
 }
 
-void CliSenseState::init() {
+void cli_tasks::cliSense() {
   // Send ack of command
   cliSendAck(true, nullptr);
-}
 
-EndCondition_t CliSenseState::run() {
   // Read sensor data and send in human-readable format
   HM_ReadSensorData();
   SensorData_t* data = HM_GetSensorData();
@@ -104,7 +100,5 @@ EndCondition_t CliSenseState::run() {
   snprintf(cliStr, sizeof(cliStr), "\r\n");
   cliSend(cliStr);
 
-  return EndCondition_t::CliCommandComplete;
+  cliSendComplete(true, nullptr);
 }
-
-void CliSenseState::cleanup() { cliSendComplete(true, nullptr); }
