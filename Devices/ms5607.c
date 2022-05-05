@@ -4,8 +4,6 @@
 
 #define SPI_TIMEOUT_MS 50
 
-static uint16_t promVals[6];
-
 /*
  * Initializes MS5607 temperature and pressure sensor
  * with specific MS5607Ctrl_t configuration
@@ -38,8 +36,8 @@ bool MS5607_init(MS5607Ctrl_t *altCtrl) {
                             SPI_TIMEOUT_MS);
     HAL_GPIO_WritePin(altCtrl->spiconfig.port, altCtrl->spiconfig.pin,
                       GPIO_PIN_SET);
-    promVals[i] = rxBuffer[1] << 8 | rxBuffer[2];
-    if (promVals[i] == 0xFF || promVals[i] == 0x00) {
+    altCtrl->promVals[i] = rxBuffer[1] << 8 | rxBuffer[2];
+    if (altCtrl->promVals[i] == 0xFF || altCtrl->promVals[i] == 0x00) {
       success = false;
     }
   }
@@ -93,12 +91,12 @@ void MS5607_get_data(MS5607Ctrl_t *altCtrl) {
   uint32_t D1 = (presStore[1] << 16 | presStore[2] << 8 | presStore[3]);
   uint32_t D2 = (tempStore[1] << 16 | tempStore[2] << 8 | tempStore[3]);
 
-  int32_t dT = D2 - ((int32_t)(promVals[4]) << 8);
-  volatile int64_t Temp = 2000 + (((int64_t)(promVals[5]) * dT) >> 23);
-  volatile int64_t OFF =
-      ((int64_t)(promVals[1]) << 17) + (((int64_t)(promVals[3]) * dT) >> 6);
-  volatile int64_t SENS =
-      ((int64_t)(promVals[0]) << 16) + (((int64_t)(promVals[2]) * dT) >> 7);
+  int32_t dT = D2 - ((int32_t)(altCtrl->promVals[4]) << 8);
+  volatile int64_t Temp = 2000 + (((int64_t)(altCtrl->promVals[5]) * dT) >> 23);
+  volatile int64_t OFF = ((int64_t)(altCtrl->promVals[1]) << 17) +
+                         (((int64_t)(altCtrl->promVals[3]) * dT) >> 6);
+  volatile int64_t SENS = ((int64_t)(altCtrl->promVals[0]) << 16) +
+                          (((int64_t)(altCtrl->promVals[2]) * dT) >> 7);
 
   // perform higher order corrections
   int64_t T2 = 0, OFF2 = 0, SENS2 = 0;

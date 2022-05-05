@@ -37,6 +37,7 @@ typedef struct {
 typedef struct MS5607Ctrl_s {
   SPICtrl_t spiconfig;
   AltData_t altData;
+  uint16_t promVals[6];
 } MS5607Ctrl_t;
 
 bool MS5607_init(MS5607Ctrl_t *altCtrl);
