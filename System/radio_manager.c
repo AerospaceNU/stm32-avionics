@@ -172,15 +172,16 @@ void RadioManager_transmitData(SensorData_t *sensorData,
   }
 
   if (currentTime - lastSent.lineCutterVarsLastSent >= 10000) {
-      for (int i = ADDR_CUTTER1; i <= ADDR_CUTTER2; i++) {
-        transmitPacket.packetType = TELEMETRY_ID_LINECUTTER_VARS;
-        transmitPacket.payload.lineCutterFlightVars.data = *HM_GetLineCutterFlightVariables(i);
-        lastSent.lineCutterVarsLastSent = currentTime;
+    for (int i = ADDR_CUTTER1; i <= ADDR_CUTTER2; i++) {
+      transmitPacket.packetType = TELEMETRY_ID_LINECUTTER_VARS;
+      transmitPacket.payload.lineCutterFlightVars.data =
+          *HM_GetLineCutterFlightVariables(i);
+      lastSent.lineCutterVarsLastSent = currentTime;
 
-        HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
-                     RADIO_PACKET_SIZE);
-      }
+      HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
+                   RADIO_PACKET_SIZE);
     }
+  }
 }
 
 #endif
