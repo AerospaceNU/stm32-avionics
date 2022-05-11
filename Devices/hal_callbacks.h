@@ -6,6 +6,7 @@
 #define DEVICES_HAL_CALLBACKS_H_
 
 #include "board_config.h"
+#include HAL_HEADER
 
 #ifdef HAS_SPI
 void register_HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi,

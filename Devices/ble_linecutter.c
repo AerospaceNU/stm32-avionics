@@ -1,16 +1,18 @@
 /*
- * BleLineCutter.c
+ * ble_linecutter.c
  *
  *  Created on: Jan 23, 2022
  *      Author: matth
  */
 
+#include "board_config.h"
+
+#ifdef HAS_BLE
+
 #include <ble_linecutter.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "board_config.h"
-#include "hardware_manager.h"
 #include "radio_manager.h"
 
 // Temporary buffer used while dequeueing packets
@@ -27,11 +29,11 @@ static const char *REQ_CUT_2_CMD = "!cut 2\n\0";
 static const char *REQ_RESET_CMD = "!reset\n\0";
 
 bool LineCutter_SendString(LineCutterCtrl_t *lineCutter, const char *cmd) {
-  /*if (LineCutter_IsAwaitingReply(lineCutter)) return HAL_BUSY;*/
-  // if (!LineCutter_IsConnected(lineCutter)) return HAL_TIMEOUT;
+  // We used to have more checks here, but IMO we really just wanna send it
+  // regardless
   bool ret =
       (HAL_OK == Bluetooth_SendRequest(lineCutter->ble, lineCutter->address,
-                                       (uint8_t *)(cmd), strlen((cmd)) + 1));
+                                       cmd, strlen((cmd)) + 1));
   if (ret) lineCutter->lastRequestTimestamp = HAL_GetTick();
   return ret;
 }
@@ -79,6 +81,7 @@ void LineCutter_Tick(LineCutterCtrl_t *lineCutter) {
   if (HAL_GetTick() >
       (lineCutter->lastFlightVarsTimestamp + LC_VARS_INTERVAL_MS)) {
     // Bluetooth_PollConnectedClients(lineCutter->ble);
+
     lineCutter->lastFlightVarsTimestamp = HAL_GetTick();
     ec |= LineCutter_RequestConfig(lineCutter);
   }
@@ -86,11 +89,8 @@ void LineCutter_Tick(LineCutterCtrl_t *lineCutter) {
   // printf("%i\n", ec);
 }
 
-static volatile int packetCount;
-
 void LineCutter_Parse(LineCutterCtrl_t *cutter, uint16_t len, uint8_t *arr) {
-  packetCount++;
-
+  // If the first character is an invalid ASCII code, parse as a binary message
   if (len && arr[0] == 128) {
     // Skip first non-valid byte indicating byte-packed data
     len -= 1;
@@ -114,6 +114,7 @@ void LineCutter_Parse(LineCutterCtrl_t *cutter, uint16_t len, uint8_t *arr) {
 
     if (success) cutter->lastRequestTimestamp = 0;
   } else {
+    // Otherwise, we got a string -- we should just send it over radio
 #ifdef TELEMETRY_RADIO
     RadioManager_transmitString(TELEMETRY_RADIO, (uint8_t *)arr, len);
 #endif
@@ -137,3 +138,5 @@ bool LineCutter_IsConnected(LineCutterCtrl_t *ctrl) {
 bool LineCutter_IsAwaitingReply(LineCutterCtrl_t *ctrl) {
   return ctrl->lastRequestTimestamp > 0;
 }
+
+#endif

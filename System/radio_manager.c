@@ -207,7 +207,9 @@ void RadioManager_transmitString(Hardware_t radio, uint8_t *data, size_t len) {
     // TODO: This is a HACK
     for (int i = 0; i < 10; i++) {
       HM_RadioUpdate();
-      HAL_Delay(15);
+      uint32_t start = HM_Millis();
+      while ((HM_Millis() - start) < 15) {
+      }
       HM_IWDG_Refresh();
     }
 

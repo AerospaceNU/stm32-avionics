@@ -27,7 +27,7 @@ class Scheduler {
     UNKNOWN
   } StateId;
 
-  StateId getNextState(EndCondition_t endCondition, State* states[]);
+  StateId getNextState(EndCondition_t endCondition);
 
   State* pCurrentState_ = nullptr;
 };

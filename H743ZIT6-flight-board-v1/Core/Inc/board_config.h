@@ -6,7 +6,7 @@
 #ifndef H743ZIT6_FLIGHT_BOARD_V1_CORE_INC_BOARD_CONFIG_H_
 #define H743ZIT6_FLIGHT_BOARD_V1_CORE_INC_BOARD_CONFIG_H_
 
-#include "stm32h7xx.h"
+#define HAL_HEADER "stm32h7xx.h"
 
 #define HAS_CC1200
 #define HAS_ADC_DEVICE
@@ -20,12 +20,15 @@
 #define HAS_DC_MOTOR
 #define HAS_USB
 #define HAS_INA226
-
 #define HAS_LED_1
 
 #define HAS_SPI
 #define HAS_ADC
 #define HAS_UART
+
+#define HAS_BLE
+#define HAS_LINE_CUTTER
+#define NUM_LINE_CUTTERS 2
 
 #define HAS_PYRO
 #define MAX_PYRO 3
@@ -40,6 +43,7 @@
 
 typedef enum { AXIS_X = 0, AXIS_Y, AXIS_Z } Axis_t;
 
+#include <stdint.h>
 typedef struct {
   Axis_t axis;
   int8_t direction;
@@ -62,7 +66,5 @@ extern Orientation_t HIGH_G_ACCEL_BOARD_TO_LOCAL[3];
 #define BARO_2 BARO_MS5607_SPI
 
 #define TELEMETRY_RADIO RADIO_915
-
-#define HAS_BLE
 
 #endif  // H743ZIT6_FLIGHT_BOARD_V1_CORE_INC_BOARD_CONFIG_H_

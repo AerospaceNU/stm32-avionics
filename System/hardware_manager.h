@@ -124,7 +124,7 @@ typedef enum {
 
   MAX_ADDRESS = ADDR_CUTTER2,
   NUM_ADDRESSES = ADDR_CUTTER2 + 1
-} BluetoothAddresses_e;
+} BluetoothAddresses_te;
 
 void HM_HardwareInit();
 
@@ -167,15 +167,15 @@ CircularBuffer_t* HM_UsbGetRxBuffer();
 
 /* Bluetooth functions */
 //! Return if a phone is connected
-bool Hm_BluetoothCliConnected();
+bool HM_BluetoothCliConnected();
 bool HM_BluetoothSend(uint8_t address, const uint8_t* data, uint16_t numBytes);
 CircularBuffer_t* Hm_BleConsoleGetRxBuffer();
 
 void HM_BluetoothTick();
 
-LineCutterData_t* HM_GetLineCutterData(BluetoothAddresses_e address);
+LineCutterData_t* HM_GetLineCutterData(BluetoothAddresses_te address);
 LineCutterFlightVars_t* HM_GetLineCutterFlightVariables(
-    BluetoothAddresses_e address);
+    BluetoothAddresses_te address);
 
 bool HM_LineCutterSendString(int id, char* string);
 bool HM_LineCuttersSendCut(int chan);

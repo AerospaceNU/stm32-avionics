@@ -4,6 +4,7 @@
 
 #include "filters.h"
 
+#include <math.h>
 #include <string.h>
 
 #include "altitude_kalman.h"

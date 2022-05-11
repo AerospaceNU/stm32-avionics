@@ -1,15 +1,16 @@
 /*
- * BluetoothClient.c
+ * ble_interface.c
  *
  *  Created on: Jan 5, 2022
  *      Author: matth
  */
+#include "ble_interface.h"
 
-#include <ble_interface.h>
-#include <ble_linecutter.h>
+
+#ifdef HAS_BLE
+
 #include <stdio.h>
 
-#include "cli.h"
 #include "hal_callbacks.h"
 #include "string.h"
 
@@ -17,7 +18,7 @@ HAL_StatusTypeDef BLE_Tx_Internal(BluetoothInterface_t *ctrl, uint8_t *buf,
                                   int bufLen) {
   uint32_t start = HAL_GetTick();
 
-  while (HAL_GetTick() - start < 10) {  // Wait for the last transmit to end, up
+  while (HAL_GetTick() - start < BLE_TX_TIMEOUT) {  // Wait for the last transmit to end, up
                                         // to 10ms. TODO this seems really long
     if (!Bluetooth_TxBusy(ctrl)) {
       return HAL_UART_Transmit(ctrl->ble_uart, buf, bufLen, HAL_MAX_DELAY);
@@ -103,7 +104,7 @@ bool Bluetooth_TxBusy(BluetoothInterface_t *ctrl) {
  */
 HAL_StatusTypeDef Bluetooth_SendRequest(BluetoothInterface_t *ctrl,
                                         const uint8_t address,
-                                        const uint8_t *pdata,
+                                        const void *pdata,
                                         const uint16_t len) {
   // We need to transmit 1 byte addr, 2 byte len, n bytes of data
   const uint16_t headerSize = sizeof(address) + sizeof(len);
@@ -120,11 +121,9 @@ HAL_StatusTypeDef Bluetooth_SendRequest(BluetoothInterface_t *ctrl,
 
   // Stuff from headerSize up to sizeof(arr) should be set to the array pointed
   // to by pdata
-  for (uint16_t i = 0; i < len; i++) {
-    arr[i + headerSize] = pdata[i];
-  }
+  memcpy(arr + headerSize, pdata, len);
 
-  // Transmit this all over UART -- this happens asynchronously
+  // Transmit this all over UART -- this happens syncronously
   HAL_StatusTypeDef ret = BLE_Tx_Internal(ctrl, arr, totalSize);
   return ret;
 }
@@ -157,7 +156,7 @@ uint16_t Bluetooth_DequeuePacket(CircularBuffer_t *buffer, uint8_t *pdata) {
 
     cbDequeue(buffer, len_);
 
-    return len;
+    return len_;
   } else {
     // If we don't, all we can do is flush the buffer
     cbFlush(buffer);
@@ -176,8 +175,10 @@ bool Bluetooth_PollConnectedClients(BluetoothInterface_t *ctrl) {
 }
 
 void Bluetooth_Tick(BluetoothInterface_t *ctrl) {
-  if (HAL_GetTick() > ctrl->lastPollTimestamp + 900) {
+  if (HAL_GetTick() > ctrl->lastPollTimestamp + BLE_POLL_INTERVAL) {
     Bluetooth_PollConnectedClients(ctrl);
     ctrl->lastPollTimestamp = HAL_GetTick();
   }
 }
+
+#endif

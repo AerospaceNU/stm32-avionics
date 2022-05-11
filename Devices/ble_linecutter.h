@@ -1,5 +1,5 @@
 /*
- * BleLineCutter.h
+ * ble_linecutter.h
  *
  *  Created on: Jan 6, 2022
  *      Author: matth

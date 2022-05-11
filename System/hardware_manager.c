@@ -1,9 +1,5 @@
 #include "hardware_manager.h"
 
-#include <ble_console.h>
-#include <ble_interface.h>
-#include <ble_linecutter.h>
-
 #include "board_config.h"
 #include "main.h"
 #include "sensor_types.h"
@@ -79,6 +75,12 @@
 #include "pyro.h"
 #endif
 
+#ifdef HAS_BLE
+#include <ble_console.h>
+#include <ble_interface.h>
+#include <ble_linecutter.h>
+#endif
+
 #include "iwdg.h"
 #include "radio_manager.h"
 
@@ -141,9 +143,10 @@ static GPSCtrl_t gps;
 #ifdef HAS_BLE
 /* BLE */
 static BluetoothInterface_t ble;
-static LineCutterCtrl_t lineCutter1;
-static LineCutterCtrl_t lineCutter2;
 static BleConsole_t bleConsole;
+#ifdef HAS_LINE_CUTTER
+static LineCutterCtrl_t lineCutterArray[NUM_LINE_CUTTERS];
+#endif
 #endif
 
 #ifdef HAS_PYRO
@@ -164,14 +167,6 @@ static TiRadioCtrl_t radio915;
 static SensorProperties_t sensorProperties;
 static SensorData_t sensorData;
 static size_t SENSOR_DATA_SIZE = sizeof(SensorData_t);
-
-#ifdef HAS_BLE
-/* BLE */
-static BluetoothInterface_t ble;
-static LineCutterCtrl_t lineCutter1;
-static LineCutterCtrl_t lineCutter2;
-static BleConsole_t bleConsole;
-#endif
 
 /* Sensor states */
 static bool bImu1Sampling = true;
@@ -408,9 +403,12 @@ void HM_HardwareInit() {
 #ifdef HAS_BLE
   /* BLE */
   Bluetooth_Init(&ble, BLUETOOTH_HUART);
-  LineCutter_Init(&lineCutter1, &ble, ADDR_CUTTER1);
-  LineCutter_Init(&lineCutter2, &ble, ADDR_CUTTER2);
   BleConsole_Init(&bleConsole, &ble, ADDR_PHONE);
+
+  for (int i = 0; i < NUM_LINE_CUTTERS; i++) {
+    LineCutter_Init(&lineCutterArray[i], &ble, ADDR_CUTTER1 + i);
+  }
+
 #endif
 
 #ifdef HAS_PYRO
@@ -682,7 +680,7 @@ CircularBuffer_t *HM_UsbGetRxBuffer() {
 #endif
 }
 
-bool Hm_BluetoothCliConnected() {
+bool HM_BluetoothCliConnected() {
 #ifdef HAS_BLE
   return Bluetooth_IsAddressConnected(&ble, ADDR_PHONE);
 #endif
@@ -706,33 +704,27 @@ CircularBuffer_t *Hm_BleConsoleGetRxBuffer() {
 void HM_BluetoothTick() {
 #ifdef HAS_BLE
   Bluetooth_Tick(&ble);
-  LineCutter_Tick(&lineCutter1);
-  LineCutter_Tick(&lineCutter2);
   BleConsole_Tick(&bleConsole);
+
+  for (int i = 0; i < NUM_LINE_CUTTERS; i++) {
+    LineCutter_Tick(&lineCutterArray[i]);
+  }
 #endif
 }
 
-LineCutterData_t *HM_GetLineCutterData(BluetoothAddresses_e address) {
+LineCutterData_t *HM_GetLineCutterData(BluetoothAddresses_te address) {
 #ifdef HAS_BLE
-  if (address == ADDR_CUTTER1)
-    return &lineCutter1.lastData;
-  else if (address == ADDR_CUTTER2)
-    return &lineCutter2.lastData;
-  else
+  return &lineCutterArray[address - ADDR_CUTTER1].lastData;
 #endif
-    return NULL;
+  return NULL;
 }
 
 LineCutterFlightVars_t *HM_GetLineCutterFlightVariables(
-    BluetoothAddresses_e address) {
+    BluetoothAddresses_te address) {
 #ifdef HAS_BLE
-  if (address == ADDR_CUTTER1)
-    return &lineCutter1.flightVars;
-  else if (address == ADDR_CUTTER2)
-    return &lineCutter2.flightVars;
-  else
+  return &lineCutterArray[address - ADDR_CUTTER1].flightVars;
 #endif
-    return NULL;
+  return NULL;
 }
 
 bool HM_LineCutterSendString(int id, char *string) {
@@ -740,12 +732,10 @@ bool HM_LineCutterSendString(int id, char *string) {
   if (!string) return false;
 
   LineCutterCtrl_t *cutter;
-  if (id == lineCutter1.lastData.lineCutterNumber) {
-    cutter = &lineCutter1;
-  } else if (id == lineCutter2.lastData.lineCutterNumber) {
-    cutter = &lineCutter2;
-  } else {
-    return false;
+  for (int i = 0; i < NUM_LINE_CUTTERS; i++) {
+    if (id == lineCutterArray[i].lastData.lineCutterNumber) {
+      cutter = &lineCutterArray[i];
+    }
   }
 
   return LineCutter_SendString(cutter, string);
@@ -755,19 +745,21 @@ bool HM_LineCutterSendString(int id, char *string) {
 
 bool HM_LineCuttersSendCut(int chan) {
 #ifdef HAS_BLE
-  if (chan == 1) {
-    // We want to check that both succeed, not that one succeeds
-    // This means we gotta be careful about short-circuiting!
-    bool ret = true;
-    ret |= LineCutter_Cut1(&lineCutter1);
-    ret |= LineCutter_Cut1(&lineCutter2);
-    return ret;
-  } else if (chan == 2) {
-    bool ret = true;
-    ret |= LineCutter_Cut2(&lineCutter1);
-    ret |= LineCutter_Cut2(&lineCutter2);
-    return ret;
+  // We want to check that both succeed, not that one succeeds
+  // This means we gotta be careful about short-circuiting!
+  bool ret = true;
+
+  for (int i = 0; i < NUM_LINE_CUTTERS; i++) {
+    if (chan == 1) {
+      ret |= LineCutter_Cut1(&lineCutterArray[i]);
+    } else if (chan == 2) {
+      ret |= LineCutter_Cut2(&lineCutterArray[i]);
+    } else {
+      ret = false;
+    }
   }
+
+  return ret;
 
 #endif
   return false;

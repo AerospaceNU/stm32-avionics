@@ -14,6 +14,7 @@ extern "C" {
 
 #include "SPIDriver.h"
 #include "board_config.h"
+#include HAL_HEADER
 
 // Accelerometer-Gyroscope Registers
 #define REG_WHO_AM_I_AG 0x0F

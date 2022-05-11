@@ -7,6 +7,7 @@
 
 #include "pyro_manager.h"
 
+#include <math.h>
 #include <stdbool.h>
 
 #include "board_config.h"
@@ -14,6 +15,7 @@
 #include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
+
 #ifdef HAS_PYRO
 static bool pyroFireStatus[MAX_PYRO] = {0};
 static uint64_t apogeeTimestamp;

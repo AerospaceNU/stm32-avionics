@@ -13,6 +13,7 @@ extern "C" {
 #include <stdint.h>
 
 #include "board_config.h"
+#include HAL_HEADER
 
 typedef struct {
   TIM_HandleTypeDef *htim;

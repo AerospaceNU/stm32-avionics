@@ -1,5 +1,5 @@
 /*
- * BleConsole.h
+ * ble_console.h
  *
  *  Created on: Jan 23, 2022
  *      Author: matth
@@ -9,6 +9,10 @@
 #define DEVICES_BLE_CONSOLE_H_
 
 #include <ble_interface.h>
+#include <stdint.h>
+
+#include "board_config.h"
+#include HAL_HEADER
 
 #define LINE_CUTTER_CB_SIZE 512
 

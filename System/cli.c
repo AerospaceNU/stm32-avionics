@@ -149,7 +149,7 @@ CliCommand_t cliParse(CliComms_t commsType) {
     argv[argc] = token;
     argc++;
 
-    int tokenLength = strlen(token);
+    int tokenLength = strnlen(token, inputBuffer - token);
 
     if (!isInString) {
       if (*(token + tokenLength + 1) == '\"')

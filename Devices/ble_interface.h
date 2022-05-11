@@ -1,5 +1,5 @@
 /*
- * BluetoothClient.h
+ * ble_interface.h
  *
  *  Created on: Jan 3, 2022
  *      Author: matth
@@ -8,13 +8,20 @@
 #ifndef DEVICES_BLE_INTERFACE_H_
 #define DEVICES_BLE_INTERFACE_H_
 
+#include "board_config.h"
 #include "circular_buffer.h"
-#include "stm32h7xx_hal.h"
+#include HAL_HEADER
 
 #define BLEINTERFACE_SELF_ADDR 0
 #define BT_MAX_PACKET_SIZE 0xff  // or 256
 #define MAX_ADDRESSES \
   10  // The maximum number of addresses we could possibly have
+
+// How many ms between polling the nRF for new clients
+#define BLE_POLL_INTERVAL 1000
+
+// MS to wait for last UART transmit to end and start ours
+#define BLE_TX_TIMEOUT 10
 
 /*
  * A single packet from the nRF on the FCB. Packed so we can read directly from
@@ -70,7 +77,6 @@ typedef struct {
 HAL_StatusTypeDef BLE_Tx_Internal(BluetoothInterface_t *ctrl, uint8_t *buf,
                                   int bufLen);
 
-// the DMA channel should be hdma_usart6_rx
 void Bluetooth_Init(BluetoothInterface_t *ctrl, UART_HandleTypeDef *ble_uart);
 
 // Associate a given circular buffer with an address. Bytes addressed to it will
@@ -88,8 +94,7 @@ bool Bluetooth_TxBusy(BluetoothInterface_t *ctrl);
  */
 HAL_StatusTypeDef Bluetooth_SendRequest(BluetoothInterface_t *ctrl,
                                         const uint8_t address,
-                                        const uint8_t *pdata,
-                                        const uint16_t len);
+                                        const void *pdata, const uint16_t len);
 
 // Check if a particular address was reported as connected. Note that this uses
 // the cached connectedClients value! connectedClients should be updated

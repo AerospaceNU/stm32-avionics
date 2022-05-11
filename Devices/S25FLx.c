@@ -6,6 +6,8 @@
 
 #ifdef HAS_S25FLX
 
+#include HAL_HEADER
+
 #include <string.h>
 
 #include "hal_callbacks.h"
