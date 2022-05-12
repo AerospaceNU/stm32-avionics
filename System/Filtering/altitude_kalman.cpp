@@ -1,4 +1,5 @@
 #include "altitude_kalman.h"
+
 #include "matrix.h"
 
 AltitudeKalman::AltitudeKalman(double dt) : m_dt(dt) {}
@@ -10,9 +11,6 @@ void AltitudeKalman::Predict(const double az) {
   xHat.estimatedAltitude +=
       xHat.estimatedVelocity * m_dt + 1 / 2 * az * m_dt * m_dt;
   xHat.estimatedVelocity += az * m_dt;
-    Matrix<2,2> mat{};
-    Matrix<2,2> mat2{};
-    auto ret = mat * mat2;
 }
 
 void AltitudeKalman::Correct(const double baroAltitude,

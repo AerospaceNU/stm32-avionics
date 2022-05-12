@@ -10,6 +10,7 @@
 #include "board_config.h"
 #include "cli.h"
 #include "hardware_manager.h"
+#include "orientation_estimation.h"
 
 #define R_DRY_AIR 287.0474909  // J/K/kg
 #define G_ACCEL_EARTH 9.80665  // m/s**2
@@ -40,10 +41,13 @@ static double medianArray[kPrevPresMedianCount + kPrevPresCount];
 
 // Sane default
 static AltitudeKalman kalman{0.015};
+static OrientationEstimation orientation(0.015);
 
 void filterInit(double dt) {
   kalman.Reset();
   kalman.SetDt(dt);
+  orientation.reset();
+  orientation.setDt(dt);
   // Initialize circular buffers for running medians/running pressure values
   cbInit(&runningPresMediansBuffer, runningPresMedians,
          kPrevPresMedianCount + 1, sizeof(double));
@@ -85,9 +89,26 @@ static double filterAccelOneAxis(const double imu1reading,
   return accelSum / (double)numAccelsValid;
 }
 
-static double getSensorAccelAxis(const Axis_t boardAxis,
-                                 const Orientation_t* sensorOrientation,
-                                 double* sensorAccels) {
+static double filterGyroOneAxis(const double imu1reading,
+                                const double imu2reading, bool imu1sampling,
+                                bool imu2sampling) {
+  int numGyrosValid = 0;
+  double gyroSum = 0;
+
+  if (imu1sampling) {
+    gyroSum += imu1reading;
+    ++numGyrosValid;
+  }
+  if (imu2sampling) {
+    gyroSum += imu2reading;
+    ++numGyrosValid;
+  }
+  return numGyrosValid == 0 ? 0.0 : gyroSum / (double)numGyrosValid;
+}
+
+static double getSensorAxis(const Axis_t boardAxis,
+                            const Orientation_t* sensorOrientation,
+                            double* sensorAccels) {
   Orientation_t sensorOrient = sensorOrientation[boardAxis];
   double multiplier = sensorOrient.direction;
   // The gravity ref tells us whether or not we need to rotate our coordinate
@@ -113,25 +134,54 @@ static void filterAccels(SensorData_t* curSensorVals,
   memcpy(high_g_data, &curSensorVals->high_g_accel_x, 3 * sizeof(double));
 
   filterData.acc_x = (filterAccelOneAxis(
-      getSensorAccelAxis(AXIS_X, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
-      getSensorAccelAxis(AXIS_X, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
-      getSensorAccelAxis(AXIS_X, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
+      getSensorAxis(AXIS_X, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
+      getSensorAxis(AXIS_X, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
+      getSensorAxis(AXIS_X, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
       sensorProperties, status[IMU1], status[IMU2],
       status[HIGH_G_ACCELEROMETER]));
 
   filterData.acc_y = (filterAccelOneAxis(
-      getSensorAccelAxis(AXIS_Y, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
-      getSensorAccelAxis(AXIS_Y, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
-      getSensorAccelAxis(AXIS_Y, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
+      getSensorAxis(AXIS_Y, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
+      getSensorAxis(AXIS_Y, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
+      getSensorAxis(AXIS_Y, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
       sensorProperties, status[IMU1], status[IMU2],
       status[HIGH_G_ACCELEROMETER]));
 
   filterData.acc_z = (filterAccelOneAxis(
-      getSensorAccelAxis(AXIS_Z, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
-      getSensorAccelAxis(AXIS_Z, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
-      getSensorAccelAxis(AXIS_Z, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
+      getSensorAxis(AXIS_Z, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
+      getSensorAxis(AXIS_Z, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
+      getSensorAxis(AXIS_Z, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
       sensorProperties, status[IMU1], status[IMU2],
       status[HIGH_G_ACCELEROMETER]));
+}
+
+static void filterGyros(SensorData_t* curSensorVals) {
+  bool* status = HM_GetHardwareStatus();
+
+  double imu1_data[3] = {0};
+  memcpy(imu1_data, &curSensorVals->imu1_gyro_x, 3 * sizeof(double));
+  double imu2_data[3] = {0};
+  memcpy(imu2_data, &curSensorVals->imu2_gyro_x, 3 * sizeof(double));
+  float gyro[3];
+  gyro[0] = filterGyroOneAxis(
+      getSensorAxis(AXIS_X, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
+      getSensorAxis(AXIS_X, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data), status[IMU1],
+      status[IMU2]);
+  gyro[1] = filterGyroOneAxis(
+      getSensorAxis(AXIS_Y, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
+      getSensorAxis(AXIS_Y, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data), status[IMU1],
+      status[IMU2]);
+  gyro[2] = filterGyroOneAxis(
+      getSensorAxis(AXIS_Z, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
+      getSensorAxis(AXIS_Z, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data), status[IMU1],
+      status[IMU2]);
+
+  orientation.update(gyro);
+  // Copy quaternion to filter data
+  filterData.qx = orientation.q(0, 0);
+  filterData.qy = orientation.q(1, 0);
+  filterData.qz = orientation.q(2, 0);
+  filterData.qw = orientation.q(3, 0);
 }
 
 static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
@@ -213,6 +263,11 @@ void filterAddGravityRef() {
   // reaing, don't flip gravity
   if (fabs(accelSum) < 0.5 * G_ACCEL_EARTH * gravCount) return;
 
+  // Once we have a semi-realistic gravity vector, and we know we're in
+  // preflight, add this to the orientation estimation
+
+  orientation.setAccelVector((float*)&filterData.acc_x);
+
   // If the sum is negative, we should flip, switch gravity ref and flush
   // buffer
   if (accelSum < 0) {
@@ -282,6 +337,8 @@ void filterApplyData(SensorData_t* curSensorVals,
   filterPositionZ(curSensorVals, hasPassedApogee);
 
   filterAccels(curSensorVals, sensorProperties);
+
+  filterGyros(curSensorVals);
 }
 
 FilterData_t* filterGetData() { return &filterData; }
