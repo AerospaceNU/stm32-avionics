@@ -85,8 +85,6 @@ void LineCutter_Tick(LineCutterCtrl_t *lineCutter) {
     lineCutter->lastFlightVarsTimestamp = HAL_GetTick();
     ec |= LineCutter_RequestConfig(lineCutter);
   }
-
-  // printf("%i\n", ec);
 }
 
 void LineCutter_Parse(LineCutterCtrl_t *cutter, uint16_t len, uint8_t *arr) {

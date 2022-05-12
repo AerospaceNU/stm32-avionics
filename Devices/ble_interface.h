@@ -109,9 +109,6 @@ bool Bluetooth_PollConnectedClients(BluetoothInterface_t *ctrl);
 // [2 bytes len, n bytes data]) Note that pdata must be at least
 uint16_t Bluetooth_DequeuePacket(CircularBuffer_t *buffer, uint8_t *pdata);
 
-// Helper for printing packets
-void Bluetooth_PrintPacket(uint8_t addr, uint16_t len, uint8_t *pdata);
-
 void Bluetooth_Tick(BluetoothInterface_t *ctrl);
 
 #endif  // DEVICES_BLE_INTERFACE_H_

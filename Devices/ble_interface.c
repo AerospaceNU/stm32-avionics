@@ -128,15 +128,6 @@ HAL_StatusTypeDef Bluetooth_SendRequest(BluetoothInterface_t *ctrl,
   return ret;
 }
 
-void Bluetooth_PrintPacket(uint8_t addr, uint16_t len, uint8_t *pdata) {
-  printf("Packet: addr [%u] len [%u]\nData:\n", addr, len);
-  for (int i = 0; i < len; i++) {
-    printf("0x%X ", pdata[i]);
-    if (i % 8 == 0 && i != 0) printf("\n");
-  }
-  printf("\n");  // Flush
-}
-
 uint16_t Bluetooth_DequeuePacket(CircularBuffer_t *buffer, uint8_t *pdata) {
   // We should have at least 2 bytes (the len bytes) in our array
   if (cbCount(buffer) < 2) return 0;
