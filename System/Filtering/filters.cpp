@@ -178,10 +178,10 @@ static void filterGyros(SensorData_t* curSensorVals) {
 
   orientation.update(gyro);
   // Copy quaternion to filter data
-  filterData.qx = orientation.q(0, 0);
-  filterData.qy = orientation.q(1, 0);
-  filterData.qz = orientation.q(2, 0);
-  filterData.qw = orientation.q(3, 0);
+  filterData.qx = orientation.q(1, 0);
+  filterData.qy = orientation.q(2, 0);
+  filterData.qz = orientation.q(3, 0);
+  filterData.qw = orientation.q(0, 0);
 }
 
 static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
@@ -263,17 +263,16 @@ void filterAddGravityRef() {
   // reaing, don't flip gravity
   if (fabs(accelSum) < 0.5 * G_ACCEL_EARTH * gravCount) return;
 
-  // Once we have a semi-realistic gravity vector, and we know we're in
-  // preflight, add this to the orientation estimation
-
-  orientation.setAccelVector((float*)&filterData.acc_x);
-
   // If the sum is negative, we should flip, switch gravity ref and flush
   // buffer
   if (accelSum < 0) {
     gravityRef *= -1;
     cbFlush(&runningGravityRefBuffer);
   }
+
+  // We have a semi-realistic gravity vector, and we know we're in
+  // preflight. Reset the orientation estimation to this new gravity vector
+  orientation.setAccelVector((float*)&filterData.acc_x);
 }
 
 void filterAddPressureRef(double currentPres) {
