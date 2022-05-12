@@ -23,6 +23,8 @@ EndCondition_t DescentState::run() {
   FilterData_t* filterData = filterGetData();
   data_log_write(sensorData, filterData, this->getID());
 
+  // TODO this logic does NOT belong here!
+
   // If below X meters, disreef
   if (filterData->pos_z < 400 && !sentCut1) {
     HM_LineCuttersSendCut(1);
