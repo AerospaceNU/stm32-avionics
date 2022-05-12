@@ -80,10 +80,10 @@ void cliSetDefaultConfig() {
   cliConfigs.pyroConfiguration[0].flags = 0b1;   // FLAG_APOGEE
   cliConfigs.pyroConfiguration[1].flags = 0b10;  // FLAG_DESCENT_ALT_THRESHOLD
   cliConfigs.pyroConfiguration[1].configValue = 230;  // 230 m deploy
+#endif
   cliConfigs.groundElevationM = 0;
   cliConfigs.groundTemperatureC = 14.85;
   cliConfigs.radioChannel = 1;
-#endif
 }
 
 CliCommand_t cliParse(CliComms_t commsType) {
