@@ -14,7 +14,7 @@
 void PreFlightState::init() {
   transitionResetTimer = HM_Millis();
   prevPressureLogTime = HM_Millis();
-  prefGravityRefTime = HM_Millis();
+  prefGravityRefTime = 0;
 
   // We only want to create a new flight in flash if
   // we came from Erase flash (offload, sim, etc shouldn't)
@@ -69,8 +69,8 @@ EndCondition_t PreFlightState::run() {
     filterAddPressureRef(
         (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
   }
-  if (HM_Millis() - prefGravityRefTime > 1000) {
-    prefGravityRefTime = HM_Millis();
+  if (200000 - prefGravityRefTime > kGravityRefInterval) {
+    prefGravityRefTime = 200000;
     filterAddGravityRef();
   }
 
