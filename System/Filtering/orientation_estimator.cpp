@@ -4,23 +4,23 @@
  *  Created on: Mar 21, 2022
  *      Author: sam
  */
-#include "orientation_estimation.h"
-
 #include <math.h>
+#include <orientation_estimator.h>
 
 #include "matrix.h"
 
-OrientationEstimation::OrientationEstimation(double dt) : m_dt(dt) {}
+OrientationEstimator::OrientationEstimator(double dt) : m_dt(dt) {}
 
-void OrientationEstimation::reset() { this->q = Matrix<4, 1>({1.0, 0, 0, 0}); }
+void OrientationEstimator::reset() { this->q = Matrix<4, 1>({1.0, 0, 0, 0}); }
 
-void OrientationEstimation::setDt(double dt) { this->m_dt = dt; }
+void OrientationEstimator::setDt(double dt) { this->m_dt = dt; }
 
-void OrientationEstimation::setAccelVector(float accels[]) {
+void OrientationEstimator::setAccelVector(double accels[]) {
   // From
   // https://github.com/Mayitzin/ahrs/blob/87d27880fd903be3762c68000cc5dd41c720200d/ahrs/common/orientation.py#L923
-  Matrix<3, 1> a({accels[0], accels[1], accels[2]});
+  Matrix<3, 1> a({(float)accels[0], (float)accels[1], (float)accels[2]});
   float a_norm = a.norm();
+  // if (!(a_norm > 9.0 && a_norm < 11.0)) return;
   float ax = accels[0] / a_norm;
   float ay = accels[1] / a_norm;
   float az = accels[2] / a_norm;
@@ -34,7 +34,7 @@ void OrientationEstimation::setAccelVector(float accels[]) {
   this->q = q * (1.0 / q.norm());
 }
 
-void OrientationEstimation::update(float gyr[]) {
+void OrientationEstimator::update(float gyr[]) {
   // From
   // https://github.com/Mayitzin/ahrs/blob/87f9210cfcf6c545d86ae8588a93f012020164ee/ahrs/filters/angular.py#L374
   Matrix<4, 4> omega({0.0, -gyr[0], -gyr[1], -gyr[2], gyr[0], 0.0, gyr[2],
@@ -42,9 +42,10 @@ void OrientationEstimation::update(float gyr[]) {
                       -gyr[0], 0.0});
   Matrix<3, 1> gyro({gyr[0], gyr[1], gyr[2]});
 
-  float w = gyro.norm();
-  Matrix<4, 4> A = (Matrix<4, 4>::identity() * cos(w * m_dt / 2.0)) +
-                   (omega * (1.0 / w) * sin(2 * m_dt / 2.0));
+  volatile float w = gyro.norm();
+  Matrix<4, 4> ident = (Matrix<4, 4>::identity() * cos(w * m_dt / 2.0));
+  float omgmult = 1.0 / w + sin(w * m_dt / 2.0);
+  Matrix<4, 4> A = ident + omega * omgmult;
   this->q = A * q;
   this->q = q * (1.0 / q.norm());
 }

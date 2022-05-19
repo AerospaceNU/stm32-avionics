@@ -53,13 +53,28 @@ void RadioManager_tick() {
   }
 }
 
+void RadioManager_send_internal() {
+  if (false) {
+    HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
+                 RADIO_PACKET_SIZE);
+  } else {
+    static RecievedPacket_t packet;
+    packet.crc = true;
+    packet.lqi = 1;
+    packet.rssi = 1;
+    packet.radioId = TELEMETRY_RADIO;
+    memcpy(packet.data, &transmitPacket, RADIO_PACKET_SIZE);
+    HM_UsbTransmit((uint8_t *)&packet, sizeof(packet));
+  }
+}
+
 void RadioManager_addMessageCallback(RadioCallback_t callback) {
   dataRx.callbacks[dataRx.numCallbacks] = callback;
   dataRx.numCallbacks++;
 }
 
 // Packet rates, in hz
-#define ORIENTATION_RATE 1
+#define ORIENTATION_RATE 10
 #define POSITION_RATE 10
 #define PYRO_INFO_RATE 1
 
@@ -104,8 +119,8 @@ void RadioManager_transmitData(SensorData_t *sensorData,
     transmitPacket.payload.orientation = data;
     lastSent.orientationLastSent = currentTime;
 
-    HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
-                 RADIO_PACKET_SIZE);
+    RadioManager_send_internal(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
+                               RADIO_PACKET_SIZE);
   }
 
   if (currentTime - lastSent.positionLastSent >= 1000 / POSITION_RATE) {
@@ -129,8 +144,8 @@ void RadioManager_transmitData(SensorData_t *sensorData,
     transmitPacket.payload.positionData = data;
     lastSent.positionLastSent = currentTime;
 
-    HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
-                 RADIO_PACKET_SIZE);
+    RadioManager_send_internal(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
+                               RADIO_PACKET_SIZE);
   }
 
   if (currentTime - lastSent.altInfoLastSent >= 1213) {
@@ -142,8 +157,8 @@ void RadioManager_transmitData(SensorData_t *sensorData,
     transmitPacket.payload.altitudeInfo = data;
     lastSent.altInfoLastSent = currentTime;
 
-    HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
-                 RADIO_PACKET_SIZE);
+    RadioManager_send_internal(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
+                               RADIO_PACKET_SIZE);
   }
 
   if (currentTime - lastSent.pyroInfoLastSent >= 1000 / PYRO_INFO_RATE) {
@@ -156,8 +171,8 @@ void RadioManager_transmitData(SensorData_t *sensorData,
     transmitPacket.payload.pyroInfo = data;
     lastSent.pyroInfoLastSent = currentTime;
 
-    HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
-                 RADIO_PACKET_SIZE);
+    RadioManager_send_internal(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
+                               RADIO_PACKET_SIZE);
   }
 
   /*
@@ -201,7 +216,8 @@ void RadioManager_transmitString(Hardware_t radio, uint8_t *data, size_t len) {
     memcpy(transmitPacket.payload.cliString.string, data, txLen);
     transmitPacket.payload.cliString.len = txLen;
 
-    HM_RadioSend(radio, (uint8_t *)&transmitPacket, RADIO_PACKET_SIZE);
+    RadioManager_send_internal(radio, (uint8_t *)&transmitPacket,
+                               RADIO_PACKET_SIZE);
 
     // The radio seems to not actually send the packet unless we actually call
     // RadioUpdate a bunch

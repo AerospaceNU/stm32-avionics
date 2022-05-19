@@ -4,13 +4,13 @@
 
 #include "filters.h"
 
+#include <orientation_estimator.h>
 #include <string.h>
 
 #include "altitude_kalman.h"
 #include "board_config.h"
 #include "cli.h"
 #include "hardware_manager.h"
-#include "orientation_estimation.h"
 
 #define R_DRY_AIR 287.0474909  // J/K/kg
 #define G_ACCEL_EARTH 9.80665  // m/s**2
@@ -41,13 +41,13 @@ static double medianArray[kPrevPresMedianCount + kPrevPresCount];
 
 // Sane default
 static AltitudeKalman kalman{0.015};
-static OrientationEstimation orientation(0.015);
+static OrientationEstimator orientationEstimator(0.015);
 
 void filterInit(double dt) {
   kalman.Reset();
   kalman.SetDt(dt);
-  orientation.reset();
-  orientation.setDt(dt);
+  orientationEstimator.reset();
+  orientationEstimator.setDt(dt);
   // Initialize circular buffers for running medians/running pressure values
   cbInit(&runningPresMediansBuffer, runningPresMedians,
          kPrevPresMedianCount + 1, sizeof(double));
@@ -176,12 +176,13 @@ static void filterGyros(SensorData_t* curSensorVals) {
       getSensorAxis(AXIS_Z, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data), status[IMU1],
       status[IMU2]);
 
-  orientation.update(gyro);
+  orientationEstimator.update(gyro);
   // Copy quaternion to filter data
-  filterData.qx = orientation.q(1, 0);
-  filterData.qy = orientation.q(2, 0);
-  filterData.qz = orientation.q(3, 0);
-  filterData.qw = orientation.q(0, 0);
+
+  filterData.qx = orientationEstimator.q(1, 0);
+  filterData.qy = orientationEstimator.q(2, 0);
+  filterData.qz = orientationEstimator.q(3, 0);
+  filterData.qw = orientationEstimator.q(0, 0);
 }
 
 static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
@@ -257,7 +258,9 @@ void filterAddGravityRef() {
   for (uint8_t i = 0; i < gravCount; ++i) {
     accelSum += gravityRefBuffer[i];
   }
-
+  // We have a semi-realistic gravity vector, and we know we're in
+  // preflight. Reset the orientation estimation to this new gravity vector
+  orientationEstimator.setAccelVector(&filterData.acc_x);
   // Check that we are mostly in the direction of gravity in some direction.
   // If the sum of our accelerations averages out to less than half G per
   // reaing, don't flip gravity
@@ -269,10 +272,6 @@ void filterAddGravityRef() {
     gravityRef *= -1;
     cbFlush(&runningGravityRefBuffer);
   }
-
-  // We have a semi-realistic gravity vector, and we know we're in
-  // preflight. Reset the orientation estimation to this new gravity vector
-  orientation.setAccelVector((float*)&filterData.acc_x);
 }
 
 void filterAddPressureRef(double currentPres) {

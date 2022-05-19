@@ -29,6 +29,7 @@ class PreFlightState : public FlightState {
   static constexpr double kLaunchAccelThreshold = 20.0;  // m/s**2
   static constexpr double kLaunchPosZDiffFailsafeThreshold =
       100.0;  // m failsafe
+  static constexpr uint32_t kGravityRefInterval = 20;
   static constexpr uint32_t kTransitionResetTimeThreshold =
       150;  // 150 ms transition timer
 
