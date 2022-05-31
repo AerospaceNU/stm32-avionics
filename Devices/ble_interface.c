@@ -6,7 +6,6 @@
  */
 #include "ble_interface.h"
 
-
 #ifdef HAS_BLE
 
 #include <stdio.h>
@@ -18,8 +17,9 @@ HAL_StatusTypeDef BLE_Tx_Internal(BluetoothInterface_t *ctrl, uint8_t *buf,
                                   int bufLen) {
   uint32_t start = HAL_GetTick();
 
-  while (HAL_GetTick() - start < BLE_TX_TIMEOUT) {  // Wait for the last transmit to end, up
-                                        // to 10ms. TODO this seems really long
+  while (HAL_GetTick() - start <
+         BLE_TX_TIMEOUT) {  // Wait for the last transmit to end, up
+                            // to 10ms. TODO this seems really long
     if (!Bluetooth_TxBusy(ctrl)) {
       return HAL_UART_Transmit(ctrl->ble_uart, buf, bufLen, HAL_MAX_DELAY);
     }
@@ -104,8 +104,7 @@ bool Bluetooth_TxBusy(BluetoothInterface_t *ctrl) {
  */
 HAL_StatusTypeDef Bluetooth_SendRequest(BluetoothInterface_t *ctrl,
                                         const uint8_t address,
-                                        const void *pdata,
-                                        const uint16_t len) {
+                                        const void *pdata, const uint16_t len) {
   // We need to transmit 1 byte addr, 2 byte len, n bytes of data
   const uint16_t headerSize = sizeof(address) + sizeof(len);
   const uint16_t totalSize = headerSize + len;
