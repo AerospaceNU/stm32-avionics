@@ -9,7 +9,6 @@
 
 #ifdef HAS_LSM9DS1
 
-
 #define LSM9DS1SPI_SPI_REG_MASK (1 << 7)
 
 uint8_t AG_whoAmI(AG_LSM9DS1Ctrl_t *sensor) {
