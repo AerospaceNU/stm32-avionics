@@ -160,6 +160,7 @@ void RadioManager_transmitData(SensorData_t *sensorData,
                  RADIO_PACKET_SIZE);
   }
 
+#ifdef HAS_LINE_CUTTER
   if (currentTime - lastSent.lineCutterLastSent >= 1000) {
     for (int i = ADDR_CUTTER1; i <= ADDR_CUTTER2; i++) {
       transmitPacket.packetType = TELEMETRY_ID_LINECUTTER;
@@ -170,6 +171,7 @@ void RadioManager_transmitData(SensorData_t *sensorData,
                    RADIO_PACKET_SIZE);
     }
   }
+#endif
 
   if (currentTime - lastSent.lineCutterVarsLastSent >= 10000) {
     for (int i = ADDR_CUTTER1; i <= ADDR_CUTTER2; i++) {
