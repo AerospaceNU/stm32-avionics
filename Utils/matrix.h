@@ -46,8 +46,16 @@ class Matrix {
     static_assert(Cols == oRows,
                   "Must multiply matrices with matching column and row count "
                   "(a x n * n x b)");
-    Matrix<Rows, oCols> ret = {};
-    arm_mat_mult_f32(&this->m_matrix, &other.m_matrix, &ret.m_matrix);
+    float newElems[Rows * oCols] = {0};
+    for (int i = 0; i < Rows; ++i) {
+      for (int j = 0; j < oCols; ++j) {
+        for (int k = 0; k < Cols; ++k) {
+          newElems[i * oCols + j] += this->m_backingArray[i * Cols + k] *
+                                     other.m_backingArray[k * oCols + j];
+        }
+      }
+    }
+    Matrix<Rows, oCols> ret(newElems);
     return ret;
   }
 
@@ -76,8 +84,14 @@ class Matrix {
   Matrix<Rows, Cols> operator+(const Matrix<oRows, oCols> &other) {
     static_assert(Rows == oRows && Cols == oCols,
                   "Matrices must have same dimension!");
-    Matrix<Rows, Cols> ret = {};
-    arm_mat_add_f32(&this->m_matrix, &other.m_matrix, &ret.m_matrix);
+    float newElems[Rows * Cols] = {0};
+    for (int i = 0; i < Rows; ++i) {
+      for (int j = 0; j < Cols; ++j) {
+        newElems[i * oCols + j] = this->m_backingArray[i * Cols + j] +
+                                  other.m_backingArray[i * oCols + j];
+      }
+    }
+    Matrix<Rows, Cols> ret(newElems);
     return ret;
   }
 
@@ -85,8 +99,14 @@ class Matrix {
   Matrix<Rows, Cols> operator-(const Matrix<oRows, oCols> &other) {
     static_assert(Rows == oRows && Cols == oCols,
                   "Matrices must have same dimension!");
-    Matrix<Rows, Cols> ret = {};
-    arm_mat_sub_f32(&this->m_matrix, &other.m_matrix, &ret.m_matrix);
+    float newElems[Rows * Cols] = {0};
+    for (int i = 0; i < Rows; ++i) {
+      for (int j = 0; j < Cols; ++j) {
+        newElems[i * oCols + j] = this->m_backingArray[i * Cols + j] -
+                                  other.m_backingArray[i * oCols + j];
+      }
+    }
+    Matrix<Rows, Cols> ret(newElems);
     return ret;
   }
 
@@ -101,7 +121,7 @@ class Matrix {
   Matrix<Rows, Cols> inverse() {
     static_assert(Rows == Cols, "Matrix must be square to invert!");
     Matrix<Rows, Cols> ret = {};
-    arm_mat_inverse_f32(&this->m_matrix, &ret.m_matrix);
+    arm_mat_inverse_f32(&(this->m_matrix), &(ret.m_matrix));
     return ret;
   }
 
@@ -120,7 +140,7 @@ class Matrix {
       ident[i][i] = 1.0;
     }
     memcpy(ret.m_backingArray, &ident, sizeof(ident));
-    arm_mat_init_f32(&ret.m_matrix, Rows, Rows, ret.m_backingArray);
+    arm_mat_init_f32(&(ret.m_matrix), Rows, Rows, ret.m_backingArray);
     return ret;
   }
 
@@ -128,7 +148,7 @@ class Matrix {
     Matrix<Rows, Cols> ret = {};
     float32_t zeroes[Rows][Cols] = {0.0};
     memcpy(ret.m_backingArray, &zeroes, sizeof(zeroes));
-    arm_mat_init_f32(&ret.m_matrix, Rows, Cols, ret.m_backingArray);
+    arm_mat_init_f32(ret.m_matrix, Rows, Cols, ret.m_backingArray);
     return ret;
   }
   template <int oRows, int oCols>

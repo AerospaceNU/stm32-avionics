@@ -23,6 +23,9 @@ typedef struct {
   double acc_x;
   double acc_y;
   double acc_z;
+  float gyr_x;
+  float gyr_y;
+  float gyr_z;
   double qx;
   double qy;
   double qz;
@@ -55,6 +58,8 @@ void filterAddPressureRef(double currentPres);
  */
 
 void filterAddGravityRef();
+
+void filterAddGyroRef();
 
 /**
  * @brief Sets reference pressure used for converting pressure to altitude

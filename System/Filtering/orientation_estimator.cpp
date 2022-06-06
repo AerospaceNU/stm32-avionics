@@ -20,7 +20,7 @@ void OrientationEstimator::setAccelVector(double accels[]) {
   // https://github.com/Mayitzin/ahrs/blob/87d27880fd903be3762c68000cc5dd41c720200d/ahrs/common/orientation.py#L923
   Matrix<3, 1> a({(float)accels[0], (float)accels[1], (float)accels[2]});
   float a_norm = a.norm();
-  // if (!(a_norm > 9.0 && a_norm < 11.0)) return;
+  if (!(a_norm > 9.0 && a_norm < 11.0)) return;
   float ax = accels[0] / a_norm;
   float ay = accels[1] / a_norm;
   float az = accels[2] / a_norm;
@@ -44,7 +44,7 @@ void OrientationEstimator::update(float gyr[]) {
 
   volatile float w = gyro.norm();
   Matrix<4, 4> ident = (Matrix<4, 4>::identity() * cos(w * m_dt / 2.0));
-  float omgmult = 1.0 / w + sin(w * m_dt / 2.0);
+  float omgmult = (1.0 / w) * sin(w * m_dt / 2.0);
   Matrix<4, 4> A = ident + omega * omgmult;
   this->q = A * q;
   this->q = q * (1.0 / q.norm());

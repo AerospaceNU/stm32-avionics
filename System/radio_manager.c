@@ -54,7 +54,7 @@ void RadioManager_tick() {
 }
 
 void RadioManager_send_internal() {
-  if (false) {
+  if (true) {
     HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
                  RADIO_PACKET_SIZE);
   } else {
@@ -106,9 +106,9 @@ void RadioManager_transmitData(SensorData_t *sensorData,
                                 (filterData->qx * 100.0),
                                 filterData->qy * 100.0,
                                 (filterData->qz * 100.0),
-                                sensorData->imu1_gyro_x,
-                                sensorData->imu1_gyro_y,
-                                sensorData->imu1_gyro_z,
+                                filterData->gyr_x,
+                                filterData->gyr_y,
+                                filterData->gyr_z,
                                 filterData->acc_x,
                                 filterData->acc_y,
                                 filterData->acc_z,
