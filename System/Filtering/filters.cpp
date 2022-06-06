@@ -22,6 +22,7 @@
 #define kPrevPresMedianCount 10
 #define kPrevPresCount 10
 #define kGravityRefCount 10
+#define kGyroRefCount 10
 
 static double runningPresMedians[kPrevPresMedianCount + 1];
 static CircularBuffer_t runningPresMediansBuffer;
@@ -33,6 +34,17 @@ static uint8_t runningPresCount;
 static double gravityRefBuffer[kGravityRefCount];
 static double runningGravityRef[kGravityRefCount + 1];
 static CircularBuffer_t runningGravityRefBuffer;
+
+static float gyroBuff[kGyroRefCount];
+static float gyroXRefBack[kGyroRefCount + 1];
+static CircularBuffer_t gyroXRefBuffer;
+static float gyroXOffset;
+static float gyroYRefBack[kGyroRefCount + 1];
+static CircularBuffer_t gyroYRefBuffer;
+static float gyroYOffset;
+static float gyroZRefBack[kGyroRefCount + 1];
+static CircularBuffer_t gyroZRefBuffer;
+static float gyroZOffset;
 
 static FilterData_t filterData;
 static double presRef = 1.0;   // atm
@@ -55,6 +67,12 @@ void filterInit(double dt) {
   cbInit(&runningPresBuffer, runningPres, kPrevPresCount + 1, sizeof(double));
   cbInit(&runningGravityRefBuffer, runningGravityRef, kGravityRefCount + 1,
          sizeof(double));
+  cbInit(&gyroXRefBuffer, gyroXRefBack, kGyroRefCount + 1, sizeof(float));
+  cbInit(&gyroYRefBuffer, gyroYRefBack, kGyroRefCount + 1, sizeof(float));
+  cbInit(&gyroZRefBuffer, gyroZRefBack, kGyroRefCount + 1, sizeof(float));
+  gyroXOffset = 0;
+  gyroYOffset = 0;
+  gyroZOffset = 0;
   runningPresMedianCount = 0;
   runningPresCount = 0;
 }
@@ -165,25 +183,80 @@ static void filterGyros(SensorData_t* curSensorVals) {
   memcpy(imu2_data, &curSensorVals->imu2_gyro_x, 3 * sizeof(double));
   float gyro[3];
   gyro[0] = filterGyroOneAxis(
-      getSensorAxis(AXIS_X, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
-      getSensorAxis(AXIS_X, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data), status[IMU1],
-      status[IMU2]);
+                getSensorAxis(AXIS_X, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
+                getSensorAxis(AXIS_X, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
+                status[IMU1], status[IMU2]) -
+            gyroXOffset;
+
   gyro[1] = filterGyroOneAxis(
-      getSensorAxis(AXIS_Y, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
-      getSensorAxis(AXIS_Y, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data), status[IMU1],
-      status[IMU2]);
+                getSensorAxis(AXIS_Y, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
+                getSensorAxis(AXIS_Y, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
+                status[IMU1], status[IMU2]) -
+            gyroYOffset;
+
   gyro[2] = filterGyroOneAxis(
-      getSensorAxis(AXIS_Z, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
-      getSensorAxis(AXIS_Z, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data), status[IMU1],
-      status[IMU2]);
+                getSensorAxis(AXIS_Z, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
+                getSensorAxis(AXIS_Z, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
+                status[IMU1], status[IMU2]) -
+            gyroZOffset;
 
   orientationEstimator.update(gyro);
   // Copy quaternion to filter data
+
+  filterData.gyr_x = gyro[0];
+  filterData.gyr_y = gyro[1];
+  filterData.gyr_z = gyro[2];
 
   filterData.qx = orientationEstimator.q(1, 0);
   filterData.qy = orientationEstimator.q(2, 0);
   filterData.qz = orientationEstimator.q(3, 0);
   filterData.qw = orientationEstimator.q(0, 0);
+}
+
+void filterAddGyroRef() {
+  uint8_t i;
+  float gyroSum = 0;
+  static float noOffset;
+
+  if (cbFull(&gyroXRefBuffer)) {
+    cbDequeue(&gyroXRefBuffer, 1);
+  }
+  noOffset = filterData.gyr_x + gyroXOffset;
+  cbEnqueue(&gyroXRefBuffer, &noOffset);
+  cbPeek(&gyroXRefBuffer, gyroBuff, nullptr);
+
+  for (i = 0; i < cbCount(&gyroXRefBuffer); ++i) {
+    gyroSum += gyroBuff[i];
+  }
+
+  gyroXOffset = gyroSum / (float)cbCount(&gyroXRefBuffer);
+  gyroSum = 0;
+
+  if (cbFull(&gyroYRefBuffer)) {
+    cbDequeue(&gyroXRefBuffer, 1);
+  }
+
+  noOffset = filterData.gyr_y + gyroYOffset;
+  cbEnqueue(&gyroYRefBuffer, &noOffset);
+  cbPeek(&gyroYRefBuffer, gyroBuff, nullptr);
+  for (i = 0; i < cbCount(&gyroYRefBuffer); ++i) {
+    gyroSum += gyroBuff[i];
+  }
+
+  gyroYOffset = gyroSum / (float)cbCount(&gyroYRefBuffer);
+  gyroSum = 0;
+
+  if (cbFull(&gyroZRefBuffer)) {
+    cbDequeue(&gyroZRefBuffer, 1);
+  }
+  noOffset = filterData.gyr_z + gyroZOffset;
+  cbEnqueue(&gyroZRefBuffer, &noOffset);
+  cbPeek(&gyroZRefBuffer, gyroBuff, nullptr);
+  for (i = 0; i < cbCount(&gyroZRefBuffer); ++i) {
+    gyroSum += gyroBuff[i];
+  }
+
+  gyroZOffset = gyroSum / (float)cbCount(&gyroZRefBuffer);
 }
 
 static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
@@ -263,13 +336,15 @@ void filterAddGravityRef() {
   for (uint8_t i = 0; i < gravCount; ++i) {
     accelSum += gravityRefBuffer[i];
   }
-  // We have a semi-realistic gravity vector, and we know we're in
-  // preflight. Reset the orientation estimation to this new gravity vector
-  orientationEstimator.setAccelVector(&filterData.acc_x);
+
   // Check that we are mostly in the direction of gravity in some direction.
   // If the sum of our accelerations averages out to less than half G per
   // reaing, don't flip gravity
   if (fabs(accelSum) < 0.5 * G_ACCEL_EARTH * gravCount) return;
+
+  // We have a semi-realistic gravity vector, and we know we're in
+  // preflight. Reset the orientation estimation to this new gravity vector
+  orientationEstimator.setAccelVector(&filterData.acc_x);
 
   // If the sum is negative, we should flip, switch gravity ref and flush
   // buffer
