@@ -30,7 +30,7 @@ void LSM9DS1_init(LSM9DS1Ctrl_t *sensor) {
 
   // Initialize Gyroscope
   SPI_WriteRegister(&sensor->ag.LSM9DS1SPI, CTRL_REG1_G,
-                    ODR_G_238 | sensor->ag.gFs | BW_G_1);
+                    ODR_G_238 | sensor->ag.gFs | BW_G_2);
 
   // Initialize Accelerometer
   SPI_WriteRegister(&sensor->ag.LSM9DS1SPI, CTRL_REG6_XL,

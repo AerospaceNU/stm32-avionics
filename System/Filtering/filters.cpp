@@ -133,7 +133,7 @@ static double getSensorAxis(const Axis_t boardAxis,
   // system around the x axis to flip the gravity (z) direction. We're assuming
   // that the z axis is always the correct axis, just possibly reversed. To flip
   // around the x axis, we need to negate y and z, but not x
-  if (boardAxis != AXIS_X) {
+  if (boardAxis != AXIS_Y) {
     multiplier *= gravityRef;
   }
 
@@ -283,17 +283,17 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
   // acceleration" is the measured acceleration minus 9.81 (since earth pulls us
   // down). Under parachute it's about zero, since we're about-ish in
   // equilibrium
-  double accz = hasPassedApogee ? 0 : filterData.acc_z - 9.81;
+  double accx = hasPassedApogee ? 0 : filterData.acc_x - 9.81;
 
   // TODO check what order these "should" run in. Worst case we're off by one
   // iteration We don't update accelerations till after this, so the z
   // acceleration should still be from the last timestep
-  kalman.Predict(accz);
+  kalman.Predict(accx);
   kalman.Correct(baroAlt, DEFAULT_KALMAN_GAIN);
 
   auto kalmanOutput = kalman.GetXhat();
   filterData.pos_z = kalmanOutput.estimatedAltitude;
-  filterData.vel_z = kalmanOutput.estimatedVelocity;
+  filterData.vel_x = kalmanOutput.estimatedVelocity;
 }
 
 static double median(double* input, uint8_t count) {
@@ -321,7 +321,7 @@ void filterAddGravityRef() {
   if (cbFull(&runningGravityRefBuffer)) {
     cbDequeue(&runningGravityRefBuffer, 1);
   }
-  cbEnqueue(&runningGravityRefBuffer, &(filterData.acc_z));
+  cbEnqueue(&runningGravityRefBuffer, &(filterData.acc_x));
 
   cbPeek(&runningGravityRefBuffer, gravityRefBuffer, nullptr);
 
