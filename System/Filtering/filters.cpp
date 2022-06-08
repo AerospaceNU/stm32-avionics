@@ -181,7 +181,7 @@ static void filterGyros(SensorData_t* curSensorVals) {
   memcpy(imu1_data, &curSensorVals->imu1_gyro_x, 3 * sizeof(double));
   double imu2_data[3] = {0};
   memcpy(imu2_data, &curSensorVals->imu2_gyro_x, 3 * sizeof(double));
-  float gyro[3];
+  static float gyro[3];
   gyro[0] = filterGyroOneAxis(
                 getSensorAxis(AXIS_X, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
                 getSensorAxis(AXIS_X, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
@@ -200,17 +200,17 @@ static void filterGyros(SensorData_t* curSensorVals) {
                 status[IMU1], status[IMU2]) -
             gyroZOffset;
 
-  orientationEstimator.update(gyro);
-  // Copy quaternion to filter data
+  // orientationEstimator.update(gyro);
+  //  Copy quaternion to filter data
 
   filterData.gyr_x = gyro[0];
   filterData.gyr_y = gyro[1];
   filterData.gyr_z = gyro[2];
 
-  filterData.qx = orientationEstimator.q(1, 0);
-  filterData.qy = orientationEstimator.q(2, 0);
-  filterData.qz = orientationEstimator.q(3, 0);
-  filterData.qw = orientationEstimator.q(0, 0);
+  filterData.qx = orientationEstimator.q(0, 0);
+  filterData.qy = orientationEstimator.q(1, 0);
+  filterData.qz = orientationEstimator.q(2, 0);
+  filterData.qw = orientationEstimator.q(3, 0);
 }
 
 void filterAddGyroRef() {
