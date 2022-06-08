@@ -409,7 +409,7 @@ void HM_HardwareInit() {
   usbInit();
 #endif
 #ifdef IMU_1
-  hardwareStatus[IMU1] = true;
+  hardwareStatus[IMU1] = false;
 #endif
 #ifdef IMU_2
   hardwareStatus[IMU2] = true;
