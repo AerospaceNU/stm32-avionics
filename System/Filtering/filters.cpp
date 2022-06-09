@@ -233,7 +233,7 @@ void filterAddGyroRef() {
   gyroSum = 0;
 
   if (cbFull(&gyroYRefBuffer)) {
-    cbDequeue(&gyroXRefBuffer, 1);
+    cbDequeue(&gyroYRefBuffer, 1);
   }
 
   noOffset = filterData.gyr_y + gyroYOffset;
