@@ -13,6 +13,7 @@
 
 #define R_DRY_AIR 287.0474909  // J/K/kg
 #define G_ACCEL_EARTH 9.80665  // m/s**2
+#define BARO_MAX_SPEED 248     // m/s over which to not call correct()
 
 #define ACCEL_SWITCH_MULTIPLE \
   0.9  // How close IMU accel should be to fullscale before switching to
@@ -165,7 +166,11 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
   // iteration We don't update accelerations till after this, so the z
   // acceleration should still be from the last timestep
   kalman.Predict(accz);
-  kalman.Correct(baroAlt, DEFAULT_KALMAN_GAIN);
+
+  // Only correct if below max speed (above, baro readings untrustworthy)
+  if (fabs(kalman.GetXhat().estimatedVelocity) < BARO_MAX_SPEED) {
+    kalman.Correct(baroAlt, DEFAULT_KALMAN_GAIN);
+  }
 
   auto kalmanOutput = kalman.GetXhat();
   filterData.pos_z = kalmanOutput.estimatedAltitude;
