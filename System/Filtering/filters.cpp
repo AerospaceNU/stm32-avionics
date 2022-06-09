@@ -290,15 +290,11 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
   // iteration We don't update accelerations till after this, so the z
   // acceleration should still be from the last timestep
   kalman.Predict(accx);
-<<<<<<< HEAD
 
   // Only correct if below max speed (above, baro readings untrustworthy)
   if (fabs(kalman.GetXhat().estimatedVelocity) < BARO_MAX_SPEED) {
     kalman.Correct(baroAlt, DEFAULT_KALMAN_GAIN);
   }
-=======
-  kalman.Correct(baroAlt, DEFAULT_KALMAN_GAIN);
->>>>>>> 66ca4da91adeeca3e1378eac7ef1318a51ef5e45
 
   auto kalmanOutput = kalman.GetXhat();
   filterData.pos_z = kalmanOutput.estimatedAltitude;
