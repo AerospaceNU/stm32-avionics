@@ -1,5 +1,5 @@
 /*
- * orientation_estimation.cpp
+ * orientation_estimator.cpp
  *
  *  Created on: Mar 21, 2022
  *      Author: sam
@@ -15,15 +15,16 @@ void OrientationEstimator::reset() { this->q = Matrix<4, 1>({1.0, 0, 0, 0}); }
 
 void OrientationEstimator::setDt(double dt) { this->m_dt = dt; }
 
-void OrientationEstimator::setAccelVector(double accels[]) {
+void OrientationEstimator::setAccelVector(float acc_x, float acc_y,
+                                          float acc_z) {
   // From
   // https://github.com/Mayitzin/ahrs/blob/87d27880fd903be3762c68000cc5dd41c720200d/ahrs/common/orientation.py#L923
-  Matrix<3, 1> a({(float)accels[0], (float)accels[1], (float)accels[2]});
+  Matrix<3, 1> a({acc_x, acc_y, acc_z});
   float a_norm = a.norm();
   if (!(a_norm > 9.0 && a_norm < 11.0)) return;
-  float ax = accels[0] / a_norm;
-  float ay = accels[1] / a_norm;
-  float az = accels[2] / a_norm;
+  float ax = acc_x / a_norm;
+  float ay = acc_y / a_norm;
+  float az = acc_z / a_norm;
   float ex = atan2(ay, az);
   float ey = atan2(-ax, sqrt(pow(ay, 2) + pow(az, 2)));
   float cx2 = cos(ex / 2.0);

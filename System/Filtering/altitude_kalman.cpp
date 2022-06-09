@@ -1,7 +1,5 @@
 #include "altitude_kalman.h"
 
-#include "matrix.h"
-
 AltitudeKalman::AltitudeKalman(double dt) : m_dt(dt) {}
 
 void AltitudeKalman::Predict(const double ax) {
