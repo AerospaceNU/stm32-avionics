@@ -199,17 +199,17 @@ static void filterGyros(SensorData_t* curSensorVals) {
                 status[IMU1], status[IMU2]) -
             gyroZOffset;
 
-  // orientationEstimator.update(gyro);
+  orientationEstimator.update(gyro);
   //  Copy quaternion to filter data
 
   filterData.gyr_x = gyro[0];
   filterData.gyr_y = gyro[1];
   filterData.gyr_z = gyro[2];
 
-  filterData.qx = orientationEstimator.q(0, 0);
-  filterData.qy = orientationEstimator.q(1, 0);
-  filterData.qz = orientationEstimator.q(2, 0);
-  filterData.qw = orientationEstimator.q(3, 0);
+  filterData.qx = orientationEstimator.q(1, 0);
+  filterData.qy = orientationEstimator.q(2, 0);
+  filterData.qz = orientationEstimator.q(3, 0);
+  filterData.qw = orientationEstimator.q(0, 0);
 }
 
 void filterAddGyroRef() {
