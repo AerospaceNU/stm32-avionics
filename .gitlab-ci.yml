@@ -25,9 +25,17 @@ before_script:
 
 stages:
   - lint
+  - desktop-build
 
 lint-job:
   stage: lint
   script:
     - chmod -R +x ci/run_lint.sh
     - ./ci/run_lint.sh
+
+desktop-sim-job:
+  stage: desktop-build
+  script:
+    - apt-get install -y --no-install-recommends make cmake g++ gcc
+    - chmod -R +x ci/build_desktop.sh
+    - ./ci/build_desktop.sh
