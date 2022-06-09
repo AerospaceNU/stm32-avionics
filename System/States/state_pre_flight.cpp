@@ -14,7 +14,7 @@
 void PreFlightState::init() {
   transitionResetTimer = HM_Millis();
   prevPressureLogTime = HM_Millis();
-  prefGravityRefTime = 0;
+  prefGravityRefTime = HM_Millis();
 
   // We only want to create a new flight in flash if
   // we came from Erase flash (offload, sim, etc shouldn't)

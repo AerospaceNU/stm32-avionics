@@ -344,7 +344,8 @@ void filterAddGravityRef() {
 
   // We have a semi-realistic gravity vector, and we know we're in
   // preflight. Reset the orientation estimation to this new gravity vector
-  orientationEstimator.setAccelVector(&filterData.acc_x);
+  orientationEstimator.setAccelVector(filterData.acc_x, filterData.acc_y,
+                                      filterData.acc_z);
 
   // If the sum is negative, we should flip, switch gravity ref and flush
   // buffer

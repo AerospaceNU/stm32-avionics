@@ -1,5 +1,5 @@
 /*
- * orientation_estimation.h
+ * orientation_estimator.h
  *
  *  Created on: Mar 21, 2022
  *      Author: sam
@@ -18,7 +18,7 @@ class OrientationEstimator {
 
   void setDt(double dt);
 
-  void setAccelVector(double accels[]);
+  void setAccelVector(float acc_x, float acc_y, float acc_z);
 
   void update(float gyros[]);
 };
