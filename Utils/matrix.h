@@ -10,14 +10,11 @@
 
 #define ARM_MATH_CM7
 
-#if FCB_VERSION == 0
-#include "stm32h750xx.h"
-#elif FCB_VERSION == 1
-#include "stm32h743xx.h"
-#endif
-
 #include <initializer_list>
 
+#include "board_config.h"
+
+// Board config needs to be above arm_math to include the hal header first
 #include "arm_math.h"
 
 /**
