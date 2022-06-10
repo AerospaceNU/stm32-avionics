@@ -39,6 +39,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Devices</locationURI>
 		</link>
 		<link>
+			<name>Libs</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Libs</locationURI>
+		</link>
+		<link>
 			<name>System</name>
 			<type>2</type>
 			<locationURI>PARENT-1-PROJECT_LOC/System</locationURI>
@@ -47,11 +52,6 @@
 			<name>Utils</name>
 			<type>2</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Utils</locationURI>
-		</link>
-		<link>
-			<name>libs</name>
-			<type>2</type>
-			<location>PARENT-1-PROJECT_LOC/libs</location>
 		</link>
 	</linkedResources>
 </projectDescription>
