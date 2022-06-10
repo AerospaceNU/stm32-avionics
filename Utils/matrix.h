@@ -22,8 +22,6 @@
 
 /**
  * @brief Holds an arm matrix internally, with wrappers for common operations.
- * Currently supported:
- * +-, dot, inverse
  *
  * @tparam Rows
  * @tparam Cols
@@ -31,8 +29,19 @@
 template <int Rows, int Cols>
 class Matrix {
  public:
+  arm_matrix_instance_f32 m_matrix{};
+  float32_t m_backingArray[Rows * Cols] = {0};
+  /**
+   * @brief Constructs a zero-valued matrix
+   */
   Matrix() { arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray); }
 
+  /**
+   * @brief Constructs a zero-valued matrix
+   * @param list: Initializer list to initialize matrix values with
+   * @tparam N: Length of list, must be equal to number of elements in the
+   * matrix
+   */
   template <int N>
   explicit Matrix(const float (&list)[N]) {
     static_assert(N == Rows * Cols,
@@ -41,6 +50,18 @@ class Matrix {
     arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray);
   }
 
+  /**
+   * @brief Destructor for matrix
+   */
+  ~Matrix() {}
+
+  /**
+   * @brief Matrix multiplication operator
+   * @param other: Matrix to multiply by this matrix
+   * @tparam oRows: Rows of other matrix, must be equal to cols of this matrix
+   * @tparam oCols: Columns of other matrix
+   * @return New matrix from the multiplication, Rows * Columns of other
+   */
   template <int oRows, int oCols>
   Matrix<Rows, oCols> operator*(const Matrix<oRows, oCols> &other) {
     static_assert(Cols == oRows,
@@ -59,6 +80,11 @@ class Matrix {
     return ret;
   }
 
+  /**
+   * @brief Elementwise multiplication by a constant factor
+   * @param factor: Constant factor to multiply by this matrix
+   * @return New matrix from the multiplication
+   */
   Matrix<Rows, Cols> operator*(const float factor) {
     float newElems[Rows * Cols] = {0};
     for (int i = 0; i < Rows * Cols; ++i) {
@@ -68,6 +94,23 @@ class Matrix {
     return ret;
   }
 
+  /**
+   * @brief Elementwise division by a constant factor
+   * @param factor: Constant factor to divide this matrix by
+   * @return New matrix from the division
+   */
+  Matrix<Rows, Cols> operator/(const float factor) {
+    return this->operator*(1.0 / factor);
+  }
+
+  /**
+   * @brief Elementwise matrix multiplication operator
+   * @param other: Matrix to multiply by this matrix
+   * @tparam oRows: Rows of other matrix, must be equal to rows of this matrix
+   * @tparam oCols: Columns of other matrix, must be equal to columns of this
+   * matrix
+   * @return New matrix from the multiplication
+   */
   template <int oRows, int oCols>
   Matrix<Rows, Cols> operator^(const Matrix<oRows, oCols> &other) {
     static_assert(Rows == oRows && Cols == oCols,
@@ -80,6 +123,14 @@ class Matrix {
     return ret;
   }
 
+  /**
+   * @brief Elementwise matrix addition operator
+   * @param other: Matrix to add to this matrix
+   * @tparam oRows: Rows of other matrix, must be equal to rows of this matrix
+   * @tparam oCols: Columns of other matrix, must be equal to columns of this
+   * matrix
+   * @return New matrix from the addition
+   */
   template <int oRows, int oCols>
   Matrix<Rows, Cols> operator+(const Matrix<oRows, oCols> &other) {
     static_assert(Rows == oRows && Cols == oCols,
@@ -95,6 +146,14 @@ class Matrix {
     return ret;
   }
 
+  /**
+   * @brief Elementwise matrix subtraction operator
+   * @param other: Matrix to subtract from this matrix
+   * @tparam oRows: Rows of other matrix, must be equal to rows of this matrix
+   * @tparam oCols: Columns of other matrix, must be equal to columns of this
+   * matrix
+   * @return New matrix from the subtraction
+   */
   template <int oRows, int oCols>
   Matrix<Rows, Cols> operator-(const Matrix<oRows, oCols> &other) {
     static_assert(Rows == oRows && Cols == oCols,
@@ -110,6 +169,12 @@ class Matrix {
     return ret;
   }
 
+  /**
+   * @brief Index operator on this matrix
+   * @param row: Row to get element from
+   * @param col: Column to get element from
+   * @return Element located at the specified row, column
+   */
   float operator()(const int row, const int col) {
     // Offset start of backing array by the size of a row
     // times however many rows we want to go to
@@ -117,7 +182,9 @@ class Matrix {
     return m_backingArray[row * Cols + col];
   }
 
-  template <int oRows, int oCols>
+  /**
+   * @brief Inverse of this matrix
+   */
   Matrix<Rows, Cols> inverse() {
     static_assert(Rows == Cols, "Matrix must be square to invert!");
     Matrix<Rows, Cols> ret = {};
@@ -125,6 +192,10 @@ class Matrix {
     return ret;
   }
 
+  /**
+   * @brief Norm of this matrix
+   * Must be a vector
+   */
   float norm() {
     static_assert(Rows == 1 || Cols == 1, "Must be a 1D-vector");
     float square_sum;
@@ -132,6 +203,9 @@ class Matrix {
     return sqrt(square_sum);
   }
 
+  /**
+   * @brief Generates an identity matrix of the given dimension
+   */
   static Matrix<Rows, Rows> identity() {
     static_assert(Rows == Cols, "Identity matrix must be square!");
     Matrix<Rows, Rows> ret = {};
@@ -144,34 +218,9 @@ class Matrix {
     return ret;
   }
 
-  static Matrix<Rows, Cols> zeroes() {
-    Matrix<Rows, Cols> ret = {};
-    float32_t zeroes[Rows][Cols] = {0.0};
-    memcpy(ret.m_backingArray, &zeroes, sizeof(zeroes));
-    arm_mat_init_f32(ret.m_matrix, Rows, Cols, ret.m_backingArray);
-    return ret;
-  }
-  template <int oRows, int oCols>
-  static Matrix<Rows, Cols> cos(const Matrix<oRows, oCols> &start) {
-    static_assert(Rows == oRows && Cols == oCols,
-                  "Matrices must have same dimension!");
-    float32_t values[Rows * Cols] = {0};
-    for (int i = 0; i < Rows * Cols; ++i) {
-      values[i] = arm_cos_f32(start.m_backingArray[i]);
-    }
-    return Matrix<Rows, Cols>(values);
-  }
-
-  template <int oRows, int oCols>
-  static Matrix<Rows, Cols> sin(const Matrix<oRows, oCols> &start) {
-    static_assert(Rows == oRows && Cols == oCols,
-                  "Matrices must have same dimension!");
-    float32_t values[Rows * Cols] = {0};
-    for (int i = 0; i < Rows * Cols; ++i) {
-      values[i] = arm_sin_f32(start.m_backingArray[i]);
-    }
-    return Matrix<Rows, Cols>(values);
-  }
+  /**
+   * @brief Trace of a square matrix
+   */
 
   float trace() {
     static_assert(Rows == Cols, "Matrix must be square to find trace!");
@@ -182,8 +231,38 @@ class Matrix {
     return tr;
   }
 
-  arm_matrix_instance_f32 m_matrix{};
-  float32_t m_backingArray[Rows * Cols] = {0};
+  /**
+   * @brief Generates a zero-filled matrix of the given dimension
+   */
+  static Matrix<Rows, Cols> zeroes() {
+    Matrix<Rows, Cols> ret = {};
+    float32_t zeroes[Rows][Cols] = {0.0};
+    memcpy(ret.m_backingArray, &zeroes, sizeof(zeroes));
+    arm_mat_init_f32(ret.m_matrix, Rows, Cols, ret.m_backingArray);
+    return ret;
+  }
+
+  /**
+   * @brief Calculate elementwise cosine of the values in the given matrix
+   */
+  static Matrix<Rows, Cols> cos(const Matrix<Rows, Cols> &start) {
+    float32_t values[Rows * Cols] = {0};
+    for (int i = 0; i < Rows * Cols; ++i) {
+      values[i] = arm_cos_f32(start.m_backingArray[i]);
+    }
+    return Matrix<Rows, Cols>(values);
+  }
+
+  /**
+   * @brief Calculate elementwise sine of the values in the given matrix
+   */
+  static Matrix<Rows, Cols> sin(const Matrix<Rows, Cols> &start) {
+    float32_t values[Rows * Cols] = {0};
+    for (int i = 0; i < Rows * Cols; ++i) {
+      values[i] = arm_sin_f32(start.m_backingArray[i]);
+    }
+    return Matrix<Rows, Cols>(values);
+  }
 };
 
 #endif  // UTILS_MATRIX_H_

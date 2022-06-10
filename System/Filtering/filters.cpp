@@ -35,7 +35,6 @@ static double gravityRefBuffer[kGravityRefCount];
 static double runningGravityRef[kGravityRefCount + 1];
 static CircularBuffer_t runningGravityRefBuffer;
 
-static float gyroBuff[kGyroRefCount];
 static float gyroXRefBack[kGyroRefCount + 1];
 static CircularBuffer_t gyroXRefBuffer;
 static float gyroXOffset;
@@ -181,82 +180,63 @@ static void filterGyros(SensorData_t* curSensorVals) {
   memcpy(imu1_data, &curSensorVals->imu1_gyro_x, 3 * sizeof(double));
   double imu2_data[3] = {0};
   memcpy(imu2_data, &curSensorVals->imu2_gyro_x, 3 * sizeof(double));
-  static float gyro[3];
-  gyro[0] = filterGyroOneAxis(
-                getSensorAxis(AXIS_X, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
-                getSensorAxis(AXIS_X, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
-                status[IMU1], status[IMU2]) -
-            gyroXOffset;
+  filterData.gyr_x =
+      filterGyroOneAxis(
+          getSensorAxis(AXIS_X, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
+          getSensorAxis(AXIS_X, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
+          status[IMU1], status[IMU2]) -
+      gyroXOffset;
 
-  gyro[1] = filterGyroOneAxis(
-                getSensorAxis(AXIS_Y, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
-                getSensorAxis(AXIS_Y, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
-                status[IMU1], status[IMU2]) -
-            gyroYOffset;
+  filterData.gyr_y =
+      filterGyroOneAxis(
+          getSensorAxis(AXIS_Y, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
+          getSensorAxis(AXIS_Y, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
+          status[IMU1], status[IMU2]) -
+      gyroYOffset;
 
-  gyro[2] = filterGyroOneAxis(
-                getSensorAxis(AXIS_Z, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
-                getSensorAxis(AXIS_Z, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
-                status[IMU1], status[IMU2]) -
-            gyroZOffset;
+  filterData.gyr_z =
+      filterGyroOneAxis(
+          getSensorAxis(AXIS_Z, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
+          getSensorAxis(AXIS_Z, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
+          status[IMU1], status[IMU2]) -
+      gyroZOffset;
 
-  orientationEstimator.update(gyro);
+  orientationEstimator.update(filterData.gyr_x, filterData.gyr_y,
+                              filterData.gyr_z);
+
   //  Copy quaternion to filter data
-
-  filterData.gyr_x = gyro[0];
-  filterData.gyr_y = gyro[1];
-  filterData.gyr_z = gyro[2];
-
+  filterData.qw = orientationEstimator.q(0, 0);
   filterData.qx = orientationEstimator.q(1, 0);
   filterData.qy = orientationEstimator.q(2, 0);
   filterData.qz = orientationEstimator.q(3, 0);
-  filterData.qw = orientationEstimator.q(0, 0);
+}
+
+void updateGyroOffsetOneAxis(CircularBuffer_t* refBuffer, const float& newValue,
+                             float* offset) {
+  uint8_t i;
+  float gyroSum = 0;
+  static float referenceBuffer[kGyroRefCount];
+  if (cbFull(refBuffer)) {
+    cbDequeue(refBuffer, 1);
+  }
+  cbEnqueue(refBuffer, &newValue);
+  cbPeek(refBuffer, referenceBuffer, nullptr);
+
+  for (i = 0; i < cbCount(refBuffer); ++i) {
+    gyroSum += referenceBuffer[i];
+  }
+
+  *offset = gyroSum / (float)cbCount(refBuffer);
 }
 
 void filterAddGyroRef() {
-  uint8_t i;
-  float gyroSum = 0;
   static float noOffset;
-
-  if (cbFull(&gyroXRefBuffer)) {
-    cbDequeue(&gyroXRefBuffer, 1);
-  }
   noOffset = filterData.gyr_x + gyroXOffset;
-  cbEnqueue(&gyroXRefBuffer, &noOffset);
-  cbPeek(&gyroXRefBuffer, gyroBuff, nullptr);
-
-  for (i = 0; i < cbCount(&gyroXRefBuffer); ++i) {
-    gyroSum += gyroBuff[i];
-  }
-
-  gyroXOffset = gyroSum / (float)cbCount(&gyroXRefBuffer);
-  gyroSum = 0;
-
-  if (cbFull(&gyroYRefBuffer)) {
-    cbDequeue(&gyroYRefBuffer, 1);
-  }
-
+  updateGyroOffsetOneAxis(&gyroXRefBuffer, noOffset, &gyroXOffset);
   noOffset = filterData.gyr_y + gyroYOffset;
-  cbEnqueue(&gyroYRefBuffer, &noOffset);
-  cbPeek(&gyroYRefBuffer, gyroBuff, nullptr);
-  for (i = 0; i < cbCount(&gyroYRefBuffer); ++i) {
-    gyroSum += gyroBuff[i];
-  }
-
-  gyroYOffset = gyroSum / (float)cbCount(&gyroYRefBuffer);
-  gyroSum = 0;
-
-  if (cbFull(&gyroZRefBuffer)) {
-    cbDequeue(&gyroZRefBuffer, 1);
-  }
+  updateGyroOffsetOneAxis(&gyroYRefBuffer, noOffset, &gyroYOffset);
   noOffset = filterData.gyr_z + gyroZOffset;
-  cbEnqueue(&gyroZRefBuffer, &noOffset);
-  cbPeek(&gyroZRefBuffer, gyroBuff, nullptr);
-  for (i = 0; i < cbCount(&gyroZRefBuffer); ++i) {
-    gyroSum += gyroBuff[i];
-  }
-
-  gyroZOffset = gyroSum / (float)cbCount(&gyroZRefBuffer);
+  updateGyroOffsetOneAxis(&gyroZRefBuffer, noOffset, &gyroZOffset);
 }
 
 static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {

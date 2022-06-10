@@ -59,6 +59,11 @@ void filterAddPressureRef(double currentPres);
 
 void filterAddGravityRef();
 
+/**
+ * @brief Adds a reference angular velocity reading from all gyroscopes
+ * Used to calculate zero offset to correctly bias the gyroscopes
+ */
+
 void filterAddGyroRef();
 
 /**
