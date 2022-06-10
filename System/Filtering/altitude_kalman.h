@@ -160,7 +160,7 @@ class AltitudeKalman {
 
   // Project our state estimate x forward in time by one timestep
   // See above, but this does x_new = Ax_old + Bu
-  void Predict(const double ax);
+  void Predict(const double az);
 
   // Correct our estimate by sorta "nudging it a bit" towards where
   // we measured ourselves to actually be

@@ -2,13 +2,13 @@
 
 AltitudeKalman::AltitudeKalman(double dt) : m_dt(dt) {}
 
-void AltitudeKalman::Predict(const double ax) {
+void AltitudeKalman::Predict(const double az) {
   // x_k+1 = A x_k + B u_k
   // x_k+1 = [pos] = [old pos + vel * m_dt] + [1/2 acceleration m_dt^2]
   //         [vel]   [old vel           ]   [acceleration * m_dt    ]
   xHat.estimatedAltitude +=
-      xHat.estimatedVelocity * m_dt + 1 / 2 * ax * m_dt * m_dt;
-  xHat.estimatedVelocity += ax * m_dt;
+      xHat.estimatedVelocity * m_dt + 1 / 2 * az * m_dt * m_dt;
+  xHat.estimatedVelocity += az * m_dt;
 }
 
 void AltitudeKalman::Correct(const double baroAltitude,

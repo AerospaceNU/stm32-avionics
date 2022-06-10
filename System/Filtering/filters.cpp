@@ -151,21 +151,21 @@ static void filterAccels(SensorData_t* curSensorVals,
   double high_g_data[3] = {0};
   memcpy(high_g_data, &curSensorVals->high_g_accel_x, 3 * sizeof(double));
 
-  filterData.acc_x = (filterAccelOneAxis(
+  filterData.rocket_acc_x = (filterAccelOneAxis(
       getSensorAxis(AXIS_X, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
       getSensorAxis(AXIS_X, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
       getSensorAxis(AXIS_X, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
       sensorProperties, status[IMU1], status[IMU2],
       status[HIGH_G_ACCELEROMETER]));
 
-  filterData.acc_y = (filterAccelOneAxis(
+  filterData.rocket_acc_y = (filterAccelOneAxis(
       getSensorAxis(AXIS_Y, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
       getSensorAxis(AXIS_Y, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
       getSensorAxis(AXIS_Y, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
       sensorProperties, status[IMU1], status[IMU2],
       status[HIGH_G_ACCELEROMETER]));
 
-  filterData.acc_z = (filterAccelOneAxis(
+  filterData.rocket_acc_z = (filterAccelOneAxis(
       getSensorAxis(AXIS_Z, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
       getSensorAxis(AXIS_Z, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
       getSensorAxis(AXIS_Z, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
@@ -264,12 +264,12 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
   // acceleration" is the measured acceleration minus 9.81 (since earth pulls us
   // down). Under parachute it's about zero, since we're about-ish in
   // equilibrium
-  double accx = hasPassedApogee ? 0 : filterData.acc_x - 9.81;
+  double accz = hasPassedApogee ? 0 : filterData.world_acc_z - 9.81;
 
   // TODO check what order these "should" run in. Worst case we're off by one
   // iteration We don't update accelerations till after this, so the z
   // acceleration should still be from the last timestep
-  kalman.Predict(accx);
+  kalman.Predict(accz);
 
   // Only correct if below max speed (above, baro readings untrustworthy)
   if (fabs(kalman.GetXhat().estimatedVelocity) < BARO_MAX_SPEED) {
@@ -278,7 +278,7 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
 
   auto kalmanOutput = kalman.GetXhat();
   filterData.pos_z = kalmanOutput.estimatedAltitude;
-  filterData.vel_x = kalmanOutput.estimatedVelocity;
+  filterData.rocket_vel_x = kalmanOutput.estimatedVelocity;
 }
 
 static double median(double* input, uint8_t count) {
@@ -306,7 +306,7 @@ void filterAddGravityRef() {
   if (cbFull(&runningGravityRefBuffer)) {
     cbDequeue(&runningGravityRefBuffer, 1);
   }
-  cbEnqueue(&runningGravityRefBuffer, &(filterData.acc_x));
+  cbEnqueue(&runningGravityRefBuffer, &(filterData.rocket_acc_x));
 
   cbPeek(&runningGravityRefBuffer, gravityRefBuffer, nullptr);
 
@@ -324,8 +324,9 @@ void filterAddGravityRef() {
 
   // We have a semi-realistic gravity vector, and we know we're in
   // preflight. Reset the orientation estimation to this new gravity vector
-  orientationEstimator.setAccelVector(filterData.acc_x, filterData.acc_y,
-                                      filterData.acc_z);
+  orientationEstimator.setAccelVector(filterData.rocket_acc_x,
+                                      filterData.rocket_acc_y,
+                                      filterData.rocket_acc_z);
 
   // If the sum is negative, we should flip, switch gravity ref and flush
   // buffer
@@ -387,6 +388,23 @@ void filterSetPressureRef(double pres) { presRef = pres; }
 
 double filterGetPressureRef() { return presRef; }
 
+static void filterSetWorldReference() {
+  /*
+   * Data comes in through sensors relative to the board. Other filter functions
+   * convert sensor measurements into the board reference frame. We then also
+   * need to convert this into the world reference frame.
+   */
+
+  // How this works is going to change significantly, so this is a very basic
+  // transform
+  filterData.world_acc_x = filterData.rocket_acc_z;
+  filterData.world_acc_y = filterData.rocket_acc_y;
+  filterData.world_acc_z = filterData.rocket_acc_x;
+  filterData.world_vel_x = filterData.rocket_vel_z;
+  filterData.world_vel_y = filterData.rocket_vel_y;
+  filterData.world_vel_z = filterData.rocket_vel_x;
+}
+
 void filterApplyData(SensorData_t* curSensorVals,
                      SensorProperties_t* sensorProperties,
                      bool hasPassedApogee) {
@@ -396,6 +414,8 @@ void filterApplyData(SensorData_t* curSensorVals,
   filterPositionZ(curSensorVals, hasPassedApogee);
 
   filterAccels(curSensorVals, sensorProperties);
+
+  filterSetWorldReference();
 
   filterGyros(curSensorVals);
 }

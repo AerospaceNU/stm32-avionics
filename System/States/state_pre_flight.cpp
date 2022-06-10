@@ -77,7 +77,7 @@ EndCondition_t PreFlightState::run() {
 
   // Detect launch by looking for accel and z position difference thresholds
   // Either we should have large enough acceleration
-  if (filterData->acc_x > kLaunchAccelThreshold) {
+  if (filterData->rocket_acc_x > kLaunchAccelThreshold) {
     if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
       return EndCondition_t::Launch;
     }
