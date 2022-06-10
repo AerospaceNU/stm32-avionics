@@ -54,18 +54,21 @@ void RadioManager_tick() {
 }
 
 void RadioManager_send_internal() {
-  if (true) {
-    HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
-                 RADIO_PACKET_SIZE);
-  } else {
-    static RecievedPacket_t packet;
-    packet.crc = true;
-    packet.lqi = 1;
-    packet.rssi = 1;
-    packet.radioId = TELEMETRY_RADIO;
-    memcpy(packet.data, &transmitPacket, RADIO_PACKET_SIZE);
-    HM_UsbTransmit((uint8_t *)&packet, sizeof(packet));
-  }
+#ifdef TELEMETRY_RADIO
+  // if (true) {
+  HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket, RADIO_PACKET_SIZE);
+  /*
+   } else {
+     static RecievedPacket_t packet;
+     packet.crc = true;
+     packet.lqi = 1;
+     packet.rssi = 1;
+     packet.radioId = TELEMETRY_RADIO;
+     memcpy(packet.data, &transmitPacket, RADIO_PACKET_SIZE);
+     HM_UsbTransmit((uint8_t *)&packet, sizeof(packet));
+   }
+   */
+#endif
 }
 
 void RadioManager_addMessageCallback(RadioCallback_t callback) {
