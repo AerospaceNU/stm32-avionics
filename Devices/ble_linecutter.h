@@ -15,6 +15,8 @@
 
 #define LINE_CUTTER_CB_SIZE 512
 
+typedef void (*LineCutterForwardStringCb)(uint8_t *, size_t);
+
 typedef struct {
   // The address assigned by the FCB bluetooth chip
   uint8_t address;
@@ -38,10 +40,12 @@ typedef struct {
   // The timestamp when we last sent a request
   // 0 if it's been acked
   uint32_t lastRequestTimestamp;
+
+  LineCutterForwardStringCb stringCallback;
 } LineCutterCtrl_t;
 
 void LineCutter_Init(LineCutterCtrl_t *lineCutter, BluetoothInterface_t *ble,
-                     uint8_t address);
+                     uint8_t address, LineCutterForwardStringCb stringCb);
 void LineCutter_Parse(LineCutterCtrl_t *cutter, uint16_t len, uint8_t *arr);
 void LineCutter_Tick(LineCutterCtrl_t *lineCutter);
 

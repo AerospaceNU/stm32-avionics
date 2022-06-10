@@ -113,16 +113,17 @@ void LineCutter_Parse(LineCutterCtrl_t *cutter, uint16_t len, uint8_t *arr) {
     if (success) cutter->lastRequestTimestamp = 0;
   } else {
     // Otherwise, we got a string -- we should just send it over radio
-#ifdef TELEMETRY_RADIO
-    RadioManager_transmitString(TELEMETRY_RADIO, (uint8_t *)arr, len);
-#endif
+    if (cutter->stringCallback) {
+      cutter->stringCallback((uint8_t *)arr, len);
+    }
   }
 }
 
 void LineCutter_Init(LineCutterCtrl_t *lineCutter, BluetoothInterface_t *ble,
-                     uint8_t address) {
+                     uint8_t address, LineCutterForwardStringCb stringCb) {
   lineCutter->ble = ble;
   lineCutter->address = address;
+  lineCutter->stringCallback = stringCb;
 
   cbInit(&lineCutter->buffer, lineCutter->packetArray, LINE_CUTTER_CB_SIZE,
          sizeof(uint8_t));

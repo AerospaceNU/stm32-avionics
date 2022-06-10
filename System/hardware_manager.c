@@ -407,7 +407,8 @@ void HM_HardwareInit() {
   BleConsole_Init(&bleConsole, &ble, ADDR_PHONE);
 
   for (int i = 0; i < NUM_LINE_CUTTERS; i++) {
-    LineCutter_Init(&lineCutterArray[i], &ble, ADDR_CUTTER1 + i);
+    LineCutter_Init(&lineCutterArray[i], &ble, ADDR_CUTTER1 + i,
+                    RadioManager_transmitStringDefault);
   }
 
 #endif

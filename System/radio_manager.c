@@ -219,3 +219,9 @@ void RadioManager_transmitString(Hardware_t radio, uint8_t *data, size_t len) {
     data += txLen;
   }
 }
+
+void RadioManager_transmitStringDefault(uint8_t *data, size_t len) {
+#ifdef TELEMETRY_RADIO
+  RadioManager_transmitString(TELEMETRY_RADIO, data, len);
+#endif
+}
