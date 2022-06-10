@@ -183,6 +183,7 @@ bool HM_LineCuttersSendCut(int chan);
 /* Outputs */
 void HM_PyroFire(int channel, uint32_t duration);
 void HM_PyroUpdate();
+void HM_CameraPyroSet(bool on);
 
 /* Sensor functions */
 

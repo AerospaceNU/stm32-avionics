@@ -152,6 +152,7 @@ static LineCutterCtrl_t lineCutterArray[NUM_LINE_CUTTERS];
 #ifdef HAS_PYRO
 /* Pyro */
 PyroCtrl_t pyroCtrl[MAX_PYRO];
+PyroCtrl_t cameraPyro;
 #endif
 
 /* Radio */
@@ -420,9 +421,13 @@ void HM_HardwareInit() {
   pyroCtrl[2].port = FIRE3_GPIO_Port;
   pyroCtrl[2].pin = FIRE3_Pin;
 
+  cameraPyro.port = FIRE6_GPIO_Port;
+  cameraPyro.pin = FIRE6_Pin;
+
   Pyro_init(&pyroCtrl[0]);
   Pyro_init(&pyroCtrl[1]);
   Pyro_init(&pyroCtrl[2]);
+  Pyro_init(&cameraPyro);
 #endif
 
 #ifdef HAS_LED_1
@@ -799,6 +804,11 @@ void HM_PyroUpdate() {
     Pyro_tick(&pyroCtrl[i]);
   }
 #endif
+}
+
+void HM_CameraPyroSet(bool on) {
+  HAL_GPIO_WritePin(cameraPyro.port, cameraPyro.pin,
+                    on ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 static void HM_SimReadSensorData() {

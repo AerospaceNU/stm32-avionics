@@ -34,6 +34,9 @@ void PreFlightState::init() {
 
   cli_tasks::ConfigureForGround();
   doCleanup = false;
+
+  // Hack in the camera, which needs to turn on now
+  HM_CameraPyroSet(true);
 }
 
 EndCondition_t PreFlightState::run() {
