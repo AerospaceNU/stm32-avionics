@@ -38,10 +38,12 @@ void OrientationEstimator::setAccelVector(float acc_x, float acc_y,
   this->q = q / q.norm();
 }
 
-void OrientationEstimator::update(float gyr_x, float gyr_y, float gyr_z) {
-  Matrix<4, 4> omega({0.0, -gyr_x, -gyr_y, -gyr_z, gyr_x, 0.0, gyr_z, -gyr_y,
-                      gyr_y, -gyr_z, 0.0, gyr_x, gyr_z, gyr_y, -gyr_x, 0.0});
-  Matrix<3, 1> gyro({gyr_x, gyr_y, gyr_z});
+void OrientationEstimator::update(float ang_vel_x, float ang_vel_y,
+                                  float ang_vel_z) {
+  Matrix<4, 4> omega({0.0, -ang_vel_x, -ang_vel_y, -ang_vel_z, ang_vel_x, 0.0,
+                      ang_vel_z, -ang_vel_y, ang_vel_y, -ang_vel_z, 0.0,
+                      ang_vel_x, ang_vel_z, ang_vel_y, -ang_vel_x, 0.0});
+  Matrix<3, 1> gyro({ang_vel_x, ang_vel_y, ang_vel_z});
 
   volatile float w = gyro.norm();
   Matrix<4, 4> ident = (Matrix<4, 4>::identity() * cos(w * m_dt / 2.0));
