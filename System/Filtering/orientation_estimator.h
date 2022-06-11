@@ -51,25 +51,34 @@ class OrientationEstimator {
 
   /**
    * @brief Sets the estimated orientation based on x, y, and z accelerations
-   * from gravity
-   * Uses formulas from
+   * from gravity.
+   * Accelerations must be in the rocket reference frame, NOT the world
+   * reference frame Uses formulas from
    * https://github.com/Mayitzin/ahrs/blob/87d27880fd903be3762c68000cc5dd41c720200d/ahrs/common/orientation.py#L923
-   * @param acc_x: x acceleration from gravity
-   * @param acc_y: y acceleration from gravity
-   * @param acc_z: z acceleration from gravity
+   * @param rocket_acc_x: x acceleration from gravity in the rocket reference
+   * frame
+   * @param rocket_acc_y: y acceleration from gravity in the rocket reference
+   * frame
+   * @param rocket_acc_z: z acceleration from gravity in the rocket reference
+   * frame
    */
 
-  void setAccelVector(float acc_x, float acc_y, float acc_z);
+  void setAccelVector(float rocket_acc_x, float rocket_acc_y,
+                      float rocket_acc_z);
 
   /**
    * @brief Updates the estimated orientation from given angular rates
    * Uses formulas from
    * https://github.com/Mayitzin/ahrs/blob/87f9210cfcf6c545d86ae8588a93f012020164ee/ahrs/filters/angular.py#L374
-   * @param gyr_x: angular velocity around x axis
-   * @param gyr_y: angular velocity around y axis
-   * @param gyr_z: angular velocity around z axis
+   * @param rocket_gyr_x: angular velocity around x axis in the rocket reference
+   * frame
+   * @param rocket_gyr_y: angular velocity around y axis in the rocket reference
+   * frame
+   * @param rocket_gyr_z: angular velocity around z axis in the rocket reference
+   * frame
    */
-  void update(float gyr_x, float gyr_y, float gyr_z);
+  void update(float rocket_ang_vel_x, float rocket_ang_vel_y,
+              float rocket_ang_vel_z);
 };
 
 #endif  // SYSTEM_FILTERING_ORIENTATION_ESTIMATOR_H_

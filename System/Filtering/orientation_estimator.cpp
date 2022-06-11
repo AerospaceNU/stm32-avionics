@@ -20,14 +20,15 @@ void OrientationEstimator::reset() { this->q = Matrix<4, 1>({1.0, 0, 0, 0}); }
 
 void OrientationEstimator::setDt(double dt) { this->m_dt = dt; }
 
-void OrientationEstimator::setAccelVector(float acc_x, float acc_y,
-                                          float acc_z) {
-  Matrix<3, 1> a({acc_x, acc_y, acc_z});
+void OrientationEstimator::setAccelVector(float rocket_acc_x,
+                                          float rocket_acc_y,
+                                          float rocket_acc_z) {
+  Matrix<3, 1> a({rocket_acc_x, rocket_acc_y, rocket_acc_z});
   float a_norm = a.norm();
   if (!(a_norm > G_THRESHOLD_MIN && a_norm < G_THRESHOLD_MAX)) return;
-  float ax = acc_x / a_norm;
-  float ay = acc_y / a_norm;
-  float az = acc_z / a_norm;
+  float ax = rocket_acc_x / a_norm;
+  float ay = rocket_acc_y / a_norm;
+  float az = rocket_acc_z / a_norm;
   float ex = atan2(ay, az);
   float ey = atan2(-ax, sqrt(pow(ay, 2) + pow(az, 2)));
   float cx2 = cos(ex / 2.0);
@@ -38,12 +39,15 @@ void OrientationEstimator::setAccelVector(float acc_x, float acc_y,
   this->q = q / q.norm();
 }
 
-void OrientationEstimator::update(float ang_vel_x, float ang_vel_y,
-                                  float ang_vel_z) {
-  Matrix<4, 4> omega({0.0, -ang_vel_x, -ang_vel_y, -ang_vel_z, ang_vel_x, 0.0,
-                      ang_vel_z, -ang_vel_y, ang_vel_y, -ang_vel_z, 0.0,
-                      ang_vel_x, ang_vel_z, ang_vel_y, -ang_vel_x, 0.0});
-  Matrix<3, 1> gyro({ang_vel_x, ang_vel_y, ang_vel_z});
+void OrientationEstimator::update(float rocket_ang_vel_x,
+                                  float rocket_ang_vel_y,
+                                  float rocket_ang_vel_z) {
+  Matrix<4, 4> omega(
+      {0.0, -rocket_ang_vel_x, -rocket_ang_vel_y, -rocket_ang_vel_z,
+       rocket_ang_vel_x, 0.0, rocket_ang_vel_z, -rocket_ang_vel_y,
+       rocket_ang_vel_y, -rocket_ang_vel_z, 0.0, rocket_ang_vel_x,
+       rocket_ang_vel_z, rocket_ang_vel_y, -rocket_ang_vel_x, 0.0});
+  Matrix<3, 1> gyro({rocket_ang_vel_x, rocket_ang_vel_y, rocket_ang_vel_z});
 
   volatile float w = gyro.norm();
   Matrix<4, 4> ident = (Matrix<4, 4>::identity() * cos(w * m_dt / 2.0));

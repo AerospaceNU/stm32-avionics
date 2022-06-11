@@ -180,29 +180,30 @@ static void filterGyros(SensorData_t* curSensorVals) {
   memcpy(imu1_data, &curSensorVals->imu1_gyro_x, 3 * sizeof(double));
   double imu2_data[3] = {0};
   memcpy(imu2_data, &curSensorVals->imu2_gyro_x, 3 * sizeof(double));
-  filterData.ang_vel_x =
+  filterData.rocket_ang_vel_x =
       filterGyroOneAxis(
           getSensorAxis(AXIS_X, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
           getSensorAxis(AXIS_X, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
           status[IMU1], status[IMU2]) -
       gyroXOffset;
 
-  filterData.ang_vel_y =
+  filterData.rocket_ang_vel_y =
       filterGyroOneAxis(
           getSensorAxis(AXIS_Y, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
           getSensorAxis(AXIS_Y, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
           status[IMU1], status[IMU2]) -
       gyroYOffset;
 
-  filterData.ang_vel_z =
+  filterData.rocket_ang_vel_z =
       filterGyroOneAxis(
           getSensorAxis(AXIS_Z, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
           getSensorAxis(AXIS_Z, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
           status[IMU1], status[IMU2]) -
       gyroZOffset;
 
-  orientationEstimator.update(filterData.ang_vel_x, filterData.ang_vel_y,
-                              filterData.ang_vel_z);
+  orientationEstimator.update(filterData.rocket_ang_vel_x,
+                              filterData.rocket_ang_vel_y,
+                              filterData.rocket_ang_vel_z);
 
   //  Copy quaternion to filter data
   filterData.qw = orientationEstimator.q(0, 0);
@@ -231,11 +232,11 @@ void updateGyroOffsetOneAxis(CircularBuffer_t* refBuffer, const float& newValue,
 
 void filterAddGyroRef() {
   static float noOffset;
-  noOffset = filterData.ang_vel_x + gyroXOffset;
+  noOffset = filterData.rocket_ang_vel_x + gyroXOffset;
   updateGyroOffsetOneAxis(&gyroXRefBuffer, noOffset, &gyroXOffset);
-  noOffset = filterData.ang_vel_y + gyroYOffset;
+  noOffset = filterData.rocket_ang_vel_y + gyroYOffset;
   updateGyroOffsetOneAxis(&gyroYRefBuffer, noOffset, &gyroYOffset);
-  noOffset = filterData.ang_vel_z + gyroZOffset;
+  noOffset = filterData.rocket_ang_vel_z + gyroZOffset;
   updateGyroOffsetOneAxis(&gyroZRefBuffer, noOffset, &gyroZOffset);
 }
 

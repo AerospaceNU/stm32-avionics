@@ -29,9 +29,9 @@ typedef struct {
   double world_acc_x;
   double world_acc_y;
   double world_acc_z;
-  float ang_vel_x;
-  float ang_vel_y;
-  float ang_vel_z;
+  float rocket_ang_vel_x;
+  float rocket_ang_vel_y;
+  float rocket_ang_vel_z;
   double qx;
   double qy;
   double qz;
