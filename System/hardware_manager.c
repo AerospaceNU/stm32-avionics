@@ -808,8 +808,10 @@ void HM_PyroUpdate() {
 }
 
 void HM_CameraPyroSet(bool on) {
+#ifdef HAS_CAMERA
   HAL_GPIO_WritePin(cameraPyro.port, cameraPyro.pin,
                     on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+#endif
 }
 
 static void HM_SimReadSensorData() {
