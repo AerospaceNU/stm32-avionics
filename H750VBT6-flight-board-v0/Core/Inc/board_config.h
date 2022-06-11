@@ -48,6 +48,8 @@ typedef struct {
 extern Orientation_t IMU1_ACCEL_BOARD_TO_LOCAL[3];
 extern Orientation_t IMU2_ACCEL_BOARD_TO_LOCAL[3];
 extern Orientation_t HIGH_G_ACCEL_BOARD_TO_LOCAL[3];
+extern Orientation_t IMU1_GYRO_BOARD_TO_LOCAL[3];
+extern Orientation_t IMU2_GYRO_BOARD_TO_LOCAL[3];
 /*
  * Baro Types: (up to 2 baros)
  */

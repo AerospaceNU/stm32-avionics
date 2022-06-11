@@ -17,12 +17,21 @@ typedef struct {
   double pos_x;
   double pos_y;
   double pos_z;
-  double vel_x;
-  double vel_y;
-  double vel_z;
-  double acc_x;
-  double acc_y;
-  double acc_z;
+  double rocket_vel_x;
+  double rocket_vel_y;
+  double rocket_vel_z;
+  double rocket_acc_x;
+  double rocket_acc_y;
+  double rocket_acc_z;
+  double world_vel_x;
+  double world_vel_y;
+  double world_vel_z;
+  double world_acc_x;
+  double world_acc_y;
+  double world_acc_z;
+  float rocket_ang_vel_x;
+  float rocket_ang_vel_y;
+  float rocket_ang_vel_z;
   double qx;
   double qy;
   double qz;
@@ -55,6 +64,13 @@ void filterAddPressureRef(double currentPres);
  */
 
 void filterAddGravityRef();
+
+/**
+ * @brief Adds a reference angular velocity reading from all gyroscopes
+ * Used to calculate zero offset to correctly bias the gyroscopes
+ */
+
+void filterAddGyroRef();
 
 /**
  * @brief Sets reference pressure used for converting pressure to altitude

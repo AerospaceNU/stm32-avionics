@@ -24,6 +24,7 @@ void cli_tasks::cliPyroFire() {
 
     // Send success ack to CLI
     cliSendAck(true, nullptr);
+    return;
   }
   cliSendAck(false, "You must specify a pyro number to fire with -p");
 }
