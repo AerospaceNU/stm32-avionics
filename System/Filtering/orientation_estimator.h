@@ -70,11 +70,11 @@ class OrientationEstimator {
    * @brief Updates the estimated orientation from given angular rates
    * Uses formulas from
    * https://github.com/Mayitzin/ahrs/blob/87f9210cfcf6c545d86ae8588a93f012020164ee/ahrs/filters/angular.py#L374
-   * @param rocket_gyr_x: angular velocity around x axis in the rocket reference
+   * @param rocket_ang_vel_x: angular velocity around x axis in the rocket reference
    * frame
-   * @param rocket_gyr_y: angular velocity around y axis in the rocket reference
+   * @param rocket_ang_vel_y: angular velocity around y axis in the rocket reference
    * frame
-   * @param rocket_gyr_z: angular velocity around z axis in the rocket reference
+   * @param rocket_ang_vel_z: angular velocity around z axis in the rocket reference
    * frame
    */
   void update(float rocket_ang_vel_x, float rocket_ang_vel_y,
