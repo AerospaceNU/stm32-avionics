@@ -13,6 +13,7 @@
 #include <initializer_list>
 
 #include "board_config.h"
+#include HAL_HEADER
 
 // Board config needs to be above arm_math to include the hal header first
 #include "arm_math.h"
