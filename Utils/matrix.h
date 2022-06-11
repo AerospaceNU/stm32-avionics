@@ -8,14 +8,11 @@
 #ifndef UTILS_MATRIX_H_
 #define UTILS_MATRIX_H_
 
-#define ARM_MATH_CM7
+#include <string.h>
 
 #include <initializer_list>
 
 #include "board_config.h"
-
-// Board config needs to be above arm_math to include the hal header first
-#include "arm_math.h"
 
 /**
  * @brief Holds an arm matrix internally, with wrappers for common operations.
@@ -26,12 +23,11 @@
 template <int Rows, int Cols>
 class Matrix {
  public:
-  arm_matrix_instance_f32 m_matrix{};
-  float32_t m_backingArray[Rows * Cols] = {0};
+  float m_backingArray[Rows * Cols] = {0};
   /**
    * @brief Constructs a zero-valued matrix
    */
-  Matrix() { arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray); }
+  Matrix() {}
 
   /**
    * @brief Constructs a zero-valued matrix
@@ -44,7 +40,6 @@ class Matrix {
     static_assert(N == Rows * Cols,
                   "Array must be the same length as the matrix!");
     memcpy(m_backingArray, list, Rows * Cols * sizeof(float));
-    arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray);
   }
 
   /**
@@ -184,9 +179,13 @@ class Matrix {
    */
   Matrix<Rows, Cols> inverse() {
     static_assert(Rows == Cols, "Matrix must be square to invert!");
-    Matrix<Rows, Cols> ret = {};
-    arm_mat_inverse_f32(&(this->m_matrix), &(ret.m_matrix));
-    return ret;
+    float rev[Cols][Rows];
+    for (int row = 0; row < Rows; ++row) {
+      for (int col = 0; col < Cols; ++col) {
+        rev[col][row] = m_backingArray[row * col + col];
+      }
+    }
+    return new Matrix<Cols, Rows>(rev);
   }
 
   /**
@@ -195,8 +194,11 @@ class Matrix {
    */
   float norm() {
     static_assert(Rows == 1 || Cols == 1, "Must be a 1D-vector");
-    float square_sum;
-    arm_power_f32(m_backingArray, Rows == 1 ? Cols : Rows, &square_sum);
+    float square_sum = 0;
+    for (int elem = 0; elem < (Rows == 1 ? Cols : Rows); elem++) {
+      square_sum += pow(m_backingArray[elem], 2);
+    }
+
     return sqrt(square_sum);
   }
 
@@ -211,7 +213,6 @@ class Matrix {
       ident[i][i] = 1.0;
     }
     memcpy(ret.m_backingArray, &ident, sizeof(ident));
-    arm_mat_init_f32(&(ret.m_matrix), Rows, Rows, ret.m_backingArray);
     return ret;
   }
 
@@ -233,19 +234,18 @@ class Matrix {
    */
   static Matrix<Rows, Cols> zeroes() {
     Matrix<Rows, Cols> ret = {};
-    float32_t zeroes[Rows][Cols] = {0.0};
+    float zeroes[Rows][Cols] = {0.0};
     memcpy(ret.m_backingArray, &zeroes, sizeof(zeroes));
-    arm_mat_init_f32(ret.m_matrix, Rows, Cols, ret.m_backingArray);
     return ret;
   }
 
   /**
    * @brief Calculate elementwise cosine of the values in the given matrix
    */
-  static Matrix<Rows, Cols> cos(const Matrix<Rows, Cols> &start) {
-    float32_t values[Rows * Cols] = {0};
+  static Matrix<Rows, Cols> mCos(const Matrix<Rows, Cols> &start) {
+    float values[Rows * Cols] = {0};
     for (int i = 0; i < Rows * Cols; ++i) {
-      values[i] = arm_cos_f32(start.m_backingArray[i]);
+      values[i] = cos(start.m_backingArray[i]);
     }
     return Matrix<Rows, Cols>(values);
   }
@@ -253,10 +253,10 @@ class Matrix {
   /**
    * @brief Calculate elementwise sine of the values in the given matrix
    */
-  static Matrix<Rows, Cols> sin(const Matrix<Rows, Cols> &start) {
-    float32_t values[Rows * Cols] = {0};
+  static Matrix<Rows, Cols> mSin(const Matrix<Rows, Cols> &start) {
+    float values[Rows * Cols] = {0};
     for (int i = 0; i < Rows * Cols; ++i) {
-      values[i] = arm_sin_f32(start.m_backingArray[i]);
+      values[i] = sin(start.m_backingArray[i]);
     }
     return Matrix<Rows, Cols>(values);
   }
