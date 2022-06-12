@@ -185,7 +185,7 @@ class Matrix {
         rev[col][row] = m_backingArray[row * col + col];
       }
     }
-    return new Matrix<Cols, Rows>(rev);
+    return Matrix<Cols, Rows>(rev);
   }
 
   /**
