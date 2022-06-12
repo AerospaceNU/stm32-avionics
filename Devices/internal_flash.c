@@ -6,11 +6,12 @@
 
 #include <string.h>
 
-#include "board_config.h"
-
 #define FLASH_TIMEOUT_VALUE 50000U /* 50 s */
 #define FLASH_BYTE_INCREMENT 32
 #define ERASED 0xFF
+
+#include "board_config.h"
+#include HAL_HEADER
 
 /**
  * @brief  Duplicate of HAL_FLASH_Program but without checking for a valid flash

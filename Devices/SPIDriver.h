@@ -9,6 +9,7 @@
 #define DEVICES_SPIDRIVER_H_
 
 #include "board_config.h"
+#include HAL_HEADER
 
 #ifdef __cplusplus
 extern "C" {

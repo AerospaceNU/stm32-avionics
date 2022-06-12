@@ -29,7 +29,9 @@ static CliOptionVals_t cliOptionVals = {.p = NULL,
                                         .t = NULL,
                                         .f = NULL,
                                         .A = false,
-                                        .h = false};
+                                        .h = false,
+                                        .lcCmd = NULL,
+                                        .lcId = NULL};
 
 static int primaryCommand = 0;
 
@@ -43,6 +45,7 @@ static struct option longOptions[] = {
     {"sim", no_argument, &primaryCommand, SIM},
     {"sense", no_argument, &primaryCommand, SENSE},
     {"pyrofire", no_argument, &primaryCommand, PYROFIRE},
+    {"linecutter", no_argument, &primaryCommand, LINECUTTER},
     {0, 0, 0, 0}};
 
 static CliConfigs_t cliConfigs;
@@ -136,14 +139,35 @@ CliCommand_t cliParse(CliComms_t commsType) {
   char* argv[MAX_ARGS] = {0};
   argv[0] = "F";  // Fake application name
   int argc = 1;
+
   char* token = strtok(inputBuffer, " ");
-  while (token != NULL) {
-    if (argc >= MAX_ARGS) {
-      break;
-    }
+
+  bool isInString = false;  // Keeps track of whether it should delimit by " or
+                            // by space. Default is by space
+
+  while (token != NULL && argc < MAX_ARGS) {
     argv[argc] = token;
     argc++;
-    token = strtok(NULL, " ");
+
+    int tokenLength = strnlen(token, inputBuffer - token);
+
+    if (!isInString) {
+      if (*(token + tokenLength + 1) == '\"')
+        isInString =
+            true;  // If next token starts with a ", set isInString to true
+    } else {
+      if (*(token + tokenLength - 1) == '\"')
+        isInString =
+            false;  // If current token ends with a ", set isInString to false
+    }
+
+    if (isInString) {
+      token = strtok(token + tokenLength + 2,
+                     "\"");  // Delimits tokens by " instead of by space, skips
+                             // past open quote
+    } else {
+      token = strtok(NULL, " ");
+    }
   }
 
   // Parse buffer in loop with getopt
@@ -151,7 +175,7 @@ CliCommand_t cliParse(CliComms_t commsType) {
   int optionIndex = 0;
   optind = 0;
   primaryCommand = NONE;
-  while ((opt = getopt_long(argc, argv, "p:H:D:e:t:f:c:Ah", longOptions,
+  while ((opt = getopt_long(argc, argv, "p:H:D:e:t:f:c:i:Ah", longOptions,
                             &optionIndex)) != -1) {
     switch (opt) {
       case 0:
@@ -164,6 +188,8 @@ CliCommand_t cliParse(CliComms_t commsType) {
         cliOptionVals.t = NULL;
         cliOptionVals.h = false;
         cliOptionVals.c = NULL;
+        cliOptionVals.lcCmd = NULL;
+        cliOptionVals.lcId = NULL;
         break;
       case 'f':
         if (primaryCommand == OFFLOAD) {
@@ -209,8 +235,18 @@ CliCommand_t cliParse(CliComms_t commsType) {
         // Radio channel
         if (primaryCommand == CONFIG) {
           cliOptionVals.c = optarg;
+        } else if (primaryCommand == LINECUTTER) {
+          cliOptionVals.lcCmd = optarg;
         }
         break;
+
+      // Line cutter ID
+      case 'i':
+        if (primaryCommand == LINECUTTER) {
+          cliOptionVals.lcId = optarg;
+        }
+        break;
+
       default:
         break;
     }
@@ -234,13 +270,12 @@ CliCommand_t cliParse(CliComms_t commsType) {
 
 void cliSend(const char* msg) {
   switch (lastCommsType) {
-    case CLI_BLUETOOTH:
-      HM_BluetoothSend((uint8_t*)msg, (uint16_t)strlen(msg));
+    case CLI_PHONE:
+      HM_BluetoothSend(ADDR_PHONE, (uint8_t*)msg, (uint16_t)strlen(msg));
       break;
     case CLI_RADIO:
 #ifdef TELEMETRY_RADIO
       RadioManager_transmitString(TELEMETRY_RADIO, (uint8_t*)msg, strlen(msg));
-
 #endif
       break;
     case CLI_USB:
@@ -280,7 +315,7 @@ CliOptionVals_t cliGetOptions() { return cliOptionVals; }
 
 CircularBuffer_t* cliGetRxBufferFor(CliComms_t source) {
   switch (source) {
-    case CLI_BLUETOOTH:
+    case CLI_PHONE:
       return NULL;
     case CLI_RADIO:
       return &radioRxCircBuffer;

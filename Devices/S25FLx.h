@@ -14,6 +14,8 @@ extern "C" {
 
 #include "board_config.h"
 
+#include HAL_HEADER
+
 // #define USE_S25FLx_DMA
 // NOTE: DMA is not yet functional. Leave the define commented and remove this
 // comment when DMA works

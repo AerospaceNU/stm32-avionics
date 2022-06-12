@@ -2,6 +2,8 @@
 #define DEVICES_GPS_H_
 
 #include "board_config.h"
+#include HAL_HEADER
+
 #include "minmea.h"
 #include "stdbool.h"
 #include "string.h"

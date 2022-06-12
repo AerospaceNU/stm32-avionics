@@ -25,6 +25,9 @@ class DescentState : public FlightState {
   uint32_t transitionResetTimer = 0;
 
   double altitude = 0;
+
+  bool sentCut1 = false;
+  bool sentCut2 = false;
 };
 
 #ifdef __cplusplus

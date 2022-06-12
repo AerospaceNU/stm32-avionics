@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Clang-format
-for file in $(find Devices System Utils -type f)
+for file in $(find Devices System Utils -type f -iregex '.*\.\(h\|c\|cpp\)')
 do
 	clang-format --dry-run --Werror $file
         if [ $? -ne 0 ];

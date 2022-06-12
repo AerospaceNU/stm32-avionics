@@ -6,6 +6,7 @@
 #define DEVICES_HAL_CALLBACKS_H_
 
 #include "board_config.h"
+#include HAL_HEADER
 
 #ifdef HAS_SPI
 void register_HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi,
@@ -27,6 +28,9 @@ void register_HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart,
                                           void *userData);
 void register_HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,
                                       void (*callback)(void *), void *userData);
+void register_HAL_UART_RxIdleCallback(UART_HandleTypeDef *huart,
+                                      void (*callback)(void *, size_t),
+                                      void *userData);
 #endif
 
 #endif  // DEVICES_HAL_CALLBACKS_H_

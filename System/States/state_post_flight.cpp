@@ -15,6 +15,9 @@ void PostFlightState::init() {
   // state
   state_log_write_complete();
   lastSimDataTime = HM_Millis();
+
+  // Turn off the camera
+  HM_CameraPyroSet(false);
 }
 
 EndCondition_t PostFlightState::run() {

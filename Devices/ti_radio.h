@@ -15,6 +15,7 @@ extern "C" {
 #include <stdbool.h>
 
 #include "board_config.h"
+#include HAL_HEADER
 #include "circular_buffer.h"
 #include "data_structures.h"
 #include "radioconfig/smartrf_registersettings.h"

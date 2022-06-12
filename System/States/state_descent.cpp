@@ -12,6 +12,9 @@ void DescentState::init() {
   transitionResetTimer = HM_Millis();
   altitude = 0;
   state_log_write(this->getID());
+
+  sentCut1 = false;
+  sentCut2 = false;
 }
 
 EndCondition_t DescentState::run() {
@@ -19,6 +22,18 @@ EndCondition_t DescentState::run() {
   SensorData_t* sensorData = HM_GetSensorData();
   FilterData_t* filterData = filterGetData();
   data_log_write(sensorData, filterData, this->getID());
+
+  // TODO this logic does NOT belong here!
+
+  // If below X meters, disreef
+  if (filterData->pos_z < 400 && !sentCut1) {
+    HM_LineCuttersSendCut(1);
+    sentCut1 = true;
+  }
+  if (filterData->pos_z < 200 && !sentCut2) {
+    HM_LineCuttersSendCut(2);
+    sentCut2 = true;
+  }
 
   // Reset touchdown threshold counter if recent change in z position is large
   // enough

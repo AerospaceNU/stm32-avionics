@@ -54,13 +54,7 @@ PositionPacket_t;
 
 // Line cutter (x2)
 #define TELEMETRY_ID_LINECUTTER 4
-PACKED_STRUCT {
-  uint8_t lineCutterNumber, state;
-  uint16_t battSense, cutSense1, cutSense2, currentSense, photoresistor;
-  uint32_t timestamp, pressure;
-  float altitude, avgAltitude, deltaAltitude, avgDeltaAltitude, temperature,
-      accelX, accelY, accelZ;
-}
+PACKED_STRUCT { LineCutterData_t data; }
 LineCutterPacket_t;
 
 // Uplinked string (not necessarily null-terminated)
@@ -85,11 +79,17 @@ PACKED_STRUCT {
 }
 PyroInfoPacket_t;
 
+// Line cutter (x2)
+#define TELEMETRY_ID_LINECUTTER_VARS 8
+PACKED_STRUCT { LineCutterFlightVars_t data; }
+LineCutterVarsPacket_t;
+
 typedef union {
   PropulsionPacket_t propStuff;
   OrientationPacket_t orientation;
   PositionPacket_t positionData;
   LineCutterPacket_t lineCutter;
+  LineCutterVarsPacket_t lineCutterFlightVars;
   CliStringPacket_t cliString;
   AltInfoPacket_t altitudeInfo;
   PyroInfoPacket_t pyroInfo;
@@ -112,6 +112,7 @@ typedef struct {
   uint32_t orientationLastSent;
   uint32_t positionLastSent;
   uint32_t lineCutterLastSent;
+  uint32_t lineCutterVarsLastSent;
   uint32_t altInfoLastSent;
   uint32_t pyroInfoLastSent;
   uint32_t cliStringLastSent;
@@ -138,6 +139,7 @@ void RadioManager_transmitData(SensorData_t* sensorData,
 // Send a string over CLI
 // Note that this BLOCKS for up to 150ms!!
 void RadioManager_transmitString(Hardware_t radio, uint8_t* data, size_t len);
+void RadioManager_transmitStringDefault(uint8_t* data, size_t len);
 
 void RadioManager_addMessageCallback(RadioCallback_t callback);
 
