@@ -12,8 +12,11 @@ int main(int argC, char**argv) {
         printf("Running with output file %s, ext flash %s, int flash %s\n",
             output_file.c_str(), ext_flash_path.c_str(), int_flash_path.c_str());
     } else {
-        printf("Must have 3 args! Eg ./desktop_sim path/to/flight.csv external_flash.dat internal_flash.dat\n");
-        return 1;
+        output_file = "/mnt/d/Documents/GitHub/pyqt_groundstation/output/LDRS-beanboozler-l265-output-post.csv";
+        ext_flash_path = "external_flash.dat";
+        int_flash_path = "internal_flash.dat";
+        // printf("Must have 3 args! Eg ./desktop_sim path/to/flight.csv external_flash.dat internal_flash.dat\n");
+        // return 1;
     }
 
     Scheduler s = Scheduler();

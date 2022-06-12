@@ -28,8 +28,16 @@ set(SYSTEM_FILES_LIST
         States/Cli/state_cli_offload.cpp
         States/Cli/state_cli_temp.cpp
 
+        Tasks/cli/task_cli_config.cpp
+        Tasks/cli/task_cli_help.cpp
+        Tasks/cli/task_cli_linecutter.cpp
+        Tasks/cli/task_cli_main.cpp
+        Tasks/cli/task_cli_pyro.cpp
+        Tasks/cli/task_cli_sense.cpp
+
         Filtering/altitude_kalman.cpp
         Filtering/filters.cpp
+        Filtering/orientation_estimator.cpp
         )
 
 add_library(system ${SYSTEM_FILES_LIST})

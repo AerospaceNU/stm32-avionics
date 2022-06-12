@@ -90,8 +90,29 @@ bool HM_UsbTransmit(uint8_t *data, uint16_t numBytes) {
 
   return true;
 }
-bool HM_BluetoothSend(const uint8_t *data, uint16_t numBytes) { return true; }
+bool HM_BluetoothSend(uint8_t address, const uint8_t* data, uint16_t numBytes) { return true; }
 CircularBuffer_t *HM_UsbGetRxBuffer() { return 0; }
+
+
+LineCutterFlightVars_t *HM_GetLineCutterFlightVariables(
+    BluetoothAddresses_te address) {
+ static LineCutterFlightVars_t vars;
+ return &vars;
+}
+
+void HM_BluetoothTick() { }
+
+void HM_CameraPyroSet(bool on) {
+  printf("Setting camera to %s\n", on ? "ON" : "OFF");
+}
+
+bool HM_LineCuttersSendCut(int chan) {
+  printf("Line cutter cut channel %i commanded\n", chan);
+}
+
+bool HM_LineCutterSendString(int id, char *string) {
+  printf("Setting string %s to Line Cutter %i\n", string, id);
+}
 
 uint32_t HM_Millis() {
   using namespace std::chrono;
