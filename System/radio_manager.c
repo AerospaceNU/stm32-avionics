@@ -130,7 +130,7 @@ void RadioManager_transmitData(SensorData_t *sensorData,
     PositionPacket_t data = {
         sensorData->baro1_temp,
         filterData->pos_z,
-        filterData->rocket_vel_z,
+        filterData->world_vel_z,
         sensorData->gps_lat,
         sensorData->gps_long,
         sensorData->gps_alt,

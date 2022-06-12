@@ -481,9 +481,11 @@ void data_log_load_cli_configs() {
       kCliConfigSize +
       data_log_get_last_packet_type(firstAddress, maxCount, kCliConfigSize);
   *cliConfig = *(CliConfigs_t *)packetBuffer;
+  
   if (packet_is_empty((uint8_t *)cliConfig, kCliConfigSize)) {
     cliSetDefaultConfig();
   }
+
 #ifdef TELEMETRY_RADIO
   // Set the radio channel to be whatever we are using from the cli configs,
   // since we may have something saved that isn't the default that gets

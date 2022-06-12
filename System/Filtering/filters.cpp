@@ -274,9 +274,9 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
   kalman.Predict(accz);
 
   // Only correct if below max speed (above, baro readings untrustworthy)
-  if (fabs(kalman.GetXhat().estimatedVelocity) < BARO_MAX_SPEED) {
+  // if (fabs(kalman.GetXhat().estimatedVelocity) < BARO_MAX_SPEED) {
     kalman.Correct(baroAlt, DEFAULT_KALMAN_GAIN);
-  }
+  // }
 
   auto kalmanOutput = kalman.GetXhat();
   filterData.pos_z = kalmanOutput.estimatedAltitude;
