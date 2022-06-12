@@ -4,10 +4,7 @@
 
 #include "filters.h"
 
-<<<<<<< HEAD
-=======
 #include <math.h>
->>>>>>> ldrs-dev
 #include <orientation_estimator.h>
 #include <string.h>
 
