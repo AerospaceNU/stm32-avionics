@@ -48,6 +48,8 @@ typedef struct {
 extern Orientation_t IMU1_ACCEL_BOARD_TO_LOCAL[3];
 extern Orientation_t IMU2_ACCEL_BOARD_TO_LOCAL[3];
 extern Orientation_t HIGH_G_ACCEL_BOARD_TO_LOCAL[3];
+extern Orientation_t IMU1_GYRO_BOARD_TO_LOCAL[3];
+extern Orientation_t IMU2_GYRO_BOARD_TO_LOCAL[3];
 
 /*
  * Radio. We assume we can only have 433 or 915, and they're both

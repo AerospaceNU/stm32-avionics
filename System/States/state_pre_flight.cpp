@@ -69,14 +69,15 @@ EndCondition_t PreFlightState::run() {
     filterAddPressureRef(
         (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
   }
-  if (HM_Millis() - prefGravityRefTime > 1000) {
+  if (HM_Millis() - prefGravityRefTime > kGravityRefInterval) {
     prefGravityRefTime = HM_Millis();
     filterAddGravityRef();
+    filterAddGyroRef();
   }
 
   // Detect launch by looking for accel and z position difference thresholds
   // Either we should have large enough acceleration
-  if (filterData->acc_z > kLaunchAccelThreshold) {
+  if (filterData->rocket_acc_x > kLaunchAccelThreshold) {
     if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
       return EndCondition_t::Launch;
     }
