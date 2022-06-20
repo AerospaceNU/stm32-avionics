@@ -4,6 +4,7 @@
 
 #include "filters.h"
 
+#include <math.h>
 #include <orientation_estimator.h>
 #include <string.h>
 

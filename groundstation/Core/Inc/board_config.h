@@ -5,7 +5,7 @@
 #ifndef GROUNDSTATION_CORE_INC_BOARD_CONFIG_H_
 #define GROUNDSTATION_CORE_INC_BOARD_CONFIG_H_
 
-#include "stm32h7xx.h"
+#define HAL_HEADER "stm32h7xx.h"
 
 #define HAS_CC1200
 #define HAS_GPS

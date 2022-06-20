@@ -21,7 +21,7 @@ extern "C" {
  * Ways the command line can receive information
  */
 typedef enum CliComms_t {
-  CLI_BLUETOOTH,
+  CLI_PHONE,
   CLI_RADIO,
   CLI_USB,
   NUM_CLI_COMMS
@@ -37,6 +37,7 @@ typedef enum CliCommand_t {
   CREATE_NEW_FLIGHT,
   ERASE_FLASH,
   OFFLOAD,
+  LINECUTTER,
   SENSE,
   SIM,
   HELP,
@@ -48,15 +49,17 @@ typedef enum CliCommand_t {
  * Stored argument values
  */
 typedef struct {
-  char* f;  // flight number
-  char* p;  // pyro number
-  char* H;  // pyro deploy altitude
-  char* D;  // pyro deploy apogee delay
-  bool A;   // pyro mode
-  char* e;  // ground elevation
-  char* t;  // ground temperature
-  bool h;   // help flag
-  char* c;  // Radio channel, can be negative
+  char* f;      // flight number
+  char* p;      // pyro number
+  char* H;      // pyro deploy altitude
+  char* D;      // pyro deploy apogee delay
+  bool A;       // pyro mode
+  char* e;      // ground elevation
+  char* t;      // ground temperature
+  bool h;       // help flag
+  char* c;      // Radio channel, can be negative
+  char* lcCmd;  // Line cuttter command
+  char* lcId;   // Line cuttter id
 } CliOptionVals_t;
 
 /**

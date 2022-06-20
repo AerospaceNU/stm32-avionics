@@ -75,6 +75,12 @@
 #include "pyro.h"
 #endif
 
+#ifdef HAS_BLE
+#include <ble_console.h>
+#include <ble_interface.h>
+#include <ble_linecutter.h>
+#endif
+
 #include "iwdg.h"
 #include "radio_manager.h"
 
@@ -132,6 +138,15 @@ static S25FLXCtrl_t s25flx1;
 /* GPS */
 #ifdef HAS_GPS
 static GPSCtrl_t gps;
+#endif
+
+#ifdef HAS_BLE
+/* BLE */
+static BluetoothInterface_t ble;
+static BleConsole_t bleConsole;
+#ifdef HAS_LINE_CUTTER
+static LineCutterCtrl_t lineCutterArray[NUM_LINE_CUTTERS];
+#endif
 #endif
 
 #ifdef HAS_PYRO
@@ -384,6 +399,18 @@ void HM_HardwareInit() {
 #endif  // HAS 915 and has cc1200
 
 #endif  // has_radio_915
+
+#ifdef HAS_BLE
+  /* BLE */
+  Bluetooth_Init(&ble, BLUETOOTH_HUART);
+  BleConsole_Init(&bleConsole, &ble, ADDR_PHONE);
+
+  for (int i = 0; i < NUM_LINE_CUTTERS; i++) {
+    LineCutter_Init(&lineCutterArray[i], &ble, ADDR_CUTTER1 + i,
+                    RadioManager_transmitStringDefault);
+  }
+
+#endif
 
 #ifdef HAS_PYRO
   /* Pyros */
@@ -654,8 +681,88 @@ CircularBuffer_t *HM_UsbGetRxBuffer() {
 #endif
 }
 
-bool HM_BluetoothSend(const uint8_t *data, uint16_t numBytes) {
-  // TODO: Implement HM_BluetoothSend
+bool HM_BluetoothCliConnected() {
+#ifdef HAS_BLE
+  return Bluetooth_IsAddressConnected(&ble, ADDR_PHONE);
+#endif
+  return false;
+}
+
+bool HM_BluetoothSend(uint8_t address, const uint8_t *data, uint16_t numBytes) {
+#ifdef HAS_BLE
+  return HAL_OK == Bluetooth_SendRequest(&ble, address, data, numBytes);
+#endif
+  return false;
+}
+
+CircularBuffer_t *Hm_BleConsoleGetRxBuffer() {
+#ifdef HAS_BLE
+  return &bleConsole.parsedBuffer;
+#endif
+  return NULL;
+}
+
+void HM_BluetoothTick() {
+#ifdef HAS_BLE
+  Bluetooth_Tick(&ble);
+  BleConsole_Tick(&bleConsole);
+
+  for (int i = 0; i < NUM_LINE_CUTTERS; i++) {
+    LineCutter_Tick(&lineCutterArray[i]);
+  }
+#endif
+}
+
+LineCutterData_t *HM_GetLineCutterData(BluetoothAddresses_te address) {
+#ifdef HAS_BLE
+  return &lineCutterArray[address - ADDR_CUTTER1].lastData;
+#endif
+  return NULL;
+}
+
+LineCutterFlightVars_t *HM_GetLineCutterFlightVariables(
+    BluetoothAddresses_te address) {
+#ifdef HAS_BLE
+  return &lineCutterArray[address - ADDR_CUTTER1].flightVars;
+#endif
+  return NULL;
+}
+
+bool HM_LineCutterSendString(int id, char *string) {
+#ifdef HAS_BLE
+  if (!string) return false;
+
+  LineCutterCtrl_t *cutter;
+  for (int i = 0; i < NUM_LINE_CUTTERS; i++) {
+    if (id == lineCutterArray[i].lastData.lineCutterNumber) {
+      cutter = &lineCutterArray[i];
+    }
+  }
+
+  return LineCutter_SendString(cutter, string);
+#endif
+  return false;
+}
+
+bool HM_LineCuttersSendCut(int chan) {
+#ifdef HAS_BLE
+  // We want to check that both succeed, not that one succeeds
+  // This means we gotta be careful about short-circuiting!
+  bool ret = true;
+
+  for (int i = 0; i < NUM_LINE_CUTTERS; i++) {
+    if (chan == 1) {
+      ret |= LineCutter_Cut1(&lineCutterArray[i]);
+    } else if (chan == 2) {
+      ret |= LineCutter_Cut2(&lineCutterArray[i]);
+    } else {
+      ret = false;
+    }
+  }
+
+  return ret;
+
+#endif
   return false;
 }
 

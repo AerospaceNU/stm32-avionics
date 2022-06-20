@@ -33,6 +33,7 @@ void PreFlightState::init() {
       (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
 
   cli_tasks::ConfigureForGround();
+  doCleanup = false;
 }
 
 EndCondition_t PreFlightState::run() {

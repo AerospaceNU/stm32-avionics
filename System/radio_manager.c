@@ -178,29 +178,30 @@ void RadioManager_transmitData(SensorData_t *sensorData,
                                RADIO_PACKET_SIZE);
   }
 
-  /*
+#ifdef HAS_LINE_CUTTER
   if (currentTime - lastSent.lineCutterLastSent >= 1000) {
-    LineCutterPacket_t data = {sensorData->lineCutterNumber,
-                               sensorData->state,
-                               sensorData->battSense,
-                               sensorData->cutSense1,
-                               sensorData->cutSense2,
-                               sensorData->currentSense,
-                               sensorData->photoresistor,
-                               sensorData->timestamp,
-                               sensorData->pressure,
-                               sensorData->altitude,
-                               sensorData->avgAltitude,
-                               sensorData->deltaAltitude,
-                               sensorData->avgDeltaAltitude,
-                               sensorData->temperature,
-                               sensorData->accelX,
-                               sensorData->accelY,
-                               sensorData->accelZ};
-    transmitPacket.packetType = 4;
-    transmitPacket.payload.lineCutter = data;
-    lastSent.lineCutterLastSent = currentTime;
-  */
+    for (int i = ADDR_CUTTER1; i <= ADDR_CUTTER2; i++) {
+      transmitPacket.packetType = TELEMETRY_ID_LINECUTTER;
+      transmitPacket.payload.lineCutter.data = *HM_GetLineCutterData(i);
+      lastSent.lineCutterLastSent = currentTime;
+
+      HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
+                   RADIO_PACKET_SIZE);
+    }
+  }
+
+  if (currentTime - lastSent.lineCutterVarsLastSent >= 10000) {
+    for (int i = ADDR_CUTTER1; i <= ADDR_CUTTER2; i++) {
+      transmitPacket.packetType = TELEMETRY_ID_LINECUTTER_VARS;
+      transmitPacket.payload.lineCutterFlightVars.data =
+          *HM_GetLineCutterFlightVariables(i);
+      lastSent.lineCutterVarsLastSent = currentTime;
+
+      HM_RadioSend(TELEMETRY_RADIO, (uint8_t *)&transmitPacket,
+                   RADIO_PACKET_SIZE);
+    }
+  }
+#endif
 }
 
 #endif
@@ -227,11 +228,19 @@ void RadioManager_transmitString(Hardware_t radio, uint8_t *data, size_t len) {
     // TODO: This is a HACK
     for (int i = 0; i < 10; i++) {
       HM_RadioUpdate();
-      HAL_Delay(15);
+      uint32_t start = HM_Millis();
+      while ((HM_Millis() - start) < 15) {
+      }
       HM_IWDG_Refresh();
     }
 
     len -= txLen;
     data += txLen;
   }
+}
+
+void RadioManager_transmitStringDefault(uint8_t *data, size_t len) {
+#ifdef TELEMETRY_RADIO
+  RadioManager_transmitString(TELEMETRY_RADIO, data, len);
+#endif
 }

@@ -6,7 +6,7 @@
 #ifndef H750VBT6_FLIGHT_BOARD_V0_CORE_INC_BOARD_CONFIG_H_
 #define H750VBT6_FLIGHT_BOARD_V0_CORE_INC_BOARD_CONFIG_H_
 
-#include "stm32h7xx.h"
+#define HAL_HEADER "stm32h7xx.h"
 
 #define HAS_CC1120
 #define HAS_ADC_DEVICE
@@ -39,6 +39,7 @@
 
 typedef enum { AXIS_X = 0, AXIS_Y, AXIS_Z } Axis_t;
 
+#include "stdint.h"
 typedef struct {
   Axis_t axis;
   int8_t direction;

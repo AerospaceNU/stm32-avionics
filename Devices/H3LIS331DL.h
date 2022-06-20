@@ -14,6 +14,7 @@ extern "C" {
 
 #include "SPIDriver.h"
 #include "board_config.h"
+#include HAL_HEADER
 
 #define HIGH_G_ACC_ADDR 0x19 << 1
 #define REG_WHO_AM_I 0x0F

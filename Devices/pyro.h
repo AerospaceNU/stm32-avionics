@@ -9,6 +9,7 @@
 #define DEVICES_PYRO_H_
 
 #include "board_config.h"
+#include HAL_HEADER
 
 typedef struct {
   GPIO_TypeDef *port;

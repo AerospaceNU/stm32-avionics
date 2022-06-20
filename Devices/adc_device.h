@@ -6,6 +6,7 @@
 #define DEVICES_ADC_DEVICE_H_
 
 #include "board_config.h"
+#include HAL_HEADER
 
 #ifdef __cplusplus
 extern "C" {
