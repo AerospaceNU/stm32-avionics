@@ -112,7 +112,7 @@ void cli_tasks::cliConfig() {
   // Send help message to cli
   if (options.h) {
     char name[30];
-    char val[40];
+    char val[45];
     char float_buff[10];
     // New line
     cliSend("\r\n");

@@ -28,7 +28,7 @@ void cli_tasks::cliSense() {
   // Read sensor data and send in human-readable format
   HM_ReadSensorData();
   SensorData_t* data = HM_GetSensorData();
-  char cliStr[90];
+  char cliStr[60];
   char float1[10];
   char float2[10];
   char float3[10];
@@ -52,7 +52,7 @@ void cli_tasks::cliSense() {
   dtoa(float1, sizeof(float1), data->imu1_mag_x, 3);
   dtoa(float2, sizeof(float2), data->imu1_mag_y, 3);
   dtoa(float3, sizeof(float3), data->imu1_mag_z, 3);
-  snprintf(cliStr, sizeof(cliStr), "IMU 1 Mag XYZ (gauss): %s %s %3s\r\n",
+  snprintf(cliStr, sizeof(cliStr), "IMU 1 Mag XYZ (gauss): %s %s %s\r\n",
            float1, float2, float3);
   cliSend(cliStr);
 
