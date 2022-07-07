@@ -47,8 +47,8 @@ bool fileExists(const std::string &filename) {
   return false;
 }
 
-void FileBackedFlash::Reinit() {
-  if (fileExists(filepath)) {
+void FileBackedFlash::Reinit(bool overwrite) {
+  if (fileExists(filepath) && !overwrite) {
     return;
   }
 

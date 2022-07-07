@@ -16,7 +16,7 @@ class FileBackedFlash {
     Reinit();
   }
 
-  void Reinit();
+  void Reinit(bool overwrite = false);
   bool ReadStart(uint32_t startLoc, uint32_t numBytes, uint8_t *pdata);
   bool WriteStart(uint32_t startLoc, uint32_t numBytes, uint8_t *pdata);
 
