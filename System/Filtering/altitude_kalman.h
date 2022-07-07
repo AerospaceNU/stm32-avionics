@@ -7,7 +7,7 @@
 
 // These numbers are for a dt of 0.01513 seconds, Q of diag([0.5, 1]).^2 and R
 // of diag([10]).^2
-constexpr double DEFAULT_KALMAN_GAIN[2] = {0.03407042, 0.03685564};
+static constexpr const double DEFAULT_KALMAN_GAIN[2] = {0.03407042, 0.03685564};
 
 typedef struct {
   double estimatedVelocity;

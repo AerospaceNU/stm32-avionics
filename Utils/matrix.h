@@ -10,6 +10,7 @@
 
 #define ARM_MATH_CM7
 
+#include <cstring>
 #include <initializer_list>
 
 #include "board_config.h"
@@ -32,7 +33,11 @@ class Matrix {
   /**
    * @brief Constructs a zero-valued matrix
    */
-  Matrix() { arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray); }
+  Matrix() {
+#ifndef IS_DESKTOP
+    arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray);
+#endif
+  }
 
   /**
    * @brief Constructs a zero-valued matrix
@@ -45,7 +50,9 @@ class Matrix {
     static_assert(N == Rows * Cols,
                   "Array must be the same length as the matrix!");
     memcpy(m_backingArray, list, Rows * Cols * sizeof(float));
+#ifndef IS_DESKTOP
     arm_mat_init_f32(&m_matrix, Rows, Cols, m_backingArray);
+#endif
   }
 
   /**
@@ -185,9 +192,13 @@ class Matrix {
    */
   Matrix<Rows, Cols> inverse() {
     static_assert(Rows == Cols, "Matrix must be square to invert!");
+#ifndef IS_DESKTOP
     Matrix<Rows, Cols> ret = {};
     arm_mat_inverse_f32(&(this->m_matrix), &(ret.m_matrix));
     return ret;
+#else
+// Not implemented yet
+#endif
   }
 
   /**
@@ -196,8 +207,16 @@ class Matrix {
    */
   float norm() {
     static_assert(Rows == 1 || Cols == 1, "Must be a 1D-vector");
-    float square_sum;
+
+    float square_sum = 0;
+#ifndef IS_DESKTOP
     arm_power_f32(m_backingArray, Rows == 1 ? Cols : Rows, &square_sum);
+#else
+    for (int elem = 0; elem < Rows * Cols; elem++) {
+      square_sum += pow(m_backingArray[elem], 2);
+    }
+#endif
+
     return sqrt(square_sum);
   }
 
@@ -212,7 +231,9 @@ class Matrix {
       ident[i][i] = 1.0;
     }
     memcpy(ret.m_backingArray, &ident, sizeof(ident));
+#ifndef IS_DESKTOP
     arm_mat_init_f32(&(ret.m_matrix), Rows, Rows, ret.m_backingArray);
+#endif
     return ret;
   }
 
@@ -236,7 +257,9 @@ class Matrix {
     Matrix<Rows, Cols> ret = {};
     float32_t zeroes[Rows][Cols] = {0.0};
     memcpy(ret.m_backingArray, &zeroes, sizeof(zeroes));
+#ifndef IS_DESKTOP
     arm_mat_init_f32(ret.m_matrix, Rows, Cols, ret.m_backingArray);
+#endif
     return ret;
   }
 
