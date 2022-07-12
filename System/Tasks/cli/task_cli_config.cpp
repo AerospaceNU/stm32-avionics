@@ -6,8 +6,10 @@
 #include "cli.h"
 #include "cli_tasks.h"
 #include "data_log.h"
+#include "dtoa.h"
 #include "errno.h"
 #include "hardware_manager.h"
+#include "small_strtod.h"
 
 static void generateConfigHelp(const char* name, const char* value) {
   char msg[70 + 4];
@@ -32,7 +34,7 @@ void cli_tasks::cliConfig() {
       // Write new cli configs to flash
       data_log_write_cli_configs();
     } else if (options.H) {
-      double pyroAlt = strtod(options.H, &endPtr);
+      double pyroAlt = small_strtod(options.H, &endPtr);
       if (*endPtr != '\0') {
         cliSendAck(false, "Pyro deploy altitude invalid float");
         return;
@@ -43,7 +45,7 @@ void cli_tasks::cliConfig() {
       // Write new cli configs to flash
       data_log_write_cli_configs();
     } else if (options.D) {
-      double apogeeDelay = strtod(options.D, &endPtr);
+      double apogeeDelay = small_strtod(options.D, &endPtr);
       if (*endPtr != '\0') {
         cliSendAck(false, "Apogee delay invalid float");
         return;
@@ -64,7 +66,7 @@ void cli_tasks::cliConfig() {
   // Configure ground elevation
   if (options.e) {
     char* endPtr;
-    double elevation = strtod(options.e, &endPtr);
+    double elevation = small_strtod(options.e, &endPtr);
     if (*endPtr != '\0') {
       cliSendAck(false, "Ground elevation invalid float");
       return;
@@ -77,7 +79,7 @@ void cli_tasks::cliConfig() {
   // Configure ground temperature
   if (options.t) {
     char* endPtr;
-    double temperature = strtod(options.t, &endPtr);
+    double temperature = small_strtod(options.t, &endPtr);
     if (*endPtr != '\0') {
       cliSendAck(false, "Ground temperature invalid float");
       return;
@@ -110,7 +112,8 @@ void cli_tasks::cliConfig() {
   // Send help message to cli
   if (options.h) {
     char name[30];
-    char val[40];
+    char val[45];
+    char float_buff[10];
     // New line
     cliSend("\r\n");
 #ifdef HAS_PYRO
@@ -118,15 +121,16 @@ void cli_tasks::cliConfig() {
     for (int i = 0; i < MAX_PYRO; i++) {
       snprintf(name, sizeof(name), "Pyro %i Configuration:", i + 1);
       PyroConfig_t* pyroConfig = (cliGetConfigs()->pyroConfiguration + i);
+      dtoa(float_buff, sizeof(float_buff), pyroConfig->configValue, 2);
       if (pyroConfig->flags == FLAG_APOGEE) {  // Apogee
         snprintf(val, sizeof(val), "Deploy at apogee");
       } else if (pyroConfig->flags ==
                  FLAG_ALT_DURING_DESCENT) {  // Deploy at an altitude
-        snprintf(val, sizeof(val), "Deploy at descent altitude of %.2f m",
-                 pyroConfig->configValue);
+        snprintf(val, sizeof(val), "Deploy at descent altitude of %s m",
+                 float_buff);
       } else if (pyroConfig->flags == FLAG_APOGEE_DELAY) {
-        snprintf(val, sizeof(val), "Deploy %0.2f seconds after apogee",
-                 pyroConfig->configValue);
+        snprintf(val, sizeof(val), "Deploy %s seconds after apogee",
+                 float_buff);
       } else {
         snprintf(val, sizeof(val), "None");
       }
@@ -134,10 +138,11 @@ void cli_tasks::cliConfig() {
     }
 #endif
     // Ground elevation
-    snprintf(val, sizeof(val), "%.3f", cliGetConfigs()->groundElevationM);
+    dtoa(val, sizeof(val), cliGetConfigs()->groundElevationM, 3);
     generateConfigHelp("Ground Elevation (m):", val);
     // Ground temperature
-    snprintf(val, sizeof(val), "%.3f", cliGetConfigs()->groundTemperatureC);
+
+    dtoa(val, sizeof(val), cliGetConfigs()->groundTemperatureC, 3);
     generateConfigHelp("Ground Temperature (C):", val);
     // Radio channel
     snprintf(val, sizeof(val), "%i", cliGetConfigs()->radioChannel);

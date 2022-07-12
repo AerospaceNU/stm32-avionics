@@ -89,7 +89,7 @@ EndCondition_t CliOffloadState::run() {
         flight_timestamp = (time_t)metadataPacket->gpsTimestamp;
         // Check timestamp between 2000 and 2100
         if (flight_timestamp > 946702800 && flight_timestamp < 4102462800) {
-          strftime(timeString, 25, "%c", localtime(&flight_timestamp));
+          snprintf(timeString, sizeof(timeString), "%lld", flight_timestamp);
         } else {
           snprintf(timeString, sizeof(timeString), "None");
         }
