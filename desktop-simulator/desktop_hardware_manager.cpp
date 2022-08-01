@@ -2,14 +2,15 @@
 // Created by matth on 3/25/2022.
 //
 
-#include <hardware_manager.h>
+#include "desktop_hardware_manager.h"
 
-#include <chrono>
+#include <chrono>  // NOLINT
+#include <fstream>
 
 #include "board_config.h"
+#include "circular_buffer.h"
 #include "file_backed_flash.h"
 #include "flight_replay.h"
-#include "fstream"
 #include "hardware_manager.h"
 #include "radio_manager.h"
 #include "sensor_types.h"
@@ -24,9 +25,9 @@ static SensorProperties_t sensorProperties;
 
 static TcpSocket *radioSocket;
 
-std::string int_flash_path;
-std::string ext_flash_path;
-std::string output_file;
+std::string int_flash_path;  // NOLINT
+std::string ext_flash_path;  // NOLINT
+std::string output_file;     // NOLINT
 
 extern "C" {
 
@@ -83,9 +84,7 @@ void HM_PyroUpdate() {
   }
 }
 
-CircularBuffer_t *HM_BleConsoleGetRxBuffer() {
-  return NULL;
-}
+CircularBuffer_t *HM_BleConsoleGetRxBuffer() { return NULL; }
 
 void HM_RadioRegisterConsumer(Hardware_t radio, CircularBuffer_t *rxBuffer) {}
 void HM_RadioSetChannel(Hardware_t radio, int channel) {}
@@ -99,24 +98,21 @@ bool HM_BluetoothSend(uint8_t address, const uint8_t *data, uint16_t numBytes) {
   return true;
 }
 
-void HM_BluetoothTick() {
-
-}
+void HM_BluetoothTick() {}
 
 bool HM_LineCuttersSendCut(int chan) {
   printf("Line cutter chan %i cut sent!\n", chan);
+  return true;
 }
 
-bool HM_LineCutterSendString(int id, char *string) {
-
-}
+bool HM_LineCutterSendString(int id, char *string) { return true; }
 
 CircularBuffer_t *HM_UsbGetRxBuffer() { return 0; }
 
 uint32_t HM_Millis() {
-  using namespace std::chrono;
-  milliseconds ms =
-      duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+  std::chrono::milliseconds ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::system_clock::now().time_since_epoch());
   return ms.count();
 }
 
@@ -188,5 +184,4 @@ void HM_DisableSimMode() {}
 SensorData_t *HM_GetSensorData() { return &sensorData; }
 
 bool HM_InSimMode() { return false; }
-
 }

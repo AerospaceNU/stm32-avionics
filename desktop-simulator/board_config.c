@@ -14,8 +14,3 @@ Orientation_t IMU1_GYRO_BOARD_TO_LOCAL[3] = {
 
 Orientation_t IMU2_GYRO_BOARD_TO_LOCAL[3] = {
     {AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, -1}};
-
-void HAL_Delay(uint32_t ms) {
-    auto start = HM_Millis();
-    while((HM_Millis() - start) < ms);
-}

@@ -1,5 +1,7 @@
 #include "data_offload.h"
 
+#include <stdlib.h>
+
 #include "data_log.h"
 #include "hardware_manager.h"
 

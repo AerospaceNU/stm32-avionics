@@ -6,6 +6,8 @@
 
 #include <algorithm>  // std::min
 
+#include "hardware_manager.h"
+
 CsvReplay::CsvReplay(std::string path) : doc{path} {}
 
 void CsvReplay::GetNext(SensorData_t* data) {

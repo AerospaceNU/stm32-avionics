@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdio.h>
 
 #include "cli.h"
@@ -34,7 +35,7 @@ void cli_tasks::cliSense() {
   char float3[10];
 
   cliSend("\r\n");
-  snprintf(cliStr, sizeof(cliStr), "Timestamp (ms): %lu\r\n",
+  snprintf(cliStr, sizeof(cliStr), "Timestamp (ms): %" PRIu32 "\r\n",
            data->timestamp_s);
   cliSend(cliStr);
   dtoa(float1, sizeof(float1), data->imu1_accel_x, 3);
@@ -110,7 +111,8 @@ void cli_tasks::cliSense() {
   cliSend(cliStr);
   ssize_t numPyros =
       sizeof(data->pyro_continuity) / sizeof(data->pyro_continuity[0]);
-  snprintf(cliStr, sizeof(cliStr), "Pyro Continuity 1-%i:", numPyros);
+  snprintf(cliStr, sizeof(cliStr), "Pyro Continuity 1-%" PRIu32 ":",
+           (uint32_t)numPyros);
   cliSend(cliStr);
   for (ssize_t i = 0; i < numPyros; i++) {
     snprintf(cliStr, sizeof(cliStr), " %i", data->pyro_continuity[i]);

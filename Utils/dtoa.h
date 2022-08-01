@@ -13,6 +13,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 void dtoa(char* out, size_t capacity, double in, int digits);
 
 #ifdef __cplusplus

@@ -1,4 +1,5 @@
 #include "buzzer_heartbeat.h"
+#include "circular_buffer.h"
 #include "cli.h"
 #include "cli_tasks.h"
 #include "hardware_manager.h"

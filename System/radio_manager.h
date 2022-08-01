@@ -12,6 +12,7 @@ extern "C" {
 #include <stdint.h>
 
 #include "board_config.h"
+#include "circular_buffer.h"
 #include "data_structures.h"
 #include "filters.h"
 #include "hardware_manager.h"

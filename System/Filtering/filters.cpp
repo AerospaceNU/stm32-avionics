@@ -10,6 +10,7 @@
 
 #include "altitude_kalman.h"
 #include "board_config.h"
+#include "circular_buffer.h"
 #include "cli.h"
 #include "hardware_manager.h"
 

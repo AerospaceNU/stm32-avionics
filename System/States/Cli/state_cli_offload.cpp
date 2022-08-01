@@ -1,5 +1,6 @@
 #include "state_cli_offload.h"
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,7 +18,8 @@ static void format_time_seconds(char *result, int resultLen, uint32_t seconds) {
   uint32_t hours = minutes / 60;
   minutes %= 60;
 
-  snprintf(result, resultLen, "%02lu:%02lu:%02lu", hours, minutes, seconds);
+  snprintf(result, resultLen, "%02" PRIu32 ":%02" PRIu32 ":%02" PRIu32, hours,
+           minutes, seconds);
 }
 
 void CliOffloadState::init() {
@@ -75,7 +77,7 @@ EndCondition_t CliOffloadState::run() {
                "Available flights to offload: \r\n");
       cliSend(sendString);
       snprintf(sendString, sizeof(sendString),
-               "Last: %ld      Last Launched: %ld\r\n",
+               "Last: %" PRIu32 "      Last Launched: %" PRIu32 "\r\n",
                data_log_get_last_flight_num(),
                data_log_get_last_launched_flight_num());
       cliSend(sendString);
@@ -89,7 +91,8 @@ EndCondition_t CliOffloadState::run() {
         flight_timestamp = (time_t)metadataPacket->gpsTimestamp;
         // Check timestamp between 2000 and 2100
         if (flight_timestamp > 946702800 && flight_timestamp < 4102462800) {
-          snprintf(timeString, sizeof(timeString), "%lld", flight_timestamp);
+          snprintf(timeString, sizeof(timeString), "%" PRIu64,
+                   flight_timestamp);
         } else {
           snprintf(timeString, sizeof(timeString), "None");
         }
