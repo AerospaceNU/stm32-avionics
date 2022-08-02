@@ -18,6 +18,10 @@ class CliEraseFlashState : public State {
   EndCondition_t run(void) override;
 
   void cleanup(void) override;
+
+ private:
+  static constexpr uint32_t SEND_PERIOD = 990;
+  uint32_t last_time = 0;
 };
 
 #ifdef __cplusplus
