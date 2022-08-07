@@ -42,6 +42,7 @@ typedef enum CliCommand_t {
   SIM,
   HELP,
   PYROFIRE,
+  VERSION,
   NUM_CLI_COMMANDS,
 } CliCommand_t;
 

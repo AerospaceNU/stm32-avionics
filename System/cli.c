@@ -46,6 +46,7 @@ static struct option longOptions[] = {
     {"sense", no_argument, &primaryCommand, SENSE},
     {"pyrofire", no_argument, &primaryCommand, PYROFIRE},
     {"linecutter", no_argument, &primaryCommand, LINECUTTER},
+    {"version", no_argument, &primaryCommand, VERSION},
     {0, 0, 0, 0}};
 
 static CliConfigs_t cliConfigs;

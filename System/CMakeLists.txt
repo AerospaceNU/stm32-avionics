@@ -15,6 +15,7 @@ set(SYSTEM_FILES_LIST
         Tasks/cli/task_cli_pyro.cpp
         Tasks/cli/task_cli_sense.cpp
         Tasks/cli/task_cli_linecutter.cpp
+        Tasks/cli/task_cli_version.cpp
 
         States/flight_state.cpp
         States/states_interface.cpp
