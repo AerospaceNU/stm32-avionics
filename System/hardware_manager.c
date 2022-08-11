@@ -695,7 +695,7 @@ bool HM_BluetoothSend(uint8_t address, const uint8_t *data, uint16_t numBytes) {
   return false;
 }
 
-CircularBuffer_t *Hm_BleConsoleGetRxBuffer() {
+CircularBuffer_t *HM_BleConsoleGetRxBuffer() {
 #ifdef HAS_BLE
   return &bleConsole.parsedBuffer;
 #endif

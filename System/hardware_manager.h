@@ -169,7 +169,7 @@ CircularBuffer_t* HM_UsbGetRxBuffer();
 //! Return if a phone is connected
 bool HM_BluetoothCliConnected();
 bool HM_BluetoothSend(uint8_t address, const uint8_t* data, uint16_t numBytes);
-CircularBuffer_t* Hm_BleConsoleGetRxBuffer();
+CircularBuffer_t* HM_BleConsoleGetRxBuffer();
 
 void HM_BluetoothTick();
 

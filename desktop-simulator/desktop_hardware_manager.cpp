@@ -83,6 +83,10 @@ void HM_PyroUpdate() {
   }
 }
 
+CircularBuffer_t *HM_BleConsoleGetRxBuffer() {
+  return NULL;
+}
+
 void HM_RadioRegisterConsumer(Hardware_t radio, CircularBuffer_t *rxBuffer) {}
 void HM_RadioSetChannel(Hardware_t radio, int channel) {}
 bool HM_UsbTransmit(uint8_t *data, uint16_t numBytes) {

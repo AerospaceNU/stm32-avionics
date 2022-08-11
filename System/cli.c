@@ -317,7 +317,7 @@ CliOptionVals_t cliGetOptions() { return cliOptionVals; }
 CircularBuffer_t* cliGetRxBufferFor(CliComms_t source) {
   switch (source) {
     case CLI_PHONE:
-      return NULL;
+      return HM_BleConsoleGetRxBuffer();
     case CLI_RADIO:
       return &radioRxCircBuffer;
     case CLI_USB:
