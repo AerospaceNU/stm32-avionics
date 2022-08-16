@@ -13,8 +13,8 @@
  */
 static void generateDoc(const char* primaryCommand, const char* args,
                         const char* desc) {
-  char doc[177 + 5];
-  snprintf(doc, sizeof(doc), "%-12s %-15s %-150s\r\n", primaryCommand, args,
+  char doc[180 + 5];
+  snprintf(doc, sizeof(doc), "%-15s %-15s %-150s\r\n", primaryCommand, args,
            desc);
   cliSend(doc);
 }

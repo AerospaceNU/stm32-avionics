@@ -12,7 +12,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "board_config.h"
+#include "board_config_common.h"
 #include "circular_buffer.h"
 #include "data_structures.h"
 #include "pyro_manager.h"
@@ -67,9 +67,9 @@ typedef struct {
  * Configs that can be changed via CLI
  */
 typedef struct {
-#ifdef HAS_PYRO
-  PyroConfig_t pyroConfiguration[MAX_PYRO];
-#endif
+#if HAS_DEV(PYRO)
+  PyroConfig_t pyroConfiguration[NUM_PYRO];
+#endif  // HAS_DEV(PYRO)
   double groundElevationM;
   double groundTemperatureC;
   int radioChannel;

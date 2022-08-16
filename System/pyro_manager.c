@@ -7,21 +7,23 @@
 
 #include "pyro_manager.h"
 
+#include "board_config_common.h"
+
+#if HAS_DEV(PYRO)
+
 #include <math.h>
 #include <stdbool.h>
 
-#include "board_config.h"
 #include "cli.h"
 #include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
 
-#ifdef HAS_PYRO
-static bool pyroFireStatus[MAX_PYRO] = {0};
+static bool pyroFireStatus[NUM_PYRO] = {0};
 static uint64_t apogeeTimestamp;
 
 void PyroManager_Init() {
-  for (int i = 0; i < MAX_PYRO; ++i) pyroFireStatus[i] = 0;
+  for (int i = 0; i < NUM_PYRO; ++i) pyroFireStatus[i] = 0;
   apogeeTimestamp = 0;
 }
 
@@ -31,14 +33,14 @@ void PyroManager_SetApogeeTime(uint64_t timestamp) {
 
 uint8_t PyroManager_Status() {
   uint8_t status = 0;
-  for (int i = 0; i < fmin(MAX_PYRO, 8); ++i) {
+  for (int i = 0; i < fmin(NUM_PYRO, 8); ++i) {
     status |= pyroFireStatus[i] << i;
   }
   return status;
 }
 
 void PyroManager_SetPyroFireStatus(uint8_t status) {
-  for (int i = 0; i < fmin(MAX_PYRO, 8); ++i) {
+  for (int i = 0; i < fmin(NUM_PYRO, 8); ++i) {
     pyroFireStatus[i] = status >> i & 0x1;
   }
 }
@@ -46,9 +48,8 @@ void PyroManager_SetPyroFireStatus(uint8_t status) {
 void PyroManager_Update(FilterData_t* filterData, bool hasPastApogee) {
   // Turns off expired pyros
   HM_PyroUpdate();
-
   PyroConfig_t* pyroConfiguration = cliGetConfigs()->pyroConfiguration;
-  for (int i = 0; i < MAX_PYRO; i++) {
+  for (int i = 0; i < NUM_PYRO; i++) {
     if (!pyroFireStatus[i]) {
       // Check that we are after apogee
       if (hasPastApogee) {
@@ -73,10 +74,20 @@ void PyroManager_Update(FilterData_t* filterData, bool hasPastApogee) {
 }
 
 void PyroManager_PyroFire(uint8_t pyroNum, uint32_t fireTime, bool logFire) {
-  if (!(pyroNum >= 0 && pyroNum <= MAX_PYRO)) return;
+  if (!(pyroNum >= 0 && pyroNum <= NUM_PYRO)) return;
   HM_PyroFire(pyroNum, fireTime);
   if (logFire) pyroFireStatus[pyroNum] = true;
   data_log_get_flight_metadata()->pyroFireStatus = ~PyroManager_Status();
   data_log_write_flight_metadata();
 }
-#endif  // HAS_PYRO
+
+#else
+
+void PyroManager_Init() {}
+void PyroManager_SetApogeeTime(uint64_t timestamp) {}
+uint8_t PyroManager_Status() { return 255; }
+void PyroManager_SetPyroFireStatus(uint8_t status) {}
+void PyroManager_Update(FilterData_t* filterData, bool hasPastApogee) {}
+void PyroManager_PyroFire(uint8_t pyroNum, uint32_t fireTime, bool logFire) {}
+
+#endif  // HAS_DEV(PYRO)

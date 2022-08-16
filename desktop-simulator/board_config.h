@@ -5,28 +5,26 @@
 #ifndef DESKTOP_SIMULATOR_BOARD_CONFIG_H_
 #define DESKTOP_SIMULATOR_BOARD_CONFIG_H_
 
-#include <stdint.h>
-
-#define TELEMETRY_RADIO RADIO_433
-#define HAS_PYRO
-#define MAX_PYRO 2
+#include "board_config_types.h"
 
 #define HAL_HEADER "fake_stm_hal.h"
-#define IS_DESKTOP
 
-typedef enum { AXIS_X = 0, AXIS_Y, AXIS_Z } Axis_t;
+#define NUM_ACCEL_DESKTOP_FILE 1
 
-typedef struct {
-  Axis_t axis;
-  int8_t direction;
-} Orientation_t;
+#define NUM_BAROMETER_DESKTOP_FILE 2
 
-extern Orientation_t IMU1_ACCEL_BOARD_TO_LOCAL[3];
-extern Orientation_t IMU2_ACCEL_BOARD_TO_LOCAL[3];
-extern Orientation_t HIGH_G_ACCEL_BOARD_TO_LOCAL[3];
-extern Orientation_t IMU1_GYRO_BOARD_TO_LOCAL[3];
-extern Orientation_t IMU2_GYRO_BOARD_TO_LOCAL[3];
+#define NUM_FLASH_DESKTOP_FILE_BACKED 1
 
-void HAL_Delay(uint32_t Delay);
+#define NUM_GPS_DESKTOP_FILE 1
+
+#define NUM_IMU_DESKTOP_FILE 2
+
+#define NUM_PYRO_DESKTOP_PRINT 6
+
+#define NUM_PYRO_CONT_DESKTOP_FILE 6
+
+#define NUM_RADIO_DESKTOP_SOCKET 1
+
+#define NUM_VBAT_DESKTOP_FILE 1
 
 #endif  // DESKTOP_SIMULATOR_BOARD_CONFIG_H_

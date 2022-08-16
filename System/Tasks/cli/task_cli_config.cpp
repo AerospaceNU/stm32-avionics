@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "board_config.h"
+#include "board_config_common.h"
 #include "cli.h"
 #include "cli_tasks.h"
 #include "data_log.h"
@@ -20,12 +20,12 @@ static void generateConfigHelp(const char* name, const char* value) {
 void cli_tasks::cliConfig() {
   // Get command line options
   CliOptionVals_t options = cliGetOptions();
-#ifdef HAS_PYRO
+#if HAS_DEV(PYRO)
   // Configure pyro
   if (options.p) {
     char* endPtr;
     int pyroNum = strtol(options.p, &endPtr, 10) - 1;
-    if (*endPtr != '\0' || pyroNum < 0 || pyroNum >= MAX_PYRO) {
+    if (*endPtr != '\0' || pyroNum < 0 || pyroNum >= NUM_PYRO) {
       cliSendAck(false, "Invalid pyro number");
       return;
     }
@@ -61,7 +61,7 @@ void cli_tasks::cliConfig() {
       return;
     }
   }
-#endif
+#endif  // HAS_DEV(PYRO)
 
   // Configure ground elevation
   if (options.e) {
@@ -101,9 +101,10 @@ void cli_tasks::cliConfig() {
     cliGetConfigs()->radioChannel = channel;
     // Write new cli configs to flash
     data_log_write_cli_configs();
-#ifdef TELEMETRY_RADIO
-    HM_RadioSetChannel(TELEMETRY_RADIO, channel);
-#endif
+    // For now, set all channels since there's no support for multiple radios
+    for (int i = 0; i < NUM_RADIO; i++) {
+      HM_RadioSetChannel(i, channel);
+    }
   }
 
   // Send positive ACK (all inputs have been appropriately processed)
@@ -116,9 +117,9 @@ void cli_tasks::cliConfig() {
     char float_buff[10];
     // New line
     cliSend("\r\n");
-#ifdef HAS_PYRO
+#if HAS_DEV(PYRO)
     // Pyros
-    for (int i = 0; i < MAX_PYRO; i++) {
+    for (int i = 0; i < NUM_PYRO; i++) {
       snprintf(name, sizeof(name), "Pyro %i Configuration:", i + 1);
       PyroConfig_t* pyroConfig = (cliGetConfigs()->pyroConfiguration + i);
       dtoa(float_buff, sizeof(float_buff), pyroConfig->configValue, 2);
@@ -136,7 +137,7 @@ void cli_tasks::cliConfig() {
       }
       generateConfigHelp(name, val);
     }
-#endif
+#endif  // HAS_DEV(PYRO)
     // Ground elevation
     dtoa(val, sizeof(val), cliGetConfigs()->groundElevationM, 3);
     generateConfigHelp("Ground Elevation (m):", val);

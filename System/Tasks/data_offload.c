@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 
+#include "board_config_common.h"
 #include "data_log.h"
 #include "hardware_manager.h"
 
@@ -19,7 +20,7 @@ bool dataOffload() {
     if (bytesRead == 0) {
       readComplete_ = true;
     } else {
-      HM_UsbTransmit(flashBuf_, (uint16_t)bytesRead);
+      HM_UsbTransmit(USB_CLI_ID, flashBuf_, (uint16_t)bytesRead);
     }
   }
   return readComplete_;

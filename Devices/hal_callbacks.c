@@ -10,7 +10,7 @@
 #define MAX_ADC_HANDLES 3   // ADC 1-3
 #define MAX_UART_HANDLES 5  // UART 1-5
 
-#ifdef HAS_SPI
+#ifdef HAL_SPI_MODULE_ENABLED
 typedef struct {
   SPI_HandleTypeDef *hspi;
   void (*txCallback)(void *);
@@ -81,10 +81,9 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
     }
   }
 }
-#endif
+#endif  // HAL_SPI_MODULE_ENABLED
 
-#ifdef HAS_UART
-
+#ifdef HAL_UART_MODULE_ENABLED
 typedef struct {
   UART_HandleTypeDef *huart;
   void (*rxHalfCallback)(void *);
@@ -190,9 +189,9 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
   }
 }
 
-#endif
+#endif  // HAL_UART_MODULE_ENABLED
 
-#ifdef HAS_ADC
+#ifdef HAL_ADC_MODULE_ENABLED
 typedef struct {
   ADC_HandleTypeDef *hadc;
   void (*convCallback)(void *);
@@ -232,4 +231,4 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
   }
 }
 
-#endif
+#endif  // HAL_ADC_MODULE_ENABLED

@@ -8,16 +8,13 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "board_config_common.h"
 #include "circular_buffer.h"
 #include "data_structures.h"
 
-/* Useful defines for files that need to know some info about hardware it works
- * with */
-#define FLASH_SECTOR_BYTES 0x40000
-#define FLIGHT_METADATA_PAGES 2
-#define FLASH_SIZE_BYTES 0x4000000
-#define FLASH_PAGE_SIZE_BYTES 0x200
-#define FLASH_TIMEOUT_MS 500
+/* Useful defines for files that need to know about hardware it works with */
+#define FLASH_MAX_SECTOR_BYTES 0x40000
+#define FLASH_MIN_PAGE_SIZE_BYTES 0x200
 #define PYRO_CONTINUITY_THRESHOLD 3
 
 #define KHZ_TO_HZ 1000
@@ -27,162 +24,141 @@ extern "C" {
 #define RAD915_CHAN0 914 * MHZ_TO_HZ
 
 typedef struct __attribute__((__packed__)) {
-  uint32_t timestamp_s;
-  uint32_t timestamp_us;
-  int16_t imu1_accel_x_raw;
-  int16_t imu1_accel_y_raw;
-  int16_t imu1_accel_z_raw;
-  double imu1_accel_x;
-  double imu1_accel_y;
-  double imu1_accel_z;
-  int16_t imu1_gyro_x_raw;
-  int16_t imu1_gyro_y_raw;
-  int16_t imu1_gyro_z_raw;
-  double imu1_gyro_x;
-  double imu1_gyro_y;
-  double imu1_gyro_z;
-  int16_t imu1_mag_x_raw;
-  int16_t imu1_mag_y_raw;
-  int16_t imu1_mag_z_raw;
-  double imu1_mag_x;
-  double imu1_mag_y;
-  double imu1_mag_z;
-  int16_t imu2_accel_x_raw;
-  int16_t imu2_accel_y_raw;
-  int16_t imu2_accel_z_raw;
-  double imu2_accel_x;
-  double imu2_accel_y;
-  double imu2_accel_z;
-  int16_t imu2_gyro_x_raw;
-  int16_t imu2_gyro_y_raw;
-  int16_t imu2_gyro_z_raw;
-  double imu2_gyro_x;
-  double imu2_gyro_y;
-  double imu2_gyro_z;
-  int16_t imu2_mag_x_raw;
-  int16_t imu2_mag_y_raw;
-  int16_t imu2_mag_z_raw;
-  double imu2_mag_x;
-  double imu2_mag_y;
-  double imu2_mag_z;
-  int16_t high_g_accel_x_raw;
-  int16_t high_g_accel_y_raw;
-  int16_t high_g_accel_z_raw;
-  double high_g_accel_x;
-  double high_g_accel_y;
-  double high_g_accel_z;
-  double baro1_pres;
-  double baro1_temp;
-  double baro2_pres;
-  double baro2_temp;
-  float gps_lat;
-  float gps_long;
-  float gps_alt;
-  float gps_speed;
-  float gps_course;
-  float gps_latitude_deviation;
-  float gps_longitude_deviation;
-  float gps_altitude_deviation;
-  float gps_speed_kph;
-  float gps_speed_knots;
-  uint64_t gps_timestamp;
-  int gps_seconds;
-  int gps_minutes;
-  int gps_hours;
-  int gps_day;
-  int gps_month;
-  int gps_year;
-  int gps_num_sats;
-  char gps_status;
-  double battery_voltage;
-  bool pyro_continuity[6];
+  uint32_t timestampS;
+  uint32_t timestampUs;
+#if HAS_DEV(IMU)
+  ImuData_t imuData[NUM_IMU];
+#endif  // HAS_DEV(IMU)
+#if HAS_DEV(ACCEL)
+  AccelData_t accelData[NUM_ACCEL];
+#endif  // HAS_DEV(ACCEL)
+#if HAS_DEV(BAROMETER)
+  BarometerData_t barometerData[NUM_BAROMETER];
+#endif  // HAS_DEV(BAROMETER)
+#if HAS_DEV(GPS)
+  GpsData_t gpsData[NUM_GPS];
+#endif  // HAS_DEV(GPS)
+#if HAS_DEV(VBAT)
+  double vbatData[NUM_VBAT];
+#endif  // HAS_DEV(VBAT)
+#if HAS_DEV(PYRO_CONT)
+  bool pyroContData[NUM_PYRO_CONT];
+#endif  // HAS_DEV(PYRO_CONT)
 } SensorData_t;
 
 // Sensor fullscales, in m/s/s
 typedef struct {
-  double imu1_accel_fs;
-  double imu2_accel_fs;
+#if HAS_DEV(IMU)
+  double imuAccelFs[NUM_IMU];
+#endif  // HAS_DEV(IMU)
+#if HAS_DEV(ACCEL)
+  double accelFs[NUM_ACCEL];
+#endif  // HAS_DEV(ACCEL)
 } SensorProperties_t;
 
-typedef enum hardware_t {
-  RADIO_433 = 0,
-  RADIO_915,
-  IMU1,
-  IMU2,
-  BAROMETER1,
-  BAROMETER2,
-  HIGH_G_ACCELEROMETER,
-  NUM_HARDWARE
-} Hardware_t;
-
-// Addresses
-typedef enum {
-  ADDR_NRF_FCB = 0,  // the NRF on the FCB
-  ADDR_PHONE = 1,    // A phone
-  ADDR_CUTTER1 = 2,  // LC 1
-  ADDR_CUTTER2 = 3,  // LC 2
-
-  MAX_ADDRESS = ADDR_CUTTER2,
-  NUM_ADDRESSES = ADDR_CUTTER2 + 1
-} BluetoothAddresses_te;
+#if HAS_DEV(ACCEL)
+extern bool hardwareStatusAccel[NUM_ACCEL];
+#endif  // HAS_DEV(ACCEL)
+#if HAS_DEV(BAROMETER)
+extern bool hardwareStatusBarometer[NUM_BAROMETER];
+#endif  // HAS_DEV(BAROMETER)
+#if HAS_DEV(BLE_CHIP)
+extern bool hardwareStatusBleChip[NUM_BLE_CHIP];
+#endif  // HAS_DEV(BLE)
+#if HAS_DEV(BLE_CLIENT)
+extern bool hardwareStatusBleClient[NUM_BLE_CLIENT];
+#endif  // HAS_DEV(BLE_CLIENT)
+#if HAS_DEV(BUZZER)
+extern bool hardwareStatusBuzzer[NUM_BUZZER];
+#endif  // HAS_DEV(BUZZER)
+#if HAS_DEV(DC_MOTOR)
+extern bool hardwareStatusDcMotor[NUM_DC_MOTOR];
+#endif  // HAS_DEV(DC_MOTOR)
+#if HAS_DEV(FLASH)
+extern bool hardwareStatusFlash[NUM_FLASH];
+#endif  // HAS_DEV(FLASH)
+#if HAS_DEV(GPS)
+extern bool hardwareStatusGps[NUM_GPS];
+#endif  // HAS_DEV(GPS)
+#if HAS_DEV(IMU)
+extern bool hardwareStatusImu[NUM_IMU];
+#endif  // HAS_DEV(IMU)
+#if HAS_DEV(LED)
+extern bool hardwareStatusLed[NUM_LED];
+#endif  // HAS_DEV(LED)
+#if HAS_DEV(LINE_CUTTER)
+extern bool hardwareStatusLineCutter[NUM_LINE_CUTTER];
+#endif  // HAS_DEV(LINE_CUTTER)
+#if HAS_DEV(PYRO)
+extern bool hardwareStatusPyro[NUM_PYRO];
+#endif  // HAS_DEV(PYRO)
+#if HAS_DEV(RADIO)
+extern bool hardwareStatusRadio[NUM_RADIO];
+#endif  // HAS_DEV(RADIO)
+#if HAS_DEV(SERVO)
+extern bool hardwareStatusServo[NUM_SERVO];
+#endif  // HAS_DEV(SERVO)
+#if HAS_DEV(USB)
+extern bool hardwareStatusUsb[NUM_USB];
+#endif  // HAS_DEV(USB)
+#if HAS_DEV(VBAT)
+extern bool hardwareStatusVbat[NUM_VBAT];
+#endif  // // HAS_DEV(USB)
 
 void HM_HardwareInit();
-
-bool* HM_GetHardwareStatus();
 
 /* Microcontroller timer functions */
 uint32_t HM_Millis();
 
 /* Flash functions */
-bool HM_FlashReadStart(uint32_t startLoc, uint32_t numBytes, uint8_t* pData);
-bool HM_FlashWriteStart(uint32_t startLoc, uint32_t numBytes, uint8_t* data);
-bool HM_FlashEraseSectorStart(uint32_t sectorNum);
-bool HM_FlashEraseChipStart();
-bool HM_FlashIsReadComplete();
-bool HM_FlashIsWriteComplete();
-bool HM_FlashIsEraseComplete();
+bool HM_FlashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
+                       uint8_t* pData);
+bool HM_FlashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
+                        uint8_t* data);
+bool HM_FlashEraseSectorStart(int flashId, uint32_t sectorNum);
+bool HM_FlashEraseChipStart(int flashId);
+bool HM_FlashIsReadComplete(int flashId);
+bool HM_FlashIsWriteComplete(int flashId);
+bool HM_FlashIsEraseComplete(int flashId);
 
-/* Buzzer functions for hardware manager */
-void HM_BuzzerSetFrequency(float fHz);
-void HM_BuzzerStart();
-void HM_BuzzerStop();
-
-/* Servo functions */
-void HM_ServoSetAngle(int servoNum, float degrees);
+/* Buzzer functions */
+void HM_BuzzerSetFrequency(int buzzerId, float fHz);
+void HM_BuzzerStart(int buzzerId);
+void HM_BuzzerStop(int buzzerId);
 
 /* LED functions */
-void HM_LedSet(int ledNum, bool on);
-void HM_LedToggle(int ledNum);
+void HM_LedSet(int ledId, bool on);
+void HM_LedToggle(int ledId);
 
 /* Radio functions */
-bool HM_RadioSend(Hardware_t radio, uint8_t* data, uint16_t numBytes);
-void HM_RadioRegisterConsumer(Hardware_t radio, CircularBuffer_t* rxBuffer);
+bool HM_RadioSend(int radioNum, uint8_t* data, uint16_t numBytes);
+void HM_RadioRegisterConsumer(int radioNum, CircularBuffer_t* rxBuffer);
 void HM_RadioUpdate();
-void HM_RadioSetChannel(Hardware_t radio, int channel);
+void HM_RadioSetChannel(int radioNum, int channel);
 
 /* USB functions */
-bool HM_UsbIsConnected();
-bool HM_UsbTransmit(uint8_t* data, uint16_t numBytes);
-CircularBuffer_t* HM_UsbGetRxBuffer();
+bool HM_UsbIsConnected(int usbId);
+bool HM_UsbTransmit(int usbId, uint8_t* data, uint16_t numBytes);
+CircularBuffer_t* HM_UsbGetRxBuffer(int usbId);
 
 /* Bluetooth functions */
-//! Return if a phone is connected
-bool HM_BluetoothCliConnected();
-bool HM_BluetoothSend(uint8_t address, const uint8_t* data, uint16_t numBytes);
-CircularBuffer_t* HM_BleConsoleGetRxBuffer();
+bool HM_BleClientConnected(int bleClientId);
+bool HM_BleClientSend(int bleClientId, const uint8_t* data, uint16_t numBytes);
+CircularBuffer_t* HM_BleClientGetRxBuffer(int bleClientId);
 
-void HM_BluetoothTick();
+void HM_BleTick();
 
-LineCutterData_t* HM_GetLineCutterData(BluetoothAddresses_te address);
-LineCutterFlightVars_t* HM_GetLineCutterFlightVariables(
-    BluetoothAddresses_te address);
+LineCutterData_t* HM_GetLineCutterData(int lineCutterId);
+LineCutterFlightVars_t* HM_GetLineCutterFlightVariables(int lineCutterId);
 
-bool HM_LineCutterSendString(int id, char* string);
+bool HM_LineCutterSendString(int lineCutterNumber, char* string);
 bool HM_LineCuttersSendCut(int chan);
 
 /* Outputs */
-void HM_PyroFire(int channel, uint32_t duration);
+void HM_ServoSetAngle(int servoId, float degrees);
+void HM_PyroFire(int pyroId, uint32_t duration);
 void HM_PyroUpdate();
+void HM_DCMotorSetPercent(int dcMotorId, double percent);
 
 /* Sensor functions */
 
@@ -195,7 +171,7 @@ void HM_SetBaro2Sampling(bool enable);
 void HM_SetGpsSampling(bool enable);
 void HM_SetBatteryVoltageSampling(bool enable);
 void HM_SetPyroContinuitySampling(bool enable);
-void HM_IWDG_Refresh();
+void HM_WatchdogRefresh();
 
 /**
  * @brief Updates sensor data from enabled sensors

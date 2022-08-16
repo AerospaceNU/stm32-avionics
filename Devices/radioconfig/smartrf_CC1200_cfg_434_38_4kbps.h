@@ -1,6 +1,7 @@
 #ifndef DEVICES_RADIOCONFIG_SMARTRF_CC1200_CFG_434_38_4KBPS_H_
 #define DEVICES_RADIOCONFIG_SMARTRF_CC1200_CFG_434_38_4KBPS_H_
 
+#include "board_config_common.h"
 #include "cc1120_cc1200_defs.h"
 #include "smartrf_registersettings.h"
 
@@ -18,8 +19,7 @@
 // Symbol rate = 38.4
 // Whitening = false
 
-#ifdef HAS_CC1200
-
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
 const RegisterSetting_t cc1200_433_1_2kbps_cfg[] = {
     {TIRADIO_IOCFG3,
      0x06},  // asserted when sync word, de-asserted at end of packet (in RX)
@@ -87,6 +87,6 @@ const RegisterSetting_t cc1200_433_1_2kbps_cfg[] = {
 
 #define cc1200_433_1_2kbps_size sizeof(cc1200_433_1_2kbps_cfg)
 
-#endif
+#endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
 
 #endif  // DEVICES_RADIOCONFIG_SMARTRF_CC1200_CFG_434_38_4KBPS_H_

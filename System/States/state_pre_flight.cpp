@@ -3,7 +3,6 @@
 
 #include <string.h>
 
-#include "buzzer_report_scheme.h"
 #include "cli.h"
 #include "cli_tasks.h"
 #include "data_log.h"
@@ -29,24 +28,23 @@ void PreFlightState::init() {
   PyroManager_Init();
   filterInit(this->period_ms_ / 1000.0);
   HM_ReadSensorData();
-  filterSetPressureRef(
-      (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
+  filterSetPressureRef(filterGetAveragePressure(HM_GetSensorData()));
 
   cli_tasks::ConfigureForGround();
   doCleanup = false;
 }
 
 EndCondition_t PreFlightState::run() {
-  // Produce a tone for each functioning peripheral
-  buzzerReport();
-
   // Collect, and filter data
   SensorData_t* sensorData = HM_GetSensorData();
-  if (!gpsTimestamp && sensorData->gps_timestamp > 0) {
-    data_log_get_flight_metadata()->gpsTimestamp = sensorData->gps_timestamp;
+#if HAS_DEV(GPS)
+  if (!gpsTimestamp && sensorData->gpsData[0].timestamp > 0) {
+    data_log_get_flight_metadata()->gpsTimestamp =
+        sensorData->gpsData[0].timestamp;
     data_log_write_flight_metadata();
     gpsTimestamp = true;
   }
+#endif  // HAS_DEV(GPS)
 
   memcpy(&sensorDataBuffer[bufferCounter], sensorData, sizeof(SensorData_t));
   FilterData_t* filterData = filterGetData();
@@ -67,8 +65,7 @@ EndCondition_t PreFlightState::run() {
   if (HM_Millis() - prevPressureLogTime > 1000) {
     prevPressureLogTime = HM_Millis();
     // Add a pressure ref to the filter
-    filterAddPressureRef(
-        (HM_GetSensorData()->baro1_pres + HM_GetSensorData()->baro2_pres) / 2);
+    filterAddPressureRef(sensorData);
   }
   if (HM_Millis() - prefGravityRefTime > kGravityRefInterval) {
     prefGravityRefTime = HM_Millis();
@@ -104,7 +101,7 @@ EndCondition_t PreFlightState::run() {
   }
 
   // Detect if USB was plugged back in (not in sim mode)
-  if (!HM_InSimMode() && HM_UsbIsConnected()) {
+  if (!HM_InSimMode() && HM_UsbIsConnected(USB_CLI_ID)) {
     return EndCondition_t::UsbConnect;
   }
 

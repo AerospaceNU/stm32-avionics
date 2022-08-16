@@ -20,6 +20,73 @@ typedef struct __attribute__((packed)) {
   uint8_t lqi;
 } RecievedPacket_t;
 
+typedef enum { AXIS_X = 0, AXIS_Y, AXIS_Z } Axis_t;
+
+typedef struct {
+  Axis_t axis;
+  int8_t direction;
+} Orientation_t;
+
+typedef struct __attribute__((packed)) {
+  int16_t x;
+  int16_t y;
+  int16_t z;
+} Axis3dRaw_t;
+
+typedef struct __attribute__((packed)) {
+  double x;
+  double y;
+  double z;
+} Axis3dReal_t;
+
+typedef struct __attribute__((packed)) {
+  Axis3dRaw_t raw;
+  Axis3dReal_t realMps2;
+} AccelData_t;
+
+typedef struct __attribute__((packed)) {
+  double temperatureC;
+  double pressureAtm;
+} BarometerData_t;
+
+typedef struct __attribute__((packed)) {
+  float latitude;
+  float longitude;
+  float altitude;
+  float speedKnots;
+  float courseDeg;
+  float latitudeDeviation;
+  float longitudeDeviation;
+  float altitudeDeviation;
+  float speedKph;
+  float speedKnots2;
+  uint64_t timestamp;
+  int seconds;
+  int microseconds;
+  int minutes;
+  int hours;
+  int day;
+  int month;
+  int year;
+  int num_sats;
+  char status;
+} GpsData_t;
+
+typedef struct __attribute__((packed)) {
+  Axis3dRaw_t accel;
+  Axis3dRaw_t angVel;
+  Axis3dRaw_t mag;
+} ImuDataRaw_t;
+
+typedef struct __attribute__((packed)) {
+  Axis3dRaw_t accelRaw;
+  Axis3dReal_t accelRealMps2;
+  Axis3dRaw_t angVelRaw;
+  Axis3dReal_t angVelRealRadps;
+  Axis3dRaw_t magRaw;
+  Axis3dReal_t magRealG;
+} ImuData_t;
+
 // The data struct from the line cutter
 typedef struct __attribute__((__packed__)) {
   uint8_t lineCutterNumber;  // ID programmed into the line cutter. Maybe CRC of

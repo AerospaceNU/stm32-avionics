@@ -7,6 +7,7 @@
 
 #include "flight_state.h"
 
+#include "board_config_common.h"
 #include "cli.h"
 #include "cli_tasks.h"
 #include "data_log.h"
@@ -20,14 +21,18 @@ EndCondition_t FlightState::run_state() {
   // We also should run periodic updates
   HM_RadioUpdate();
   RadioManager_tick();
-  HM_BluetoothTick();
+  HM_BleTick();
 
   // Collect, filter, and log all sensor data
   HM_ReadSensorData();
   SensorData_t* sensorData = HM_GetSensorData();
   filterApplyData(sensorData, HM_GetSensorProperties(), m_hasPastApogee);
   FilterData_t* filterData = filterGetData();
-  RadioManager_transmitData(sensorData, filterData, this->getID());
+
+  // For now, transmit data to all attached radios
+  for (int i = 0; i < NUM_RADIO; i++) {
+    RadioManager_transmitData(i, sensorData, filterData, this->getID());
+  }
 
   // Update pyros
   PyroManager_Update(filterData, m_hasPastApogee);

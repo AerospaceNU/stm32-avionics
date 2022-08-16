@@ -1,5 +1,5 @@
 /*
- * tiRadio_spi_drv.h
+ * ti_radio.h
  *
  *  Created on: May 24, 2020
  *      Author: bph71
@@ -14,14 +14,13 @@ extern "C" {
 
 #include <stdbool.h>
 
-#include "board_config.h"
-#include HAL_HEADER
+#include "board_config_common.h"
 #include "circular_buffer.h"
 #include "data_structures.h"
 #include "radioconfig/smartrf_registersettings.h"
 #include "stdint.h"
 
-#define tiRadio_STATUS_MASK 0xF0
+#define TI_RADIO_STATUS_MASK 0xF0
 
 #define MAX_COMSUMER 5
 

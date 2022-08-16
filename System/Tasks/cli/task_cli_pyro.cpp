@@ -10,7 +10,7 @@ void cli_tasks::cliPyroFire() {
   if (options.p) {
     char* endPtr;
     int pyroNum = strtol(options.p, &endPtr, 10) - 1;
-    if (*endPtr != '\0' || pyroNum < 0 || pyroNum >= MAX_PYRO) {
+    if (*endPtr != '\0' || pyroNum < 0 || pyroNum >= NUM_PYRO) {
       cliSendAck(false, "Invalid pyro number");
       return;
     }

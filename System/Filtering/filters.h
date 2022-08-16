@@ -52,10 +52,16 @@ void filterApplyData(SensorData_t* curSensorVals,
                      bool hasPassedApogee);
 
 /**
- * @brief Adds reference pressure to the running list of pressures
- * @param pres: Must be same unit as sensor data pressure
+ * @brief Get average pressure from sensor data
+ * @param curSensorVals: Current sensor values to get average pressure of
  */
-void filterAddPressureRef(double currentPres);
+double filterGetAveragePressure(SensorData_t* curSensorVals);
+
+/**
+ * @brief Adds reference pressure to the running list of pressures
+ * @param curSensorVals: Current sensor values to use pressure from
+ */
+void filterAddPressureRef(SensorData_t* curSensorVals);
 
 /**
  * @brief Adds a reference acceleration value to calculate gravity direction

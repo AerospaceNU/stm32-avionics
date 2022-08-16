@@ -4,7 +4,7 @@
 
 #include "adc_device.h"
 
-#ifdef HAS_ADC_DEVICE
+#if HAS_DEV(VBAT_ADC) || HAS_DEV(PYRO_CONT_ADC)
 
 #include "hal_callbacks.h"
 
@@ -98,4 +98,4 @@ bool adcGetValue(AdcCtrl_t *adc, float *pval, uint32_t timeoutMS) {
   return false;
 }
 
-#endif  // HAS_ADC_DEVICE
+#endif  // HAS_DEV(VBAT_ADC) || HAS_DEV(PYRO_CONT_ADC)

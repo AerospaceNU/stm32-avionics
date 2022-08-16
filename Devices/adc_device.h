@@ -5,8 +5,7 @@
 #ifndef DEVICES_ADC_DEVICE_H_
 #define DEVICES_ADC_DEVICE_H_
 
-#include "board_config.h"
-#include HAL_HEADER
+#include "board_config_common.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -7,7 +7,6 @@ set(SYSTEM_FILES_LIST
         pyro_manager.c
 
         Tasks/buzzer_heartbeat.cpp
-        Tasks/buzzer_report_scheme.cpp
         Tasks/data_offload.c
         Tasks/cli/task_cli_config.cpp
         Tasks/cli/task_cli_help.cpp

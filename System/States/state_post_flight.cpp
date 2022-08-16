@@ -42,7 +42,7 @@ EndCondition_t PostFlightState::run() {
     data_log_write(sensorData, filterData, this->getID());
 
   // Detect if USB has been plugged in (non-sim mode)
-  if (!HM_InSimMode() && HM_UsbIsConnected()) {
+  if (!HM_InSimMode() && HM_UsbIsConnected(USB_CLI_ID)) {
     return EndCondition_t::UsbConnect;
   }
 

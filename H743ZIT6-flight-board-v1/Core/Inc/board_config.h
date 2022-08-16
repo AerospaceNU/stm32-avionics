@@ -1,72 +1,58 @@
 /*
  * board_config file for Flight Control Board V1
- *
  */
 
 #ifndef H743ZIT6_FLIGHT_BOARD_V1_CORE_INC_BOARD_CONFIG_H_
 #define H743ZIT6_FLIGHT_BOARD_V1_CORE_INC_BOARD_CONFIG_H_
 
+#include "board_config_types.h"
+
 #define HAL_HEADER "stm32h7xx.h"
 
-#define HAS_CC1200
-#define HAS_ADC_DEVICE
-#define HAS_GPS
-#define HAS_MS5607
-#define HAS_S25FLX
-#define HAS_BUZZER
-#define HAS_SERVO
-#define HAS_LSM9DS1
-#define HAS_H3LIS331DL
-#define HAS_DC_MOTOR
-#define HAS_USB
-#define HAS_INA226
-#define HAS_LED_1
+#define NUM_ACCEL_H3LIS331DL 1
 
-#define HAS_SPI
-#define HAS_ADC
-#define HAS_UART
+#define NUM_BAROMETER_MS5607 2
 
-#define HAS_BLE
-#define HAS_LINE_CUTTER
-#define NUM_LINE_CUTTERS 2
+#define NUM_BLE_CHIP_NRF 1
 
-#define HAS_PYRO
-#define MAX_PYRO 3
+#define NUM_BLE_CLIENT_STD 1
 
-/*
- * IMU Types:
- * 0: NO IMU
- * 1: LSM9DS1
- */
+#define NUM_BUZZER_PWM 1
 
-#define IMU_1 IMU_LSM9DS1
+#define NUM_DC_MOTOR_PWM 0
 
-typedef enum { AXIS_X = 0, AXIS_Y, AXIS_Z } Axis_t;
+#define NUM_FLASH_S25FLX 1
 
-#include <stdint.h>
-typedef struct {
-  Axis_t axis;
-  int8_t direction;
-} Orientation_t;
+#define NUM_GPS_STD 0
+#define NUM_GPS_UBLOX 1
 
-extern Orientation_t IMU1_ACCEL_BOARD_TO_LOCAL[3];
-extern Orientation_t IMU2_ACCEL_BOARD_TO_LOCAL[3];
-extern Orientation_t HIGH_G_ACCEL_BOARD_TO_LOCAL[3];
-extern Orientation_t IMU1_GYRO_BOARD_TO_LOCAL[3];
-extern Orientation_t IMU2_GYRO_BOARD_TO_LOCAL[3];
+#define NUM_IMU_LSM9DS1 2
+#define NUM_IMU_ICM20948 0
 
-/*
- * Radio. We assume we can only have 433 or 915, and they're both
- * either cc1200 or cc1120
- */
+#define NUM_LED_DIGITAL 5
 
-// #define HAS_RADIO_433
-#define HAS_RADIO_915  // This one will always have a CC1190 attached
+#define NUM_LINE_CUTTER_BLE 2
 
-// Baro, 1 for MS5607 over SPI
-#define BARO_1 BARO_MS5607_SPI
-#define BARO_2 BARO_MS5607_SPI
+#define NUM_PYRO_DIGITAL 6
 
-#define TELEMETRY_RADIO RADIO_915
+#define NUM_PYRO_CONT_ADC 6
+
+#define NUM_RADIO_TI_433 0
+#define NUM_RADIO_TI_915 1
+
+#define NUM_SERVO_PWM 4
+
+#define NUM_USB_STD 1
+
+#define NUM_VBAT_ADC 0
+#define NUM_VBAT_INA226 1
+
+#define NUM_WATCHDOG_INTERNAL 1
+
+#define BLE_CLI_ID 0
+#define RADIO_CLI_ID 0
+#define USB_CLI_ID 0
+
+#define RADIO_TI_TYPE RADIO_TI_TYPE_CC1200
 
 #endif  // H743ZIT6_FLIGHT_BOARD_V1_CORE_INC_BOARD_CONFIG_H_

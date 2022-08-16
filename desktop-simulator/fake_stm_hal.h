@@ -1,3 +1,7 @@
+/*
+ * fake_stm_hal.h
+ */
+
 #ifndef DESKTOP_SIMULATOR_FAKE_STM_HAL_H_
 #define DESKTOP_SIMULATOR_FAKE_STM_HAL_H_
 

@@ -1,22 +1,22 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.h
+ * @brief          : Header for main.c file.
+ *                   This file contains the common defines of the application.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -136,64 +136,7 @@ void Error_Handler(void);
 #define IMU2_AG_CS_Pin GPIO_PIN_1
 #define IMU2_AG_CS_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
-#define IMU1_AG_HSPI		&hspi3
-#define IMU1_M_HSPI			&hspi3
 
-#define IMU2_AG_HSPI		&hspi6
-#define IMU2_M_HSPI			&hspi6
-
-#define BARO1_HSPI			&hspi3
-
-#define BARO2_HSPI			&hspi6
-
-#define HIGH_G_HSPI			&hspi3
-
-#define SERVO1_HTIM			&htim8
-#define SERVO1_CHANNEL		TIM_CHANNEL_1
-
-#define SERVO2_HTIM			&htim8
-#define SERVO2_CHANNEL		TIM_CHANNEL_2
-
-#define SERVO3_HTIM			&htim8
-#define SERVO3_CHANNEL		TIM_CHANNEL_3
-
-#define SERVO4_HTIM			&htim8
-#define SERVO4_CHANNEL		TIM_CHANNEL_4
-
-#define BUZZER_HTIM			&htim1
-#define BUZZER_CHANNEL		TIM_CHANNEL_1
-
-#define FLASH_HSPI			&hspi1
-
-#define GPS_HUART			&huart5
-
-#define RAD433_HSPI			&hspi4
-
-#define VBAT_ADC			&hadc3
-#define VBAT_ADC_RANK		1
-
-#define CURRENT_ADC			&hadc1
-#define CURRENT_ADC_RANK	1
-
-#define PYRO1_ADC			&hadc2
-#define PYRO1_ADC_RANK		1
-
-#define PYRO2_ADC			&hadc2
-#define PYRO2_ADC_RANK		4
-
-#define PYRO3_ADC			&hadc2
-#define PYRO3_ADC_RANK		3
-
-#define PYRO4_ADC			&hadc2
-#define PYRO4_ADC_RANK		2
-
-#define PYRO5_ADC			&hadc1
-#define PYRO5_ADC_RANK		3
-
-#define PYRO6_ADC			&hadc1
-#define PYRO6_ADC_RANK		2
-
-#define IWDG_HANDLE			&hiwdg1
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

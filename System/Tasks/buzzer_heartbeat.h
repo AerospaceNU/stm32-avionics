@@ -6,6 +6,7 @@
 extern "C" {
 #endif
 
+void buzzerHeartbeatSetBuzzer(int buzzerId);
 void buzzerHeartbeat();
 
 #ifdef __cplusplus

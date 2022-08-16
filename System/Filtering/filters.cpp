@@ -5,22 +5,21 @@
 #include "filters.h"
 
 #include <math.h>
-#include <orientation_estimator.h>
 #include <string.h>
 
 #include "altitude_kalman.h"
-#include "board_config.h"
+#include "board_config_common.h"
 #include "circular_buffer.h"
 #include "cli.h"
 #include "hardware_manager.h"
+#include "orientation_estimator.h"
 
 #define R_DRY_AIR 287.0474909  // J/K/kg
 #define G_ACCEL_EARTH 9.80665  // m/s**2
 #define BARO_MAX_SPEED 248     // m/s over which to not call correct()
 
-#define ACCEL_SWITCH_MULTIPLE \
-  0.9  // How close IMU accel should be to fullscale before switching to
-       // higher-range accelerometer
+#define ACCEL_FS_THRESHOLD \
+  0.9  // How close IMU accel should be to fullscale before ignoring values
 #define kPrevPresMedianCount 10
 #define kPrevPresCount 10
 #define kGravityRefCount 10
@@ -78,130 +77,171 @@ void filterInit(double dt) {
   runningPresCount = 0;
 }
 
-static double filterAccelOneAxis(const double imu1reading,
-                                 const double imu2reading,
-                                 const double highGreading,
-                                 SensorProperties_t* sensorProperties,
-                                 bool imu1sampling, bool imu2sampling,
-                                 bool highGsampling) {
+static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
+                                 const SensorProperties_t* sensorProperties) {
   int numAccelsValid = 0;
   double accelSum = 0;
+  int highestValidPriority = 0;
 
-  // Only pull from IMUs if accel below fullscale and if they're working
-  if (fabs(imu1reading) <
-          ACCEL_SWITCH_MULTIPLE * sensorProperties->imu1_accel_fs &&
-      imu1sampling) {
-    numAccelsValid++;
-    accelSum += imu1reading;
+  // Only pull data if accel below fullscale and sensor is working
+#if HAS_DEV(ACCEL)
+  for (int i = 0; i < NUM_ACCEL; i++) {
+    if (hardwareStatusAccel[i] &&
+        fabs(accelReadings[i]) <
+            ACCEL_FS_THRESHOLD * sensorProperties->accelFs[i]) {
+      if (accelFilterPriority[i] > highestValidPriority) {
+        numAccelsValid = 1;
+        accelSum = accelReadings[i];
+        highestValidPriority = accelFilterPriority[i];
+      } else if (accelFilterPriority[i] == highestValidPriority) {
+        numAccelsValid++;
+        accelSum += accelReadings[i];
+      }
+    }
   }
-  if (fabs(imu2reading) <
-          ACCEL_SWITCH_MULTIPLE * sensorProperties->imu2_accel_fs &&
-      imu2sampling) {
-    numAccelsValid++;
-    accelSum += imu2reading;
-  }
+#endif  // HAS_DEV(ACCEL)
 
-  // If our IMUs are fullscaled, pull from high-G
-  if (numAccelsValid == 0 && highGsampling) {
-    numAccelsValid++;
-    accelSum += highGreading;
+#if HAS_DEV(IMU)
+  for (int i = 0; i < NUM_IMU; i++) {
+    if (hardwareStatusImu[i] &&
+        fabs(imuReadings[i]) <
+            ACCEL_FS_THRESHOLD * sensorProperties->imuAccelFs[i]) {
+      if (imuAccelFilterPriority[i] > highestValidPriority) {
+        numAccelsValid = 1;
+        accelSum = imuReadings[i];
+        highestValidPriority = imuAccelFilterPriority[i];
+      } else if (imuAccelFilterPriority[i] == highestValidPriority) {
+        numAccelsValid++;
+        accelSum += imuReadings[i];
+      }
+    }
   }
-  return accelSum / (double)numAccelsValid;
+#endif  // HAS_DEV(IMU)
+
+  return numAccelsValid == 0 ? 0.0 : accelSum / numAccelsValid;
 }
 
-static double filterGyroOneAxis(const double imu1reading,
-                                const double imu2reading, bool imu1sampling,
-                                bool imu2sampling) {
+static double filterGyroOneAxis(double* imuReadings) {
   int numGyrosValid = 0;
   double gyroSum = 0;
 
-  if (imu1sampling) {
-    gyroSum += imu1reading;
-    ++numGyrosValid;
+#if HAS_DEV(IMU)
+  for (int i = 0; i < NUM_IMU; i++) {
+    if (hardwareStatusImu[i]) {
+      numGyrosValid++;
+      gyroSum += imuReadings[i];
+    }
   }
-  if (imu2sampling) {
-    gyroSum += imu2reading;
-    ++numGyrosValid;
-  }
-  return numGyrosValid == 0 ? 0.0 : gyroSum / (double)numGyrosValid;
+#endif  // HAS_DEV(IMU)
+
+  return numGyrosValid == 0 ? 0.0 : gyroSum / numGyrosValid;
 }
 
 static double getSensorAxis(const Axis_t boardAxis,
                             const Orientation_t* sensorOrientation,
-                            double* sensorAccels) {
+                            double* sensorVals) {
   Orientation_t sensorOrient = sensorOrientation[boardAxis];
   double multiplier = sensorOrient.direction;
   // The gravity ref tells us whether or not we need to rotate our coordinate
   // system around the x axis to flip the gravity (z) direction. We're assuming
   // that the z axis is always the correct axis, just possibly reversed. To flip
-  // around the x axis, we need to negate y and z, but not x
+  // around the y axis, we need to negate x and z, but not y
   if (boardAxis != AXIS_Y) {
     multiplier *= gravityRef;
   }
 
-  return multiplier * sensorAccels[sensorOrient.axis];
+  return multiplier * sensorVals[sensorOrient.axis];
 }
 
 static void filterAccels(SensorData_t* curSensorVals,
                          SensorProperties_t* sensorProperties) {
-  bool* status = HM_GetHardwareStatus();
+  // Get acceleration readings along raw axes
+#if HAS_DEV(ACCEL)
+  double accelData[NUM_ACCEL][3] = {0};
+  for (int i = 0; i < NUM_ACCEL; i++) {
+    memcpy(accelData[i], &curSensorVals->accelData[i].realMps2,
+           3 * sizeof(double));
+  }
+#endif  // HAS_DEV(ACCEL)
+#if HAS_DEV(IMU)
+  double imuAccelData[NUM_IMU][3] = {0};
+  for (int i = 0; i < NUM_IMU; i++) {
+    memcpy(imuAccelData[i], &curSensorVals->imuData[i].accelRealMps2,
+           3 * sizeof(double));
+  }
+#endif  // HAS_DEV(IMU)
 
-  double imu1_data[3] = {0};
-  memcpy(imu1_data, &curSensorVals->imu1_accel_x, 3 * sizeof(double));
-  double imu2_data[3] = {0};
-  memcpy(imu2_data, &curSensorVals->imu2_accel_x, 3 * sizeof(double));
-  double high_g_data[3] = {0};
-  memcpy(high_g_data, &curSensorVals->high_g_accel_x, 3 * sizeof(double));
+  // Get acceleration readings along real-world axes
+#if HAS_DEV(ACCEL)
+  double accelReadings[3][NUM_ACCEL];
+  for (int i = 0; i < NUM_ACCEL; i++) {
+    for (int axis = 0; axis < 3; axis++) {
+      accelReadings[axis][i] =
+          getSensorAxis((Axis_t)axis, accelBoardToLocal[i], accelData[i]);
+    }
+  }
+#else
+  double* accelReadings[3] = {NULL};
+#endif  // HAS_DEV(ACCEL)
+#if HAS_DEV(IMU)
+  double imuReadings[3][NUM_IMU];
+  for (int i = 0; i < NUM_IMU; i++) {
+    for (int axis = 0; axis < 3; axis++) {
+      imuReadings[axis][i] =
+          getSensorAxis((Axis_t)axis, imuBoardToLocal[i], imuAccelData[i]);
+    }
+  }
+#else
+  double* imuReadings[3] = {NULL};
+#endif  // HAS_DEV(IMU)
 
-  filterData.rocket_acc_x = (filterAccelOneAxis(
-      getSensorAxis(AXIS_X, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
-      getSensorAxis(AXIS_X, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
-      getSensorAxis(AXIS_X, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
-      sensorProperties, status[IMU1], status[IMU2],
-      status[HIGH_G_ACCELEROMETER]));
+  // Filter out acceleration data by fullscale range and sensor status
+  filterData.rocket_acc_x = filterAccelOneAxis(
+      accelReadings[AXIS_X], imuReadings[AXIS_X], sensorProperties);
+  filterData.rocket_acc_y = filterAccelOneAxis(
+      accelReadings[AXIS_Y], imuReadings[AXIS_Y], sensorProperties);
+  filterData.rocket_acc_z = filterAccelOneAxis(
+      accelReadings[AXIS_Z], imuReadings[AXIS_Z], sensorProperties);
+}
 
-  filterData.rocket_acc_y = (filterAccelOneAxis(
-      getSensorAxis(AXIS_Y, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
-      getSensorAxis(AXIS_Y, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
-      getSensorAxis(AXIS_Y, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
-      sensorProperties, status[IMU1], status[IMU2],
-      status[HIGH_G_ACCELEROMETER]));
-
-  filterData.rocket_acc_z = (filterAccelOneAxis(
-      getSensorAxis(AXIS_Z, IMU1_ACCEL_BOARD_TO_LOCAL, imu1_data),
-      getSensorAxis(AXIS_Z, IMU2_ACCEL_BOARD_TO_LOCAL, imu2_data),
-      getSensorAxis(AXIS_Z, HIGH_G_ACCEL_BOARD_TO_LOCAL, high_g_data),
-      sensorProperties, status[IMU1], status[IMU2],
-      status[HIGH_G_ACCELEROMETER]));
+double filterGetAveragePressure(SensorData_t* curSensorVals) {
+  double presAvg = 0;
+#if HAS_DEV(BAROMETER)
+  for (int i = 0; i < NUM_BAROMETER; i++) {
+    presAvg += curSensorVals->barometerData[i].pressureAtm;
+  }
+  presAvg /= NUM_BAROMETER;
+#endif  // HAS_DEV(BAROMETER)
+  return presAvg;
 }
 
 static void filterGyros(SensorData_t* curSensorVals) {
-  bool* status = HM_GetHardwareStatus();
+#if HAS_DEV(IMU)
+  // Get gyro readings along raw axes
+  double imuGyroData[NUM_IMU][3];
+  for (int i = 0; i < NUM_IMU; i++) {
+    memcpy(imuGyroData[i], &curSensorVals->imuData[i].angVelRealRadps,
+           sizeof(double) * 3);
+  }
 
-  double imu1_data[3] = {0};
-  memcpy(imu1_data, &curSensorVals->imu1_gyro_x, 3 * sizeof(double));
-  double imu2_data[3] = {0};
-  memcpy(imu2_data, &curSensorVals->imu2_gyro_x, 3 * sizeof(double));
+  // Get gyro readings along real-world axes
+  double imuReadings[3][NUM_IMU];
+  for (int i = 0; i < NUM_IMU; i++) {
+    for (int axis = 0; axis < 3; axis++) {
+      imuReadings[axis][i] =
+          getSensorAxis((Axis_t)axis, imuBoardToLocal[i], imuGyroData[i]);
+    }
+  }
+#else
+  double* imuReadings[3] = {NULL};
+#endif  // HAS_DEV(IMU)
+
   filterData.rocket_ang_vel_x =
-      filterGyroOneAxis(
-          getSensorAxis(AXIS_X, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
-          getSensorAxis(AXIS_X, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
-          status[IMU1], status[IMU2]) -
-      gyroXOffset;
-
+      filterGyroOneAxis(imuReadings[AXIS_X]) - gyroXOffset;
   filterData.rocket_ang_vel_y =
-      filterGyroOneAxis(
-          getSensorAxis(AXIS_Y, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
-          getSensorAxis(AXIS_Y, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
-          status[IMU1], status[IMU2]) -
-      gyroYOffset;
-
+      filterGyroOneAxis(imuReadings[AXIS_Y]) - gyroYOffset;
   filterData.rocket_ang_vel_z =
-      filterGyroOneAxis(
-          getSensorAxis(AXIS_Z, IMU1_GYRO_BOARD_TO_LOCAL, imu1_data),
-          getSensorAxis(AXIS_Z, IMU2_GYRO_BOARD_TO_LOCAL, imu2_data),
-          status[IMU1], status[IMU2]) -
-      gyroZOffset;
+      filterGyroOneAxis(imuReadings[AXIS_Z]) - gyroZOffset;
 
   orientationEstimator.update(filterData.rocket_ang_vel_x,
                               filterData.rocket_ang_vel_y,
@@ -246,11 +286,13 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
   // For now, just convert pressure to altitude using the following formula
   // without any sort of real filtering
   // https://en.wikipedia.org/wiki/Barometric_formula
-  double lapseRate = -0.0065;  // valid below 11000m, use lookup table for lapse
-                               // rate when altitude is higher
+#if HAS_DEV(BAROMETER)
+  double lapseRate = -0.0065;  // valid below 11000m, use lookup table for
+                               // lapse rate when altitude is higher
   double tempRef = cliGetConfigs()->groundTemperatureC + 273.15;  // C to K
   double elevRef = cliGetConfigs()->groundElevationM;
-  double presAvg = (curSensorVals->baro1_pres + curSensorVals->baro2_pres) / 2;
+
+  double presAvg = filterGetAveragePressure(curSensorVals);
   double baroAlt =
       fabs(presAvg) < 0.001
           ? 0
@@ -258,14 +300,16 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
                     (1 - pow(presAvg / presRef,
                              R_DRY_AIR * lapseRate / G_ACCEL_EARTH)) +
                 elevRef;
+#endif  // HAS_DEV(BAROMETER)
 
   // Kalman filtering, assuming Z is always up
   // TODO rotate Z by orientation
 
-  // If we're descending, we can't trust the acceleration from our accelerometer
+  // If we're descending, we can't trust the acceleration from our
+  // accelerometer
   // -- the rocket's flapping around on a parachute! Otherwise, our "global
-  // acceleration" is the measured acceleration minus 9.81 (since earth pulls us
-  // down). Under parachute it's about zero, since we're about-ish in
+  // acceleration" is the measured acceleration minus 9.81 (since earth pulls
+  // us down). Under parachute it's about zero, since we're about-ish in
   // equilibrium
   double accz = hasPassedApogee ? 0 : filterData.world_acc_z - 9.81;
 
@@ -274,10 +318,12 @@ static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
   // acceleration should still be from the last timestep
   kalman.Predict(accz);
 
+#if HAS_DEV(BAROMETER)
   // Only correct if below max speed (above, baro readings untrustworthy)
   if (fabs(kalman.GetXhat().estimatedVelocity) < BARO_MAX_SPEED) {
-    kalman.Correct(baroAlt, DEFAULT_KALMAN_GAIN);
+    kalman.Correct(baroAlt, kalman.DEFAULT_KALMAN_GAIN);
   }
+#endif  // HAS_DEV(BAROMETER)
 
   auto kalmanOutput = kalman.GetXhat();
   filterData.pos_z = kalmanOutput.estimatedAltitude;
@@ -339,7 +385,10 @@ void filterAddGravityRef() {
   }
 }
 
-void filterAddPressureRef(double currentPres) {
+void filterAddPressureRef(SensorData_t* curSensorVals) {
+  // Average current pressures
+  double currentPres = filterGetAveragePressure(curSensorVals);
+
   // For the first 10 seconds (before we have any current medians
   // just set the current pressure ref so we don't depend on
   // a single initial value

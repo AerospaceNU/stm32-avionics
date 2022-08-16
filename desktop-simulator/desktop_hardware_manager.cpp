@@ -7,23 +7,106 @@
 #include <chrono>  // NOLINT
 #include <fstream>
 
-#include "board_config.h"
 #include "circular_buffer.h"
-#include "file_backed_flash.h"
-#include "flight_replay.h"
 #include "hardware_manager.h"
-#include "radio_manager.h"
-#include "sensor_types.h"
-#include "tcp_socket.h"
 
-FileBackedFlash *externalFlash;
+/* Device includes */
+
+#if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
+    HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
+    HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
+#include "flight_replay.h"
+#endif  // HAS_DEV(XXX_DESKTOP_FILE)
+
+#if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
+#include "file_backed_flash.h"
+#endif  // HAS_DEV(NUM_FLASH_DESKTOP_FILE_BACKED)
+
+#if HAS_DEV(PYRO_DESKTOP_PRINT)
+#include "print_pyro.h"
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+
+#if HAS_DEV(RADIO_DESKTOP_SOCKET)
+#include "tcp_socket.h"
+#endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
+
+/* Hardware statuses */
+#if HAS_DEV(ACCEL)
+bool hardwareStatusAccel[NUM_ACCEL];
+#endif  // HAS_DEV(ACCEL)
+#if HAS_DEV(BAROMETER)
+bool hardwareStatusBarometer[NUM_BAROMETER];
+#endif  // HAS_DEV(BAROMETER)
+#if HAS_DEV(BLE_CHIP)
+bool hardwareStatusBleChip[NUM_BLE_CHIP];
+#endif  // HAS_DEV(BLE)
+#if HAS_DEV(BLE_CLIENT)
+bool hardwareStatusBleClient[NUM_BLE_CLIENT];
+#endif  // HAS_DEV(BLE_CLIENT)
+#if HAS_DEV(BUZZER)
+bool hardwareStatusBuzzer[NUM_BUZZER];
+#endif  // HAS_DEV(BUZZER)
+#if HAS_DEV(DC_MOTOR)
+bool hardwareStatusDcMotor[NUM_DC_MOTOR];
+#endif  // HAS_DEV(DC_MOTOR)
+#if HAS_DEV(FLASH)
+bool hardwareStatusFlash[NUM_FLASH];
+#endif  // HAS_DEV(FLASH)
+#if HAS_DEV(GPS)
+bool hardwareStatusGps[NUM_GPS];
+#endif  // HAS_DEV(GPS)
+#if HAS_DEV(IMU)
+bool hardwareStatusImu[NUM_IMU];
+#endif  // HAS_DEV(IMU)
+#if HAS_DEV(LED)
+bool hardwareStatusLed[NUM_LED];
+#endif  // HAS_DEV(LED)
+#if HAS_DEV(LINE_CUTTER)
+bool hardwareStatusLineCutter[NUM_LINE_CUTTER];
+#endif  // HAS_DEV(LINE_CUTTER)
+#if HAS_DEV(PYRO)
+bool hardwareStatusPyro[NUM_PYRO];
+#endif  // HAS_DEV(PYRO)
+#if HAS_DEV(PYRO_CONT)
+bool hardwareStatusPyroCont[NUM_PYRO_CONT];
+#endif  // HAS_DEV(PYRO_CONT)
+#if HAS_DEV(RADIO)
+bool hardwareStatusRadio[NUM_RADIO];
+#endif  // HAS_DEV(RADIO)
+#if HAS_DEV(SERVO)
+bool hardwareStatusServo[NUM_SERVO];
+#endif  // HAS_DEV(SERVO)
+#if HAS_DEV(USB)
+bool hardwareStatusUsb[NUM_USB];
+#endif  // HAS_DEV(USB)
+#if HAS_DEV(VBAT)
+bool hardwareStatusVbat[NUM_VBAT];
+#endif  // HAS_DEV(VBAT)
+
+/* Hardware objects */
+
 FileBackedFlash *internalFlash;
+
+#if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
+    HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
+    HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
 static CsvReplay *flightReplay;
+#endif  // HAS_DEV(XXX_DESKTOP_FILE)
+
+#if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
+static FileBackedFlash *externalFlash[NUM_FLASH_DESKTOP_FILE_BACKED];
+#endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
+
+#if HAS_DEV(PYRO_DESKTOP_PRINT)
+static PrintPyroCtrl_t printPyro[NUM_PYRO_DESKTOP_PRINT];
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+
+#if HAS_DEV(RADIO_DESKTOP_SOCKET)
+static TcpSocket *radioSocket[NUM_RADIO_DESKTOP_SOCKET];
+#endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
 
 static SensorData_t sensorData = {0};
 static SensorProperties_t sensorProperties;
-
-static TcpSocket *radioSocket;
 
 std::string int_flash_path;  // NOLINT
 std::string ext_flash_path;  // NOLINT
@@ -31,83 +114,53 @@ std::string output_file;     // NOLINT
 
 extern "C" {
 
-bool hardwareStatus[NUM_HARDWARE] = {true, true, true, true, true, true, true};
-
-#include "stdint.h"
-#define GPIO_TypeDef uint32_t
-#include "pyro.h"
-uint32_t zero = 0;
-PyroCtrl_t pyroCtrl[MAX_PYRO];
-
 void HM_HardwareInit() {
   printf("STARTING: output %s, ext flash %s, int flash %s\n",
          output_file.c_str(), ext_flash_path.c_str(), int_flash_path.c_str());
-  externalFlash = new FileBackedFlash(ext_flash_path, FLASH_SIZE_BYTES);
-  internalFlash = new FileBackedFlash(int_flash_path, FLASH_SIZE_BYTES);
+
+  internalFlash = new FileBackedFlash(int_flash_path, kFlashSizeBytes[0]);
+
+#if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
+    HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
+    HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
   flightReplay = new CsvReplay(output_file);
-  radioSocket = new TcpSocket{8080};
+#endif  // HAS_DEV(XXX_DESKTOP_FILE)
 
-  pyroCtrl[0].port = &zero;
-  pyroCtrl[0].pin = 0;
-  pyroCtrl[1].port = &zero;
-  pyroCtrl[1].pin = 1;
-  Pyro_init(&pyroCtrl[0]);
-  Pyro_init(&pyroCtrl[1]);
-
-  // Fullscale of 16 gees, hardcoded for now
-  // TODO we shouldn't do this, and should instead record this in metadata
-  sensorProperties.imu1_accel_fs = 16 * 9.8;
-  sensorProperties.imu2_accel_fs = 156.96;
-}
-
-bool HM_RadioSend(Hardware_t radio, uint8_t *data, uint16_t numBytes) {
-  static RecievedPacket_t packet;
-  packet.crc = true;
-  packet.lqi = 4;
-  packet.radioId = radio;
-  packet.rssi = 10;
-
-  memcpy(packet.data, data, numBytes);
-
-  radioSocket->writeData((uint8_t *)&packet, sizeof(packet));
-
-  return true;
-}
-
-void HM_PyroFire(int channel, uint32_t duration) {
-  Pyro_start(&pyroCtrl[channel], duration);
-}
-
-void HM_PyroUpdate() {
-  for (int i = 0; i < MAX_PYRO; i++) {
-    Pyro_tick(&pyroCtrl[i]);
+#if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
+  for (int i = 0; i < NUM_FLASH_DESKTOP_FILE_BACKED; i++) {
+    externalFlash[i] = new FileBackedFlash(ext_flash_path, kFlashSizeBytes[i]);
+    hardwareStatusFlash[FIRST_ID_FLASH_DESKTOP_FILE_BACKED + i] = true;
   }
+#endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
+
+#if HAS_DEV(PYRO_DESKTOP_PRINT)
+  for (int i = 0; i < NUM_PYRO_DESKTOP_PRINT; i++) {
+    printPyro_init(&printPyro[i], i);
+    hardwareStatusPyro[FIRST_ID_PYRO_DESKTOP_PRINT + i] = true;
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+
+#if HAS_DEV(RADIO_DESKTOP_SOCKET)
+  for (int i = 0; i < NUM_RADIO_DESKTOP_SOCKET; i++) {
+    radioSocket[i] = new TcpSocket{radioDesktopSocketPort[i]};
+    hardwareStatusRadio[FIRST_ID_RADIO_DESKTOP_SOCKET + i] = true;
+  }
+#endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
+
+#if HAS_DEV(ACCEL)
+  // TODO we shouldn't do this, and should instead record this in metadata
+  for (int i = 0; i < NUM_ACCEL; i++) {
+    sensorProperties.accelFs[i] = 981;  // 100G * 9.81 m/s^2
+  }
+#endif  // HAS_DEV(ACCEL)
+
+#if HAS_DEV(IMU)
+  // TODO we shouldn't do this, and should instead record this in metadata
+  for (int i = 0; i < NUM_IMU; i++) {
+    sensorProperties.imuAccelFs[i] = 156.96;  // 16 * 9.81
+  }
+#endif  // HAS_DEV(IMU)
 }
-
-CircularBuffer_t *HM_BleConsoleGetRxBuffer() { return NULL; }
-
-void HM_RadioRegisterConsumer(Hardware_t radio, CircularBuffer_t *rxBuffer) {}
-void HM_RadioSetChannel(Hardware_t radio, int channel) {}
-bool HM_UsbTransmit(uint8_t *data, uint16_t numBytes) {
-  std::cout << data << std::endl;
-
-  return true;
-}
-
-bool HM_BluetoothSend(uint8_t address, const uint8_t *data, uint16_t numBytes) {
-  return true;
-}
-
-void HM_BluetoothTick() {}
-
-bool HM_LineCuttersSendCut(int chan) {
-  printf("Line cutter chan %i cut sent!\n", chan);
-  return true;
-}
-
-bool HM_LineCutterSendString(int id, char *string) { return true; }
-
-CircularBuffer_t *HM_UsbGetRxBuffer() { return 0; }
 
 uint32_t HM_Millis() {
   std::chrono::milliseconds ms =
@@ -116,72 +169,122 @@ uint32_t HM_Millis() {
   return ms.count();
 }
 
-bool HM_FlashReadStart(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
-  return externalFlash->ReadStart(startLoc, numBytes, pData);
+bool HM_FlashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
+                       uint8_t *pData) {
+#if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
+  if (IS_DEVICE(flashId, FLASH_DESKTOP_FILE_BACKED)) {
+    return externalFlash[flashId - FIRST_ID_FLASH_DESKTOP_FILE_BACKED]
+        ->ReadStart(startLoc, numBytes, pData);
+  }
+#endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
+
+  return false;
 }
-bool HM_FlashWriteStart(uint32_t startLoc, uint32_t numBytes, uint8_t *data) {
-  return externalFlash->WriteStart(startLoc, numBytes, data);
+
+bool HM_FlashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
+                        uint8_t *data) {
+#if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
+  if (IS_DEVICE(flashId, FLASH_DESKTOP_FILE_BACKED)) {
+    return externalFlash[flashId - FIRST_ID_FLASH_DESKTOP_FILE_BACKED]
+        ->WriteStart(startLoc, numBytes, data);
+  }
+#endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
+
+  return false;
 }
 
-bool HM_FlashEraseSectorStart(uint32_t sectorNum) { return false; }
+bool HM_FlashEraseSectorStart(int flashId, uint32_t sectorNum) { return false; }
+bool HM_FlashEraseChipStart(int flashId) { return false; }
+bool HM_FlashIsReadComplete(int flashId) { return true; }
+bool HM_FlashIsWriteComplete(int flashId) { return true; }
+bool HM_FlashIsEraseComplete(int flashId) { return true; }
 
-bool HM_FlashEraseChipStart() { return false; }
+void HM_BuzzerSetFrequency(int buzzerId, float fHz) {}
+void HM_BuzzerStart(int buzzerId) {}
+void HM_BuzzerStop(int buzzerId) {}
 
-bool HM_FlashIsReadComplete() { return true; }
+void HM_ServoSetAngle(int servoId, float degrees) {}
 
-bool HM_FlashIsWriteComplete() { return true; }
+void HM_LedSet(int ledId, bool set) {}
+void HM_LedToggle(int ledId) {}
 
-bool HM_FlashIsEraseComplete() { return true; }
+bool HM_RadioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
+  static RecievedPacket_t packet;
+  packet.crc = true;
+  packet.lqi = 4;
+  packet.rssi = 10;
+  memcpy(packet.data, data, numBytes);
 
-void HM_BuzzerSetFrequency(float fHz) {}
+#if HAS_DEV(RADIO_DESKTOP_SOCKET)
+  if (IS_DEVICE(radioNum, RADIO_DESKTOP_SOCKET)) {
+    packet.radioId = radioNum;
+    radioSocket[radioNum]->writeData((uint8_t *)&packet, sizeof(packet));
+    return true;
+  }
+#endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
 
-void HM_BuzzerStart() {}
-
-void HM_BuzzerStop() {}
-
-void HM_ServoSetAngle(int servoNum, float degrees) {}
-
-void HM_LedSet(int ledNum, bool set) {}
-
-void HM_LedToggle(int ledNum) {}
+  return false;
+}
 
 void HM_RadioUpdate() {}
+void HM_RadioRegisterConsumer(int radioNum, CircularBuffer_t *rxBuffer) {}
+void HM_RadioSetChannel(int radioNum, int channel) {}
 
-bool HM_UsbIsConnected() { return false; }
+bool HM_UsbIsConnected(int usbId) { return false; }
+bool HM_UsbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
+  std::cout << data << std::endl;
+  return true;
+}
+CircularBuffer_t *HM_UsbGetRxBuffer(int usbId) { return nullptr; }
 
-void HM_SetImu1Sampling(bool enable) {}
+bool HM_BleClientConnected(int bleClientId) { return false; }
+bool HM_BleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
+  return false;
+}
+CircularBuffer_t *HM_BleClientGetRxBuffer(int bleClientId) { return nullptr; }
+void HM_BleTick() {}
 
-void HM_SetImu2Sampling(bool enable) {}
+LineCutterData_t *HM_GetLineCutterData(int lineCutterId) { return nullptr; }
+LineCutterFlightVars_t *HM_GetLineCutterFlightVariables(int lineCutterId) {
+  return nullptr;
+}
+bool HM_LineCutterSendString(int lineCutterNumber, char *string) {
+  return true;
+}
+bool HM_LineCuttersSendCut(int chan) {
+  printf("Line cutter chan %i cut sent!\n", chan);
+  return true;
+}
 
-void HM_SetHighGSampling(bool enable) {}
+void HM_WatchdogRefresh() {}
 
-void HM_SetBaro1Sampling(bool enable) {}
+void HM_PyroFire(int pyroId, uint32_t duration) {
+#if HAS_DEV(PYRO_DESKTOP_PRINT)
+  if (IS_DEVICE(pyroId, PYRO_DESKTOP_PRINT)) {
+    printPyro_start(&printPyro[pyroId - FIRST_ID_PYRO_DESKTOP_PRINT], duration);
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+}
 
-void HM_SetBaro2Sampling(_Bool enable) {}
+void HM_PyroUpdate() {
+#if HAS_DEV(PYRO_DESKTOP_PRINT)
+  for (int i = 0; i < NUM_PYRO_DESKTOP_PRINT; i++) {
+    printPyro_tick(&printPyro[i]);
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+}
 
-void HM_SetGpsSampling(bool enable) {}
-
-void HM_SetBatteryVoltageSampling(bool enable) {}
-
-void HM_SetPyroContinuitySampling(bool enable) {}
-
-void HM_IWDG_Refresh() {}
-
-static void HM_SimReadSensorData() {}
-
-#include "data_log.h"
+void HM_DCMotorSetPercent(int dcMotorId, double percent) {}
 
 void HM_ReadSensorData() { flightReplay->GetNext(&sensorData); }
 
-SensorProperties_t *HM_GetSensorProperties() { return &sensorProperties; }
+SensorData_t *HM_GetSensorData() { return &sensorData; }
 
-bool *HM_GetHardwareStatus() { return hardwareStatus; }
+SensorProperties_t *HM_GetSensorProperties() { return &sensorProperties; }
 
 void HM_EnableSimMode(CircularBuffer_t *rxBuffer) {}
 
 void HM_DisableSimMode() {}
 
-SensorData_t *HM_GetSensorData() { return &sensorData; }
-
 bool HM_InSimMode() { return false; }
-}
+}  // extern "C"

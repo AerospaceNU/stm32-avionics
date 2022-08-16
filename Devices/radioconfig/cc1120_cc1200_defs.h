@@ -8,6 +8,8 @@
 #ifndef DEVICES_RADIOCONFIG_CC1120_CC1200_DEFS_H_
 #define DEVICES_RADIOCONFIG_CC1120_CC1200_DEFS_H_
 
+#include "board_config_common.h"
+
 /******************************************************************************
  * CONSTANTS
  */
@@ -45,7 +47,7 @@ typedef enum {
 } CCAMode_e;
 #define CCA_MODE_SHIFT 2
 
-#ifdef HAS_CC1120
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
 
 #define TIRADIO_IOCFG3 0x0000
 #define TIRADIO_IOCFG2 0x0001
@@ -275,8 +277,9 @@ typedef enum {
 #define TIRADIO_STATE_RXFIFO_ERROR 0x60
 #define TIRADIO_STATE_TXFIFO_ERROR 0x70
 
-#endif
-#ifdef HAS_CC1200
+#endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
+
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
 
 /* configuration registers */
 #define TIRADIO_IOCFG3 0x0000
@@ -546,7 +549,7 @@ typedef enum {
 #define TIRADIO_STATE_RXFIFO_ERROR 0x60
 #define TIRADIO_STATE_TXFIFO_ERROR 0x70
 
-#endif
+#endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
 
 #define TRXEM_PORT_SEL P3SEL
 #define TRXEM_PORT_OUT P3OUT

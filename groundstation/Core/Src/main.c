@@ -32,8 +32,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "board_config_common.h"
+#include "hardware_manager.h"
 #include "radio_manager.h"
-#include "ti_radio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -76,8 +77,8 @@ typedef struct __attribute__((__packed__)) {
 } HeartbeatData_t;
 
 typedef enum {
-  RAD_433 = 0,
-  RAD_915 = 1,
+  RAD_433 = FIRST_ID_RADIO_TI_433,
+  RAD_915 = FIRST_ID_RADIO_TI_915,
   GROUNDSTATION = 0xff
 } MessageDestination_e;
 
@@ -90,12 +91,12 @@ typedef struct __attribute__((packed)) {
 #define CHANNEL_COMMAND_ID 1
 #define RADIO_HARDWARE_COMMAND_ID 2
 
-void GroundstationParseCommand(GroundstationUsbCommand_t *command) {
+static void GroundstationParseCommand(GroundstationUsbCommand_t *command) {
   if (command->data[0] == CHANNEL_COMMAND_ID) {
     uint8_t radioHw = command->data[1];
     int8_t channel = command->data[2];
 
-    HM_RadioSetChannel(radioHw, channel);
+    HM_RadioSetChannel((int)radioHw, channel);
   }
 
   //  if (command->data[0] == CHANNEL_COMMAND_ID) {
@@ -106,8 +107,8 @@ void GroundstationParseCommand(GroundstationUsbCommand_t *command) {
   //  }
 }
 
-void OnDataRx(RecievedPacket_t *packet) {
-  HM_UsbTransmit((uint8_t *)packet, sizeof(*packet));
+static void OnDataRx(RecievedPacket_t *packet) {
+  HM_UsbTransmit(FIRST_ID_USB_STD, (uint8_t *)packet, sizeof(*packet));
 }
 
 #define min(a, b) (a < b) ? a : b
@@ -166,15 +167,17 @@ int main(void) {
   HM_HardwareInit();
 
   RadioManager_init();
-  RadioManager_addMessageCallback(OnDataRx);
+  for (int i = 0; i < NUM_RADIO; i++) {
+    RadioManager_addMessageCallback(i, OnDataRx);
+  }
 
-  CircularBuffer_t *buffer = HM_UsbGetRxBuffer();
+  CircularBuffer_t *buffer = HM_UsbGetRxBuffer(FIRST_ID_USB_STD);
 
   uint32_t start = HAL_GetTick();
 
   while (1) {
     // Update sensors
-    HM_IWDG_Refresh();
+    HM_WatchdogRefresh();
     HM_ReadSensorData();
     HM_RadioUpdate();
 
@@ -187,17 +190,19 @@ int main(void) {
 
       static HeartbeatData_t heartbeat;
       heartbeat.packetType = 200;
-      heartbeat.latitude = HM_GetSensorData()->gps_lat;
-      heartbeat.longitude = HM_GetSensorData()->gps_long;
-      heartbeat.gps_alt = HM_GetSensorData()->gps_alt;
-      heartbeat.groundPressure = HM_GetSensorData()->baro1_pres;
-      heartbeat.groundTemp = HM_GetSensorData()->baro1_temp;
+      heartbeat.latitude = HM_GetSensorData()->gpsData->latitude;
+      heartbeat.longitude = HM_GetSensorData()->gpsData->longitude;
+      heartbeat.gps_alt = HM_GetSensorData()->gpsData->altitude;
+      heartbeat.groundPressure =
+          HM_GetSensorData()->barometerData[0].pressureAtm;
+      heartbeat.groundTemp = HM_GetSensorData()->barometerData[0].temperatureC;
 
       // Hack to make all packets the same length when sent over USB
       static uint8_t heartbeatArr[sizeof(RecievedPacket_t)] = {0};
       memset(heartbeatArr, 0, sizeof(heartbeatArr));
       memcpy(heartbeatArr, &heartbeat, sizeof(heartbeat));
-      HM_UsbTransmit((uint8_t *)&heartbeatArr, sizeof(heartbeatArr));
+      HM_UsbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr,
+                     sizeof(heartbeatArr));
     }
 
     // A packet must mave at least a destination [1 byte] and a len [2 bytes],
@@ -212,8 +217,9 @@ int main(void) {
         if (command.destination == GROUNDSTATION) {
           GroundstationParseCommand(&command);
         } else {
-          RadioManager_transmitString((Hardware_t)command.destination,
-                                      command.data, command.len);
+          int dest = command.destination == RAD_433 ? FIRST_ID_RADIO_TI_433
+                                                    : FIRST_ID_RADIO_TI_915;
+          RadioManager_transmitString(dest, command.data, command.len);
         }
         cbDequeue(buffer, count);
       } else if (command.destination != GROUNDSTATION ||

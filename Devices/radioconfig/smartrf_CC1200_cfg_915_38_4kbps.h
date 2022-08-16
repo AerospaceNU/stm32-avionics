@@ -1,6 +1,7 @@
 #ifndef DEVICES_RADIOCONFIG_SMARTRF_CC1200_CFG_915_38_4KBPS_H_
 #define DEVICES_RADIOCONFIG_SMARTRF_CC1200_CFG_915_38_4KBPS_H_
 
+#include "board_config_common.h"
 #include "cc1120_cc1200_defs.h"
 #include "smartrf_registersettings.h"
 
@@ -18,6 +19,7 @@
 // Symbol rate = 38.4
 // Whitening = true, FEC = true
 
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
 const RegisterSetting_t cc1200_916_1_2kbps_cfg[] = {
     {TIRADIO_IOCFG2, 0x06},     // GPIO2 IO Pin Configuration
     {TIRADIO_SYNC_CFG1, 0xA9},  // Sync Word Detection Configuration Reg. 1
@@ -75,5 +77,7 @@ const RegisterSetting_t cc1200_916_1_2kbps_cfg[] = {
     {TIRADIO_XOSC5, 0x0E},  // Crystal Oscillator Configuration Reg. 5
     {TIRADIO_XOSC1, 0x03},  // Crystal Oscillator Configuration Reg. 1
 };
+
+#endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
 
 #endif  // DEVICES_RADIOCONFIG_SMARTRF_CC1200_CFG_915_38_4KBPS_H_

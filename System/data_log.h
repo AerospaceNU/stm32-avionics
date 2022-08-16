@@ -24,9 +24,15 @@ typedef struct __attribute__((__packed__)) {
 } FlightMetadata;
 
 /**
- * @brief Erases the entire S25FLx chip
+ * @brief Initializes variables important to the data log
  */
-void data_log_flash_erase();
+void data_log_init();
+
+/**
+ * @brief Erases the entire S25FLx chip
+ * @param flashId: ID of flash to erase
+ */
+void data_log_flash_erase(int flashId);
 
 /**
  * @brief Return the last flight number that was logged

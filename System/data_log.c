@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "board_config_common.h"
 #include "cli.h"
 
 #ifdef FCB_VERSION
@@ -19,7 +20,10 @@ const uint8_t BOARD_VERSION = 0xff;
 #define PACKET_BUFFER_SIZE 1000
 #define CONFIG_START_ADDRESS 0x200
 #define MAX_LOG_PACKETS \
-  FLASH_SECTOR_BYTES / sizeof(LogData)  // 1 sector's worth of log data
+  FLASH_MAX_SECTOR_BYTES / sizeof(LogData)  // 1 sector's worth of log data
+
+#define FLIGHT_METADATA_PAGES 2
+#define FLASH_TIMEOUT_MS 500
 
 static uint32_t flightNum = 0;
 static uint32_t curSectorNum;
@@ -27,23 +31,33 @@ static uint32_t flightFirstSectorNum;
 static uint32_t curWriteAddress;
 static uint32_t currentConfigAddress;
 static uint8_t packetBuffer[PACKET_BUFFER_SIZE];
+static int curErasingFlashId;
+static uint32_t logSizeBytes;
 
 // Log Data shows what data will be logged in what relative location
 typedef struct __attribute__((__packed__)) LogData {
-  uint32_t timestamp_s, timestamp_us;
-  int16_t imu1_accel_x_raw, imu1_accel_y_raw, imu1_accel_z_raw;
-  int16_t imu1_gyro_x_raw, imu1_gyro_y_raw, imu1_gyro_z_raw;
-  int16_t imu1_mag_x_raw, imu1_mag_y_raw, imu1_mag_z_raw;
-  int16_t imu2_accel_x_raw, imu2_accel_y_raw, imu2_accel_z_raw;
-  int16_t imu2_gyro_x_raw, imu2_gyro_y_raw, imu2_gyro_z_raw;
-  int16_t imu2_mag_x_raw, imu2_mag_y_raw, imu2_mag_z_raw;
-  int16_t high_g_accel_x_raw, high_g_accel_y_raw, high_g_accel_z_raw;
-  double baro1_temp, baro1_pres;
-  double baro2_temp, baro2_pres;
-  float gps_lat, gps_long, gps_alt;
-  double battery_voltage;
-  uint8_t pyro_continuity;
-  uint8_t pyro_status;
+  uint32_t timestampS, timestampUs;
+#if HAS_DEV(IMU)
+  ImuDataRaw_t imuData[NUM_IMU];
+#endif  // HAS_DEV(IMU)
+#if HAS_DEV(ACCEL)
+  Axis3dRaw_t accelData[NUM_ACCEL];
+#endif  // HAS_DEV(ACCEL)
+#if HAS_DEV(BAROMETER)
+  BarometerData_t barometerData[NUM_BAROMETER];
+#endif  // HAS_DEV(BAROMETER)
+#if HAS_DEV(GPS)
+  float gpsLat[NUM_GPS], gpsLong[NUM_GPS], gpsAlt[NUM_GPS];
+#endif  // HAS_DEV(GPS)
+#if HAS_DEV(VBAT)
+  double vbatData[NUM_VBAT];
+#endif  // HAS_DEV(VBAT)
+#if HAS_DEV(PYRO_CONT)
+  uint8_t pyroContinuity;
+#endif  // HAS_DEV(PYRO_CONT)
+#if HAS_DEV(PYRO)
+  uint8_t pyroStatus;
+#endif  // HAS_DEV(PYRO)
   double heading, vtg;
   double pos_x, pos_y, pos_z;
   double vel_x, vel_y, vel_z;
@@ -63,45 +77,83 @@ static const uint16_t kFlightMetadataSize = sizeof(FlightMetadata);
 
 static const uint16_t kCliConfigSize = sizeof(CliConfigs_t);
 
+static void addressToFlashId(uint32_t startLoc, int *flashId,
+                             uint32_t *flashOffset) {
+  uint32_t sum = 0;
+  for (int i = 0; i < NUM_FLASH; i++) {
+    if (startLoc < kFlashSizeBytes[i] + sum) {
+      *flashId = i;
+      *flashOffset = startLoc - sum;
+      return;
+    }
+    sum += kFlashSizeBytes[i];
+  }
+}
+
 static void flash_read(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
-  HM_FlashReadStart(startLoc, numBytes, pData);
+  int flashId = -1;
+  uint32_t flashOffset = 0;
+  addressToFlashId(startLoc, &flashId, &flashOffset);
+  HM_FlashReadStart(flashId, flashOffset, numBytes, pData);
   uint32_t waitStartMS = HM_Millis();
-  while (!HM_FlashIsReadComplete() &&
+  while (!HM_FlashIsReadComplete(flashId) &&
          HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
   }
 }
 
 static void flash_write(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
-  if (startLoc > FLASH_SIZE_BYTES) return;
-  uint32_t second_page_bytes = (startLoc + numBytes) % FLASH_PAGE_SIZE_BYTES;
+  int flashId = -1;
+  uint32_t flashOffset = 0;
+  addressToFlashId(startLoc, &flashId, &flashOffset);
+  if (flashId == -1) return;
+
+  uint32_t second_page_bytes =
+      (startLoc + numBytes) % FLASH_MIN_PAGE_SIZE_BYTES;
   if (second_page_bytes >= numBytes) second_page_bytes = 0;
   uint32_t first_page_bytes = numBytes - second_page_bytes;
-  HM_FlashWriteStart(startLoc, first_page_bytes, pData);
+  HM_FlashWriteStart(flashId, flashOffset, first_page_bytes, pData);
   uint32_t waitStartMS = HM_Millis();
-  while (!HM_FlashIsWriteComplete() &&
+  while (!HM_FlashIsWriteComplete(flashId) &&
          HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
   }
   if (second_page_bytes > 0) {
-    HM_FlashWriteStart(startLoc + first_page_bytes, second_page_bytes,
+    addressToFlashId(startLoc + first_page_bytes, &flashId, &flashOffset);
+    if (flashId == -1) return;
+    HM_FlashWriteStart(flashId, flashOffset, second_page_bytes,
                        pData + first_page_bytes);
     waitStartMS = HM_Millis();
-    while (!HM_FlashIsWriteComplete() &&
+    while (!HM_FlashIsWriteComplete(flashId) &&
            HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
     }
   }
 }
 
 static void flash_erase_sector(uint32_t sectorNum) {
-  HM_FlashEraseSectorStart(sectorNum);
+  int flashId = -1;
+  uint32_t flashOffset = 0;
+  addressToFlashId(sectorNum * FLASH_MAX_SECTOR_BYTES, &flashId, &flashOffset);
+  if (flashId == -1) return;
+
+  curErasingFlashId = flashId;
+  HM_FlashEraseSectorStart(curErasingFlashId,
+                           flashOffset / FLASH_MAX_SECTOR_BYTES);
   uint32_t waitStartMS = HM_Millis();
-  while (!HM_FlashIsEraseComplete() &&
+  while (!HM_FlashIsEraseComplete(flashId) &&
          HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
   }
 }
 
-void data_log_flash_erase() {
-  HM_FlashEraseChipStart();
-  currentConfigAddress = CONFIG_START_ADDRESS;
+void data_log_init() {
+  // Sum number of bytes in full flash
+  logSizeBytes = 0;
+  for (int i = 0; i < NUM_FLASH; i++) {
+    logSizeBytes += kFlashSizeBytes[i];
+  }
+}
+
+void data_log_flash_erase(int flashId) {
+  HM_FlashEraseChipStart(flashId);
+  if (flashId == 0) currentConfigAddress = CONFIG_START_ADDRESS;
 }
 
 static uint32_t data_log_get_last_flight_num_type(bool launched) {
@@ -132,7 +184,7 @@ static uint32_t data_log_get_last_flight_num_type(bool launched) {
         flightNumFound = true;
       } else {
         if (launched) {  // Need to check for launched to mark as last flight
-          metadataReadAddress = curSectorNum * FLASH_SECTOR_BYTES;
+          metadataReadAddress = curSectorNum * FLASH_MAX_SECTOR_BYTES;
           flash_read(metadataReadAddress, kFlightMetadataSize,
                      metadataBuff);  // Read the metadata
           flightMetadataPacket = *(FlightMetadata *)&metadataBuff;
@@ -168,7 +220,7 @@ static void data_log_get_flight_sectors(uint32_t flightNum,
   uint8_t sectorRxBuff[2] = {0};
 
   while (*firstSector == 0 &&
-         tempCurSectorNum < FLASH_SIZE_BYTES / FLASH_SECTOR_BYTES) {
+         tempCurSectorNum < logSizeBytes / FLASH_MAX_SECTOR_BYTES) {
     flash_read(tempCurSectorNum * 2, 2, sectorRxBuff);
     uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
     if (tempFlightNum == flightNum) {
@@ -185,7 +237,7 @@ static void data_log_get_flight_sectors(uint32_t flightNum,
 
   // Find last sector of flight num using metadata.
   while (*lastSector == 0 &&
-         tempCurSectorNum < FLASH_SIZE_BYTES / FLASH_SECTOR_BYTES) {
+         tempCurSectorNum < logSizeBytes / FLASH_MAX_SECTOR_BYTES) {
     flash_read(tempCurSectorNum * 2, 2, sectorRxBuff);
 
     uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
@@ -198,7 +250,7 @@ static void data_log_get_flight_sectors(uint32_t flightNum,
   // If the last sector is still 0, the last sector of data is the last sector
   // of flash
   if (*lastSector == 0) {
-    *lastSector = FLASH_SIZE_BYTES / FLASH_SECTOR_BYTES;
+    *lastSector = logSizeBytes / FLASH_MAX_SECTOR_BYTES;
   }
 }
 
@@ -228,12 +280,12 @@ void data_log_assign_flight() {
   uint8_t flightTxBuff[2] = {(flightNum >> 8) & 0xFF, flightNum & 0xFF};
 
   // We can't have a flight past the last sector
-  if (curSectorNum * FLASH_SECTOR_BYTES < FLASH_SIZE_BYTES)
+  if (curSectorNum * FLASH_MAX_SECTOR_BYTES < logSizeBytes)
     flash_write(curSectorNum * 2, 2, flightTxBuff);
 
   flightFirstSectorNum = curSectorNum;
-  curWriteAddress = curSectorNum * FLASH_SECTOR_BYTES +
-                    FLIGHT_METADATA_PAGES * FLASH_PAGE_SIZE_BYTES;
+  curWriteAddress = curSectorNum * FLASH_MAX_SECTOR_BYTES +
+                    FLIGHT_METADATA_PAGES * FLASH_MIN_PAGE_SIZE_BYTES;
 }
 
 void data_log_load_last_stored_flight_metadata() {
@@ -247,7 +299,7 @@ void data_log_read_flight_num_metadata(uint8_t flightNum) {
   data_log_get_flight_sectors(flightNum, &firstSector, &lastSector);
   // Create a buffer for the metadata
   uint8_t metadataBuff[kFlightMetadataSize];
-  uint32_t metadataReadAddress = firstSector * FLASH_SECTOR_BYTES;
+  uint32_t metadataReadAddress = firstSector * FLASH_MAX_SECTOR_BYTES;
   // Read the metadata
   flash_read(metadataReadAddress, kFlightMetadataSize, metadataBuff);
   flightMetadataPacket = *(FlightMetadata *)metadataBuff;
@@ -259,8 +311,8 @@ void data_log_write_flight_metadata() {
   if (flightNum > 0) {
     uint32_t metadataWriteAddress =
         flightFirstSectorNum *
-        FLASH_SECTOR_BYTES;  // Metadata is located at the start of the flight
-                             // sector
+        FLASH_MAX_SECTOR_BYTES;  // Metadata is located at the start of the
+                                 // flight sector
     flash_write(metadataWriteAddress, kFlightMetadataSize,
                 (uint8_t *)&flightMetadataPacket);  // Write the metadata packet
   }
@@ -270,57 +322,60 @@ void data_log_write(SensorData_t *sensorData, FilterData_t *filterData,
                     uint8_t state) {
   if (flightNum > 0) {
     // Check if current sector is beyond flash capacity. If so, stop
-    if (curSectorNum >= FLASH_SIZE_BYTES / FLASH_SECTOR_BYTES) return;
+    if (curSectorNum >= logSizeBytes / FLASH_MAX_SECTOR_BYTES) return;
 
     LogData logPacket;
-    logPacket.timestamp_s = sensorData->timestamp_s;
-    logPacket.timestamp_us = sensorData->timestamp_us;
-    logPacket.imu1_accel_x_raw = sensorData->imu1_accel_x_raw;
-    logPacket.imu1_accel_y_raw = sensorData->imu1_accel_y_raw;
-    logPacket.imu1_accel_z_raw = sensorData->imu1_accel_z_raw;
-    logPacket.imu1_gyro_x_raw = sensorData->imu1_gyro_x_raw;
-    logPacket.imu1_gyro_y_raw = sensorData->imu1_gyro_y_raw;
-    logPacket.imu1_gyro_z_raw = sensorData->imu1_gyro_z_raw;
-    logPacket.imu1_mag_x_raw = sensorData->imu1_mag_x_raw;
-    logPacket.imu1_mag_y_raw = sensorData->imu1_mag_y_raw;
-    logPacket.imu1_mag_z_raw = sensorData->imu1_mag_z_raw;
-    logPacket.imu2_accel_x_raw = sensorData->imu2_accel_x_raw;
-    logPacket.imu2_accel_y_raw = sensorData->imu2_accel_y_raw;
-    logPacket.imu2_accel_z_raw = sensorData->imu2_accel_z_raw;
-    logPacket.imu2_gyro_x_raw = sensorData->imu2_gyro_x_raw;
-    logPacket.imu2_gyro_y_raw = sensorData->imu2_gyro_y_raw;
-    logPacket.imu2_gyro_z_raw = sensorData->imu2_gyro_z_raw;
-    logPacket.imu2_mag_x_raw = sensorData->imu2_mag_x_raw;
-    logPacket.imu2_mag_y_raw = sensorData->imu2_mag_y_raw;
-    logPacket.imu2_mag_z_raw = sensorData->imu2_mag_z_raw;
-    logPacket.high_g_accel_x_raw = sensorData->high_g_accel_x_raw;
-    logPacket.high_g_accel_y_raw = sensorData->high_g_accel_y_raw;
-    logPacket.high_g_accel_z_raw = sensorData->high_g_accel_z_raw;
-    logPacket.baro1_pres = sensorData->baro1_pres;
-    logPacket.baro1_temp = sensorData->baro1_temp;
-    logPacket.baro2_pres = sensorData->baro2_pres;
-    logPacket.baro2_temp = sensorData->baro2_temp;
-    logPacket.gps_lat = sensorData->gps_lat;
-    logPacket.gps_long = sensorData->gps_long;
-    logPacket.gps_alt = sensorData->gps_alt;
-    logPacket.battery_voltage = sensorData->battery_voltage;
-    logPacket.pyro_continuity = 0;
-    for (int i = 0; i < sizeof(sensorData->pyro_continuity); i++) {
-      logPacket.pyro_continuity |=
-          ((sensorData->pyro_continuity[i] & 0x01) << i);
+    logPacket.timestampS = sensorData->timestampS;
+    logPacket.timestampUs = sensorData->timestampUs;
+#if HAS_DEV(IMU)
+    for (int i = 0; i < NUM_IMU; i++) {
+      logPacket.imuData[i].accel = sensorData->imuData[i].accelRaw;
+      logPacket.imuData[i].angVel = sensorData->imuData[i].angVelRaw;
+      logPacket.imuData[i].mag = sensorData->imuData[i].magRaw;
     }
-    logPacket.pyro_status = PyroManager_Status();
+#endif  // HAS_DEV(IMU)
+#if HAS_DEV(ACCEL)
+    for (int i = 0; i < NUM_ACCEL; i++) {
+      logPacket.accelData[i] = sensorData->accelData[i].raw;
+    }
+#endif  // HAS_DEV(ACCEL)
+#if HAS_DEV(BAROMETER)
+    for (int i = 0; i < NUM_BAROMETER; i++) {
+      logPacket.barometerData[i] = sensorData->barometerData[i];
+    }
+#endif  // HAS_DEV(BAROMETER)
+#if HAS_DEV(GPS)
+    for (int i = 0; i < NUM_GPS; i++) {
+      logPacket.gpsLat[i] = sensorData->gpsData[i].latitude;
+      logPacket.gpsLong[i] = sensorData->gpsData[i].longitude;
+      logPacket.gpsAlt[i] = sensorData->gpsData[i].altitude;
+    }
+#endif  // HAS_DEV(GPS)
+#if HAS_DEV(VBAT)
+    for (int i = 0; i < NUM_VBAT; i++) {
+      logPacket.vbatData[i] = sensorData->vbatData[i];
+    }
+#endif  // HAS_DEV(VBAT)
+#if HAS_DEV(PYRO_CONT)
+    logPacket.pyroContinuity = 0;
+    for (int i = 0; i < NUM_PYRO_CONT; i++) {
+      logPacket.pyroContinuity |= ((sensorData->pyroContData[i] & 0x01) << i);
+    }
+#endif  // HAS_DEV(PYRO_CONT)
+#if HAS_DEV(PYRO)
+    logPacket.pyroStatus = PyroManager_Status();
+#endif  // HAS_DEV(PYRO)
     logPacket.heading = filterData->heading;
     logPacket.vtg = filterData->vtg;
     logPacket.pos_x = filterData->pos_x;
     logPacket.pos_y = filterData->pos_y;
     logPacket.pos_z = filterData->pos_z;
-    logPacket.vel_x = filterData->rocket_vel_x;
-    logPacket.vel_y = filterData->rocket_vel_y;
-    logPacket.vel_z = filterData->rocket_vel_z;
-    logPacket.acc_x = filterData->rocket_acc_x;
-    logPacket.acc_y = filterData->rocket_acc_y;
-    logPacket.acc_z = filterData->rocket_acc_z;
+    logPacket.vel_x = filterData->world_vel_x;
+    logPacket.vel_y = filterData->world_vel_y;
+    logPacket.vel_z = filterData->world_vel_z;
+    logPacket.acc_x = filterData->world_acc_x;
+    logPacket.acc_y = filterData->world_acc_y;
+    logPacket.acc_z = filterData->world_acc_z;
     logPacket.qx = filterData->qx;
     logPacket.qy = filterData->qy;
     logPacket.qz = filterData->qz;
@@ -336,11 +391,11 @@ void data_log_write(SensorData_t *sensorData, FilterData_t *filterData,
     static bool erasing = false;
     if (erasing) {
       // If currently erasing, check if erase is complete
-      erasing = !HM_FlashIsEraseComplete();
+      erasing = !HM_FlashIsEraseComplete(curErasingFlashId);
     } else {
       // Check if a new sector has been entered. If so, record in file system
       // and start erasing the sector
-      if ((curWriteAddress + kLogDataSize) / FLASH_SECTOR_BYTES >
+      if ((curWriteAddress + kLogDataSize) / FLASH_MAX_SECTOR_BYTES >
           curSectorNum) {
         curSectorNum++;
         // Write flight number and sector to metadata
@@ -381,13 +436,14 @@ uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata,
   }
 
   // Read from flight at the appropriate offset (excluding metadata)
-  uint32_t readAddress = firstSector * FLASH_SECTOR_BYTES +
-                         FLIGHT_METADATA_PAGES * FLASH_PAGE_SIZE_BYTES +
+  uint32_t readAddress = firstSector * FLASH_MAX_SECTOR_BYTES +
+                         FLIGHT_METADATA_PAGES * FLASH_MIN_PAGE_SIZE_BYTES +
                          readOffset;
   flash_read(readAddress, maxBytes, pdata);
   // If the last sector has been passed, return only the bytes that count
-  if ((readAddress + maxBytes) > FLASH_SECTOR_BYTES * (lastSector + 1)) {
-    uint32_t bytesRead = (lastSector + 1) * FLASH_SECTOR_BYTES - readAddress;
+  if ((readAddress + maxBytes) > FLASH_MAX_SECTOR_BYTES * (lastSector + 1)) {
+    uint32_t bytesRead =
+        (lastSector + 1) * FLASH_MAX_SECTOR_BYTES - readAddress;
     readOffset += bytesRead;
     return bytesRead;
   }
@@ -447,28 +503,29 @@ uint32_t data_log_get_last_flight_timestamp(uint32_t flightNum) {
   // Find sectors of flight num using metadata
   data_log_get_flight_sectors(flightNum, &firstSector, &lastSector);
 
-  uint32_t firstAddress = firstSector * FLASH_SECTOR_BYTES +
-                          FLIGHT_METADATA_PAGES * FLASH_PAGE_SIZE_BYTES;
+  uint32_t firstAddress = firstSector * FLASH_MAX_SECTOR_BYTES +
+                          FLIGHT_METADATA_PAGES * FLASH_MIN_PAGE_SIZE_BYTES;
   // We have this many bytes in the sectors we have
-  uint32_t sectorBytes = (FLASH_SECTOR_BYTES * (lastSector - firstSector + 1));
+  uint32_t sectorBytes =
+      (FLASH_MAX_SECTOR_BYTES * (lastSector - firstSector + 1));
   // We have to subtract the metadata from one of the sectors (first) and then
   // find number of sectors
   uint32_t maxCount =
-      (sectorBytes - FLIGHT_METADATA_PAGES * FLASH_PAGE_SIZE_BYTES) /
+      (sectorBytes - FLIGHT_METADATA_PAGES * FLASH_MIN_PAGE_SIZE_BYTES) /
       kLogDataSize;
   data_log_get_last_packet_type(firstAddress, maxCount, kLogDataSize);
   dataPacket = (LogData *)packetBuffer;
 
-  return dataPacket->timestamp_s;
+  return dataPacket->timestampS;
 }
 
 uint8_t data_log_get_flash_usage() {
   if (flightNum == 0) {  // In a cli state, curWriteAddress is not valid
     data_log_get_last_flight_num();
-    curWriteAddress = curSectorNum * FLASH_SECTOR_BYTES +
-                      FLIGHT_METADATA_PAGES * FLASH_PAGE_SIZE_BYTES;
+    curWriteAddress = curSectorNum * FLASH_MAX_SECTOR_BYTES +
+                      FLIGHT_METADATA_PAGES * FLASH_MIN_PAGE_SIZE_BYTES;
   }
-  uint8_t usage = (uint8_t)(curWriteAddress / (FLASH_SIZE_BYTES / 100.0));
+  uint8_t usage = (uint8_t)(curWriteAddress / (logSizeBytes / 100.0));
   return usage;
 }
 
@@ -476,7 +533,7 @@ void data_log_load_cli_configs() {
   CliConfigs_t *cliConfig = cliGetConfigs();
   uint32_t firstAddress = CONFIG_START_ADDRESS;
   uint32_t maxCount =
-      (FLASH_SECTOR_BYTES - CONFIG_START_ADDRESS) / kCliConfigSize;
+      (FLASH_MAX_SECTOR_BYTES - CONFIG_START_ADDRESS) / kCliConfigSize;
   currentConfigAddress =
       kCliConfigSize +
       data_log_get_last_packet_type(firstAddress, maxCount, kCliConfigSize);
@@ -484,18 +541,18 @@ void data_log_load_cli_configs() {
   if (packet_is_empty((uint8_t *)cliConfig, kCliConfigSize)) {
     cliSetDefaultConfig();
   }
-#ifdef TELEMETRY_RADIO
+#if HAS_DEV(RADIO)
   // Set the radio channel to be whatever we are using from the cli configs,
   // since we may have something saved that isn't the default that gets
   // initially set on init
-  HM_RadioSetChannel(TELEMETRY_RADIO, cliConfig->radioChannel);
-#endif
+  HM_RadioSetChannel(RADIO_CLI_ID, cliConfig->radioChannel);
+#endif  // HAS_DEV(RADIO)
 }
 
 void data_log_write_cli_configs() {
   CliConfigs_t *cliConfig = cliGetConfigs();
   uint32_t second_page_bytes =
-      (currentConfigAddress + kCliConfigSize) % FLASH_PAGE_SIZE_BYTES;
+      (currentConfigAddress + kCliConfigSize) % FLASH_MIN_PAGE_SIZE_BYTES;
   if (second_page_bytes >= kCliConfigSize) second_page_bytes = 0;
   uint32_t first_page_bytes = kCliConfigSize - second_page_bytes;
   // Write to first page and, if necessary, second page
@@ -505,7 +562,7 @@ void data_log_write_cli_configs() {
                 (uint8_t *)cliConfig + first_page_bytes);
   }
   currentConfigAddress += kCliConfigSize;
-  if (currentConfigAddress > FLASH_SECTOR_BYTES - kCliConfigSize) {
+  if (currentConfigAddress > FLASH_MAX_SECTOR_BYTES - kCliConfigSize) {
     flash_read(0, CONFIG_START_ADDRESS, packetBuffer);
     flash_erase_sector(0);
     flash_write(0, CONFIG_START_ADDRESS, packetBuffer);

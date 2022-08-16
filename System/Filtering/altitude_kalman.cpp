@@ -1,5 +1,7 @@
 #include "altitude_kalman.h"
 
+constexpr const double AltitudeKalman::DEFAULT_KALMAN_GAIN[];
+
 AltitudeKalman::AltitudeKalman(double dt) : m_dt(dt) {}
 
 void AltitudeKalman::Predict(const double az) {

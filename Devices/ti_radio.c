@@ -1,5 +1,5 @@
 /*
- * tiRadio_spi_drv.c
+ * ti_radio.c
  *
  *  Created on: May 24, 2020
  *      Author: ben helfrich
@@ -7,7 +7,7 @@
 
 #include "ti_radio.h"
 
-#if defined(HAS_CC1120) || defined(HAS_CC1200)
+#if HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915)
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -33,7 +33,7 @@ static void cc1120TrxReadWriteBurstSingle(TiRadioCtrl_t *radio, uint8_t addr,
 static bool cc1120TransmitPacket(TiRadioCtrl_t *radio, uint8_t *payload,
                                  uint8_t payloadLength);
 
-#ifdef HAS_CC1120
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
 static bool manualCalibration(TiRadioCtrl_t *radio);
 #endif
 
@@ -91,7 +91,7 @@ bool tiRadio_Init(TiRadioCtrl_t *radio) {
   // SetFrequency is broken, for now the prefered settings do this for us
   // tiRadio_setFrequency(radio);
 
-#ifdef HAS_CC1120
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
   // calibrate the radio per errata
   if (!manualCalibration(radio)) return false;
 #else
@@ -147,7 +147,7 @@ void tiRadio_Update(TiRadioCtrl_t *radio) {
   }
 
   uint8_t status = cc1120TrxSpiCmdStrobe(radio, TIRADIO_SNOP);
-  status = (status & tiRadio_STATUS_MASK);
+  status = (status & TI_RADIO_STATUS_MASK);
 
   switch (status) {
     case TIRADIO_STATE_IDLE:
@@ -189,7 +189,7 @@ static bool cc1120TransmitPacket(TiRadioCtrl_t *radio, uint8_t *payload,
 
   uint8_t status;
   status = cc1120TrxSpiCmdStrobe(radio, TIRADIO_SNOP);
-  status = (status & tiRadio_STATUS_MASK);
+  status = (status & TI_RADIO_STATUS_MASK);
   if (cc1120InTx(status)) {
     // If we're currently in TX, we should wait a tick to add our packet,
     // it won't get sent till we strobe TX anyhow
@@ -231,7 +231,7 @@ static bool cc1120TransmitPacket(TiRadioCtrl_t *radio, uint8_t *payload,
 
   // Check state again
   status = cc1120TrxSpiCmdStrobe(radio, TIRADIO_SNOP);
-  status = (status & tiRadio_STATUS_MASK);
+  status = (status & TI_RADIO_STATUS_MASK);
 
   if (status == TIRADIO_STATE_TXFIFO_ERROR) {
     // FIFO overflow. Flush TX FIFO and try
@@ -240,7 +240,7 @@ static bool cc1120TransmitPacket(TiRadioCtrl_t *radio, uint8_t *payload,
 
     added = false;
   }
-#ifdef HAS_CC1120
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
   if (status == TIRADIO_STATE_RX) {
     // Sometimes, the FCB V0 seems to get stuck in RX mode
     // The only way I've found to prevent this is to force
@@ -322,7 +322,7 @@ bool tiRadio_CheckNewPacket(TiRadioCtrl_t *radio) {
 
     // Double check RX FIFO has not yet overflowed
     uint8_t status = cc1120TrxSpiCmdStrobe(radio, TIRADIO_SNOP);
-    status = (status & tiRadio_STATUS_MASK);
+    status = (status & TI_RADIO_STATUS_MASK);
     if (status == TIRADIO_STATE_RXFIFO_ERROR) {
       // Flush RX FIFO
       cc1120TrxSpiCmdStrobe(radio, TIRADIO_SFRX);
@@ -362,7 +362,7 @@ bool tiRadio_ForceIdle(TiRadioCtrl_t *radio) {
   // return the radio to idle somehow
   uint8_t status;
   status = cc1120TrxSpiCmdStrobe(radio, TIRADIO_SNOP);
-  status = (status & tiRadio_STATUS_MASK);
+  status = (status & TI_RADIO_STATUS_MASK);
 
   switch (status) {
     case TIRADIO_STATE_IDLE:
@@ -420,10 +420,10 @@ bool tiRadio_StartRX(TiRadioCtrl_t *radio) {
 static const float twoToThe16 = 65536;
 static const size_t maxValue24Bits = 16777216 - 1;
 
-#ifdef HAS_CC1120
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
 #define RADIO_OSC_FREQ CC1120_OSC_FREQ
 #endif
-#ifdef HAS_CC1200
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
 #define RADIO_OSC_FREQ CC1200_OSC_FREQ
 #endif
 
@@ -479,7 +479,7 @@ void tiRadio_SetRadioFrequency(TiRadioCtrl_t *radio, enum TIRADIO_Band band,
 }
 
 bool tiRadio_Calibrate(TiRadioCtrl_t *radio) {
-#ifdef HAS_CC1120
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
   // calibrate the radio per errata
   return manualCalibration(radio);
 #else
@@ -493,7 +493,7 @@ bool tiRadio_Calibrate(TiRadioCtrl_t *radio) {
 #define FS_VCO4_INDEX 1
 #define FS_CHP_INDEX 2
 
-#ifdef HAS_CC1120
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
 static bool manualCalibration(TiRadioCtrl_t *radio) {
   uint8_t original_fs_cal2;
   uint8_t calResults_for_vcdac_start_high[3];
@@ -596,9 +596,9 @@ void tiRadio_SetOutputPower(TiRadioCtrl_t *radio, uint8_t powerDbM) {
   uint8_t pa_cfg_val;
   uint8_t pa_reg_addr;
 
-#ifdef HAS_CC1120
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
   pa_reg_addr = TIRADIO_PA_CFG2;
-#elif defined(HAS_CC1200)
+#elif RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
   pa_reg_addr = TIRADIO_PA_CFG1;
 #else
   return;
@@ -790,4 +790,4 @@ uint8_t cc1120SpiReadRxFifo(TiRadioCtrl_t *radio, uint8_t *pData, uint8_t len) {
   return (rc);
 }
 
-#endif
+#endif  // HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915)

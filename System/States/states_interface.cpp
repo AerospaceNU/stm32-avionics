@@ -11,7 +11,7 @@ EndCondition_t State::run_state() {
   EndCondition_t result = run();
 
   // Refresh watchdog
-  HM_IWDG_Refresh();
+  HM_WatchdogRefresh();
 
   run_counter_++;
   return result;

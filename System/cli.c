@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "board_config_common.h"
 #include "hardware_manager.h"
 #include "radio_manager.h"
 
@@ -74,17 +75,20 @@ void cliInit() {
                // is embedded device
 
   cbInit(&radioRxCircBuffer, radioRxBuffer, sizeof(radioRxBuffer), 1);
-  RadioManager_addMessageCallback(cliParseRadio);
+  RadioManager_addMessageCallback(RADIO_CLI_ID, cliParseRadio);
 }
 
 CliConfigs_t* cliGetConfigs() { return &cliConfigs; }
 
 void cliSetDefaultConfig() {
-#if MAX_PYRO >= 2
-  cliConfigs.pyroConfiguration[0].flags = 0b1;   // FLAG_APOGEE
+#if NUM_PYRO > 0
+  cliConfigs.pyroConfiguration[0].flags = 0b1;  // FLAG_APOGEE
+#if NUM_PYRO > 1
   cliConfigs.pyroConfiguration[1].flags = 0b10;  // FLAG_DESCENT_ALT_THRESHOLD
   cliConfigs.pyroConfiguration[1].configValue = 230;  // 230 m deploy
-#endif
+
+#endif  // NUM_PYRO > 1
+#endif  // NUM_PYRO > 0
   cliConfigs.groundElevationM = 0;
   cliConfigs.groundTemperatureC = 14.85;
   cliConfigs.radioChannel = 1;
@@ -272,15 +276,13 @@ CliCommand_t cliParse(CliComms_t commsType) {
 void cliSend(const char* msg) {
   switch (lastCommsType) {
     case CLI_PHONE:
-      HM_BluetoothSend(ADDR_PHONE, (uint8_t*)msg, (uint16_t)strlen(msg));
+      HM_BleClientSend(BLE_CLI_ID, (uint8_t*)msg, (uint16_t)strlen(msg));
       break;
     case CLI_RADIO:
-#ifdef TELEMETRY_RADIO
-      RadioManager_transmitString(TELEMETRY_RADIO, (uint8_t*)msg, strlen(msg));
-#endif
+      RadioManager_transmitString(RADIO_CLI_ID, (uint8_t*)msg, strlen(msg));
       break;
     case CLI_USB:
-      HM_UsbTransmit((uint8_t*)msg, (uint16_t)strlen(msg));
+      HM_UsbTransmit(USB_CLI_ID, (uint8_t*)msg, (uint16_t)strlen(msg));
       break;
     default:
       break;
@@ -317,11 +319,11 @@ CliOptionVals_t cliGetOptions() { return cliOptionVals; }
 CircularBuffer_t* cliGetRxBufferFor(CliComms_t source) {
   switch (source) {
     case CLI_PHONE:
-      return HM_BleConsoleGetRxBuffer();
+      return HM_BleClientGetRxBuffer(BLE_CLI_ID);
     case CLI_RADIO:
       return &radioRxCircBuffer;
     case CLI_USB:
-      return HM_UsbGetRxBuffer();
+      return HM_UsbGetRxBuffer(USB_CLI_ID);
     default:
       return NULL;
   }
