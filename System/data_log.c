@@ -9,11 +9,9 @@
 #include "board_config_common.h"
 #include "cli.h"
 
-#ifdef FCB_VERSION
-const uint8_t BOARD_VERSION = FCB_VERSION;
-#else
-const uint8_t BOARD_VERSION = 0xff;
-#endif
+// TODO: Remove board version/ID and software version and move info to metadata.
+// This method is outdated for current needs
+#define BOARD_VERSION 0x01
 #define BOARD_ID 0x01
 #define SOFTWARE_VERSION 0x01
 #define FLASH_TIMEOUT 500
@@ -264,7 +262,7 @@ void data_log_assign_flight() {
     // Erase sector since metadata indicates the versions are not the expected
     flash_erase_sector(0);
     // Write board version, id, and software version
-    uint8_t txBuffVersions[] = {BOARD_VERSION << 4 | BOARD_ID,
+    uint8_t txBuffVersions[] = {(uint16_t)(BOARD_VERSION) << 4 | BOARD_ID,
                                 SOFTWARE_VERSION};
     flash_write(0, 2, txBuffVersions);
   }

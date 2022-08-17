@@ -12,13 +12,16 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
-#if (FCB_VERSION == 0)
+#if defined(STM32H750xx)
 #define INTERNAL_FLASH_START 0x08020000
 #define INTERNAL_FLASH_END 0x080FFFFF
-#else
+#elif defined(STM32H743xx)
 #define INTERNAL_FLASH_START 0x081E0000
 #define INTERNAL_FLASH_END 0x081FFFFF
-#endif
+#else
+#define INTERNAL_FLASH_START 0x00
+#define INTERNAL_FLASH_END 0xDFFFF
+#endif  // STM32xxxxxx
 
 #define MAX_FLASH_ADDRESS INTERNAL_FLASH_END - INTERNAL_FLASH_START
 

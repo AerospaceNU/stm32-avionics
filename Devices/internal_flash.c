@@ -30,9 +30,10 @@
 HAL_StatusTypeDef Internal_Flash_Program(uint32_t TypeProgram,
                                          uint32_t FlashAddress,
                                          uint32_t DataAddress) {
-#if (FCB_VERSION == 1)
+#ifdef STM32H743xx
   return HAL_FLASH_Program(TypeProgram, FlashAddress, DataAddress);
-#else
+#endif  // STM32H743XX
+#ifdef STM32H750xx
   HAL_StatusTypeDef status;
   __IO uint32_t *dest_addr = (__IO uint32_t *)FlashAddress;
   __IO uint32_t *src_addr = (__IO uint32_t *)DataAddress;
@@ -80,7 +81,8 @@ HAL_StatusTypeDef Internal_Flash_Program(uint32_t TypeProgram,
   __HAL_UNLOCK(&pFlash);
 
   return status;
-#endif
+#endif  // STM32H750xx
+  return HAL_ERROR;
 }
 
 /*
