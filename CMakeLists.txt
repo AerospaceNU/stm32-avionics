@@ -3,7 +3,7 @@ project(STM32-Avionics)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_subdirectory(Utils)
-add_subdirectory(System)
-add_subdirectory(Devices)
-add_subdirectory(desktop-simulator)
+add_subdirectory(utils)
+add_subdirectory(system)
+add_subdirectory(devices)
+add_subdirectory(desktop_sim)

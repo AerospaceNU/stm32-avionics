@@ -58,7 +58,7 @@ To keep commonality among code, we will be using both a formatter and a linter f
 
 ## Running Code Using Debug
 
-To run code in debug mode, click on the bug symbol drop down. Click on `H750VBT6-flight-board-v0` or the equivalent for the specific board version. If it doesn't show up, click on `Debug Configurations...` and find it. The code should load onto the board.
+To run code in debug mode, click on the bug symbol drop down. Click on `fcb_v0` or the equivalent for the specific board version. If it doesn't show up, click on `Debug Configurations...` and find it. The code should load onto the board.
 
 # Code Overview
 Read this to understand how the code is set up. We will start with important folders with custom code then move to folders with "generated" code.

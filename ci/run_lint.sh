@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Clang-format
-for file in $(find Devices System Utils desktop-simulator -type f -iregex '.*\.\(h\|c\|cpp\)')
+for file in $(find devices system utils desktop_sim -type f -iregex '.*\.\(h\|c\|cpp\)')
 do
 	clang-format --dry-run --Werror $file
         if [ $? -ne 0 ];
@@ -11,4 +11,4 @@ do
 done
 
 # Cpplint
-cpplint --counting=detailed --recursive Devices/ System/ Utils/ desktop-simulator/
+cpplint --counting=detailed --recursive devices/ system/ utils/ desktop_sim/
