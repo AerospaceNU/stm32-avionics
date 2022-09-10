@@ -32,10 +32,14 @@ static uint32_t currentConfigAddress;
 static uint8_t packetBuffer[PACKET_BUFFER_SIZE];
 static int curErasingFlashId;
 static uint32_t logSizeBytes;
+#if HAS_DEV(LINE_CUTTER_BLE)
+static uint32_t lineCutterLastLogTime[NUM_LINE_CUTTER_BLE] = {0};
+#endif
 
 // Log Data shows what data will be logged in what relative location
+// for a log packet of FCB data
+#define LOG_ID_FCB 1
 typedef struct __attribute__((__packed__)) {
-  uint32_t timestampS, timestampUs;
 #if HAS_DEV(IMU)
   ImuDataRaw_s imuData[NUM_IMU];
 #endif  // HAS_DEV(IMU)
@@ -61,6 +65,19 @@ typedef struct __attribute__((__packed__)) {
   double acc_x, acc_y, acc_z;
   double qx, qy, qz, qw;
   uint8_t state;
+} FCBLogData_s;
+
+#define LOG_ID_LINE_CUTTER 2
+
+typedef union {
+  FCBLogData_s fcbData;
+  LineCutterData_s lineCutterData;
+} LogDataPacket_s;
+
+typedef struct __attribute__((__packed__)) {
+  uint8_t packetType;
+  uint32_t timestampS, timestampUs;
+  LogDataPacket_s dataPacket;
 } LogData_s;
 
 static LogData_s logPackets[MAX_LOG_PACKETS];
@@ -325,66 +342,83 @@ void data_log_write(SensorData_s *sensorData, FilterData_s *filterData,
     if (curSectorNum >= logSizeBytes / FLASH_MAX_SECTOR_BYTES) return;
 
     LogData_s logPacket;
+    logPacket.packetType = LOG_ID_FCB;
     logPacket.timestampS = sensorData->timestampS;
     logPacket.timestampUs = sensorData->timestampUs;
+    FCBLogData_s* fcbLogData = &(logPacket.dataPacket.fcbData);
 #if HAS_DEV(IMU)
     for (int i = 0; i < NUM_IMU; i++) {
-      logPacket.imuData[i].accel = sensorData->imuData[i].accelRaw;
-      logPacket.imuData[i].angVel = sensorData->imuData[i].angVelRaw;
-      logPacket.imuData[i].mag = sensorData->imuData[i].magRaw;
+      fcbLogData->imuData[i].accel = sensorData->imuData[i].accelRaw;
+      fcbLogData->imuData[i].angVel = sensorData->imuData[i].angVelRaw;
+      fcbLogData->imuData[i].mag = sensorData->imuData[i].magRaw;
     }
 #endif  // HAS_DEV(IMU)
 #if HAS_DEV(ACCEL)
     for (int i = 0; i < NUM_ACCEL; i++) {
-      logPacket.accelData[i] = sensorData->accelData[i].raw;
+      fcbLogData->accelData[i] = sensorData->accelData[i].raw;
     }
 #endif  // HAS_DEV(ACCEL)
 #if HAS_DEV(BAROMETER)
     for (int i = 0; i < NUM_BAROMETER; i++) {
-      logPacket.barometerData[i] = sensorData->barometerData[i];
+      fcbLogData->barometerData[i] = sensorData->barometerData[i];
     }
 #endif  // HAS_DEV(BAROMETER)
 #if HAS_DEV(GPS)
     for (int i = 0; i < NUM_GPS; i++) {
-      logPacket.gpsLat[i] = sensorData->gpsData[i].latitude;
-      logPacket.gpsLong[i] = sensorData->gpsData[i].longitude;
-      logPacket.gpsAlt[i] = sensorData->gpsData[i].altitude;
+      fcbLogData->gpsLat[i] = sensorData->gpsData[i].latitude;
+      fcbLogData->gpsLong[i] = sensorData->gpsData[i].longitude;
+      fcbLogData->gpsAlt[i] = sensorData->gpsData[i].altitude;
     }
 #endif  // HAS_DEV(GPS)
 #if HAS_DEV(VBAT)
     for (int i = 0; i < NUM_VBAT; i++) {
-      logPacket.vbatData[i] = sensorData->vbatData[i];
+      fcbLogData->vbatData[i] = sensorData->vbatData[i];
     }
 #endif  // HAS_DEV(VBAT)
 #if HAS_DEV(PYRO_CONT)
-    logPacket.pyroContinuity = 0;
+    fcbLogData->pyroContinuity = 0;
     for (int i = 0; i < NUM_PYRO_CONT; i++) {
-      logPacket.pyroContinuity |= ((sensorData->pyroContData[i] & 0x01) << i);
+      fcbLogData->pyroContinuity |= ((sensorData->pyroContData[i] & 0x01) << i);
     }
 #endif  // HAS_DEV(PYRO_CONT)
-    logPacket.triggerStatus = TriggerManager_Status();
-    logPacket.heading = filterData->heading;
-    logPacket.vtg = filterData->vtg;
-    logPacket.pos_x = filterData->pos_x;
-    logPacket.pos_y = filterData->pos_y;
-    logPacket.pos_z = filterData->pos_z;
-    logPacket.vel_x = filterData->world_vel_x;
-    logPacket.vel_y = filterData->world_vel_y;
-    logPacket.vel_z = filterData->world_vel_z;
-    logPacket.acc_x = filterData->world_acc_x;
-    logPacket.acc_y = filterData->world_acc_y;
-    logPacket.acc_z = filterData->world_acc_z;
-    logPacket.qx = filterData->qx;
-    logPacket.qy = filterData->qy;
-    logPacket.qz = filterData->qz;
-    logPacket.qw = filterData->qw;
-    logPacket.state = state;
+    fcbLogData->triggerStatus = TriggerManager_Status();
+    fcbLogData->heading = filterData->heading;
+    fcbLogData->vtg = filterData->vtg;
+    fcbLogData->pos_x = filterData->pos_x;
+    fcbLogData->pos_y = filterData->pos_y;
+    fcbLogData->pos_z = filterData->pos_z;
+    fcbLogData->vel_x = filterData->world_vel_x;
+    fcbLogData->vel_y = filterData->world_vel_y;
+    fcbLogData->vel_z = filterData->world_vel_z;
+    fcbLogData->acc_x = filterData->world_acc_x;
+    fcbLogData->acc_y = filterData->world_acc_y;
+    fcbLogData->acc_z = filterData->world_acc_z;
+    fcbLogData->qx = filterData->qx;
+    fcbLogData->qy = filterData->qy;
+    fcbLogData->qz = filterData->qz;
+    fcbLogData->qw = filterData->qw;
+    fcbLogData->state = state;
 
     // Add newest log packet to buffer, overriding oldest packet
     if (cbFull(&logPacketBuffer)) {
       cbDequeue(&logPacketBuffer, 1);
     }
     cbEnqueue(&logPacketBuffer, &logPacket);
+
+#if HAS_DEV(LINE_CUTTER_BLE)
+    for (int i = 0; i < NUM_LINE_CUTTER_BLE; ++i) {
+      if (lineCutterLastLogTime[i] < HM_GetLineCutterData(i)->timestamp) {
+        logPacket.packetType = LOG_ID_LINE_CUTTER;
+        logPacket.dataPacket.lineCutterData = *HM_GetLineCutterData(i);
+        lineCutterLastLogTime[i] = HM_GetLineCutterData(i)->timestamp;
+        // Line cutter data is less important so don't dequeue other data if it
+        // can't fit
+        if (!cbFull(&logPacketBuffer)) {
+          cbEnqueue(&logPacketBuffer, &logPacket);
+        }
+      }
+    }
+#endif
 
     static bool erasing = false;
     if (erasing) {
