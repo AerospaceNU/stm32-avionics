@@ -345,7 +345,7 @@ void data_log_write(SensorData_s *sensorData, FilterData_s *filterData,
     logPacket.packetType = LOG_ID_FCB;
     logPacket.timestampS = sensorData->timestampS;
     logPacket.timestampUs = sensorData->timestampUs;
-    FCBLogData_s* fcbLogData = &(logPacket.dataPacket.fcbData);
+    FCBLogData_s *fcbLogData = &(logPacket.dataPacket.fcbData);
 #if HAS_DEV(IMU)
     for (int i = 0; i < NUM_IMU; i++) {
       fcbLogData->imuData[i].accel = sensorData->imuData[i].accelRaw;
