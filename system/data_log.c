@@ -38,7 +38,7 @@ static uint32_t lineCutterLastLogTime[NUM_LINE_CUTTER_BLE] = {0};
 
 // Log Data shows what data will be logged in what relative location
 // for a log packet of FCB data
-#define LOG_ID_FCB 1
+#define LOG_ID_FCB 0
 typedef struct __attribute__((__packed__)) {
 #if HAS_DEV(IMU)
   ImuDataRaw_s imuData[NUM_IMU];
@@ -67,7 +67,7 @@ typedef struct __attribute__((__packed__)) {
   uint8_t state;
 } FCBLogData_s;
 
-#define LOG_ID_LINE_CUTTER 2
+#define LOG_ID_LINE_CUTTER 1
 
 typedef union {
   FCBLogData_s fcbData;
