@@ -17,7 +17,7 @@
 
 typedef struct {
   // Reference to the BLE chip driver "class"
-  BleChip_t *bleChip;
+  BleChip_s *bleChip;
 
   // BLE "address" data comes from
   uint8_t address;
@@ -25,15 +25,15 @@ typedef struct {
   // Backing array and incoming data circular buffer
   // This is changed by DMA!
   uint8_t packetArray[DATA_BUFFER_SIZE];
-  CircularBuffer_t dmaBuffer;
+  CircularBuffer_s dmaBuffer;
 
   // This is _not_ changed by DMA, and does _not_ have length bytes
   uint8_t parsedArray[DATA_BUFFER_SIZE];
-  CircularBuffer_t parsedBuffer;
-} BleClientStdCtrl_t;
+  CircularBuffer_s parsedBuffer;
+} BleClientStdCtrl_s;
 
-void bleClientStd_init(BleClientStdCtrl_t *ctrl, BleChip_t *bleChip,
+void bleClientStd_init(BleClientStdCtrl_s *ctrl, BleChip_s *bleChip,
                        uint8_t address);
-void bleClientStd_tick(BleClientStdCtrl_t *ctrl);
+void bleClientStd_tick(BleClientStdCtrl_s *ctrl);
 
 #endif  // DEVICES_BLE_CLIENT_STD_H_

@@ -132,12 +132,12 @@ bool hardwareStatusVbat[NUM_VBAT];
 
 /* Accelerometers */
 #if HAS_DEV(ACCEL_H3LIS331DL)
-static AccelH3lis331dlCtrl_t accelH3lis331dl[NUM_ACCEL_H3LIS331DL];
+static AccelH3lis331dlCtrl_s accelH3lis331dl[NUM_ACCEL_H3LIS331DL];
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
 /* Barometers */
 #if HAS_DEV(BAROMETER_MS5607)
-static BarometerMs5607Ctrl_t barometerMs5607[NUM_BAROMETER_MS5607];
+static BarometerMs5607Ctrl_s barometerMs5607[NUM_BAROMETER_MS5607];
 #endif  // HAS_DEV(BAROMETER_MS5607)
 
 /* BLE Chips */
@@ -147,32 +147,32 @@ static BleChipNrfCtrl_t bleChipNrf[NUM_BLE_CHIP_NRF];
 
 /* BLE Clients */
 #if HAS_DEV(BLE_CLIENT_STD)
-static BleClientStdCtrl_t bleClientStd[NUM_BLE_CLIENT_STD];
+static BleClientStdCtrl_s bleClientStd[NUM_BLE_CLIENT_STD];
 #endif  // HAS_DEV(BLE_CLIENT_STD)
 
 /* Buzzers */
 #if HAS_DEV(BUZZER_PWM)
-static BuzzerPwmCtrl_t buzzerPwm[NUM_BUZZER_PWM];
+static BuzzerPwmCtrl_s buzzerPwm[NUM_BUZZER_PWM];
 #endif  // HAS_DEV(BUZZER_PWM)
 
 /* DC Motors */
 #if HAS_DEV(DC_MOTOR_PWM)
-static DcMotorPwmCtrl_t dcMotorPwm[NUM_DC_MOTOR_PWM];
+static DcMotorPwmCtrl_s dcMotorPwm[NUM_DC_MOTOR_PWM];
 #endif  // HAS_DEV(DC_MOTOR_PWM)
 
 /* Flash memory */
 #if HAS_DEV(FLASH_S25FLX)
-static FlashS25flxCtrl_t flashS25flx[NUM_FLASH_S25FLX];
+static FlashS25flxCtrl_s flashS25flx[NUM_FLASH_S25FLX];
 #endif  // HAS_DEV(FLASH_S25FLX)
 
 /* GPS */
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
-static GpsCtrl_t gps[NUM_GPS_STD + NUM_GPS_UBLOX];
+static GpsCtrl_s gps[NUM_GPS_STD + NUM_GPS_UBLOX];
 #endif  // HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
 
 /* IMUs */
 #if HAS_DEV(IMU_LSM9DS1)
-static ImuLsm9ds1Ctrl_t imuLsm9ds1[NUM_IMU_LSM9DS1];
+static ImuLsm9ds1Ctrl_s imuLsm9ds1[NUM_IMU_LSM9DS1];
 #endif  // HAS_DEV(IMU_LSM9DS1)
 
 /* Line Cutters */
@@ -182,20 +182,20 @@ static LineCutterBleCtrl_t lineCutterBle[NUM_LINE_CUTTER_BLE];
 
 /* Pyros */
 #if HAS_DEV(PYRO_DIGITAL)
-static PyroDigitalCtrl_t pyroDigital[NUM_PYRO_DIGITAL];
+static PyroDigitalCtrl_s pyroDigital[NUM_PYRO_DIGITAL];
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
 /* Pyro continuity */
 #if HAS_DEV(PYRO_CONT_ADC)
-static AdcCtrl_t pyroContAdc[NUM_PYRO_CONT_ADC];
+static AdcDevCtrl_s pyroContAdc[NUM_PYRO_CONT_ADC];
 #endif  // HAS_DEV(PYRO_CONT_ADC)
 
 /* Radio */
 #if HAS_DEV(RADIO_TI_433)
-static TiRadioCtrl_t radioTi433[NUM_RADIO_TI_433];
+static TiRadioCtrl_s radioTi433[NUM_RADIO_TI_433];
 #endif  // HAS_DEV(RADIO_TI_433)
 #if HAS_DEV(RADIO_TI_915)
-static TiRadioCtrl_t radioTi915[NUM_RADIO_TI_915];
+static TiRadioCtrl_s radioTi915[NUM_RADIO_TI_915];
 #endif  // HAS_DEV(RADIO_TI_915)
 
 /* Servos */
@@ -205,21 +205,21 @@ static ServoPwmCtrl_t servoPwm[NUM_SERVO_PWM];
 
 /* VBat Sensors */
 #if HAS_DEV(VBAT_ADC)
-static AdcCtrl_t vbatAdc[NUM_VBAT_ADC];
-static AdcCtrl_t vbatAdcCurrent[NUM_VBAT_ADC];
+static AdcDevCtrl_s vbatAdc[NUM_VBAT_ADC];
+static AdcDevCtrl_s vbatAdcCurrent[NUM_VBAT_ADC];
 #endif  // HAS_DEV(VBAT_ADC)
 #if HAS_DEV(VBAT_INA226)
-static VbatIna226Ctrl_t vbatIna226[NUM_VBAT_INA226];
+static VbatIna226Ctrl_s vbatIna226[NUM_VBAT_INA226];
 #endif  // HAS_DEV(VBAT_INA226)
 
 /* Sensor info */
-static SensorProperties_t sensorProperties;
-static SensorData_t sensorData;
-static size_t SENSOR_DATA_SIZE = sizeof(SensorData_t);
+static SensorProperties_s sensorProperties;
+static SensorData_s sensorData;
+static size_t SENSOR_DATA_SIZE = sizeof(SensorData_s);
 
 /* Hardware manager sim mode trackers */
 static bool inSim = false;
-static CircularBuffer_t *simRxBuffer = NULL;
+static CircularBuffer_s *simRxBuffer = NULL;
 
 void HM_HardwareInit() {
   /* Accelerometers */
@@ -258,7 +258,7 @@ void HM_HardwareInit() {
   // Register each client with the 1 chip (1 chip should be enforced by config)
   for (int i = 0; i < NUM_BLE_CLIENT_STD; i++) {
 #if HAS_DEV(BLE_CHIP_NRF)
-    bleClientStd_init(&bleClientStd[i], (BleChip_t *)(&bleChipNrf[0]),
+    bleClientStd_init(&bleClientStd[i], (BleChip_s *)(&bleChipNrf[0]),
                       bleClientStdAddress[i]);
 #endif  // HAS_DEV(BLE_CHIP_NRF)
     hardwareStatusBleClient[FIRST_ID_BLE_CLIENT_STD + i] = true;
@@ -342,7 +342,7 @@ void HM_HardwareInit() {
     // Register each BLE line cutter with the 1 chip (1 chip should be enforced
     // by config)
 #if HAS_DEV(BLE_CHIP_NRF)
-    lineCutterBle_init(&lineCutterBle[i], (BleChip_t *)(&bleChipNrf[0]),
+    lineCutterBle_init(&lineCutterBle[i], (BleChip_s *)(&bleChipNrf[0]),
                        lineCutterBleAddress[i]);
     hardwareStatusLineCutter[FIRST_ID_LINE_CUTTER_BLE + i] = true;
 #endif  // HAS_DEV(BLE_CHIP_NRF)
@@ -378,7 +378,7 @@ void HM_HardwareInit() {
     radioTi433[i].GP2_pin = radioTi433Gp2Pin[i];
     radioTi433[i].GP3_port = radioTi433Gp3GpioPort[i];
     radioTi433[i].GP3_pin = radioTi433Gp3Pin[i];
-    radioTi433[i].payloadSize = sizeof(RadioPacket_t);
+    radioTi433[i].payloadSize = sizeof(RadioPacket_s);
     radioTi433[i].id = 0;
     radioTi433[i].packetCfg = TIRADIO_PKTLEN_FIXED;
     radioTi433[i].initialized = false;
@@ -417,7 +417,7 @@ void HM_HardwareInit() {
     radioTi915[i].GP2_pin = radioTi915Gp2Pin[i];
     radioTi915[i].GP3_port = radioTi915Gp3GpioPort[i];
     radioTi915[i].GP3_pin = radioTi915Gp3Pin[i];
-    radioTi915[i].payloadSize = sizeof(RadioPacket_t);
+    radioTi915[i].payloadSize = sizeof(RadioPacket_s);
     radioTi915[i].id = 1;
     radioTi915[i].packetCfg = TIRADIO_PKTLEN_FIXED;
     radioTi915[i].initialized = false;
@@ -633,14 +633,14 @@ void HM_LedToggle(int ledId) {
 bool HM_RadioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
 #if HAS_DEV(RADIO_TI_433)
   if (IS_DEVICE(radioNum, RADIO_TI_433)) {
-    TiRadioCtrl_t *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
+    TiRadioCtrl_s *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
     return tiRadio_AddTxPacket(pRadio, data, pRadio->payloadSize);
   }
 #endif  // HAS_DEV(RADIO_TI_433)
 
 #if HAS_DEV(RADIO_TI_915)
   if (IS_DEVICE(radioNum, RADIO_TI_915)) {
-    TiRadioCtrl_t *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
+    TiRadioCtrl_s *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
     return tiRadio_AddTxPacket(pRadio, data, pRadio->payloadSize);
   }
 #endif  // HAS_DEV(RADIO_TI_915)
@@ -662,17 +662,17 @@ void HM_RadioUpdate() {
 #endif  // HAS_DEV(RADIO_TI_915)
 }
 
-void HM_RadioRegisterConsumer(int radioNum, CircularBuffer_t *rxBuffer) {
+void HM_RadioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {
 #if HAS_DEV(RADIO_TI_433)
   if (IS_DEVICE(radioNum, RADIO_TI_433)) {
-    TiRadioCtrl_t *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
+    TiRadioCtrl_s *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
     tiRadio_RegisterConsumer(pRadio, rxBuffer);
   }
 #endif  // HAS_DEV(RADIO_TI_433)
 
 #if HAS_DEV(RADIO_TI_915)
   if (IS_DEVICE(radioNum, RADIO_TI_915)) {
-    TiRadioCtrl_t *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
+    TiRadioCtrl_s *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
     tiRadio_RegisterConsumer(pRadio, rxBuffer);
   }
 #endif  // HAS_DEV(RADIO_TI_915)
@@ -683,7 +683,7 @@ void HM_RadioSetChannel(int radioNum, int channel) {
   // We set channels by starting from channel 0's frequency and incrementing
   // by a fixed bandwidth between channels
   float centerFrequency;
-  TiRadioCtrl_t *rad = NULL;
+  TiRadioCtrl_s *rad = NULL;
   enum TIRADIO_Band band;
 
 #if HAS_DEV(RADIO_TI_433)
@@ -727,7 +727,7 @@ bool HM_UsbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
   return false;
 }
 
-CircularBuffer_t *HM_UsbGetRxBuffer(int usbId) {
+CircularBuffer_s *HM_UsbGetRxBuffer(int usbId) {
 #if HAS_DEV(USB_STD)
   if (IS_DEVICE(usbId, USB_STD)) {
     return usbStdGetRxBuffer();
@@ -762,7 +762,7 @@ bool HM_BleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
   return false;
 }
 
-CircularBuffer_t *HM_BleClientGetRxBuffer(int bleClientId) {
+CircularBuffer_s *HM_BleClientGetRxBuffer(int bleClientId) {
 #if HAS_DEV(BLE_CLIENT_STD)
   if (IS_DEVICE(bleClientId, BLE_CLIENT_STD)) {
     return &bleClientStd[bleClientId - FIRST_ID_BLE_CLIENT_STD].parsedBuffer;
@@ -791,7 +791,7 @@ void HM_BleTick() {
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
 }
 
-LineCutterData_t *HM_GetLineCutterData(int lineCutterId) {
+LineCutterData_s *HM_GetLineCutterData(int lineCutterId) {
 #if HAS_DEV(LINE_CUTTER_BLE)
   if (IS_DEVICE(lineCutterId, LINE_CUTTER_BLE)) {
     return &lineCutterBle[lineCutterId - FIRST_ID_LINE_CUTTER_BLE].lastData;
@@ -800,7 +800,7 @@ LineCutterData_t *HM_GetLineCutterData(int lineCutterId) {
   return NULL;
 }
 
-LineCutterFlightVars_t *HM_GetLineCutterFlightVariables(int lineCutterId) {
+LineCutterFlightVars_s *HM_GetLineCutterFlightVariables(int lineCutterId) {
 #if HAS_DEV(LINE_CUTTER_BLE)
   if (IS_DEVICE(lineCutterId, LINE_CUTTER_BLE)) {
     return &lineCutterBle[lineCutterId - FIRST_ID_LINE_CUTTER_BLE].flightVars;
@@ -973,15 +973,15 @@ void HM_ReadSensorData() {
   }
 }
 
-SensorData_t *HM_GetSensorData() { return &sensorData; }
+SensorData_s *HM_GetSensorData() { return &sensorData; }
 
-SensorProperties_t *HM_GetSensorProperties() { return &sensorProperties; }
+SensorProperties_s *HM_GetSensorProperties() { return &sensorProperties; }
 
-void HM_EnableSimMode(CircularBuffer_t *rxBuffer) {
+void HM_EnableSimMode(CircularBuffer_s *rxBuffer) {
   inSim = true;
   simRxBuffer = rxBuffer;
 }
 
-void HM_DisableSimMode(CircularBuffer_t *rxBuffer) { inSim = false; }
+void HM_DisableSimMode(CircularBuffer_s *rxBuffer) { inSim = false; }
 
 bool HM_InSimMode() { return inSim; }

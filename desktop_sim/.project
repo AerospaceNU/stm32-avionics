@@ -26,19 +26,19 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>Devices</name>
+			<name>devices</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Devices</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/devices</locationURI>
 		</link>
 		<link>
-			<name>System</name>
+			<name>system</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/System</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/system</locationURI>
 		</link>
 		<link>
-			<name>Utils</name>
+			<name>utils</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Utils</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/utils</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

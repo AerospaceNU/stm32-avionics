@@ -17,24 +17,24 @@ void PostFlightState::init() {
   lastSimDataTime = HM_Millis();
 }
 
-EndCondition_t PostFlightState::run() {
+EndCondition_e PostFlightState::run() {
   // Run buzzer heartbeat
   buzzerHeartbeat();
 
   // Check if data is still coming in (sim mode)
   uint32_t curTime = HM_Millis();
   if (HM_InSimMode()) {
-    if (cbCount(cliGetRxBuffer()) >= sizeof(SensorData_t)) {
+    if (cbCount(cliGetRxBuffer()) >= sizeof(SensorData_s)) {
       lastSimDataTime = curTime;
     }
     if (curTime - lastSimDataTime > SIM_NO_DATA_TIMEOUT_MS) {
-      return EndCondition_t::CliCommandComplete;
+      return EndCondition_e::CliCommandComplete;
     }
   }
 
   // Collect and transmit data
-  SensorData_t* sensorData = HM_GetSensorData();
-  FilterData_t* filterData = filterGetData();
+  SensorData_s* sensorData = HM_GetSensorData();
+  FilterData_s* filterData = filterGetData();
 
   // Log data at 1/10th rate for now in case this state is reached before it is
   // supposed to
@@ -43,10 +43,10 @@ EndCondition_t PostFlightState::run() {
 
   // Detect if USB has been plugged in (non-sim mode)
   if (!HM_InSimMode() && HM_UsbIsConnected(USB_CLI_ID)) {
-    return EndCondition_t::UsbConnect;
+    return EndCondition_e::UsbConnect;
   }
 
-  return EndCondition_t::NoChange;
+  return EndCondition_e::NoChange;
 }
 
 void PostFlightState::cleanup() {

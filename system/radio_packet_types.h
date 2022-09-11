@@ -23,7 +23,7 @@ PACKED_STRUCT {
   // loxVenturi, kerVenturi, loadcell, loxTank, injector, engine;
   //  etc
 }
-PropulsionPacket_t;
+PropulsionPacket_s;
 
 // Orientation, angular rates
 #define TELEMETRY_ID_ORIENTATION 2
@@ -32,7 +32,7 @@ PACKED_STRUCT {
   int8_t qw, qx, qy, qz;
   float wx, wy, wz, ax, ay, az, bx, by, bz;
 }
-OrientationPacket_t;
+OrientationPacket_s;
 
 // Location data?? from the link budget Google sheet
 #define TELEMETRY_ID_POSITION 3
@@ -43,11 +43,11 @@ PACKED_STRUCT {
   uint8_t sats, state, btClients;
   // etc
 }
-PositionPacket_t;
+PositionPacket_s;
 
 #define TELEMETRY_ID_LINECUTTER 4
-PACKED_STRUCT { LineCutterData_t data; }
-LineCutterPacket_t;
+PACKED_STRUCT { LineCutterData_s data; }
+LineCutterPacket_s;
 
 // Uplinked string (not necessarily null-terminated)
 #define TELEMETRY_ID_STRING 5
@@ -56,7 +56,7 @@ PACKED_STRUCT {
   uint8_t len;
   uint8_t string[RADIO_MAX_STRING];
 }
-CliStringPacket_t;
+CliStringPacket_s;
 
 #if HAS_DEV(BAROMETER)
 #define TELEMETRY_ID_ALT_INFO 6
@@ -64,7 +64,7 @@ PACKED_STRUCT {
   float pressure[NUM_BAROMETER];
   float pressureRef, groundElevation, groundTemp;
 }
-AltInfoPacket_t;
+AltInfoPacket_s;
 #endif  // HAS_DEV(BAROMETER)
 
 #define TELEMETRY_ID_PYRO_INFO 7
@@ -72,23 +72,23 @@ PACKED_STRUCT {
   uint8_t pyroContinuity;
   uint8_t pyroFireStatus;
 }
-PyroInfoPacket_t;
+PyroInfoPacket_s;
 
 #define TELEMETRY_ID_LINECUTTER_VARS 8
-PACKED_STRUCT { LineCutterFlightVars_t data; }
-LineCutterVarsPacket_t;
+PACKED_STRUCT { LineCutterFlightVars_s data; }
+LineCutterVarsPacket_s;
 
 typedef union {
-  PropulsionPacket_t propStuff;
-  OrientationPacket_t orientation;
-  PositionPacket_t positionData;
-  LineCutterPacket_t lineCutter;
-  LineCutterVarsPacket_t lineCutterFlightVars;
-  CliStringPacket_t cliString;
+  PropulsionPacket_s propStuff;
+  OrientationPacket_s orientation;
+  PositionPacket_s positionData;
+  LineCutterPacket_s lineCutter;
+  LineCutterVarsPacket_s lineCutterFlightVars;
+  CliStringPacket_s cliString;
 #if HAS_DEV(BAROMETER)
-  AltInfoPacket_t altitudeInfo;
+  AltInfoPacket_s altitudeInfo;
 #endif  // HAS_DEV(BAROMETER)
-  PyroInfoPacket_t pyroInfo;
+  PyroInfoPacket_s pyroInfo;
 } PayloadPacket_u;
 
 PACKED_STRUCT {
@@ -99,6 +99,6 @@ PACKED_STRUCT {
   char callsign[8];
   PayloadPacket_u payload;
 }
-RadioPacket_t;
+RadioPacket_s;
 
 #endif  // SYSTEM_RADIO_PACKET_TYPES_H_

@@ -142,7 +142,7 @@ extern uint16_t accelH3lis331dlCsPin[NUM_ACCEL_H3LIS331DL];
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
 #if HAS_DEV(ACCEL)
-extern const Orientation_t accelBoardToLocal[NUM_ACCEL][3];
+extern const Orientation_s accelBoardToLocal[NUM_ACCEL][3];
 extern int accelFilterPriority[NUM_ACCEL];
 #endif  // HAS_DEV(ACCEL)
 
@@ -252,7 +252,7 @@ extern uint16_t imuLsm9ds1MagCsPin[NUM_IMU_LSM9DS1];
 #endif  // HAS_DEV(IMU_LSM9DS1)
 
 #if HAS_DEV(IMU)
-extern const Orientation_t imuBoardToLocal[NUM_IMU][3];
+extern const Orientation_s imuBoardToLocal[NUM_IMU][3];
 extern int imuAccelFilterPriority[NUM_IMU];
 #endif  // HAS_DEV(IMU)
 

@@ -25,7 +25,7 @@ static const char *REQ_CUT_1_CMD = "!cut 1\n\0";
 static const char *REQ_CUT_2_CMD = "!cut 2\n\0";
 static const char *REQ_RESET_CMD = "!reset\n\0";
 
-static LineCutterForwardStringCb stringCallback = NULL;
+static LineCutterForwardStringCb_t stringCallback = NULL;
 
 bool lineCutterBle_sendString(LineCutterBleCtrl_t *lineCutter,
                               const char *cmd) {
@@ -102,12 +102,12 @@ void lineCutterBle_parse(LineCutterBleCtrl_t *lineCutter, uint16_t len,
     if (len == 1) {
       lineCutter->lastAckTimestamp = HAL_GetTick();
       success = true;
-    } else if (len == sizeof(LineCutterData_t)) {
-      lineCutter->lastData = *((LineCutterData_t *)arr);
+    } else if (len == sizeof(LineCutterData_s)) {
+      lineCutter->lastData = *((LineCutterData_s *)arr);
       lineCutter->lastDataTimestamp = HAL_GetTick();
       success = true;
-    } else if (len == sizeof(LineCutterFlightVars_t)) {
-      lineCutter->flightVars = *((LineCutterFlightVars_t *)arr);
+    } else if (len == sizeof(LineCutterFlightVars_s)) {
+      lineCutter->flightVars = *((LineCutterFlightVars_s *)arr);
       lineCutter->lastFlightVarsTimestamp = HAL_GetTick();
       success = true;
     }
@@ -121,7 +121,7 @@ void lineCutterBle_parse(LineCutterBleCtrl_t *lineCutter, uint16_t len,
   }
 }
 
-void lineCutterBle_init(LineCutterBleCtrl_t *lineCutter, BleChip_t *bleChip,
+void lineCutterBle_init(LineCutterBleCtrl_t *lineCutter, BleChip_s *bleChip,
                         uint8_t address) {
   lineCutter->bleChip = bleChip;
   lineCutter->address = address;
@@ -140,7 +140,7 @@ bool lineCutterBle_isAwaitingReply(LineCutterBleCtrl_t *ctrl) {
   return ctrl->lastRequestTimestamp > 0;
 }
 
-void lineCutterBle_registerForwardStringCb(LineCutterForwardStringCb cb) {
+void lineCutterBle_registerForwardStringCb(LineCutterForwardStringCb_t cb) {
   stringCallback = cb;
 }
 

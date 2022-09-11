@@ -29,10 +29,10 @@
 typedef struct __attribute__((__packed__)) {
   uint16_t len;
   uint8_t incomingPacketArray[BT_MAX_PACKET_SIZE];
-} BleChipNrfRecievedPacket_t;
+} BleChipNrfRecievedPacket_s;
 
 #define INCOMING_PACKET_BUFF_LEN 10
-#define INCOMING_PACKET_SIZE (sizeof(BleChipNrfRecievedPacket_t) + 1)
+#define INCOMING_PACKET_SIZE (sizeof(BleChipNrfRecievedPacket_s) + 1)
 #define DMA_BUFF_SIZE \
   INCOMING_PACKET_BUFF_LEN *INCOMING_PACKET_SIZE  // Buffer that DMA writes to
 
@@ -49,14 +49,14 @@ typedef struct __attribute__((__packed__)) {
 
 // Holds our two line cutters
 typedef struct {
-  BleChip_t bleChip;
+  BleChip_s bleChip;
 
   UART_HandleTypeDef *ble_uart;
   uint8_t dma_buff_begin[INCOMING_PACKET_SIZE];
 
   // List of pointers to circular buffers for our 4 addresses. Set these from
   // device drivers
-  CircularBuffer_t *circular_buffers[MAX_ADDRESSES];
+  CircularBuffer_s *circular_buffers[MAX_ADDRESSES];
 
   uint8_t connectedClients;  // bits: 0 for phone, 1 for LC1, 2 for LC2
 

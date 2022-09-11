@@ -1,6 +1,7 @@
 /*
  * state_log.c
  */
+
 #include "state_log.h"
 
 #include <stdint.h>
@@ -23,7 +24,7 @@ uint8_t prevRead;
 void state_log_reload_flight() {
   data_log_load_last_stored_flight_metadata();  // Load the previous flight
                                                 // metadata into the data log
-  FlightMetadata oldMetadataPacket = *data_log_get_flight_metadata();
+  FlightMetadata_s oldMetadataPacket = *data_log_get_flight_metadata();
 
   // Load in recovered values
   filterSetPressureRef(oldMetadataPacket.pressureRef);

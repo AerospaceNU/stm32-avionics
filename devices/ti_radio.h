@@ -13,12 +13,12 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "board_config_common.h"
 #include "circular_buffer.h"
 #include "data_structures.h"
-#include "radioconfig/smartrf_registersettings.h"
-#include "stdint.h"
+#include "smartrf_registersettings.h"
 
 #define TI_RADIO_STATUS_MASK 0xF0
 
@@ -94,11 +94,11 @@ typedef struct {
   uint8_t payloadSize;
 
   // Buffers for incoming/outgoing packets
-  CircularBuffer_t *messageConsumers[MAX_COMSUMER];
+  CircularBuffer_s *messageConsumers[MAX_COMSUMER];
   uint8_t currentConsumerCount;
 
   uint8_t txArray[PACKET_TX_SIZE];
-  CircularBuffer_t txBuffer;
+  CircularBuffer_s txBuffer;
 
   // ID assigned to this transciver
   uint8_t id;
@@ -108,29 +108,29 @@ typedef struct {
   uint8_t LQI;
 
   // Set from smartRF config
-  const RegisterSetting_t *settingsPtr;
+  const RegisterSetting_s *settingsPtr;
   size_t settingsSize;
 
   bool initialized;
-} TiRadioCtrl_t;
+} TiRadioCtrl_s;
 
-bool tiRadio_Init(TiRadioCtrl_t *radio);
+bool tiRadio_Init(TiRadioCtrl_s *radio);
 
-void tiRadio_Update(TiRadioCtrl_t *radio);
+void tiRadio_Update(TiRadioCtrl_s *radio);
 //! Add one packet to the transmit queue, if there is space in it
-bool tiRadio_AddTxPacket(TiRadioCtrl_t *radio, uint8_t *packet, uint8_t len);
-void tiRadio_RegisterConsumer(TiRadioCtrl_t *radio, CircularBuffer_t *rxBuffer);
+bool tiRadio_AddTxPacket(TiRadioCtrl_s *radio, uint8_t *packet, uint8_t len);
+void tiRadio_RegisterConsumer(TiRadioCtrl_s *radio, CircularBuffer_s *rxBuffer);
 
-void tiRadio_SetRadioFrequency(TiRadioCtrl_t *radio, enum TIRADIO_Band band,
+void tiRadio_SetRadioFrequency(TiRadioCtrl_s *radio, enum TIRADIO_Band band,
                                float frequencyHz);
 
-bool tiRadio_ForceIdle(TiRadioCtrl_t *radio);
-bool tiRadio_StartRX(TiRadioCtrl_t *radio);
-bool tiRadio_CheckNewPacket(TiRadioCtrl_t *radio);
-void tiRadio_SetOutputPower(TiRadioCtrl_t *radio, uint8_t powerDbM);
-void tiRadio_ConfigGPIO(TiRadioCtrl_t *radio, uint16_t gpio_register,
+bool tiRadio_ForceIdle(TiRadioCtrl_s *radio);
+bool tiRadio_StartRX(TiRadioCtrl_s *radio);
+bool tiRadio_CheckNewPacket(TiRadioCtrl_s *radio);
+void tiRadio_SetOutputPower(TiRadioCtrl_s *radio, uint8_t powerDbM);
+void tiRadio_ConfigGPIO(TiRadioCtrl_s *radio, uint16_t gpio_register,
                         uint8_t gpio_config, bool outputInverted);
-bool tiRadio_Calibrate(TiRadioCtrl_t *radio);
+bool tiRadio_Calibrate(TiRadioCtrl_s *radio);
 
 #ifdef __cplusplus
 }

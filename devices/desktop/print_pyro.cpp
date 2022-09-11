@@ -5,12 +5,12 @@
 
 #include <chrono>  // NOLINT
 
-void printPyro_init(PrintPyroCtrl_t *pyro, int id) {
+void printPyro_init(PrintPyroCtrl_s *pyro, int id) {
   pyro->expireTime = 0;
   pyro->id = id;
 }
 
-void printPyro_start(PrintPyroCtrl_t *pyro, uint32_t duration) {
+void printPyro_start(PrintPyroCtrl_s *pyro, uint32_t duration) {
   pyro->expireTime = std::chrono::duration_cast<std::chrono::milliseconds>(
                          std::chrono::system_clock::now().time_since_epoch())
                          .count() +
@@ -18,7 +18,7 @@ void printPyro_start(PrintPyroCtrl_t *pyro, uint32_t duration) {
   printf("Writing pyro %i to ON\n", pyro->id);
 }
 
-void printPyro_tick(PrintPyroCtrl_t *pyro) {
+void printPyro_tick(PrintPyroCtrl_s *pyro) {
   if (pyro->expireTime != 0 &&
       std::chrono::duration_cast<std::chrono::milliseconds>(
           std::chrono::system_clock::now().time_since_epoch())

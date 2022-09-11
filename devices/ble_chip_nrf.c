@@ -9,9 +9,9 @@
 #if HAS_DEV(BLE_CHIP_NRF)
 
 #include <stdio.h>
+#include <string.h>
 
 #include "hal_callbacks.h"
-#include "string.h"
 
 static bool bleChipNrf_txBusy(BleChipNrfCtrl_t *ctrl) {
   return HAL_UART_STATE_READY != ctrl->ble_uart->gState;
@@ -86,7 +86,7 @@ static void bleChipNrf_rxCpltCallback(void *userData) {
 // Associate a given circular buffer with an address. Bytes addressed to it will
 // be added to the buffer.
 static void bleChipNrf_registerAddress(void *ctrl, uint8_t address,
-                                       CircularBuffer_t *cb) {
+                                       CircularBuffer_s *cb) {
   BleChipNrfCtrl_t *realCtrl = (BleChipNrfCtrl_t *)ctrl;
   realCtrl->circular_buffers[address] = cb;
 }
@@ -123,7 +123,7 @@ static bool bleChipNrf_sendRequest(void *ctrl, uint8_t address,
   return ret == HAL_OK;
 }
 
-static uint16_t bleChipNrf_dequeuePacket(CircularBuffer_t *buffer,
+static uint16_t bleChipNrf_dequeuePacket(CircularBuffer_s *buffer,
                                          uint8_t *pdata) {
   // We should have at least 2 bytes (the len bytes) in our array
   if (cbCount(buffer) < 2) return 0;

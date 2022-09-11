@@ -14,7 +14,7 @@ void CliEraseFlashState::init() {
   data_log_flash_erase(_curFlashId);
 }
 
-EndCondition_t CliEraseFlashState::run() {
+EndCondition_e CliEraseFlashState::run() {
   // Only send data or check end condition once per second
   if (!HM_FlashIsEraseComplete(_curFlashId)) {
     if ((HM_Millis() - last_time) > SEND_PERIOD) {
@@ -25,11 +25,11 @@ EndCondition_t CliEraseFlashState::run() {
   } else {
     _curFlashId++;
     if (_curFlashId == NUM_FLASH) {
-      return EndCondition_t::CliCommandComplete;
+      return EndCondition_e::CliCommandComplete;
     }
     data_log_flash_erase(_curFlashId);
   }
-  return EndCondition_t::NoChange;
+  return EndCondition_e::NoChange;
 }
 
 void CliEraseFlashState::cleanup() {

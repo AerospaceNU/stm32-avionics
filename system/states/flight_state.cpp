@@ -15,9 +15,9 @@
 #include "pyro_manager.h"
 #include "radio_manager.h"
 
-EndCondition_t FlightState::m_lastCliEndConn;
+EndCondition_e FlightState::m_lastCliEndConn;
 
-EndCondition_t FlightState::run_state() {
+EndCondition_e FlightState::run_state() {
   // We also should run periodic updates
   HM_RadioUpdate();
   RadioManager_tick();
@@ -25,9 +25,9 @@ EndCondition_t FlightState::run_state() {
 
   // Collect, filter, and log all sensor data
   HM_ReadSensorData();
-  SensorData_t* sensorData = HM_GetSensorData();
+  SensorData_s* sensorData = HM_GetSensorData();
   filterApplyData(sensorData, HM_GetSensorProperties(), m_hasPastApogee);
-  FilterData_t* filterData = filterGetData();
+  FilterData_s* filterData = filterGetData();
 
   // For now, transmit data to all attached radios
   for (int i = 0; i < NUM_RADIO; i++) {
@@ -38,7 +38,7 @@ EndCondition_t FlightState::run_state() {
   PyroManager_Update(filterData, m_hasPastApogee);
 
   // Run the state
-  EndCondition_t normalEndCondition = State::run_state();
+  EndCondition_e normalEndCondition = State::run_state();
 
   // CLI tick checks if we've gotten a new CLI command, and if we have, return
   // it

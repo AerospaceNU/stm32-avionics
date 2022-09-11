@@ -4,7 +4,7 @@
 #include "states_interface.h"
 
 namespace cli_tasks {
-EndCondition_t cliTick();
+EndCondition_e cliTick();
 
 // Change allowed transitions based on flight state
 void ConfigureForFlight();

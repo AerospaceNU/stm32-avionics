@@ -16,7 +16,7 @@
 #define TIME_BETWEEN_TRANSMITS_MS 1
 
 static uint8_t rxBuffer[APP_RX_DATA_SIZE];
-static CircularBuffer_t rxCircBuffer;
+static CircularBuffer_s rxCircBuffer;
 static int8_t (*cdcRxReceive)(uint8_t *Buf, uint32_t *Len);
 static uint32_t lastTransmit;
 
@@ -52,7 +52,7 @@ bool usbStdTransmit(uint8_t *buf, uint16_t len) {
   return CDC_Transmit_FS(buf, len) == USBD_OK;
 }
 
-CircularBuffer_t *usbStdGetRxBuffer() { return &rxCircBuffer; }
+CircularBuffer_s *usbStdGetRxBuffer() { return &rxCircBuffer; }
 
 bool usbStdIsConnected() {
   return hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED;

@@ -20,24 +20,24 @@ extern "C" {
 
 #define LINE_CUTTER_CB_SIZE 512
 
-typedef void (*LineCutterForwardStringCb)(uint8_t *, size_t);
+typedef void (*LineCutterForwardStringCb_t)(uint8_t *, size_t);
 
 typedef struct {
   // Reference to the BLE chip driver
-  BleChip_t *bleChip;
+  BleChip_s *bleChip;
 
   // The address assigned by the FCB bluetooth chip
   uint8_t address;
 
   // Backing array and incoming data circular buffer
   uint8_t packetArray[LINE_CUTTER_CB_SIZE];
-  CircularBuffer_t buffer;
+  CircularBuffer_s buffer;
 
   // The last data packet we've gotten
   uint32_t lastDataTimestamp;
   uint32_t lastFlightVarsTimestamp;
-  LineCutterData_t lastData;
-  LineCutterFlightVars_t flightVars;
+  LineCutterData_s lastData;
+  LineCutterFlightVars_s flightVars;
 
   // If we've gotten an ack, at all
   uint32_t lastAckTimestamp;
@@ -47,7 +47,7 @@ typedef struct {
   uint32_t lastRequestTimestamp;
 } LineCutterBleCtrl_t;
 
-void lineCutterBle_init(LineCutterBleCtrl_t *lineCutter, BleChip_t *bleChip,
+void lineCutterBle_init(LineCutterBleCtrl_t *lineCutter, BleChip_s *bleChip,
                         uint8_t address);
 void lineCutterBle_parse(LineCutterBleCtrl_t *lineCutter, uint16_t len,
                          uint8_t *arr);
@@ -82,7 +82,7 @@ bool lineCutterBle_isConnected(LineCutterBleCtrl_t *ctrl);
 bool lineCutterBle_isAwaitingReply(LineCutterBleCtrl_t *ctrl);
 
 // Registers a function to call to forward strings to
-void lineCutterBle_registerForwardStringCb(LineCutterForwardStringCb cb);
+void lineCutterBle_registerForwardStringCb(LineCutterForwardStringCb_t cb);
 
 #ifdef __cplusplus
 }

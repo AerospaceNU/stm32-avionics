@@ -39,7 +39,7 @@ uint16_t accelH3lis331dlCsPin[NUM_ACCEL_H3LIS331DL] = {HIGH_G_CS_Pin};
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
 #if HAS_DEV(ACCEL)
-const Orientation_t accelBoardToLocal[NUM_ACCEL][3] = {
+const Orientation_s accelBoardToLocal[NUM_ACCEL][3] = {
     {{AXIS_X, -1}, {AXIS_Y, 1}, {AXIS_Z, -1}},
 };
 int accelFilterPriority[NUM_ACCEL] = {1};
@@ -111,7 +111,7 @@ uint16_t imuLsm9ds1MagCsPin[NUM_IMU_LSM9DS1] = {IMU1_M_CS_Pin, IMU2_M_CS_Pin};
 #endif  // HAS_DEV(IMU_LSM9DS1)
 
 #if HAS_DEV(IMU)
-const Orientation_t imuBoardToLocal[NUM_IMU][3] = {
+const Orientation_s imuBoardToLocal[NUM_IMU][3] = {
     {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, -1}},
     {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, -1}},
 };

@@ -1,10 +1,6 @@
 #ifndef SYSTEM_SCHEDULER_H_
 #define SYSTEM_SCHEDULER_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "states_interface.h"
 
 class Scheduler {
@@ -13,7 +9,7 @@ class Scheduler {
   void run(void);
 
  private:
-  typedef enum StateId {
+  typedef enum {
     CliCalibrate = 0,
     CliEraseFlash,
     CliOffload,
@@ -25,15 +21,11 @@ class Scheduler {
     SimTempState,
     NUM_STATES,
     UNKNOWN
-  } StateId;
+  } StateId_e;
 
-  StateId getNextState(EndCondition_t endCondition);
+  StateId_e getNextState(EndCondition_e endCondition);
 
   State* pCurrentState_ = nullptr;
 };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif  // SYSTEM_SCHEDULER_H_

@@ -5,8 +5,8 @@
 
 void CliCalibrateState::init() { cliSendAck(true, nullptr); }
 
-EndCondition_t CliCalibrateState::run() {
-  return EndCondition_t::CliCommandComplete;
+EndCondition_e CliCalibrateState::run() {
+  return EndCondition_e::CliCommandComplete;
 }
 
 void CliCalibrateState::cleanup() { cliSendComplete(true, nullptr); }

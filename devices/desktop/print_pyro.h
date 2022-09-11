@@ -17,11 +17,11 @@ extern "C" {
 typedef struct {
   uint32_t expireTime;
   int id;
-} PrintPyroCtrl_t;
+} PrintPyroCtrl_s;
 
-void printPyro_init(PrintPyroCtrl_t *pyro, int id);
-void printPyro_start(PrintPyroCtrl_t *pyro, uint32_t duration);
-void printPyro_tick(PrintPyroCtrl_t *pyro);
+void printPyro_init(PrintPyroCtrl_s *pyro, int id);
+void printPyro_start(PrintPyroCtrl_s *pyro, uint32_t duration);
+void printPyro_tick(PrintPyroCtrl_s *pyro);
 
 #ifdef __cplusplus
 }

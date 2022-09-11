@@ -17,9 +17,9 @@ typedef struct {
   void (*txRxCallback)(void *);
   void *txCallbackUserData;
   void *txRxCallbackUserData;
-} SPICallbackProperty_t;
+} SpiCallbackProperty_s;
 
-static SPICallbackProperty_t spiCallbacks[MAX_SPI_HANDLES];
+static SpiCallbackProperty_s spiCallbacks[MAX_SPI_HANDLES];
 static int numSpiCallbacksRegistered = 0;
 
 void register_HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi,
@@ -92,9 +92,9 @@ typedef struct {
   void *rxHalfCallbackUserData;
   void *rxCallbackUserData;
   void *rxIdleCallbackUserData;
-} UARTCallbackProperty_t;
+} UartCallbackProperty_s;
 
-static UARTCallbackProperty_t uartCallbacks[MAX_UART_HANDLES];
+static UartCallbackProperty_s uartCallbacks[MAX_UART_HANDLES];
 static int numUartCallbacksRegistered = 0;
 
 void register_HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart,
@@ -196,9 +196,9 @@ typedef struct {
   ADC_HandleTypeDef *hadc;
   void (*convCallback)(void *);
   void *convCallbackUserData;
-} ADCCallbackProperty_t;
+} AdcCallbackProperty_s;
 
-static ADCCallbackProperty_t adcCallbacks[MAX_ADC_HANDLES];
+static AdcCallbackProperty_s adcCallbacks[MAX_ADC_HANDLES];
 static int numAdcCallbacksRegistered = 0;
 
 void register_HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc,

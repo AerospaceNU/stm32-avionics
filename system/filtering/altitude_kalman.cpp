@@ -28,7 +28,7 @@ void AltitudeKalman::Correct(const double baroAltitude,
   xHat.estimatedVelocity += kalman_gain[1] * deltaAltitude;
 }
 
-const AltitudeKalmanOutput_t AltitudeKalman::GetXhat() const { return xHat; }
+const AltitudeKalmanOutput_s AltitudeKalman::GetXhat() const { return xHat; }
 
 void AltitudeKalman::SetDt(double dt) { m_dt = dt; }
 

@@ -28,25 +28,25 @@ typedef struct {
   uint32_t altInfoLastSent;
   uint32_t pyroInfoLastSent;
   uint32_t cliStringLastSent;
-} DataTransmitState_t;
+} DataTransmitState_s;
 
 #define RADIO_MAX_CALLBACKS 10
-typedef void (*RadioCallback_t)(RecievedPacket_t*);
+typedef void (*RadioCallback_t)(RadioRecievedPacket_s*);
 
 typedef struct {
   // The radio will enqueue packets here automatically
-  CircularBuffer_t rxBuffer;
-  uint8_t rxArray[RX_BUFF_LEN * sizeof(RecievedPacket_t)];
+  CircularBuffer_s rxBuffer;
+  uint8_t rxArray[RX_BUFF_LEN * sizeof(RadioRecievedPacket_s)];
 
   RadioCallback_t callbacks[RADIO_MAX_CALLBACKS];
   size_t numCallbacks;
-} DataRecieveState_t;
+} DataRecieveState_s;
 
 void RadioManager_init();
 void RadioManager_tick();
 
-void RadioManager_transmitData(int radioId, SensorData_t* sensorData,
-                               FilterData_t* filterData, uint8_t state);
+void RadioManager_transmitData(int radioId, SensorData_s* sensorData,
+                               FilterData_s* filterData, uint8_t state);
 
 // Send a string over radio
 // Note that this BLOCKS for up to 150ms!!

@@ -7,8 +7,8 @@
 
 #include "states_interface.h"
 
-EndCondition_t State::run_state() {
-  EndCondition_t result = run();
+EndCondition_e State::run_state() {
+  EndCondition_e result = run();
 
   // Refresh watchdog
   HM_WatchdogRefresh();

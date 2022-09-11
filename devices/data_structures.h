@@ -18,36 +18,36 @@ typedef struct __attribute__((packed)) {
   int8_t rssi;
   bool crc;
   uint8_t lqi;
-} RecievedPacket_t;
+} RadioRecievedPacket_s;
 
-typedef enum { AXIS_X = 0, AXIS_Y, AXIS_Z } Axis_t;
+typedef enum { AXIS_X = 0, AXIS_Y, AXIS_Z } Axis_e;
 
 typedef struct {
-  Axis_t axis;
+  Axis_e axis;
   int8_t direction;
-} Orientation_t;
+} Orientation_s;
 
 typedef struct __attribute__((packed)) {
   int16_t x;
   int16_t y;
   int16_t z;
-} Axis3dRaw_t;
+} Axis3dRaw_s;
 
 typedef struct __attribute__((packed)) {
   double x;
   double y;
   double z;
-} Axis3dReal_t;
+} Axis3dReal_s;
 
 typedef struct __attribute__((packed)) {
-  Axis3dRaw_t raw;
-  Axis3dReal_t realMps2;
-} AccelData_t;
+  Axis3dRaw_s raw;
+  Axis3dReal_s realMps2;
+} AccelData_s;
 
 typedef struct __attribute__((packed)) {
   double temperatureC;
   double pressureAtm;
-} BarometerData_t;
+} BarometerData_s;
 
 typedef struct __attribute__((packed)) {
   float latitude;
@@ -70,22 +70,22 @@ typedef struct __attribute__((packed)) {
   int year;
   int num_sats;
   char status;
-} GpsData_t;
+} GpsData_s;
 
 typedef struct __attribute__((packed)) {
-  Axis3dRaw_t accel;
-  Axis3dRaw_t angVel;
-  Axis3dRaw_t mag;
-} ImuDataRaw_t;
+  Axis3dRaw_s accel;
+  Axis3dRaw_s angVel;
+  Axis3dRaw_s mag;
+} ImuDataRaw_s;
 
 typedef struct __attribute__((packed)) {
-  Axis3dRaw_t accelRaw;
-  Axis3dReal_t accelRealMps2;
-  Axis3dRaw_t angVelRaw;
-  Axis3dReal_t angVelRealRadps;
-  Axis3dRaw_t magRaw;
-  Axis3dReal_t magRealG;
-} ImuData_t;
+  Axis3dRaw_s accelRaw;
+  Axis3dReal_s accelRealMps2;
+  Axis3dRaw_s angVelRaw;
+  Axis3dReal_s angVelRealRadps;
+  Axis3dRaw_s magRaw;
+  Axis3dReal_s magRealG;
+} ImuData_s;
 
 // The data struct from the line cutter
 typedef struct __attribute__((__packed__)) {
@@ -103,7 +103,7 @@ typedef struct __attribute__((__packed__)) {
   uint16_t cutSense2;
   uint16_t currentSense;
   uint16_t photoresistor;
-} LineCutterData_t;
+} LineCutterData_s;
 
 // For writing data to flash & flight variable log
 typedef struct __attribute__((packed)) {
@@ -119,6 +119,6 @@ typedef struct __attribute__((packed)) {
   uint16_t lightThreshold;
   uint32_t lightTriggerTime;
   uint32_t seaLevelPressure;
-} LineCutterFlightVars_t;
+} LineCutterFlightVars_s;
 
 #endif  // DEVICES_DATA_STRUCTURES_H_

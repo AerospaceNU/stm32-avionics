@@ -35,7 +35,7 @@ bool usbStdTransmit(uint8_t* buf, uint16_t len);
  * @brief Retrieve circular RX buffer
  * @return Pointer to circular buffer
  */
-CircularBuffer_t* usbStdGetRxBuffer();
+CircularBuffer_s* usbStdGetRxBuffer();
 
 /**
  * @brief Whether USB is connected or not

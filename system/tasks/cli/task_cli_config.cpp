@@ -1,13 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include "board_config_common.h"
 #include "cli.h"
 #include "cli_tasks.h"
 #include "data_log.h"
 #include "dtoa.h"
-#include "errno.h"
 #include "hardware_manager.h"
 #include "small_strtod.h"
 
@@ -19,7 +19,7 @@ static void generateConfigHelp(const char* name, const char* value) {
 
 void cli_tasks::cliConfig() {
   // Get command line options
-  CliOptionVals_t options = cliGetOptions();
+  CliOptionVals_s options = cliGetOptions();
 #if HAS_DEV(PYRO)
   // Configure pyro
   if (options.p) {
@@ -121,7 +121,7 @@ void cli_tasks::cliConfig() {
     // Pyros
     for (int i = 0; i < NUM_PYRO; i++) {
       snprintf(name, sizeof(name), "Pyro %i Configuration:", i + 1);
-      PyroConfig_t* pyroConfig = (cliGetConfigs()->pyroConfiguration + i);
+      PyroConfig_s* pyroConfig = (cliGetConfigs()->pyroConfiguration + i);
       dtoa(float_buff, sizeof(float_buff), pyroConfig->configValue, 2);
       if (pyroConfig->flags == FLAG_APOGEE) {  // Apogee
         snprintf(val, sizeof(val), "Deploy at apogee");

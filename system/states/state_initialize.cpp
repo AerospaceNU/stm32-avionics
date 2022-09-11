@@ -33,11 +33,11 @@ void InitializeState::init() {
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
 }
 
-EndCondition_t InitializeState::run() {
+EndCondition_e InitializeState::run() {
   if (HM_UsbIsConnected(USB_CLI_ID)) {
-    return EndCondition_t::UsbConnect;
+    return EndCondition_e::UsbConnect;
   }
-  return EndCondition_t::UsbDisconnect;
+  return EndCondition_e::UsbDisconnect;
 }
 
 void InitializeState::cleanup() {

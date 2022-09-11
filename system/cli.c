@@ -21,9 +21,9 @@ static char
                 1];  // +1 accounts for null terminator required for strtok
 
 static uint8_t radioRxBuffer[INPUT_BUFFER_SIZE];
-static CircularBuffer_t radioRxCircBuffer;
+static CircularBuffer_s radioRxCircBuffer;
 
-static CliOptionVals_t cliOptionVals = {.p = NULL,
+static CliOptionVals_s cliOptionVals = {.p = NULL,
                                         .H = NULL,
                                         .D = NULL,
                                         .e = NULL,
@@ -50,13 +50,13 @@ static struct option longOptions[] = {
     {"version", no_argument, &primaryCommand, VERSION},
     {0, 0, 0, 0}};
 
-static CliConfigs_t cliConfigs;
+static CliConfigs_s cliConfigs;
 
-static CliComms_t lastCommsType;  // Used to help send ack to right places
+static CliComms_e lastCommsType;  // Used to help send ack to right places
 
-static void cliParseRadio(RecievedPacket_t* packet) {
+static void cliParseRadio(RadioRecievedPacket_s* packet) {
   // Only accept packets with good CRC
-  RadioPacket_t* parsedPacket = (RadioPacket_t*)&packet->data;
+  RadioPacket_s* parsedPacket = (RadioPacket_s*)&packet->data;
   if (parsedPacket->packetType == TELEMETRY_ID_STRING) {
     if (packet->crc) {
       const uint8_t len = parsedPacket->payload.cliString.len;
@@ -78,7 +78,7 @@ void cliInit() {
   RadioManager_addMessageCallback(RADIO_CLI_ID, cliParseRadio);
 }
 
-CliConfigs_t* cliGetConfigs() { return &cliConfigs; }
+CliConfigs_s* cliGetConfigs() { return &cliConfigs; }
 
 void cliSetDefaultConfig() {
 #if NUM_PYRO > 0
@@ -94,13 +94,13 @@ void cliSetDefaultConfig() {
   cliConfigs.radioChannel = 1;
 }
 
-CliCommand_t cliParse(CliComms_t commsType) {
+CliCommand_e cliParse(CliComms_e commsType) {
   // Get buffer from hardware manager
   uint32_t bytesRead = 0;  // Raw bytes read from hardware manager to be
                            // discarded, eventually including \r\n
 
   // Find the appropriate circular buffer for our medium
-  CircularBuffer_t* selectedRxBuffer = cliGetRxBufferFor(commsType);
+  CircularBuffer_s* selectedRxBuffer = cliGetRxBufferFor(commsType);
 
   if (selectedRxBuffer == NULL) return NONE;
   if (!cbCount(selectedRxBuffer)) return NONE;
@@ -270,7 +270,7 @@ CliCommand_t cliParse(CliComms_t commsType) {
   }
 
   // Return primary command entered by user
-  return (CliCommand_t)primaryCommand;
+  return (CliCommand_e)primaryCommand;
 }
 
 void cliSend(const char* msg) {
@@ -314,9 +314,9 @@ void cliSendComplete(bool completeSuccess, const char* errMsg) {
   cliSend("\r\n");
 }
 
-CliOptionVals_t cliGetOptions() { return cliOptionVals; }
+CliOptionVals_s cliGetOptions() { return cliOptionVals; }
 
-CircularBuffer_t* cliGetRxBufferFor(CliComms_t source) {
+CircularBuffer_s* cliGetRxBufferFor(CliComms_e source) {
   switch (source) {
     case CLI_PHONE:
       return HM_BleClientGetRxBuffer(BLE_CLI_ID);
@@ -329,4 +329,4 @@ CircularBuffer_t* cliGetRxBufferFor(CliComms_t source) {
   }
 }
 
-CircularBuffer_t* cliGetRxBuffer() { return cliGetRxBufferFor(lastCommsType); }
+CircularBuffer_s* cliGetRxBuffer() { return cliGetRxBufferFor(lastCommsType); }

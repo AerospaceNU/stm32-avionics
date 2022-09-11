@@ -10,14 +10,14 @@
 
 class FlightReplay {
  public:
-  virtual void GetNext(SensorData_t *data) {}
+  virtual void GetNext(SensorData_s *data) {}
 };
 
 class CsvReplay : FlightReplay {
  public:
   explicit CsvReplay(std::string path);
 
-  void GetNext(SensorData_t *data) override;
+  void GetNext(SensorData_s *data) override;
 
  private:
   rapidcsv::Document doc;

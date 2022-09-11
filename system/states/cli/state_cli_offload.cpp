@@ -1,10 +1,10 @@
 #include "state_cli_offload.h"
 
-#include <inttypes.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include <cinttypes>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
 #include "buzzer_heartbeat.h"
 #include "cli.h"
@@ -23,7 +23,7 @@ static void format_time_seconds(char *result, int resultLen, uint32_t seconds) {
 }
 
 void CliOffloadState::init() {
-  CliOptionVals_t cliOptions = cliGetOptions();
+  CliOptionVals_s cliOptions = cliGetOptions();
 
   // If specific flight number is provided, try offloading that
   if (cliOptions.f) {
@@ -54,7 +54,7 @@ void CliOffloadState::init() {
   cliSendAck(true, nullptr);
 }
 
-EndCondition_t CliOffloadState::run() {
+EndCondition_e CliOffloadState::run() {
   // If initialization didn't succeed, stop
   if (!initSuccess_) {
     return CliCommandComplete;
@@ -87,7 +87,7 @@ EndCondition_t CliOffloadState::run() {
       cliSend(sendString);
       for (uint8_t num = 1; num <= lastFlightNum; ++num) {
         data_log_read_flight_num_metadata(num);
-        FlightMetadata *metadataPacket = data_log_get_flight_metadata();
+        FlightMetadata_s *metadataPacket = data_log_get_flight_metadata();
         flight_timestamp = (time_t)metadataPacket->gpsTimestamp;
         // Check timestamp between 2000 and 2100
         if (flight_timestamp > 946702800 && flight_timestamp < 4102462800) {
@@ -109,15 +109,15 @@ EndCondition_t CliOffloadState::run() {
         cliSend(sendString);
       }
     }
-    return EndCondition_t::CliCommandComplete;
+    return EndCondition_e::CliCommandComplete;
   }
 
   // Offload one chunk of data
   if (dataOffload()) {
-    return EndCondition_t::CliCommandComplete;
+    return EndCondition_e::CliCommandComplete;
   }
 
-  return EndCondition_t::NoChange;
+  return EndCondition_e::NoChange;
 }
 
 void CliOffloadState::cleanup() {

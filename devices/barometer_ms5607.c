@@ -14,13 +14,13 @@ typedef enum {
   OSR_1024 = 3,
   OSR_512 = 2,
   OSR_256 = 1
-} MS5607_OSR;
+} Ms5607Osr_e;
 
 /*
  * Initializes MS5607 temperature and pressure sensor
  * with specific MS5607Ctrl_t configuration
  */
-bool barometerMs5607_init(BarometerMs5607Ctrl_t *ms5607,
+bool barometerMs5607_init(BarometerMs5607Ctrl_s *ms5607,
                           SPI_HandleTypeDef *hspi, GPIO_TypeDef *csPort,
                           uint16_t csPin) {
   ms5607->hspi = hspi;
@@ -63,7 +63,7 @@ bool barometerMs5607_init(BarometerMs5607Ctrl_t *ms5607,
  * Temperature in C stored in ms5607->altData.temp
  * Pressure in Atm stored in ms5607->altData.baro
  */
-void barometerMs5607_getData(BarometerMs5607Ctrl_t *ms5607) {
+void barometerMs5607_getData(BarometerMs5607Ctrl_s *ms5607) {
   // Stores raw pressure and temperature values
   uint8_t presStore[4];
   uint8_t tempStore[4];

@@ -45,10 +45,10 @@ void PyroManager_SetPyroFireStatus(uint8_t status) {
   }
 }
 
-void PyroManager_Update(FilterData_t* filterData, bool hasPastApogee) {
+void PyroManager_Update(FilterData_s* filterData, bool hasPastApogee) {
   // Turns off expired pyros
   HM_PyroUpdate();
-  PyroConfig_t* pyroConfiguration = cliGetConfigs()->pyroConfiguration;
+  PyroConfig_s* pyroConfiguration = cliGetConfigs()->pyroConfiguration;
   for (int i = 0; i < NUM_PYRO; i++) {
     if (!pyroFireStatus[i]) {
       // Check that we are after apogee
@@ -87,7 +87,7 @@ void PyroManager_Init() {}
 void PyroManager_SetApogeeTime(uint64_t timestamp) {}
 uint8_t PyroManager_Status() { return 255; }
 void PyroManager_SetPyroFireStatus(uint8_t status) {}
-void PyroManager_Update(FilterData_t* filterData, bool hasPastApogee) {}
+void PyroManager_Update(FilterData_s* filterData, bool hasPastApogee) {}
 void PyroManager_PyroFire(uint8_t pyroNum, uint32_t fireTime, bool logFire) {}
 
 #endif  // HAS_DEV(PYRO)

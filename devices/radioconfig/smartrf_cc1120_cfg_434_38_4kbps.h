@@ -27,7 +27,7 @@
 // Whitening = false
 
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
-const RegisterSetting_t cc1120_433_1_2kbps_cfg[] = {
+const RegisterSetting_s cc1120_433_1_2kbps_cfg[] = {
     {TIRADIO_IOCFG3, 0xB0},       // GPIO3 IO Pin Configuration
     {TIRADIO_IOCFG2, 0x06},       // GPIO2 IO Pin Configuration
     {TIRADIO_IOCFG1, 0xB0},       // GPIO1 IO Pin Configuration

@@ -1,10 +1,6 @@
 #ifndef SYSTEM_STATES_STATE_DESCENT_H_
 #define SYSTEM_STATES_STATE_DESCENT_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "flight_state.h"
 
 class DescentState : public FlightState {
@@ -13,7 +9,7 @@ class DescentState : public FlightState {
 
   void init(void) override;
 
-  EndCondition_t run(void) override;
+  EndCondition_e run(void) override;
 
   void cleanup(void) override;
 
@@ -29,9 +25,5 @@ class DescentState : public FlightState {
   bool sentCut1 = false;
   bool sentCut2 = false;
 };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif  // SYSTEM_STATES_STATE_DESCENT_H_

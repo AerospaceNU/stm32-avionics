@@ -1,5 +1,5 @@
-#include <inttypes.h>
-#include <stdio.h>
+#include <cinttypes>
+#include <cstdio>
 
 #include "cli.h"
 #include "cli_tasks.h"
@@ -29,7 +29,7 @@ void cli_tasks::cliSense() {
 
   // Read sensor data and send in human-readable format
   HM_ReadSensorData();
-  SensorData_t* data = HM_GetSensorData();
+  SensorData_s* data = HM_GetSensorData();
   char cliStr[60];
   char float1[10];
   char float2[10];

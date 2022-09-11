@@ -8,8 +8,7 @@
 #include "small_strtod.h"
 
 #include <math.h>
-
-#include "stdbool.h"
+#include <stdbool.h>
 
 #define TO_INT(ch) ch - '0'
 

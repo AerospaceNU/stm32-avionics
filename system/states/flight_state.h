@@ -17,13 +17,13 @@ class FlightState : public State {
 
   ~FlightState() = default;
 
-  EndCondition_t run_state() override;
+  EndCondition_e run_state() override;
 
  protected:
   bool m_hasPastApogee;
 
  public:
-  static EndCondition_t m_lastCliEndConn;
+  static EndCondition_e m_lastCliEndConn;
 };
 
 #endif  // SYSTEM_STATES_FLIGHT_STATE_H_

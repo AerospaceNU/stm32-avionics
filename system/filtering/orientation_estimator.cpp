@@ -4,8 +4,10 @@
  *  Created on: Mar 21, 2022
  *      Author: sam
  */
-#include <math.h>
-#include <orientation_estimator.h>
+
+#include "orientation_estimator.h"
+
+#include <cmath>
 
 #include "matrix.h"
 

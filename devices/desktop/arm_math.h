@@ -1,5 +1,7 @@
+#ifndef DEVICES_DESKTOP_ARM_MATH_H_
+#define DEVICES_DESKTOP_ARM_MATH_H_
+
 #include <stdint.h>
-#pragma once
 
 typedef float float32_t;
 typedef struct {
@@ -7,3 +9,5 @@ typedef struct {
   uint16_t numCols; /**< number of columns of the matrix.  */
   float32_t *pData; /**< points to the data of the matrix. */
 } arm_matrix_instance_f32;
+
+#endif  // DEVICES_DESKTOP_ARM_MATH_H_

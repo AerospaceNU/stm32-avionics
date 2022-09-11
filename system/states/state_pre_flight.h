@@ -1,10 +1,6 @@
 #ifndef SYSTEM_STATES_STATE_PRE_FLIGHT_H_
 #define SYSTEM_STATES_STATE_PRE_FLIGHT_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "filters.h"
 #include "flight_state.h"
 #include "hardware_manager.h"
@@ -16,14 +12,14 @@ class PreFlightState : public FlightState {
 
   void init(void) override;
 
-  EndCondition_t run(void) override;
+  EndCondition_e run(void) override;
 
   void cleanup(void) override;
 
  private:
   static constexpr int kBufferSize = 7;
-  SensorData_t sensorDataBuffer[kBufferSize];
-  FilterData_t filterDataBuffer[kBufferSize];
+  SensorData_s sensorDataBuffer[kBufferSize];
+  FilterData_s filterDataBuffer[kBufferSize];
   int bufferCounter = 0;
 
   static constexpr double kLaunchAccelThreshold = 20.0;  // m/s**2
@@ -44,9 +40,5 @@ class PreFlightState : public FlightState {
 
   bool doCleanup = false;
 };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif  // SYSTEM_STATES_STATE_PRE_FLIGHT_H_

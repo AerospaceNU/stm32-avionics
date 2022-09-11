@@ -1,7 +1,7 @@
 
 #include "state_pre_flight.h"
 
-#include <string.h>
+#include <cstring>
 
 #include "cli.h"
 #include "cli_tasks.h"
@@ -34,9 +34,9 @@ void PreFlightState::init() {
   doCleanup = false;
 }
 
-EndCondition_t PreFlightState::run() {
+EndCondition_e PreFlightState::run() {
   // Collect, and filter data
-  SensorData_t* sensorData = HM_GetSensorData();
+  SensorData_s* sensorData = HM_GetSensorData();
 #if HAS_DEV(GPS)
   if (!gpsTimestamp && sensorData->gpsData[0].timestamp > 0) {
     data_log_get_flight_metadata()->gpsTimestamp =
@@ -46,9 +46,9 @@ EndCondition_t PreFlightState::run() {
   }
 #endif  // HAS_DEV(GPS)
 
-  memcpy(&sensorDataBuffer[bufferCounter], sensorData, sizeof(SensorData_t));
-  FilterData_t* filterData = filterGetData();
-  memcpy(&filterDataBuffer[bufferCounter], filterData, sizeof(FilterData_t));
+  memcpy(&sensorDataBuffer[bufferCounter], sensorData, sizeof(SensorData_s));
+  FilterData_s* filterData = filterGetData();
+  memcpy(&filterDataBuffer[bufferCounter], filterData, sizeof(FilterData_s));
 
   // Log at normal rate until launch detect is proven. TODO: Log when buffer is
   // reset
@@ -77,7 +77,7 @@ EndCondition_t PreFlightState::run() {
   // Either we should have large enough acceleration
   if (filterData->rocket_acc_x > kLaunchAccelThreshold) {
     if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
-      return EndCondition_t::Launch;
+      return EndCondition_e::Launch;
     }
   } else {
     transitionResetTimer = HM_Millis();
@@ -97,15 +97,15 @@ EndCondition_t PreFlightState::run() {
     }
     data_log_get_flight_metadata()->pressureRef = filterGetPressureRef();
     data_log_write_flight_metadata();
-    return EndCondition_t::Launch;
+    return EndCondition_e::Launch;
   }
 
   // Detect if USB was plugged back in (not in sim mode)
   if (!HM_InSimMode() && HM_UsbIsConnected(USB_CLI_ID)) {
-    return EndCondition_t::UsbConnect;
+    return EndCondition_e::UsbConnect;
   }
 
-  return EndCondition_t::NoChange;
+  return EndCondition_e::NoChange;
 }
 
 void PreFlightState::cleanup() {}

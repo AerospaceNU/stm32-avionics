@@ -4,8 +4,8 @@
 
 #include "filters.h"
 
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
 
 #include "altitude_kalman.h"
 #include "board_config_common.h"
@@ -26,27 +26,27 @@
 #define kGyroRefCount 10
 
 static double runningPresMedians[kPrevPresMedianCount + 1];
-static CircularBuffer_t runningPresMediansBuffer;
+static CircularBuffer_s runningPresMediansBuffer;
 static uint8_t runningPresMedianCount;
 static double runningPres[kPrevPresCount + 1];
-static CircularBuffer_t runningPresBuffer;
+static CircularBuffer_s runningPresBuffer;
 static uint8_t runningPresCount;
 
 static double gravityRefBuffer[kGravityRefCount];
 static double runningGravityRef[kGravityRefCount + 1];
-static CircularBuffer_t runningGravityRefBuffer;
+static CircularBuffer_s runningGravityRefBuffer;
 
 static float gyroXRefBack[kGyroRefCount + 1];
-static CircularBuffer_t gyroXRefBuffer;
+static CircularBuffer_s gyroXRefBuffer;
 static float gyroXOffset;
 static float gyroYRefBack[kGyroRefCount + 1];
-static CircularBuffer_t gyroYRefBuffer;
+static CircularBuffer_s gyroYRefBuffer;
 static float gyroYOffset;
 static float gyroZRefBack[kGyroRefCount + 1];
-static CircularBuffer_t gyroZRefBuffer;
+static CircularBuffer_s gyroZRefBuffer;
 static float gyroZOffset;
 
-static FilterData_t filterData;
+static FilterData_s filterData;
 static double presRef = 1.0;   // atm
 static int8_t gravityRef = 1;  // direction of gravity
 
@@ -78,7 +78,7 @@ void filterInit(double dt) {
 }
 
 static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
-                                 const SensorProperties_t* sensorProperties) {
+                                 const SensorProperties_s* sensorProperties) {
   int numAccelsValid = 0;
   double accelSum = 0;
   int highestValidPriority = 0;
@@ -137,10 +137,10 @@ static double filterGyroOneAxis(double* imuReadings) {
   return numGyrosValid == 0 ? 0.0 : gyroSum / numGyrosValid;
 }
 
-static double getSensorAxis(const Axis_t boardAxis,
-                            const Orientation_t* sensorOrientation,
+static double getSensorAxis(const Axis_e boardAxis,
+                            const Orientation_s* sensorOrientation,
                             double* sensorVals) {
-  Orientation_t sensorOrient = sensorOrientation[boardAxis];
+  Orientation_s sensorOrient = sensorOrientation[boardAxis];
   double multiplier = sensorOrient.direction;
   // The gravity ref tells us whether or not we need to rotate our coordinate
   // system around the x axis to flip the gravity (z) direction. We're assuming
@@ -153,8 +153,8 @@ static double getSensorAxis(const Axis_t boardAxis,
   return multiplier * sensorVals[sensorOrient.axis];
 }
 
-static void filterAccels(SensorData_t* curSensorVals,
-                         SensorProperties_t* sensorProperties) {
+static void filterAccels(SensorData_s* curSensorVals,
+                         SensorProperties_s* sensorProperties) {
   // Get acceleration readings along raw axes
 #if HAS_DEV(ACCEL)
   double accelData[NUM_ACCEL][3] = {0};
@@ -177,7 +177,7 @@ static void filterAccels(SensorData_t* curSensorVals,
   for (int i = 0; i < NUM_ACCEL; i++) {
     for (int axis = 0; axis < 3; axis++) {
       accelReadings[axis][i] =
-          getSensorAxis((Axis_t)axis, accelBoardToLocal[i], accelData[i]);
+          getSensorAxis((Axis_e)axis, accelBoardToLocal[i], accelData[i]);
     }
   }
 #else
@@ -188,7 +188,7 @@ static void filterAccels(SensorData_t* curSensorVals,
   for (int i = 0; i < NUM_IMU; i++) {
     for (int axis = 0; axis < 3; axis++) {
       imuReadings[axis][i] =
-          getSensorAxis((Axis_t)axis, imuBoardToLocal[i], imuAccelData[i]);
+          getSensorAxis((Axis_e)axis, imuBoardToLocal[i], imuAccelData[i]);
     }
   }
 #else
@@ -204,7 +204,7 @@ static void filterAccels(SensorData_t* curSensorVals,
       accelReadings[AXIS_Z], imuReadings[AXIS_Z], sensorProperties);
 }
 
-double filterGetAveragePressure(SensorData_t* curSensorVals) {
+double filterGetAveragePressure(SensorData_s* curSensorVals) {
   double presAvg = 0;
 #if HAS_DEV(BAROMETER)
   for (int i = 0; i < NUM_BAROMETER; i++) {
@@ -215,7 +215,7 @@ double filterGetAveragePressure(SensorData_t* curSensorVals) {
   return presAvg;
 }
 
-static void filterGyros(SensorData_t* curSensorVals) {
+static void filterGyros(SensorData_s* curSensorVals) {
 #if HAS_DEV(IMU)
   // Get gyro readings along raw axes
   double imuGyroData[NUM_IMU][3];
@@ -229,7 +229,7 @@ static void filterGyros(SensorData_t* curSensorVals) {
   for (int i = 0; i < NUM_IMU; i++) {
     for (int axis = 0; axis < 3; axis++) {
       imuReadings[axis][i] =
-          getSensorAxis((Axis_t)axis, imuBoardToLocal[i], imuGyroData[i]);
+          getSensorAxis((Axis_e)axis, imuBoardToLocal[i], imuGyroData[i]);
     }
   }
 #else
@@ -254,7 +254,7 @@ static void filterGyros(SensorData_t* curSensorVals) {
   filterData.qz = orientationEstimator.q(3, 0);
 }
 
-void updateGyroOffsetOneAxis(CircularBuffer_t* refBuffer, const float& newValue,
+void updateGyroOffsetOneAxis(CircularBuffer_s* refBuffer, const float& newValue,
                              float* offset) {
   uint8_t i;
   float gyroSum = 0;
@@ -282,7 +282,7 @@ void filterAddGyroRef() {
   updateGyroOffsetOneAxis(&gyroZRefBuffer, noOffset, &gyroZOffset);
 }
 
-static void filterPositionZ(SensorData_t* curSensorVals, bool hasPassedApogee) {
+static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
   // For now, just convert pressure to altitude using the following formula
   // without any sort of real filtering
   // https://en.wikipedia.org/wiki/Barometric_formula
@@ -385,7 +385,7 @@ void filterAddGravityRef() {
   }
 }
 
-void filterAddPressureRef(SensorData_t* curSensorVals) {
+void filterAddPressureRef(SensorData_s* curSensorVals) {
   // Average current pressures
   double currentPres = filterGetAveragePressure(curSensorVals);
 
@@ -457,8 +457,8 @@ static void filterSetWorldReference() {
   filterData.world_vel_z = filterData.rocket_vel_x;
 }
 
-void filterApplyData(SensorData_t* curSensorVals,
-                     SensorProperties_t* sensorProperties,
+void filterApplyData(SensorData_s* curSensorVals,
+                     SensorProperties_s* sensorProperties,
                      bool hasPassedApogee) {
   // Filter z pos first so we still have the old accelerations
   // This lets us project our state estimate forward from the last
@@ -472,4 +472,4 @@ void filterApplyData(SensorData_t* curSensorVals,
   filterGyros(curSensorVals);
 }
 
-FilterData_t* filterGetData() { return &filterData; }
+FilterData_s* filterGetData() { return &filterData; }

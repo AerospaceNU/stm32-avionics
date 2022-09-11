@@ -42,9 +42,9 @@ typedef enum {
   CCA_MODE_NONE = 0,
   CCA_MODE_RSSI,
   CCA_MODE_INRX,  // Not currently recieving packet
-  CCA_MODE_RRSIandRX,
+  CCA_MODE_RRSI_RX,
   CCA_MODE_RSSI_LBT  // Listen-before-talk, adds 5-10ms per transmit
-} CCAMode_e;
+} CcaMode_e;
 #define CCA_MODE_SHIFT 2
 
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120

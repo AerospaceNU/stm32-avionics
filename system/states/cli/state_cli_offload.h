@@ -1,10 +1,6 @@
 #ifndef SYSTEM_STATES_CLI_STATE_CLI_OFFLOAD_H_
 #define SYSTEM_STATES_CLI_STATE_CLI_OFFLOAD_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "states_interface.h"
 
 class CliOffloadState : public State {
@@ -15,16 +11,12 @@ class CliOffloadState : public State {
 
   void init(void) override;
 
-  EndCondition_t run(void) override;
+  EndCondition_e run(void) override;
 
   void cleanup(void) override;
 
  private:
   bool initSuccess_;
 };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif  // SYSTEM_STATES_CLI_STATE_CLI_OFFLOAD_H_

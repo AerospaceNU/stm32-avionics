@@ -10,6 +10,7 @@
 
 #define ARM_MATH_CM7
 
+#include <cmath>
 #include <cstring>
 #include <initializer_list>
 

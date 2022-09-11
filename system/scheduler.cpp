@@ -17,19 +17,20 @@ void Scheduler::run(void) {
   /* Create all necessary states initially and store in list */
   uint32_t defaultPeriod = 15;
   CliCalibrateState cliCalibrate =
-      CliCalibrateState(StateId::CliCalibrate, defaultPeriod);
+      CliCalibrateState(StateId_e::CliCalibrate, defaultPeriod);
   CliEraseFlashState cliEraseFlash =
-      CliEraseFlashState(StateId::CliEraseFlash, defaultPeriod);
+      CliEraseFlashState(StateId_e::CliEraseFlash, defaultPeriod);
   CliOffloadState cliOffload =
-      CliOffloadState(StateId::CliOffload, defaultPeriod);
-  AscentState ascent = AscentState(StateId::Ascent, defaultPeriod);
+      CliOffloadState(StateId_e::CliOffload, defaultPeriod);
+  AscentState ascent = AscentState(StateId_e::Ascent, defaultPeriod);
   InitializeState initialize =
-      InitializeState(StateId::Initialize, defaultPeriod);
-  DescentState descent = DescentState(StateId::Descent, defaultPeriod);
+      InitializeState(StateId_e::Initialize, defaultPeriod);
+  DescentState descent = DescentState(StateId_e::Descent, defaultPeriod);
   PostFlightState postFlight =
-      PostFlightState(StateId::PostFlight, defaultPeriod);
-  PreFlightState preFlight = PreFlightState(StateId::PreFlight, defaultPeriod);
-  CliTempState tempState = CliTempState(StateId::SimTempState, defaultPeriod);
+      PostFlightState(StateId_e::PostFlight, defaultPeriod);
+  PreFlightState preFlight =
+      PreFlightState(StateId_e::PreFlight, defaultPeriod);
+  CliTempState tempState = CliTempState(StateId_e::SimTempState, defaultPeriod);
 
   State* states[] = {&cliCalibrate, &cliEraseFlash, &cliOffload,
                      &ascent,       &initialize,    &descent,
@@ -41,7 +42,7 @@ void Scheduler::run(void) {
 
   // Helper functions throughout infinite loop
   uint32_t lastTime_ = HM_Millis();
-  EndCondition_t endCondition = NoChange;
+  EndCondition_e endCondition = NoChange;
 
   // Keep running scheduler forever
   while (1) {
@@ -66,7 +67,7 @@ void Scheduler::run(void) {
     if (pCurrentState_) endCondition = pCurrentState_->run_state();
 
     // Find and set the next state
-    StateId nextState = getNextState(endCondition);
+    StateId_e nextState = getNextState(endCondition);
     for (State* state : states) {
       if (state->getID() == nextState) {
         pNextState = state;
@@ -76,88 +77,89 @@ void Scheduler::run(void) {
   }
 }
 
-Scheduler::StateId Scheduler::getNextState(EndCondition_t endCondition) {
+Scheduler::StateId_e Scheduler::getNextState(EndCondition_e endCondition) {
   // Return the current state if there's no change
-  if (endCondition == EndCondition_t::NoChange) {
-    return static_cast<Scheduler::StateId>(pCurrentState_->getID());
+  if (endCondition == EndCondition_e::NoChange) {
+    return static_cast<Scheduler::StateId_e>(pCurrentState_->getID());
   }
 
-  if (endCondition == EndCondition_t::NewFlight) {
-    return StateId::PreFlight;
+  if (endCondition == EndCondition_e::NewFlight) {
+    return StateId_e::PreFlight;
   }
 
   // Look for next state based on current state and end condition
   switch (pCurrentState_->getID()) {
     // Coming from any CLI state, we want to end up back in
     // preflight
-    case StateId::CliCalibrate:
-    case StateId::CliEraseFlash:
-    case StateId::CliOffload:
+    case StateId_e::CliCalibrate:
+    case StateId_e::CliEraseFlash:
+    case StateId_e::CliOffload:
       switch (endCondition) {
-        case EndCondition_t::CliCommandComplete: {
-          return StateId::PreFlight;  // TODO should we go back to initialize?
+        case EndCondition_e::CliCommandComplete: {
+          return StateId_e::PreFlight;  // TODO should we go back to initialize?
         }
         default:
           break;
       }
       break;
-    case StateId::Ascent:
+    case StateId_e::Ascent:
       switch (endCondition) {
-        case EndCondition_t::Apogee:
-          return StateId::Descent;
+        case EndCondition_e::Apogee:
+          return StateId_e::Descent;
         default:
           break;
       }
       break;
-    case StateId::Initialize: {
+    case StateId_e::Initialize: {
       int storedStateInt = state_log_read();
       // Resumes a flight from the state log if there is a state to resume
       if (storedStateInt >= 0) {
-        StateId storedStateId = static_cast<Scheduler::StateId>(storedStateInt);
+        StateId_e storedStateId_e =
+            static_cast<Scheduler::StateId_e>(storedStateInt);
         // Only resume from the 2 flight states
         // (They *should* be the only states written in the state log
         // regardless)
-        if (storedStateId == StateId::Ascent ||
-            storedStateId == StateId::Descent) {
+        if (storedStateId_e == StateId_e::Ascent ||
+            storedStateId_e == StateId_e::Descent) {
           state_log_reload_flight();
           cli_tasks::ConfigureForFlight();
-          return storedStateId;
+          return storedStateId_e;
         }
       }
 
-      return StateId::PreFlight;
+      return StateId_e::PreFlight;
 
       break;
     }
-    case StateId::Descent:
+    case StateId_e::Descent:
       switch (endCondition) {
-        case EndCondition_t::Touchdown:
-          return StateId::PostFlight;
+        case EndCondition_e::Touchdown:
+          return StateId_e::PostFlight;
         default:
           break;
       }
       break;
-    case StateId::PostFlight:
-    case StateId::PreFlight:
+    case StateId_e::PostFlight:
+    case StateId_e::PreFlight:
       switch (endCondition) {
-        case EndCondition_t::Launch:
-          return StateId::Ascent;
-        case EndCondition_t::SimCommand:
-          return StateId::SimTempState;
-        case EndCondition_t::CalibrateCommand:
-          return StateId::CliCalibrate;
-        case EndCondition_t::OffloadCommand:
-          return StateId::CliOffload;
-        case EndCondition_t::EraseFlashCommand:
-          return StateId::CliEraseFlash;
+        case EndCondition_e::Launch:
+          return StateId_e::Ascent;
+        case EndCondition_e::SimCommand:
+          return StateId_e::SimTempState;
+        case EndCondition_e::CalibrateCommand:
+          return StateId_e::CliCalibrate;
+        case EndCondition_e::OffloadCommand:
+          return StateId_e::CliOffload;
+        case EndCondition_e::EraseFlashCommand:
+          return StateId_e::CliEraseFlash;
         default:
           break;
       }
       break;
-    case StateId::SimTempState:
-      return StateId::PreFlight;
+    case StateId_e::SimTempState:
+      return StateId_e::PreFlight;
     default:
       break;
   }
-  return StateId::UNKNOWN;
+  return StateId_e::UNKNOWN;
 }

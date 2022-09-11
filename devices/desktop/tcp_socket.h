@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DEVICES_DESKTOP_TCP_SOCKET_H_
+#define DEVICES_DESKTOP_TCP_SOCKET_H_
 
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -25,3 +26,5 @@ class TcpSocket {
 
   std::thread acceptThread;
 };
+
+#endif  // DEVICES_DESKTOP_TCP_SOCKET_H_

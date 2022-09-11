@@ -8,7 +8,7 @@
 
 #define TWO_POWER_SIXTEEN 65535
 
-void buzzerPwmInit(BuzzerPwmCtrl_t *buzzer, TIM_HandleTypeDef *htim,
+void buzzerPwmInit(BuzzerPwmCtrl_s *buzzer, TIM_HandleTypeDef *htim,
                    uint32_t channel, float minFrequency) {
   // Set buzzer struct values
   buzzer->htim = htim;
@@ -27,7 +27,7 @@ void buzzerPwmInit(BuzzerPwmCtrl_t *buzzer, TIM_HandleTypeDef *htim,
       SystemCoreClock / ((htim->Init.Prescaler + 1) * TWO_POWER_SIXTEEN * 2);
 }
 
-void buzzerPwmSetFrequency(BuzzerPwmCtrl_t *buzzer, float fHz) {
+void buzzerPwmSetFrequency(BuzzerPwmCtrl_s *buzzer, float fHz) {
   // Calculate period based on minimum and given frequencies
   if (fHz < buzzer->minFrequency) {
     buzzer->htim->Init.Period = 0;
@@ -43,12 +43,12 @@ void buzzerPwmSetFrequency(BuzzerPwmCtrl_t *buzzer, float fHz) {
                         buzzer->htim->Init.Period / 2);
 }
 
-void buzzerPwmStart(BuzzerPwmCtrl_t *buzzer) {
+void buzzerPwmStart(BuzzerPwmCtrl_s *buzzer) {
   // Start PWM generation
   HAL_TIM_PWM_Start(buzzer->htim, buzzer->channel);
 }
 
-void buzzerPwmStop(BuzzerPwmCtrl_t *buzzer) {
+void buzzerPwmStop(BuzzerPwmCtrl_s *buzzer) {
   // Stop PWM generation
   HAL_TIM_PWM_Stop(buzzer->htim, buzzer->channel);
 }

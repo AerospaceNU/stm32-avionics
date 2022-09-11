@@ -11,17 +11,17 @@
 
 #define LSM9DS1_SPI_REG_MASK (1 << 7)
 
-static uint8_t AG_whoAmI(Lsm9ds1AgCtrl_t *sensor) {
+static uint8_t AG_whoAmI(Lsm9ds1AgCtrl_s *sensor) {
   return SPI_ReadRegister(&sensor->lsm9ds1Spi,
                           LSM9DS1_SPI_REG_MASK | REG_WHO_AM_I_AG);
 }
 
-static uint8_t M_whoAmI(Lsm9ds1MCtrl_t *sensor) {
+static uint8_t M_whoAmI(Lsm9ds1MCtrl_s *sensor) {
   return SPI_ReadRegister(&sensor->lsm9ds1Spi,
                           LSM9DS1_SPI_REG_MASK | REG_WHO_AM_I_M);
 }
 
-static void lsm9ds1_getDataRaw(ImuLsm9ds1Ctrl_t *sensor) {
+static void lsm9ds1_getDataRaw(ImuLsm9ds1Ctrl_s *sensor) {
   // Takes x, y, and z axis readings
   uint8_t x_l_xl = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
                                     LSM9DS1_SPI_REG_MASK | OUT_X_L_XL);
@@ -83,7 +83,7 @@ static void lsm9ds1_getDataRaw(ImuLsm9ds1Ctrl_t *sensor) {
   sensor->ag.tRawVal = ((int16_t)t_h << 8) | (t_l);
 }
 
-void lsm9ds1_getData(ImuLsm9ds1Ctrl_t *sensor) {
+void lsm9ds1_getData(ImuLsm9ds1Ctrl_s *sensor) {
   lsm9ds1_getDataRaw(sensor);
   sensor->data.accelRealMps2.x = sensor->ag.aRes * sensor->data.accelRaw.x;
   sensor->data.accelRealMps2.y = sensor->ag.aRes * sensor->data.accelRaw.y;
@@ -104,7 +104,7 @@ void lsm9ds1_getData(ImuLsm9ds1Ctrl_t *sensor) {
       (sensor->m.mRes * sensor->data.magRaw.z) - sensor->m.mAdj.z;
 }
 
-static void lsm9ds1_getAdj(ImuLsm9ds1Ctrl_t *sensor) {
+static void lsm9ds1_getAdj(ImuLsm9ds1Ctrl_s *sensor) {
   int sampleCount = 100;
   int gAdjX = 0;
   int gAdjY = 0;
@@ -130,7 +130,7 @@ static void lsm9ds1_getAdj(ImuLsm9ds1Ctrl_t *sensor) {
   sensor->m.mAdj.z = (mAdjZ / sampleCount) * sensor->m.mRes;
 }
 
-static void lsm9ds1_calcRes(ImuLsm9ds1Ctrl_t *sensor) {
+static void lsm9ds1_calcRes(ImuLsm9ds1Ctrl_s *sensor) {
   switch (sensor->ag.aFs) {
     case 0 << 3:
       sensor->ag.aRes = SENSITIVITY_ACCELEROMETER_2;
@@ -182,7 +182,7 @@ static void lsm9ds1_calcRes(ImuLsm9ds1Ctrl_t *sensor) {
   }
 }
 
-bool lsm9ds1_init(ImuLsm9ds1Ctrl_t *sensor) {
+bool lsm9ds1_init(ImuLsm9ds1Ctrl_s *sensor) {
   // Pull CS High
   HAL_GPIO_WritePin(sensor->ag.lsm9ds1Spi.port, sensor->ag.lsm9ds1Spi.pin,
                     GPIO_PIN_SET);

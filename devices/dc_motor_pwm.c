@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 /* inits a DC motor specified by the user */
-void dcMotorPwmInit(DcMotorPwmCtrl_t *dev, TIM_HandleTypeDef *htim,
+void dcMotorPwmInit(DcMotorPwmCtrl_s *dev, TIM_HandleTypeDef *htim,
                     uint32_t channel) {
   dev->htim = htim;
   dev->channel = channel;
@@ -18,7 +18,7 @@ void dcMotorPwmInit(DcMotorPwmCtrl_t *dev, TIM_HandleTypeDef *htim,
 }
 
 /* STARTS a given user defined DC motor, with a certain speed percentage */
-void dcMotorPwmSetPercent(DcMotorPwmCtrl_t *dev, double speed_percent) {
+void dcMotorPwmSetPercent(DcMotorPwmCtrl_s *dev, double speed_percent) {
   /* If percent too large, stop */
   if (fabs(speed_percent) > 100) return;
 

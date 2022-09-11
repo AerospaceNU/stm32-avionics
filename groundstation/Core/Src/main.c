@@ -74,7 +74,7 @@ typedef struct __attribute__((__packed__)) {
   float gps_alt;
   double groundPressure;
   double groundTemp;
-} HeartbeatData_t;
+} HeartbeatData_s;
 
 typedef enum {
   RAD_433 = FIRST_ID_RADIO_TI_433,
@@ -86,12 +86,12 @@ typedef struct __attribute__((packed)) {
   uint8_t destination;
   uint16_t len;
   uint8_t data[256];
-} GroundstationUsbCommand_t;
+} GroundstationUsbCommand_s;
 
 #define CHANNEL_COMMAND_ID 1
 #define RADIO_HARDWARE_COMMAND_ID 2
 
-static void GroundstationParseCommand(GroundstationUsbCommand_t *command) {
+static void GroundstationParseCommand(GroundstationUsbCommand_s *command) {
   if (command->data[0] == CHANNEL_COMMAND_ID) {
     uint8_t radioHw = command->data[1];
     int8_t channel = command->data[2];
@@ -107,7 +107,7 @@ static void GroundstationParseCommand(GroundstationUsbCommand_t *command) {
   //  }
 }
 
-static void OnDataRx(RecievedPacket_t *packet) {
+static void OnDataRx(RadioRecievedPacket_s *packet) {
   HM_UsbTransmit(FIRST_ID_USB_STD, (uint8_t *)packet, sizeof(*packet));
 }
 
@@ -171,7 +171,7 @@ int main(void) {
     RadioManager_addMessageCallback(i, OnDataRx);
   }
 
-  CircularBuffer_t *buffer = HM_UsbGetRxBuffer(FIRST_ID_USB_STD);
+  CircularBuffer_s *buffer = HM_UsbGetRxBuffer(FIRST_ID_USB_STD);
 
   uint32_t start = HAL_GetTick();
 
@@ -188,7 +188,7 @@ int main(void) {
     if ((HAL_GetTick() - start) >= 2000) {
       start = HAL_GetTick();
 
-      static HeartbeatData_t heartbeat;
+      static HeartbeatData_s heartbeat;
       heartbeat.packetType = 200;
       heartbeat.latitude = HM_GetSensorData()->gpsData->latitude;
       heartbeat.longitude = HM_GetSensorData()->gpsData->longitude;
@@ -198,7 +198,7 @@ int main(void) {
       heartbeat.groundTemp = HM_GetSensorData()->barometerData[0].temperatureC;
 
       // Hack to make all packets the same length when sent over USB
-      static uint8_t heartbeatArr[sizeof(RecievedPacket_t)] = {0};
+      static uint8_t heartbeatArr[sizeof(RadioRecievedPacket_s)] = {0};
       memset(heartbeatArr, 0, sizeof(heartbeatArr));
       memcpy(heartbeatArr, &heartbeat, sizeof(heartbeat));
       HM_UsbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr,
@@ -208,7 +208,7 @@ int main(void) {
     // A packet must mave at least a destination [1 byte] and a len [2 bytes],
     // and a non-zero quantity of data
     if (cbCount(buffer) > 3) {
-      static GroundstationUsbCommand_t command;
+      static GroundstationUsbCommand_s command;
       size_t count = min(cbCount(buffer), sizeof(command));
       cbPeek(buffer, (uint8_t *)&command, &count);
 

@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <cstdio>
 
 #include "cli.h"
 #include "cli_tasks.h"

@@ -2,17 +2,17 @@
 
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
 
+#include <string.h>
+
 #include "hal_callbacks.h"
 #include "minmea.h"
-#include "stdbool.h"
-#include "string.h"
 
 #define GPS_MIN_VALID_YEAR 2000
 #define GPS_MAX_VALID_YEAR 2100
 
 #define GPS_UART_TIMEOUT_MS 50
 
-static void parseString(GpsCtrl_t *gps, char line[]) {
+static void parseString(GpsCtrl_s *gps, char line[]) {
   switch (minmea_sentence_id(line, false)) {
     case MINMEA_SENTENCE_RMC: {
       struct minmea_sentence_rmc frame0;
@@ -128,7 +128,7 @@ static void parseString(GpsCtrl_t *gps, char line[]) {
   }
 }
 
-void gps_process_data(GpsCtrl_t *gps) {
+void gps_process_data(GpsCtrl_s *gps) {
   char *buff = &gps->rx_buff[0];
   // if half is true, increment buff pointer by 2048
   if (gps->half) buff += GPS_RX_BUF_HALF;
@@ -151,18 +151,18 @@ void gps_process_data(GpsCtrl_t *gps) {
 }
 
 void gps_RxHalfCpltCallback(void *gps) {
-  GpsCtrl_t *pgps = (GpsCtrl_t *)gps;
+  GpsCtrl_s *pgps = (GpsCtrl_s *)gps;
   pgps->data_available = true;
   pgps->half = false;
 }
 
 void gps_RxCpltCallback(void *gps) {
-  GpsCtrl_t *pgps = (GpsCtrl_t *)gps;
+  GpsCtrl_s *pgps = (GpsCtrl_s *)gps;
   pgps->data_available = true;
   pgps->half = true;
 }
 
-bool gps_new_data(GpsCtrl_t *gps) {
+bool gps_new_data(GpsCtrl_s *gps) {
   if (gps->data_available) {
     gps_process_data(gps);
     return true;
@@ -170,7 +170,7 @@ bool gps_new_data(GpsCtrl_t *gps) {
   return false;
 }
 
-void gps_init(GpsCtrl_t *gps, UART_HandleTypeDef *huart, GpsType_te type) {
+void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type) {
   gps->gps_uart = huart;
   gps->type = type;
 

@@ -147,30 +147,30 @@ extern "C" {
 
 typedef struct {
   SpiCtrl_t lsm9ds1Spi;
-  Axis3dReal_t gAdj;
+  Axis3dReal_s gAdj;
   uint8_t aFs;
   uint8_t gFs;
   double aRes;
   double gRes;
   int16_t tRawVal;
   double tVal;
-} Lsm9ds1AgCtrl_t;
+} Lsm9ds1AgCtrl_s;
 
 typedef struct {
   SpiCtrl_t lsm9ds1Spi;
-  Axis3dReal_t mAdj;
+  Axis3dReal_s mAdj;
   uint8_t mFs;
   double mRes;
-} Lsm9ds1MCtrl_t;
+} Lsm9ds1MCtrl_s;
 
 typedef struct LSM9DS1Ctrl_s {
-  ImuData_t data;
-  Lsm9ds1AgCtrl_t ag;
-  Lsm9ds1MCtrl_t m;
-} ImuLsm9ds1Ctrl_t;
+  ImuData_s data;
+  Lsm9ds1AgCtrl_s ag;
+  Lsm9ds1MCtrl_s m;
+} ImuLsm9ds1Ctrl_s;
 
-bool lsm9ds1_init(ImuLsm9ds1Ctrl_t *sensor);
-void lsm9ds1_getData(ImuLsm9ds1Ctrl_t *sensor);
+bool lsm9ds1_init(ImuLsm9ds1Ctrl_s *sensor);
+void lsm9ds1_getData(ImuLsm9ds1Ctrl_s *sensor);
 
 #ifdef __cplusplus
 }

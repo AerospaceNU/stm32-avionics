@@ -6,7 +6,7 @@ set(SYSTEM_FILES_LIST
         data_log.c
         pyro_manager.c
 
-        tasks/buzzer_heartbeat.cpp
+        tasks/buzzer_heartbeat.c
         tasks/data_offload.c
         tasks/cli/task_cli_config.cpp
         tasks/cli/task_cli_help.cpp

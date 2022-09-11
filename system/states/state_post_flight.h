@@ -1,10 +1,6 @@
 #ifndef SYSTEM_STATES_STATE_POST_FLIGHT_H_
 #define SYSTEM_STATES_STATE_POST_FLIGHT_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "flight_state.h"
 
 class PostFlightState : public FlightState {
@@ -14,16 +10,12 @@ class PostFlightState : public FlightState {
 
   void init(void) override;
 
-  EndCondition_t run(void) override;
+  EndCondition_e run(void) override;
 
   void cleanup(void) override;
 
  private:
   uint32_t lastSimDataTime = 0;
 };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif  // SYSTEM_STATES_STATE_POST_FLIGHT_H_

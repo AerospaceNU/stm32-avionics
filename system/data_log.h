@@ -21,7 +21,7 @@ typedef struct __attribute__((__packed__)) {
   uint64_t gpsTimestamp;
   uint64_t apogeeTimestamp;
   uint8_t pyroFireStatus;
-} FlightMetadata;
+} FlightMetadata_s;
 
 /**
  * @brief Initializes variables important to the data log
@@ -59,9 +59,9 @@ void data_log_load_last_stored_flight_metadata();
 
 /**
  * @brief Get current flight metadata
- * @return Pointer to current FlightMetadata
+ * @return Pointer to current FlightMetadata_s
  */
-FlightMetadata *data_log_get_flight_metadata();
+FlightMetadata_s *data_log_get_flight_metadata();
 
 /**
  * @brief Load metadata from a flight load into the current packet
@@ -79,7 +79,7 @@ void data_log_write_flight_metadata();
  * @param filterData: Filter info to write to log
  * @param state: Current state ID to write to log
  */
-void data_log_write(SensorData_t *sensorData, FilterData_t *filterData,
+void data_log_write(SensorData_s *sensorData, FilterData_s *filterData,
                     uint8_t state);
 
 /**

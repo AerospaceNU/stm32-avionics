@@ -1,12 +1,11 @@
-#include <stdlib.h>
-
 #include <cstdio>
+#include <cstdlib>
 
 #include "cli.h"
 #include "cli_tasks.h"
 
 void cli_tasks::cliPyroFire() {
-  CliOptionVals_t options = cliGetOptions();
+  CliOptionVals_s options = cliGetOptions();
   if (options.p) {
     char* endPtr;
     int pyroNum = strtol(options.p, &endPtr, 10) - 1;

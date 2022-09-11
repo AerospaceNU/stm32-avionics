@@ -6,7 +6,7 @@
 
 #include <string.h>
 
-void cbInit(CircularBuffer_t *cb, void *buffer, size_t capacity, size_t size) {
+void cbInit(CircularBuffer_s *cb, void *buffer, size_t capacity, size_t size) {
   if (cb == NULL) {
     return;
   }
@@ -19,7 +19,7 @@ void cbInit(CircularBuffer_t *cb, void *buffer, size_t capacity, size_t size) {
   cb->tail = cb->buffer;
 }
 
-void cbPeek(CircularBuffer_t *cb, void *outputBuffer, size_t *numElements) {
+void cbPeek(CircularBuffer_s *cb, void *outputBuffer, size_t *numElements) {
   if (cb == NULL || outputBuffer == NULL) return;
 
   size_t count = cbCount(cb);
@@ -40,7 +40,7 @@ void cbPeek(CircularBuffer_t *cb, void *outputBuffer, size_t *numElements) {
   }
 }
 
-size_t cbCount(CircularBuffer_t *cb) {
+size_t cbCount(CircularBuffer_s *cb) {
   if (!cb) {
     return 0;
   }
@@ -54,11 +54,11 @@ size_t cbCount(CircularBuffer_t *cb) {
   return ret_bytes / cb->size;
 }
 
-size_t cbCapacity(CircularBuffer_t *cb) {
+size_t cbCapacity(CircularBuffer_s *cb) {
   return ((cb->buffer_end - cb->buffer) / cb->size) - 1;
 }
 
-bool cbEnqueue(CircularBuffer_t *cb, const void *item) {
+bool cbEnqueue(CircularBuffer_s *cb, const void *item) {
   // Figure out what next spot to fill in buffer is
   void *next = cb->head + cb->size;
   if (next >= cb->buffer_end) {
@@ -76,7 +76,7 @@ bool cbEnqueue(CircularBuffer_t *cb, const void *item) {
   return true;
 }
 
-void cbDequeue(CircularBuffer_t *cb, size_t numElements) {
+void cbDequeue(CircularBuffer_s *cb, size_t numElements) {
   size_t count = cbCount(cb);
   if (numElements > count) {
     numElements = count;
@@ -88,7 +88,7 @@ void cbDequeue(CircularBuffer_t *cb, size_t numElements) {
   }
 }
 
-bool cbFull(CircularBuffer_t *cb) {
+bool cbFull(CircularBuffer_s *cb) {
   void *next = cb->head + cb->size;
   if (next >= cb->buffer_end) {
     next = cb->buffer;
@@ -97,4 +97,4 @@ bool cbFull(CircularBuffer_t *cb) {
   return next == cb->tail;
 }
 
-void cbFlush(CircularBuffer_t *cb) { cb->tail = cb->head; }
+void cbFlush(CircularBuffer_s *cb) { cb->tail = cb->head; }

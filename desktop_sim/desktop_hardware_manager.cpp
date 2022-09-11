@@ -98,15 +98,15 @@ static FileBackedFlash *externalFlash[NUM_FLASH_DESKTOP_FILE_BACKED];
 #endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
 
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
-static PrintPyroCtrl_t printPyro[NUM_PYRO_DESKTOP_PRINT];
+static PrintPyroCtrl_s printPyro[NUM_PYRO_DESKTOP_PRINT];
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 
 #if HAS_DEV(RADIO_DESKTOP_SOCKET)
 static TcpSocket *radioSocket[NUM_RADIO_DESKTOP_SOCKET];
 #endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
 
-static SensorData_t sensorData = {0};
-static SensorProperties_t sensorProperties;
+static SensorData_s sensorData = {0};
+static SensorProperties_s sensorProperties;
 
 std::string int_flash_path;  // NOLINT
 std::string ext_flash_path;  // NOLINT
@@ -209,7 +209,7 @@ void HM_LedSet(int ledId, bool set) {}
 void HM_LedToggle(int ledId) {}
 
 bool HM_RadioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
-  static RecievedPacket_t packet;
+  static RadioRecievedPacket_s packet;
   packet.crc = true;
   packet.lqi = 4;
   packet.rssi = 10;
@@ -227,7 +227,7 @@ bool HM_RadioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
 }
 
 void HM_RadioUpdate() {}
-void HM_RadioRegisterConsumer(int radioNum, CircularBuffer_t *rxBuffer) {}
+void HM_RadioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {}
 void HM_RadioSetChannel(int radioNum, int channel) {}
 
 bool HM_UsbIsConnected(int usbId) { return false; }
@@ -235,17 +235,17 @@ bool HM_UsbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
   std::cout << data << std::endl;
   return true;
 }
-CircularBuffer_t *HM_UsbGetRxBuffer(int usbId) { return nullptr; }
+CircularBuffer_s *HM_UsbGetRxBuffer(int usbId) { return nullptr; }
 
 bool HM_BleClientConnected(int bleClientId) { return false; }
 bool HM_BleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
   return false;
 }
-CircularBuffer_t *HM_BleClientGetRxBuffer(int bleClientId) { return nullptr; }
+CircularBuffer_s *HM_BleClientGetRxBuffer(int bleClientId) { return nullptr; }
 void HM_BleTick() {}
 
-LineCutterData_t *HM_GetLineCutterData(int lineCutterId) { return nullptr; }
-LineCutterFlightVars_t *HM_GetLineCutterFlightVariables(int lineCutterId) {
+LineCutterData_s *HM_GetLineCutterData(int lineCutterId) { return nullptr; }
+LineCutterFlightVars_s *HM_GetLineCutterFlightVariables(int lineCutterId) {
   return nullptr;
 }
 bool HM_LineCutterSendString(int lineCutterNumber, char *string) {
@@ -278,11 +278,11 @@ void HM_DCMotorSetPercent(int dcMotorId, double percent) {}
 
 void HM_ReadSensorData() { flightReplay->GetNext(&sensorData); }
 
-SensorData_t *HM_GetSensorData() { return &sensorData; }
+SensorData_s *HM_GetSensorData() { return &sensorData; }
 
-SensorProperties_t *HM_GetSensorProperties() { return &sensorProperties; }
+SensorProperties_s *HM_GetSensorProperties() { return &sensorProperties; }
 
-void HM_EnableSimMode(CircularBuffer_t *rxBuffer) {}
+void HM_EnableSimMode(CircularBuffer_s *rxBuffer) {}
 
 void HM_DisableSimMode() {}
 

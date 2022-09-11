@@ -36,7 +36,7 @@ typedef struct {
   double qy;
   double qz;
   double qw;
-} FilterData_t;
+} FilterData_s;
 
 void filterInit(double dt);
 
@@ -47,21 +47,21 @@ void filterInit(double dt);
  * @param hasPassedApogee: Whether rocket has passed apogee (true) or not
  * (false)
  */
-void filterApplyData(SensorData_t* curSensorVals,
-                     SensorProperties_t* sensorProperties,
+void filterApplyData(SensorData_s* curSensorVals,
+                     SensorProperties_s* sensorProperties,
                      bool hasPassedApogee);
 
 /**
  * @brief Get average pressure from sensor data
  * @param curSensorVals: Current sensor values to get average pressure of
  */
-double filterGetAveragePressure(SensorData_t* curSensorVals);
+double filterGetAveragePressure(SensorData_s* curSensorVals);
 
 /**
  * @brief Adds reference pressure to the running list of pressures
  * @param curSensorVals: Current sensor values to use pressure from
  */
-void filterAddPressureRef(SensorData_t* curSensorVals);
+void filterAddPressureRef(SensorData_s* curSensorVals);
 
 /**
  * @brief Adds a reference acceleration value to calculate gravity direction
@@ -92,7 +92,7 @@ double filterGetPressureRef();
 /**
  * @brief Returns most recent filtered data
  */
-FilterData_t* filterGetData();
+FilterData_s* filterGetData();
 
 #ifdef __cplusplus
 }

@@ -1,10 +1,6 @@
 #ifndef SYSTEM_STATES_STATES_INTERFACE_H_
 #define SYSTEM_STATES_STATES_INTERFACE_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
 
 #include "hardware_manager.h"
@@ -28,7 +24,7 @@ typedef enum {
   Touchdown,
   UsbConnect,
   UsbDisconnect,
-} EndCondition_t;
+} EndCondition_e;
 
 class State {
  public:
@@ -51,7 +47,7 @@ class State {
   /**
    * @brief Runs this state and increments the counter
    */
-  virtual EndCondition_t run_state();
+  virtual EndCondition_e run_state();
 
   /**
    * @brief Actions that occur on initialization of state
@@ -73,7 +69,7 @@ class State {
    * @brief Actions that occur on every loop of state
    * @return End condition of the current loop
    */
-  virtual EndCondition_t run(void) = 0;
+  virtual EndCondition_e run(void) = 0;
 
   int id_;
   uint32_t run_counter_ = 0;
@@ -81,9 +77,5 @@ class State {
  protected:
   int period_ms_;
 };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif  // SYSTEM_STATES_STATES_INTERFACE_H_

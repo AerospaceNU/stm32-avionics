@@ -27,16 +27,16 @@ typedef struct __attribute__((__packed__)) {
   uint32_t timestampS;
   uint32_t timestampUs;
 #if HAS_DEV(IMU)
-  ImuData_t imuData[NUM_IMU];
+  ImuData_s imuData[NUM_IMU];
 #endif  // HAS_DEV(IMU)
 #if HAS_DEV(ACCEL)
-  AccelData_t accelData[NUM_ACCEL];
+  AccelData_s accelData[NUM_ACCEL];
 #endif  // HAS_DEV(ACCEL)
 #if HAS_DEV(BAROMETER)
-  BarometerData_t barometerData[NUM_BAROMETER];
+  BarometerData_s barometerData[NUM_BAROMETER];
 #endif  // HAS_DEV(BAROMETER)
 #if HAS_DEV(GPS)
-  GpsData_t gpsData[NUM_GPS];
+  GpsData_s gpsData[NUM_GPS];
 #endif  // HAS_DEV(GPS)
 #if HAS_DEV(VBAT)
   double vbatData[NUM_VBAT];
@@ -44,7 +44,7 @@ typedef struct __attribute__((__packed__)) {
 #if HAS_DEV(PYRO_CONT)
   bool pyroContData[NUM_PYRO_CONT];
 #endif  // HAS_DEV(PYRO_CONT)
-} SensorData_t;
+} SensorData_s;
 
 // Sensor fullscales, in m/s/s
 typedef struct {
@@ -54,7 +54,7 @@ typedef struct {
 #if HAS_DEV(ACCEL)
   double accelFs[NUM_ACCEL];
 #endif  // HAS_DEV(ACCEL)
-} SensorProperties_t;
+} SensorProperties_s;
 
 #if HAS_DEV(ACCEL)
 extern bool hardwareStatusAccel[NUM_ACCEL];
@@ -132,24 +132,24 @@ void HM_LedToggle(int ledId);
 
 /* Radio functions */
 bool HM_RadioSend(int radioNum, uint8_t* data, uint16_t numBytes);
-void HM_RadioRegisterConsumer(int radioNum, CircularBuffer_t* rxBuffer);
+void HM_RadioRegisterConsumer(int radioNum, CircularBuffer_s* rxBuffer);
 void HM_RadioUpdate();
 void HM_RadioSetChannel(int radioNum, int channel);
 
 /* USB functions */
 bool HM_UsbIsConnected(int usbId);
 bool HM_UsbTransmit(int usbId, uint8_t* data, uint16_t numBytes);
-CircularBuffer_t* HM_UsbGetRxBuffer(int usbId);
+CircularBuffer_s* HM_UsbGetRxBuffer(int usbId);
 
 /* Bluetooth functions */
 bool HM_BleClientConnected(int bleClientId);
 bool HM_BleClientSend(int bleClientId, const uint8_t* data, uint16_t numBytes);
-CircularBuffer_t* HM_BleClientGetRxBuffer(int bleClientId);
+CircularBuffer_s* HM_BleClientGetRxBuffer(int bleClientId);
 
 void HM_BleTick();
 
-LineCutterData_t* HM_GetLineCutterData(int lineCutterId);
-LineCutterFlightVars_t* HM_GetLineCutterFlightVariables(int lineCutterId);
+LineCutterData_s* HM_GetLineCutterData(int lineCutterId);
+LineCutterFlightVars_s* HM_GetLineCutterFlightVariables(int lineCutterId);
 
 bool HM_LineCutterSendString(int lineCutterNumber, char* string);
 bool HM_LineCuttersSendCut(int chan);
@@ -182,20 +182,20 @@ void HM_ReadSensorData();
  * @brief Returns a pointer to the current sensor data (statically allocated)
  * @return Pointer to statically-allocated struct where sensor data is stored
  */
-SensorData_t* HM_GetSensorData();
+SensorData_s* HM_GetSensorData();
 
 /**
  * @brief Returns a pointer to the current sensor properties
  * @return Pointer to statically-allocated struct where sensor properties are
  * stored
  */
-SensorProperties_t* HM_GetSensorProperties();
+SensorProperties_s* HM_GetSensorProperties();
 
 /**
  * @brief Turn on or off sim mode in the hardware manager
  * @param[in] rxBuffer: Buffer to read from in during sim
  */
-void HM_EnableSimMode(CircularBuffer_t* rxBuffer);
+void HM_EnableSimMode(CircularBuffer_s* rxBuffer);
 
 /**
  * @brief Turn off sim mode in the hardware manager

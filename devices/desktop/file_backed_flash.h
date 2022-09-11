@@ -5,10 +5,9 @@
 #ifndef DEVICES_DESKTOP_FILE_BACKED_FLASH_H_
 #define DEVICES_DESKTOP_FILE_BACKED_FLASH_H_
 
+#include <fstream>
 #include <string>
 #include <utility>
-
-#include "fstream"
 
 class FileBackedFlash {
  public:

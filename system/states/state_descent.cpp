@@ -1,7 +1,7 @@
 
 #include "state_descent.h"
 
-#include <math.h>
+#include <cmath>
 
 #include "data_log.h"
 #include "filters.h"
@@ -17,10 +17,10 @@ void DescentState::init() {
   sentCut2 = false;
 }
 
-EndCondition_t DescentState::run() {
+EndCondition_e DescentState::run() {
   // Collect, filter, and log all sensor data
-  SensorData_t* sensorData = HM_GetSensorData();
-  FilterData_t* filterData = filterGetData();
+  SensorData_s* sensorData = HM_GetSensorData();
+  FilterData_s* filterData = filterGetData();
   data_log_write(sensorData, filterData, this->getID());
 
   // TODO this logic does NOT belong here!
@@ -42,11 +42,11 @@ EndCondition_t DescentState::run() {
     transitionResetTimer = HM_Millis();
   } else {
     if (HM_Millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
-      return EndCondition_t::Touchdown;
+      return EndCondition_e::Touchdown;
     }
   }
 
-  return EndCondition_t::NoChange;
+  return EndCondition_e::NoChange;
 }
 
 void DescentState::cleanup() {

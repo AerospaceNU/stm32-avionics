@@ -4,9 +4,11 @@
  *  Created on: Mar 21, 2022
  *      Author: sam
  */
-#include "matrix.h"
+
 #ifndef SYSTEM_FILTERING_ORIENTATION_ESTIMATOR_H_
 #define SYSTEM_FILTERING_ORIENTATION_ESTIMATOR_H_
+
+#include "matrix.h"
 
 /* The orientation estimator uses accelerometers, gyroscopes, and the
  * magnetometer (in the future) to estimate rocket orientation.

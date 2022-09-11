@@ -11,6 +11,6 @@
 typedef struct {
   uint16_t addr;
   uint8_t data;
-} RegisterSetting_t;
+} RegisterSetting_s;
 
 #endif  // DEVICES_RADIOCONFIG_SMARTRF_REGISTERSETTINGS_H_

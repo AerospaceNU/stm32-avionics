@@ -1,12 +1,12 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #include "cli.h"
 #include "cli_tasks.h"
 #include "hardware_manager.h"
 
 void cli_tasks::cliSendLineCutterstring() {
-  CliOptionVals_t options = cliGetOptions();
+  CliOptionVals_s options = cliGetOptions();
   if (!options.lcId || !options.lcCmd) return;  // verify non-void pointers
 
   char* endPtr;

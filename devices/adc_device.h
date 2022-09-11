@@ -5,13 +5,13 @@
 #ifndef DEVICES_ADC_DEVICE_H_
 #define DEVICES_ADC_DEVICE_H_
 
-#include "board_config_common.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <stdbool.h>
+
+#include "board_config_common.h"
 
 #define MAX_CHANNELS 14
 
@@ -22,7 +22,7 @@ typedef struct {
   float offset;
   bool bConvCplt;
   uint32_t rawVals[MAX_CHANNELS];
-} AdcCtrl_t;
+} AdcDevCtrl_s;
 
 /**
  * Initializes/calibrates ADC.
@@ -31,7 +31,7 @@ typedef struct {
  * @param minVal: correlates to raw 0
  * @param maxVal: correlates to highest raw value of ADC's resolution
  */
-void adcInit(AdcCtrl_t *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
+void adcInit(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
              float minVal, float maxVal, bool bSingleEnded);
 
 /**
@@ -39,13 +39,13 @@ void adcInit(AdcCtrl_t *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
  * starting read gives flexibility for higher code to perform other tasks while
  * the read/conversion is occurring
  */
-void adcStartSingleRead(AdcCtrl_t *adc);
+void adcStartSingleRead(AdcDevCtrl_s *adc);
 
 /**
  * Returns true with converted ADC value if available, otherwise returns false
  * (hardware conversion hasn't completed)
  */
-bool adcGetValue(AdcCtrl_t *adc, float *pval, uint32_t timeoutMS);
+bool adcGetValue(AdcDevCtrl_s *adc, float *pval, uint32_t timeoutMS);
 
 #ifdef __cplusplus
 }

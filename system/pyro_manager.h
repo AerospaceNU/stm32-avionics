@@ -22,7 +22,7 @@ extern "C" {
 typedef struct {
   uint16_t flags;
   double configValue;
-} PyroConfig_t;
+} PyroConfig_s;
 
 /**
  * @brief Initializes Pyro Manager
@@ -54,7 +54,7 @@ void PyroManager_SetPyroFireStatus(uint8_t status);
  * @param filterData: Current filter data
  * @param hasPastApogee: Whether or not we have passed apogee
  */
-void PyroManager_Update(FilterData_t *filterData, bool hasPastApogee);
+void PyroManager_Update(FilterData_s *filterData, bool hasPastApogee);
 
 /**
  * @brief Fire a given pyro

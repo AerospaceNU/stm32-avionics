@@ -20,17 +20,12 @@ extern "C" {
 /**
  * Ways the command line can receive information
  */
-typedef enum CliComms_t {
-  CLI_PHONE,
-  CLI_RADIO,
-  CLI_USB,
-  NUM_CLI_COMMS
-} CliComms_t;
+typedef enum { CLI_PHONE, CLI_RADIO, CLI_USB, NUM_CLI_COMMS } CliComms_e;
 
 /**
  * CLI command types
  */
-typedef enum CliCommand_t {
+typedef enum {
   NONE = 0,
   CALIBRATE,
   CONFIG,
@@ -44,7 +39,7 @@ typedef enum CliCommand_t {
   PYROFIRE,
   VERSION,
   NUM_CLI_COMMANDS,
-} CliCommand_t;
+} CliCommand_e;
 
 /**
  * Stored argument values
@@ -61,19 +56,19 @@ typedef struct {
   char* c;      // Radio channel, can be negative
   char* lcCmd;  // Line cuttter command
   char* lcId;   // Line cuttter id
-} CliOptionVals_t;
+} CliOptionVals_s;
 
 /**
  * Configs that can be changed via CLI
  */
 typedef struct {
 #if HAS_DEV(PYRO)
-  PyroConfig_t pyroConfiguration[NUM_PYRO];
+  PyroConfig_s pyroConfiguration[NUM_PYRO];
 #endif  // HAS_DEV(PYRO)
   double groundElevationM;
   double groundTemperatureC;
   int radioChannel;
-} CliConfigs_t;
+} CliConfigs_s;
 
 /**
  * @brief Initializes command line expectations, including arguments, etc.
@@ -84,7 +79,7 @@ void cliInit();
  * @brief Return current command line configs
  * @return Pointer to statically-allocated CLI configs
  */
-CliConfigs_t* cliGetConfigs();
+CliConfigs_s* cliGetConfigs();
 
 /**
  * @brief Set CLI config values to defaults
@@ -102,7 +97,7 @@ void cliSetDefaultConfig();
  * both to execute. This behavior is necessary to know when an option ends since
  * there are no set number of chars.
  */
-CliCommand_t cliParse(CliComms_t commsType);
+CliCommand_e cliParse(CliComms_e commsType);
 
 /**
  * @brief Send message back to user via appropriate medium
@@ -129,15 +124,15 @@ void cliSendComplete(bool completeSuccess, const char* errMsg);
  * data types)
  * @return Values of CLI options
  */
-CliOptionVals_t cliGetOptions();
+CliOptionVals_s cliGetOptions();
 
 /**
  * @brief Returns current RX buffer from the appropriate medium
  * @return Pointer to circular buffer
  */
-CircularBuffer_t* cliGetRxBuffer();
+CircularBuffer_s* cliGetRxBuffer();
 
-CircularBuffer_t* cliGetRxBufferFor(CliComms_t source);
+CircularBuffer_s* cliGetRxBufferFor(CliComms_e source);
 
 #ifdef __cplusplus
 }

@@ -18,13 +18,13 @@ extern "C" {
 
 typedef struct {
   SpiCtrl_t spi;
-  Axis3dReal_t adjVal;
+  Axis3dReal_s adjVal;
   double gain;
-  AccelData_t val;
-} AccelH3lis331dlCtrl_t;
+  AccelData_s val;
+} AccelH3lis331dlCtrl_s;
 
-bool accelH3lis331dl_init(AccelH3lis331dlCtrl_t *sensor, SpiCtrl_t spi);
-void accelH3lis331dl_getData(AccelH3lis331dlCtrl_t *sensor);
+bool accelH3lis331dl_init(AccelH3lis331dlCtrl_s *sensor, SpiCtrl_t spi);
+void accelH3lis331dl_getData(AccelH3lis331dlCtrl_s *sensor);
 
 #ifdef __cplusplus
 }

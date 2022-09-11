@@ -24,7 +24,7 @@
 // Whitening = false
 
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
-const RegisterSetting_t cc1200_433_1_2kbps_cfg[] = {
+const RegisterSetting_s cc1200_433_1_2kbps_cfg[] = {
     {TIRADIO_IOCFG3,
      0x06},  // asserted when sync word, de-asserted at end of packet (in RX)
     {TIRADIO_IOCFG2, 0x01},

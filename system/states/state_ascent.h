@@ -1,10 +1,6 @@
 #ifndef SYSTEM_STATES_STATE_ASCENT_H_
 #define SYSTEM_STATES_STATE_ASCENT_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "flight_state.h"
 
 class AscentState : public FlightState {
@@ -13,7 +9,7 @@ class AscentState : public FlightState {
 
   void init(void) override;
 
-  EndCondition_t run(void) override;
+  EndCondition_e run(void) override;
 
   void cleanup(void) override;
 
@@ -21,9 +17,5 @@ class AscentState : public FlightState {
   double maxPosZ = 0;
   static constexpr double kPosDiffThreshold = 3;
 };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif  // SYSTEM_STATES_STATE_ASCENT_H_

@@ -4,7 +4,7 @@
 typedef struct {
   double estimatedVelocity;
   double estimatedAltitude;
-} AltitudeKalmanOutput_t;
+} AltitudeKalmanOutput_s;
 
 /*
 
@@ -159,7 +159,7 @@ class AltitudeKalman {
   void Correct(const double baroAltitude, const double kalman_gain[2]);
 
   // Get the current estimated position/velocity
-  const AltitudeKalmanOutput_t GetXhat() const;
+  const AltitudeKalmanOutput_s GetXhat() const;
 
   void SetDt(const double dt);
 
@@ -176,7 +176,7 @@ class AltitudeKalman {
 
  private:
   // The estimated state of the rocket. We assume we start at (0,0).
-  AltitudeKalmanOutput_t xHat = {0, 0};
+  AltitudeKalmanOutput_s xHat = {0, 0};
 
   // TODO should we calculate this every loop?
   double m_dt = 0.015;

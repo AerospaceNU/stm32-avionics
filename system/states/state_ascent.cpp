@@ -17,10 +17,10 @@ void AscentState::init() {
   cli_tasks::ConfigureForFlight();
 }
 
-EndCondition_t AscentState::run() {
+EndCondition_e AscentState::run() {
   // Collect, filter, log, and log all data
-  SensorData_t* sensorData = HM_GetSensorData();
-  FilterData_t* filterData = filterGetData();
+  SensorData_s* sensorData = HM_GetSensorData();
+  FilterData_s* filterData = filterGetData();
   data_log_write(sensorData, filterData, this->getID());
 
   // Detect if new maximum Z position has been reached and record the time
@@ -31,10 +31,10 @@ EndCondition_t AscentState::run() {
   // Detect apogee if under max z position and negative velocity
   if (maxPosZ - filterData->pos_z > kPosDiffThreshold &&
       filterData->rocket_vel_x < 0) {
-    return EndCondition_t::Apogee;
+    return EndCondition_e::Apogee;
   }
 
-  return EndCondition_t::NoChange;
+  return EndCondition_e::NoChange;
 }
 
 void AscentState::cleanup() { PyroManager_SetApogeeTime(HM_Millis()); }

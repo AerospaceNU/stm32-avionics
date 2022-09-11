@@ -7,7 +7,7 @@
 /* Accel */
 
 #if HAS_DEV(ACCEL)
-const Orientation_t accelBoardToLocal[NUM_ACCEL][3] = {
+const Orientation_s accelBoardToLocal[NUM_ACCEL][3] = {
     {{AXIS_X, -1}, {AXIS_Y, 1}, {AXIS_Z, -1}},
 };
 int accelFilterPriority[NUM_ACCEL] = {1};
@@ -20,7 +20,7 @@ const uint32_t kFlashSizeBytes[NUM_FLASH] = {0x4000000};
 /* IMU */
 
 #if HAS_DEV(IMU)
-const Orientation_t imuBoardToLocal[NUM_IMU][3] = {
+const Orientation_s imuBoardToLocal[NUM_IMU][3] = {
     {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, -1}},
     {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, -1}},
 };
