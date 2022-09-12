@@ -25,9 +25,6 @@ void cli_tasks::cliHelp() {
 
   // Send help docs to user
   cliSend("\r\n");
-  generateDoc("--calibrate", "TBD",
-              "Calibration routine is still undefined. Arguments to the "
-              "command will be guided by that routine");
   generateDoc("--config", "-p int*1",
               "Configure a pyro with additional flag: ");
   generateDoc("", "     -A", "Deploy at apogee");
@@ -39,17 +36,18 @@ void cli_tasks::cliHelp() {
               "Configure radio channel (in multiples of bandwidth), negative "
               "numbers allowed");
   generateDoc("", "-h", "Help for config. Prints current configuration values");
+  generateDoc("--create_flight", "",
+              "Clear state log and move back to preflight");
   generateDoc("--erase", "", "Fully erases on-board flash");
   generateDoc("--help", "", "FCB produces standard command line help string");
-  generateDoc("--pyrofire", "-p int*1",
-              "IMMEDIATELY fires the given pyro number");
   generateDoc("--offload", "",
               "Offloads the last flight recorded on the board");
   generateDoc("", "-f int*1", "Offload a specific flight number off the board");
   generateDoc("", "-h", "Help for offload. Prints info about each flight");
+  generateDoc("--pyrofire", "-p int*1",
+              "IMMEDIATELY fires the given pyro number");
   generateDoc("--sense", "", "Reads back most recent sensor data");
   generateDoc("--sim", "", "Simulate past flights in hardware");
-  generateDoc("--create_flight", "",
-              "Clear state log and move back to preflight");
+  generateDoc("--version", "", "Send Git version and tag info");
   cliSendComplete(true, nullptr);
 }

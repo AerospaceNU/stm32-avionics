@@ -8,22 +8,14 @@
 typedef enum {
   NoChange,
   Apogee,
-  CalibrateCommand,
   CliCommandComplete,
-  ConfigCommand,
   EraseFlashCommand,
-  HelpCommand,
-  PyroFireCommand,
+  Initialized,
   Launch,
-  MainCutAltitude,
-  MotorBurnout,
-  NewFlight,
+  NewFlightCommand,
   OffloadCommand,
-  SenseCommand,
   SimCommand,
   Touchdown,
-  UsbConnect,
-  UsbDisconnect,
 } EndCondition_e;
 
 class State {

@@ -35,7 +35,7 @@ void PreFlightState::init() {
 }
 
 EndCondition_e PreFlightState::run() {
-  // Collect, and filter data
+  // Set GPS timestamp in metadata
   SensorData_s* sensorData = HM_GetSensorData();
 #if HAS_DEV(GPS)
   if (!gpsTimestamp && sensorData->gpsData[0].timestamp > 0) {
@@ -61,7 +61,7 @@ EndCondition_e PreFlightState::run() {
   bufferCounter++;
   if (bufferCounter == kBufferSize) bufferCounter = 0;
 
-  // Check pressures once per second
+  // Recalculate ground pressure, gravity references periodically
   if (HM_Millis() - prevPressureLogTime > 1000) {
     prevPressureLogTime = HM_Millis();
     // Add a pressure ref to the filter
@@ -91,18 +91,13 @@ EndCondition_e PreFlightState::run() {
 
     // Write buffer onto data log. No need to add more code to stay in order
     // since timestamps exist It won't hurt to write if some buffer values
-    // weren't filled or if USB was plugged back in
+    // weren't filled
     for (int i = 0; i < kBufferSize; i++) {
       data_log_write(&sensorDataBuffer[i], &filterDataBuffer[i], this->getID());
     }
     data_log_get_flight_metadata()->pressureRef = filterGetPressureRef();
     data_log_write_flight_metadata();
     return EndCondition_e::Launch;
-  }
-
-  // Detect if USB was plugged back in (not in sim mode)
-  if (!HM_InSimMode() && HM_UsbIsConnected(USB_CLI_ID)) {
-    return EndCondition_e::UsbConnect;
   }
 
   return EndCondition_e::NoChange;

@@ -37,7 +37,6 @@ static CliOptionVals_s cliOptionVals = {.p = NULL,
 static int primaryCommand = 0;
 
 static struct option longOptions[] = {
-    {"calibrate", no_argument, &primaryCommand, CALIBRATE},
     {"config", no_argument, &primaryCommand, CONFIG},
     {"create_flight", no_argument, &primaryCommand, CREATE_NEW_FLIGHT},
     {"erase", no_argument, &primaryCommand, ERASE_FLASH},

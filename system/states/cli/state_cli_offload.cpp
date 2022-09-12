@@ -60,6 +60,7 @@ EndCondition_e CliOffloadState::run() {
     return CliCommandComplete;
   }
 
+  // Run buzzer heartbeat
   buzzerHeartbeat();
 
   // If help command, send help and stop

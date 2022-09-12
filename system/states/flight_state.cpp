@@ -8,6 +8,7 @@
 #include "flight_state.h"
 
 #include "board_config_common.h"
+#include "buzzer_heartbeat.h"
 #include "cli.h"
 #include "cli_tasks.h"
 #include "data_log.h"
@@ -36,6 +37,9 @@ EndCondition_e FlightState::run_state() {
 
   // Update pyros
   PyroManager_Update(filterData, m_hasPastApogee);
+
+  // Run buzzer heartbeat
+  buzzerHeartbeat();
 
   // Run the state
   EndCondition_e normalEndCondition = State::run_state();

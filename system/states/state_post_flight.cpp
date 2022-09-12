@@ -2,6 +2,7 @@
 
 #include "buzzer_heartbeat.h"
 #include "cli.h"
+#include "cli_tasks.h"
 #include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
@@ -15,6 +16,7 @@ void PostFlightState::init() {
   // state
   state_log_write_complete();
   lastSimDataTime = HM_Millis();
+  cli_tasks::ConfigureForGround();
 }
 
 EndCondition_e PostFlightState::run() {
@@ -40,11 +42,6 @@ EndCondition_e PostFlightState::run() {
   // supposed to
   if (this->getRunCounter() % 10 == 0)
     data_log_write(sensorData, filterData, this->getID());
-
-  // Detect if USB has been plugged in (non-sim mode)
-  if (!HM_InSimMode() && HM_UsbIsConnected(USB_CLI_ID)) {
-    return EndCondition_e::UsbConnect;
-  }
 
   return EndCondition_e::NoChange;
 }

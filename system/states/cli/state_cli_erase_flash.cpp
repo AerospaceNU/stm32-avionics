@@ -2,6 +2,7 @@
 #include "state_cli_erase_flash.h"
 
 #include "board_config_common.h"
+#include "buzzer_heartbeat.h"
 #include "cli.h"
 #include "data_log.h"
 #include "hardware_manager.h"
@@ -15,6 +16,9 @@ void CliEraseFlashState::init() {
 }
 
 EndCondition_e CliEraseFlashState::run() {
+  // Run buzzer heartbeat
+  buzzerHeartbeat();
+
   // Only send data or check end condition once per second
   if (!HM_FlashIsEraseComplete(_curFlashId)) {
     if ((HM_Millis() - last_time) > SEND_PERIOD) {

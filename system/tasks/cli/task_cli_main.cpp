@@ -1,4 +1,3 @@
-#include "buzzer_heartbeat.h"
 #include "circular_buffer.h"
 #include "cli.h"
 #include "cli_tasks.h"
@@ -21,7 +20,6 @@ void cli_tasks::ConfigureForFlight() {
 
   // Disable state transition commands in flight
   allowedTransitions[CliCommand_e::ERASE_FLASH] = false;
-  allowedTransitions[CliCommand_e::CALIBRATE] = false;
   allowedTransitions[CliCommand_e::SIM] = false;
   allowedTransitions[CliCommand_e::OFFLOAD] = false;
 }
@@ -33,9 +31,6 @@ void cli_tasks::ConfigureForGround() {
 }
 
 EndCondition_e cli_tasks::cliTick() {
-  // Run buzzer heartbeat
-  buzzerHeartbeat();
-
   // Check if sim is ready to start, if we're waiting for it to
   if (simModeStarted &&
       cbCount(cliGetRxBufferFor(simModeSource)) >= sizeof(SensorData_s)) {
@@ -56,12 +51,6 @@ EndCondition_e cli_tasks::cliTick() {
     // If not, return the appropriate end condition to get us
     // into the correct State (if we can)
     switch (command) {
-      case CliCommand_e::CALIBRATE:
-        if (allowedTransitions[CliCommand_e::CALIBRATE]) {
-          return EndCondition_e::CalibrateCommand;
-        } else {
-          ILLEGAL_TRANSITION
-        }
       case CliCommand_e::CONFIG:
         if (allowedTransitions[CliCommand_e::CONFIG]) cliConfig();
         return EndCondition_e::NoChange;
@@ -100,7 +89,7 @@ EndCondition_e cli_tasks::cliTick() {
           // Clear state log so that future runs won't try to resume
           state_log_write_complete();
           cliSendAck(true, nullptr);
-          return EndCondition_e::NewFlight;
+          return EndCondition_e::NewFlightCommand;
         } else {
           ILLEGAL_TRANSITION
         }

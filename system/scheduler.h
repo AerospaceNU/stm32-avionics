@@ -10,12 +10,11 @@ class Scheduler {
 
  private:
   typedef enum {
-    CliCalibrate = 0,
-    CliEraseFlash,
+    CliEraseFlash = 0,
     CliOffload,
     Ascent,
-    Initialize,
     Descent,
+    Initialize,
     PostFlight,
     PreFlight,
     SimTempState,

@@ -27,7 +27,6 @@ typedef enum { CLI_PHONE, CLI_RADIO, CLI_USB, NUM_CLI_COMMS } CliComms_e;
  */
 typedef enum {
   NONE = 0,
-  CALIBRATE,
   CONFIG,
   CREATE_NEW_FLIGHT,
   ERASE_FLASH,

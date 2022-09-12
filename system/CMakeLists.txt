@@ -24,7 +24,6 @@ set(SYSTEM_FILES_LIST
         states/state_post_flight.cpp
         states/state_pre_flight.cpp
 
-        states/cli/state_cli_calibrate.cpp
         states/cli/state_cli_erase_flash.cpp
         states/cli/state_cli_offload.cpp
         states/cli/state_cli_temp.cpp

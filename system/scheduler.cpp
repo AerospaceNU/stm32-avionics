@@ -3,7 +3,6 @@
 #include "cli_tasks.h"
 #include "hardware_manager.h"
 #include "state_ascent.h"
-#include "state_cli_calibrate.h"
 #include "state_cli_erase_flash.h"
 #include "state_cli_offload.h"
 #include "state_cli_temp.h"
@@ -16,8 +15,6 @@
 void Scheduler::run(void) {
   /* Create all necessary states initially and store in list */
   uint32_t defaultPeriod = 15;
-  CliCalibrateState cliCalibrate =
-      CliCalibrateState(StateId_e::CliCalibrate, defaultPeriod);
   CliEraseFlashState cliEraseFlash =
       CliEraseFlashState(StateId_e::CliEraseFlash, defaultPeriod);
   CliOffloadState cliOffload =
@@ -32,9 +29,8 @@ void Scheduler::run(void) {
       PreFlightState(StateId_e::PreFlight, defaultPeriod);
   CliTempState tempState = CliTempState(StateId_e::SimTempState, defaultPeriod);
 
-  State* states[] = {&cliCalibrate, &cliEraseFlash, &cliOffload,
-                     &ascent,       &initialize,    &descent,
-                     &postFlight,   &preFlight,     &tempState};
+  State* states[] = {&cliEraseFlash, &cliOffload, &ascent,    &initialize,
+                     &descent,       &postFlight, &preFlight, &tempState};
 
   // Initialize the current and next states
   pCurrentState_ = nullptr;
@@ -83,7 +79,7 @@ Scheduler::StateId_e Scheduler::getNextState(EndCondition_e endCondition) {
     return static_cast<Scheduler::StateId_e>(pCurrentState_->getID());
   }
 
-  if (endCondition == EndCondition_e::NewFlight) {
+  if (endCondition == EndCondition_e::NewFlightCommand) {
     return StateId_e::PreFlight;
   }
 
@@ -91,7 +87,6 @@ Scheduler::StateId_e Scheduler::getNextState(EndCondition_e endCondition) {
   switch (pCurrentState_->getID()) {
     // Coming from any CLI state, we want to end up back in
     // preflight
-    case StateId_e::CliCalibrate:
     case StateId_e::CliEraseFlash:
     case StateId_e::CliOffload:
       switch (endCondition) {
@@ -128,8 +123,6 @@ Scheduler::StateId_e Scheduler::getNextState(EndCondition_e endCondition) {
       }
 
       return StateId_e::PreFlight;
-
-      break;
     }
     case StateId_e::Descent:
       switch (endCondition) {
@@ -146,8 +139,6 @@ Scheduler::StateId_e Scheduler::getNextState(EndCondition_e endCondition) {
           return StateId_e::Ascent;
         case EndCondition_e::SimCommand:
           return StateId_e::SimTempState;
-        case EndCondition_e::CalibrateCommand:
-          return StateId_e::CliCalibrate;
         case EndCondition_e::OffloadCommand:
           return StateId_e::CliOffload;
         case EndCondition_e::EraseFlashCommand:
