@@ -14,14 +14,14 @@ extern "C" {
 
 #include "board_config_common.h"
 
-typedef struct SPICtrl_s {
+typedef struct {
   SPI_HandleTypeDef *hspi;
   GPIO_TypeDef *port;
   uint16_t pin;
 } SpiCtrl_t;
 
-uint8_t SPI_ReadRegister(SpiCtrl_t *sensor, uint8_t reg);
-void SPI_WriteRegister(SpiCtrl_t *sensor, uint8_t reg, uint8_t val);
+uint8_t spi_readRegister(SpiCtrl_t *sensor, uint8_t reg);
+void spi_writeRegister(SpiCtrl_t *sensor, uint8_t reg, uint8_t val);
 
 #ifdef __cplusplus
 }

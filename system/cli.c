@@ -60,7 +60,7 @@ static CliConfigs_s cliConfigs = {0};
 
 static CliComms_e lastCommsType;  // Used to help send ack to right places
 
-static void cliParseRadio(RadioRecievedPacket_s* packet) {
+static void cli_parseRadio(RadioRecievedPacket_s* packet) {
   // Only accept packets with good CRC
   RadioPacket_s* parsedPacket = (RadioPacket_s*)&packet->data;
   if (parsedPacket->packetType == TELEMETRY_ID_STRING) {
@@ -68,25 +68,25 @@ static void cliParseRadio(RadioRecievedPacket_s* packet) {
       const uint8_t len = parsedPacket->payload.cliString.len;
       const uint8_t* pdata = parsedPacket->payload.cliString.string;
       for (size_t i = 0; i < len; i++) {
-        cbEnqueue(&radioRxCircBuffer, pdata + i);
+        cb_enqueue(&radioRxCircBuffer, pdata + i);
       }
     } else {
-      cliSendAck(false, "Bad CRC!");
+      cli_sendAck(false, "Bad CRC!");
     }
   }
 }
 
-void cliInit() {
+void cli_init() {
   opterr = 0;  // Don't print any messages to standard error stream since this
                // is embedded device
 
-  cbInit(&radioRxCircBuffer, radioRxBuffer, sizeof(radioRxBuffer), 1);
-  RadioManager_addMessageCallback(RADIO_CLI_ID, cliParseRadio);
+  cb_init(&radioRxCircBuffer, radioRxBuffer, sizeof(radioRxBuffer), 1);
+  radioManager_addMessageCallback(RADIO_CLI_ID, cli_parseRadio);
 }
 
-CliConfigs_s* cliGetConfigs() { return &cliConfigs; }
+CliConfigs_s* cli_getConfigs() { return &cliConfigs; }
 
-void cliSetDefaultConfig() {
+void cli_setDefaultConfig() {
 #if NUM_PYRO > 0
   cliConfigs.triggerConfiguration[0].mode = TRIGGER_TYPE_PYRO;
   cliConfigs.triggerConfiguration[0].port = 0;  // Pyro # 1
@@ -104,24 +104,24 @@ void cliSetDefaultConfig() {
   cliConfigs.radioChannel = 1;
 }
 
-CliCommand_e cliParse(CliComms_e commsType) {
+CliCommand_e cli_parse(CliComms_e commsType) {
   // Get buffer from hardware manager
   uint32_t bytesRead = 0;  // Raw bytes read from hardware manager to be
                            // discarded, eventually including \r\n
 
   // Find the appropriate circular buffer for our medium
-  CircularBuffer_s* selectedRxBuffer = cliGetRxBufferFor(commsType);
+  CircularBuffer_s* selectedRxBuffer = cli_getRxBufferFor(commsType);
 
   if (selectedRxBuffer == NULL) return NONE;
-  if (!cbCount(selectedRxBuffer)) return NONE;
+  if (!cb_count(selectedRxBuffer)) return NONE;
 
   // Read buffer, flush if full (likely bad inputs), and copy to input buffer
-  bytesRead = cbCount(selectedRxBuffer);  // Each element 1 byte
-  if (cbFull(selectedRxBuffer)) {
-    cbFlush(selectedRxBuffer);
+  bytesRead = cb_count(selectedRxBuffer);  // Each element 1 byte
+  if (cb_full(selectedRxBuffer)) {
+    cb_flush(selectedRxBuffer);
     bytesRead = 0;
   }
-  cbPeek(selectedRxBuffer, inputBuffer, NULL);
+  cb_peek(selectedRxBuffer, inputBuffer, NULL);
 
   // Only keep buffer through first \n in this iteration
   bool endFound = false;
@@ -310,71 +310,73 @@ CliCommand_e cliParse(CliComms_e commsType) {
   lastCommsType = commsType;
 
   // Flush input buffer
-  cbDequeue(selectedRxBuffer, bytesRead);
+  cb_dequeue(selectedRxBuffer, bytesRead);
 
   // If end-of-command found but primary command doesn't exist, send NACK
   if (primaryCommand == NONE) {
-    cliSendAck(false, "Command not recognized");
+    cli_sendAck(false, "Command not recognized");
   }
 
   // Return primary command entered by user
   return (CliCommand_e)primaryCommand;
 }
 
-void cliSend(const char* msg) {
+void cli_send(const char* msg) {
   switch (lastCommsType) {
     case CLI_PHONE:
-      HM_BleClientSend(BLE_CLI_ID, (uint8_t*)msg, (uint16_t)strlen(msg));
+      hm_bleClientSend(BLE_CLI_ID, (uint8_t*)msg, (uint16_t)strlen(msg));
       break;
     case CLI_RADIO:
-      RadioManager_transmitString(RADIO_CLI_ID, (uint8_t*)msg, strlen(msg));
+      radioManager_transmitString(RADIO_CLI_ID, (uint8_t*)msg, strlen(msg));
       break;
     case CLI_USB:
-      HM_UsbTransmit(USB_CLI_ID, (uint8_t*)msg, (uint16_t)strlen(msg));
+      hm_usbTransmit(USB_CLI_ID, (uint8_t*)msg, (uint16_t)strlen(msg));
       break;
     default:
       break;
   }
 }
 
-void cliSendAck(bool success, const char* errMsg) {
+void cli_sendAck(bool success, const char* errMsg) {
   // Upon reception of command, send ERR or OK back to user
-  cliSend("\r\n");
+  cli_send("\r\n");
   if (success) {
-    cliSend("OK\r\n");
+    cli_send("OK\r\n");
   } else {
-    cliSend("ERR: ");
-    if (errMsg) cliSend(errMsg);
-    cliSend("\r\n\r\n");
+    cli_send("ERR: ");
+    if (errMsg) cli_send(errMsg);
+    cli_send("\r\n\r\n");
   }
 }
 
-void cliSendComplete(bool completeSuccess, const char* errMsg) {
+void cli_sendComplete(bool completeSuccess, const char* errMsg) {
   // Upon completion of data sending, send DONE or DONE-ERR back to user
-  cliSend("\r\n");
+  cli_send("\r\n");
   if (completeSuccess) {
-    cliSend("DONE\r\n");
+    cli_send("DONE\r\n");
   } else {
-    cliSend("DONE-ERR: ");
-    if (errMsg) cliSend(errMsg);
-    cliSend("\r\n");
+    cli_send("DONE-ERR: ");
+    if (errMsg) cli_send(errMsg);
+    cli_send("\r\n");
   }
-  cliSend("\r\n");
+  cli_send("\r\n");
 }
 
-CliOptionVals_s cliGetOptions() { return cliOptionVals; }
+CliOptionVals_s cli_getOptions() { return cliOptionVals; }
 
-CircularBuffer_s* cliGetRxBufferFor(CliComms_e source) {
+CircularBuffer_s* cli_getRxBufferFor(CliComms_e source) {
   switch (source) {
     case CLI_PHONE:
-      return HM_BleClientGetRxBuffer(BLE_CLI_ID);
+      return hm_bleClientGetRxBuffer(BLE_CLI_ID);
     case CLI_RADIO:
       return &radioRxCircBuffer;
     case CLI_USB:
-      return HM_UsbGetRxBuffer(USB_CLI_ID);
+      return hm_usbGetRxBuffer(USB_CLI_ID);
     default:
       return NULL;
   }
 }
 
-CircularBuffer_s* cliGetRxBuffer() { return cliGetRxBufferFor(lastCommsType); }
+CircularBuffer_s* cli_getRxBuffer() {
+  return cli_getRxBufferFor(lastCommsType);
+}

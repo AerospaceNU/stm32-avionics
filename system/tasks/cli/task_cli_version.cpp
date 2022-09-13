@@ -14,19 +14,19 @@
 /**
  * @brief Sends Git version and tag info over CLI
  */
-void cli_tasks::cliVersion() {
+void CliTasks::version() {
   char cliStr[70];
   // Send ack of command
-  cliSendAck(true, nullptr);
+  cli_sendAck(true, nullptr);
   snprintf(cliStr, sizeof(cliStr), "Git Commit/Tag Info:\t %s\r\n",
            GIT_DESCRIBE);
-  cliSend(cliStr);
+  cli_send(cliStr);
   snprintf(cliStr, sizeof(cliStr), "Last Commit On:\t\t %s\r\n",
            GIT_COMMIT_TIME);
-  cliSend(cliStr);
+  cli_send(cliStr);
   snprintf(cliStr, sizeof(cliStr), "With Message:\t\t %s\r\n",
            GIT_COMMIT_MESSAGE);
-  cliSend(cliStr);
+  cli_send(cliStr);
 
-  cliSendComplete(true, nullptr);
+  cli_sendComplete(true, nullptr);
 }

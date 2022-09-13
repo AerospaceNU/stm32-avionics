@@ -9,7 +9,7 @@
 
 #if HAS_DEV(PYRO_DIGITAL)
 
-void PyroDigital_init(PyroDigitalCtrl_s *pyro) {
+void pyroDigital_init(PyroDigitalCtrl_s *pyro) {
   // Make sure our pyros are OFF
   if (pyro->port) {
     HAL_GPIO_WritePin(pyro->port, pyro->pin, GPIO_PIN_RESET);
@@ -17,13 +17,13 @@ void PyroDigital_init(PyroDigitalCtrl_s *pyro) {
   pyro->stayEnabled = false;
 }
 
-void PyroDigital_start(PyroDigitalCtrl_s *pyro, uint32_t duration) {
+void pyroDigital_start(PyroDigitalCtrl_s *pyro, uint32_t duration) {
   HAL_GPIO_WritePin(pyro->port, pyro->pin, GPIO_PIN_SET);
   pyro->expireTime = HAL_GetTick() + duration;
   pyro->stayEnabled = false;
 }
 
-void PyroDigital_set(PyroDigitalCtrl_s *pyro, bool enable) {
+void pyroDigital_set(PyroDigitalCtrl_s *pyro, bool enable) {
   if (pyro->port) {
     HAL_GPIO_WritePin(pyro->port, pyro->pin,
                       enable ? GPIO_PIN_SET : GPIO_PIN_RESET);
@@ -31,7 +31,7 @@ void PyroDigital_set(PyroDigitalCtrl_s *pyro, bool enable) {
   }
 }
 
-void PyroDigital_tick(PyroDigitalCtrl_s *pyro) {
+void pyroDigital_tick(PyroDigitalCtrl_s *pyro) {
   if (pyro->expireTime != 0 && HAL_GetTick() >= pyro->expireTime &&
       pyro->port != NULL && !pyro->stayEnabled) {
     HAL_GPIO_WritePin(pyro->port, pyro->pin, GPIO_PIN_RESET);

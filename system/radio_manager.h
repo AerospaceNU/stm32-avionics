@@ -42,19 +42,19 @@ typedef struct {
   size_t numCallbacks;
 } DataRecieveState_s;
 
-void RadioManager_init();
-void RadioManager_tick();
+void radioManager_init();
+void radioManager_tick();
 
-void RadioManager_transmitData(int radioId, SensorData_s* sensorData,
+void radioManager_transmitData(int radioId, SensorData_s* sensorData,
                                FilterData_s* filterData, uint8_t state);
 
 // Send a string over radio
 // Note that this BLOCKS for up to 150ms!!
-void RadioManager_transmitString(int radioId, uint8_t* data, size_t len);
+void radioManager_transmitString(int radioId, uint8_t* data, size_t len);
 // Default function is same, but sends over CLI
-void RadioManager_transmitStringDefault(uint8_t* data, size_t len);
+void radioManager_transmitStringDefault(uint8_t* data, size_t len);
 
-void RadioManager_addMessageCallback(int radioId, RadioCallback_t callback);
+void radioManager_addMessageCallback(int radioId, RadioCallback_t callback);
 
 #ifdef __cplusplus
 }

@@ -105,109 +105,99 @@ extern bool hardwareStatusUsb[NUM_USB];
 extern bool hardwareStatusVbat[NUM_VBAT];
 #endif  // // HAS_DEV(USB)
 
-void HM_HardwareInit();
+void hm_hardwareInit();
 
 /* Microcontroller timer functions */
-uint32_t HM_Millis();
+uint32_t hm_millis();
 
 /* Flash functions */
-bool HM_FlashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
+bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
                        uint8_t* pData);
-bool HM_FlashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
+bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
                         uint8_t* data);
-bool HM_FlashEraseSectorStart(int flashId, uint32_t sectorNum);
-bool HM_FlashEraseChipStart(int flashId);
-bool HM_FlashIsReadComplete(int flashId);
-bool HM_FlashIsWriteComplete(int flashId);
-bool HM_FlashIsEraseComplete(int flashId);
+bool hm_flashEraseSectorStart(int flashId, uint32_t sectorNum);
+bool hm_flashEraseChipStart(int flashId);
+bool hm_flashIsReadComplete(int flashId);
+bool hm_flashIsWriteComplete(int flashId);
+bool hm_flashIsEraseComplete(int flashId);
 
 /* Buzzer functions */
-void HM_BuzzerSetFrequency(int buzzerId, float fHz);
-void HM_BuzzerStart(int buzzerId);
-void HM_BuzzerStop(int buzzerId);
+void hm_buzzerSetFrequency(int buzzerId, float fHz);
+void hm_buzzerStart(int buzzerId);
+void hm_buzzerStop(int buzzerId);
 
 /* LED functions */
-void HM_LedSet(int ledId, bool on);
-void HM_LedToggle(int ledId);
+void hm_ledSet(int ledId, bool on);
+void hm_ledToggle(int ledId);
 
 /* Radio functions */
-bool HM_RadioSend(int radioNum, uint8_t* data, uint16_t numBytes);
-void HM_RadioRegisterConsumer(int radioNum, CircularBuffer_s* rxBuffer);
-void HM_RadioUpdate();
-void HM_RadioSetChannel(int radioNum, int channel);
+bool hm_radioSend(int radioNum, uint8_t* data, uint16_t numBytes);
+void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s* rxBuffer);
+void hm_radioUpdate();
+void hm_radioSetChannel(int radioNum, int channel);
 
 /* USB functions */
-bool HM_UsbIsConnected(int usbId);
-bool HM_UsbTransmit(int usbId, uint8_t* data, uint16_t numBytes);
-CircularBuffer_s* HM_UsbGetRxBuffer(int usbId);
+bool hm_usbIsConnected(int usbId);
+bool hm_usbTransmit(int usbId, uint8_t* data, uint16_t numBytes);
+CircularBuffer_s* hm_usbGetRxBuffer(int usbId);
 
 /* Bluetooth functions */
-bool HM_BleClientConnected(int bleClientId);
-bool HM_BleClientSend(int bleClientId, const uint8_t* data, uint16_t numBytes);
-CircularBuffer_s* HM_BleClientGetRxBuffer(int bleClientId);
+bool hm_bleClientConnected(int bleClientId);
+bool hm_bleClientSend(int bleClientId, const uint8_t* data, uint16_t numBytes);
+CircularBuffer_s* hm_bleClientGetRxBuffer(int bleClientId);
 
-void HM_BleTick();
+void hm_bleTick();
 
-LineCutterData_s* HM_GetLineCutterData(int lineCutterId);
-LineCutterFlightVars_s* HM_GetLineCutterFlightVariables(int lineCutterId);
+LineCutterData_s* hm_getLineCutterData(int lineCutterId);
+LineCutterFlightVars_s* hm_getLineCutterFlightVariables(int lineCutterId);
 
-bool HM_LineCutterSendString(int lineCutterNumber, char* string);
-bool HM_LineCuttersSendCut(int chan);
+bool hm_lineCutterSendString(int lineCutterNumber, char* string);
+bool hm_lineCuttersSendCut(int chan);
 
 /* Outputs */
-void HM_ServoSetAngle(int servoId, float degrees);
-void HM_PyroFire(int pyroId, uint32_t duration);
-void HM_PyroSet(int pyroId, bool enabled);
-void HM_PyroUpdate();
-void HM_DCMotorSetPercent(int dcMotorId, double percent);
+void hm_servoSetAngle(int servoId, float degrees);
+void hm_pyroFire(int pyroId, uint32_t duration);
+void hm_pyroSet(int pyroId, bool enabled);
+void hm_pyroUpdate();
+void hm_dcMotorSetPercent(int dcMotorId, double percent);
 
-/* Sensor functions */
-
-/* Sensor sampling enable/disable functions. All true initially */
-void HM_SetImu1Sampling(bool enable);
-void HM_SetImu2Sampling(bool enable);
-void HM_SetHighGSampling(bool enable);
-void HM_SetBaro1Sampling(bool enable);
-void HM_SetBaro2Sampling(bool enable);
-void HM_SetGpsSampling(bool enable);
-void HM_SetBatteryVoltageSampling(bool enable);
-void HM_SetPyroContinuitySampling(bool enable);
-void HM_WatchdogRefresh();
+/* Watchdogs */
+void hm_watchdogRefresh();
 
 /**
  * @brief Updates sensor data from enabled sensors
  */
-void HM_ReadSensorData();
+void hm_readSensorData();
 
 /**
  * @brief Returns a pointer to the current sensor data (statically allocated)
  * @return Pointer to statically-allocated struct where sensor data is stored
  */
-SensorData_s* HM_GetSensorData();
+SensorData_s* hm_getSensorData();
 
 /**
  * @brief Returns a pointer to the current sensor properties
  * @return Pointer to statically-allocated struct where sensor properties are
  * stored
  */
-SensorProperties_s* HM_GetSensorProperties();
+SensorProperties_s* hm_getSensorProperties();
 
 /**
  * @brief Turn on or off sim mode in the hardware manager
  * @param[in] rxBuffer: Buffer to read from in during sim
  */
-void HM_EnableSimMode(CircularBuffer_s* rxBuffer);
+void hm_enableSimMode(CircularBuffer_s* rxBuffer);
 
 /**
  * @brief Turn off sim mode in the hardware manager
  */
-void HM_DisableSimMode();
+void hm_disableSimMode();
 
 /**
  * @brief Return whether hardware manager is currently in sim mode
  * @return True if in sim mode, false if not
  */
-bool HM_InSimMode();
+bool hm_inSimMode();
 
 #ifdef __cplusplus
 }

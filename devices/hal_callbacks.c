@@ -22,8 +22,9 @@ typedef struct {
 static SpiCallbackProperty_s spiCallbacks[MAX_SPI_HANDLES];
 static int numSpiCallbacksRegistered = 0;
 
-void register_HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi,
-                                     void (*callback)(void *), void *userData) {
+void halCallbacks_registerSpiTxCpltCallback(SPI_HandleTypeDef *hspi,
+                                            void (*callback)(void *),
+                                            void *userData) {
   // See if handle already has callback registered to it
   for (int i = 0; i < numSpiCallbacksRegistered; i++) {
     if (spiCallbacks[i].hspi == hspi) {
@@ -40,9 +41,9 @@ void register_HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi,
   numSpiCallbacksRegistered++;
 }
 
-void register_HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi,
-                                       void (*callback)(void *),
-                                       void *userData) {
+void halCallbacks_registerSpiTxRxCpltCallback(SPI_HandleTypeDef *hspi,
+                                              void (*callback)(void *),
+                                              void *userData) {
   // See if handle already has callback registered to it
   for (int i = 0; i < numSpiCallbacksRegistered; i++) {
     if (spiCallbacks[i].hspi == hspi) {
@@ -97,9 +98,9 @@ typedef struct {
 static UartCallbackProperty_s uartCallbacks[MAX_UART_HANDLES];
 static int numUartCallbacksRegistered = 0;
 
-void register_HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart,
-                                          void (*callback)(void *),
-                                          void *userData) {
+void halCallbacks_registerUartRxHalfCpltCallback(UART_HandleTypeDef *huart,
+                                                 void (*callback)(void *),
+                                                 void *userData) {
   // See if handle already has callback registered to it
   for (int i = 0; i < numUartCallbacksRegistered; i++) {
     if (uartCallbacks[i].huart == huart) {
@@ -116,9 +117,9 @@ void register_HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart,
   numUartCallbacksRegistered++;
 }
 
-void register_HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,
-                                      void (*callback)(void *),
-                                      void *userData) {
+void halCallbacks_registerUartRxCpltCallback(UART_HandleTypeDef *huart,
+                                             void (*callback)(void *),
+                                             void *userData) {
   // See if handle already has callback registered to it
   for (int i = 0; i < numUartCallbacksRegistered; i++) {
     if (uartCallbacks[i].huart == huart) {
@@ -158,9 +159,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
   }
 }
 
-void register_HAL_UART_RxIdleCallback(UART_HandleTypeDef *huart,
-                                      void (*callback)(void *, size_t),
-                                      void *userData) {
+void halCallbacks_registerUartRxIdleCallback(UART_HandleTypeDef *huart,
+                                             void (*callback)(void *, size_t),
+                                             void *userData) {
   // See if handle already has callback registered to it
   for (int i = 0; i < numUartCallbacksRegistered; i++) {
     if (uartCallbacks[i].huart == huart) {
@@ -201,9 +202,9 @@ typedef struct {
 static AdcCallbackProperty_s adcCallbacks[MAX_ADC_HANDLES];
 static int numAdcCallbacksRegistered = 0;
 
-void register_HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc,
-                                       void (*callback)(void *),
-                                       void *userData) {
+void halCallbacks_registerAdcConvCpltCallback(ADC_HandleTypeDef *hadc,
+                                              void (*callback)(void *),
+                                              void *userData) {
   // See if handle already has callback registered to it
   for (int i = 0; i < numAdcCallbacksRegistered; i++) {
     if (adcCallbacks[i].hadc == hadc) {

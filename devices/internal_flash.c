@@ -92,8 +92,8 @@ HAL_StatusTypeDef Internal_Flash_Program(uint32_t TypeProgram,
  * @param data - Array of uint8_t to write
  * @param numBytes - Number of bytes to be written from data
  */
-bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data,
-                          uint32_t numBytes) {
+bool internalFlash_write(uint32_t RelFlashAddress, uint8_t *data,
+                         uint32_t numBytes) {
   if (RelFlashAddress % FLASH_BYTE_INCREMENT ||
       RelFlashAddress >
           MAX_FLASH_ADDRESS) {  // Relative address must be a multiple of 32 and
@@ -137,8 +137,8 @@ bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data,
  * @param pData - Array of uint8_t to read into
  * @param numBytes - Number of bytes to be read from flash
  */
-bool internal_flash_read(uint32_t RelFlashAddress, uint8_t *pData,
-                         uint32_t numBytes) {
+bool internalFlash_read(uint32_t RelFlashAddress, uint8_t *pData,
+                        uint32_t numBytes) {
   if (RelFlashAddress > MAX_FLASH_ADDRESS) {
     return false;
   }

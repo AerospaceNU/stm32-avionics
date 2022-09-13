@@ -17,9 +17,9 @@ typedef struct {
   uint32_t expireTime;
 } PyroDigitalCtrl_s;
 
-void PyroDigital_init(PyroDigitalCtrl_s *pyro);
-void PyroDigital_start(PyroDigitalCtrl_s *pyro, uint32_t duration);
-void PyroDigital_set(PyroDigitalCtrl_s *pyro, bool enable);
-void PyroDigital_tick(PyroDigitalCtrl_s *pyro);
+void pyroDigital_init(PyroDigitalCtrl_s *pyro);
+void pyroDigital_start(PyroDigitalCtrl_s *pyro, uint32_t duration);
+void pyroDigital_set(PyroDigitalCtrl_s *pyro, bool enable);
+void pyroDigital_tick(PyroDigitalCtrl_s *pyro);
 
 #endif  // DEVICES_PYRO_DIGITAL_H_

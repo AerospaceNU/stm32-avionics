@@ -10,18 +10,18 @@
 
 void AscentState::init() {
   // Write launched status
-  data_log_get_flight_metadata()->launched = 1;
-  data_log_write_flight_metadata();
+  dataLog_getFlightMetadata()->launched = 1;
+  dataLog_writeFlightMetadata();
   maxPosZ = 0;
-  state_log_write(this->getID());
-  cli_tasks::ConfigureForFlight();
+  stateLog_write(this->getID());
+  CliTasks::configureForFlight();
 }
 
 EndCondition_e AscentState::run() {
   // Collect, filter, log, and log all data
-  SensorData_s* sensorData = HM_GetSensorData();
-  FilterData_s* filterData = filterGetData();
-  data_log_write(sensorData, filterData, this->getID());
+  SensorData_s* sensorData = hm_getSensorData();
+  FilterData_s* filterData = filter_getData();
+  dataLog_write(sensorData, filterData, this->getID());
 
   // Detect if new maximum Z position has been reached and record the time
   if (filterData->pos_z > maxPosZ) {
@@ -37,4 +37,4 @@ EndCondition_e AscentState::run() {
   return EndCondition_e::NoChange;
 }
 
-void AscentState::cleanup() { TriggerManager_SetApogeeTime(HM_Millis()); }
+void AscentState::cleanup() { triggerManager_setApogeeTime(hm_millis()); }

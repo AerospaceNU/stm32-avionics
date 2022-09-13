@@ -14,19 +14,19 @@
 void PostFlightState::init() {
   // Write that the flight is completed so that we don't jump back to a flight
   // state
-  state_log_write_complete();
-  lastSimDataTime = HM_Millis();
-  cli_tasks::ConfigureForGround();
+  stateLog_writeComplete();
+  lastSimDataTime = hm_millis();
+  CliTasks::configureForGround();
 }
 
 EndCondition_e PostFlightState::run() {
   // Run buzzer heartbeat
-  buzzerHeartbeat();
+  buzzerHeartbeat_tick();
 
   // Check if data is still coming in (sim mode)
-  uint32_t curTime = HM_Millis();
-  if (HM_InSimMode()) {
-    if (cbCount(cliGetRxBuffer()) >= sizeof(SensorData_s)) {
+  uint32_t curTime = hm_millis();
+  if (hm_inSimMode()) {
+    if (cb_count(cli_getRxBuffer()) >= sizeof(SensorData_s)) {
       lastSimDataTime = curTime;
     }
     if (curTime - lastSimDataTime > SIM_NO_DATA_TIMEOUT_MS) {
@@ -35,22 +35,22 @@ EndCondition_e PostFlightState::run() {
   }
 
   // Collect and transmit data
-  SensorData_s* sensorData = HM_GetSensorData();
-  FilterData_s* filterData = filterGetData();
+  SensorData_s* sensorData = hm_getSensorData();
+  FilterData_s* filterData = filter_getData();
 
   // Log data at 1/10th rate for now in case this state is reached before it is
   // supposed to
   if (this->getRunCounter() % 10 == 0)
-    data_log_write(sensorData, filterData, this->getID());
+    dataLog_write(sensorData, filterData, this->getID());
 
   return EndCondition_e::NoChange;
 }
 
 void PostFlightState::cleanup() {
   // If in sim mode, finish it up and release any unread bytes
-  if (HM_InSimMode()) {
-    cliSendComplete(true, nullptr);
-    HM_DisableSimMode();
-    cbFlush(cliGetRxBuffer());
+  if (hm_inSimMode()) {
+    cli_sendComplete(true, nullptr);
+    hm_disableSimMode();
+    cb_flush(cli_getRxBuffer());
   }
 }

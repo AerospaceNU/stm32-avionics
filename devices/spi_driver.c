@@ -11,7 +11,7 @@
 
 #define SPI_MAX_DELAY 10  // ms
 
-uint8_t SPI_ReadRegister(SpiCtrl_t *sensor, uint8_t reg) {
+uint8_t spi_readRegister(SpiCtrl_t *sensor, uint8_t reg) {
   uint8_t rxBuff[2] = {0};
   uint8_t txBuff[2] = {0};
   txBuff[0] = reg;
@@ -28,7 +28,7 @@ uint8_t SPI_ReadRegister(SpiCtrl_t *sensor, uint8_t reg) {
   return rxBuff[1];
 }
 
-void SPI_WriteRegister(SpiCtrl_t *sensor, uint8_t reg, uint8_t val) {
+void spi_writeRegister(SpiCtrl_t *sensor, uint8_t reg, uint8_t val) {
   uint8_t txBuff[2];
   txBuff[0] = reg;
   txBuff[1] = val;

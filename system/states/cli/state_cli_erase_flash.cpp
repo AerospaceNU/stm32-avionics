@@ -9,37 +9,37 @@
 
 void CliEraseFlashState::init() {
   // Send initial ack to CLI and start erasing chip
-  cliSendAck(true, nullptr);
-  last_time = HM_Millis();
+  cli_sendAck(true, nullptr);
+  last_time = hm_millis();
   _curFlashId = 0;
-  data_log_flash_erase(_curFlashId);
+  dataLog_flashErase(_curFlashId);
 }
 
 EndCondition_e CliEraseFlashState::run() {
   // Run buzzer heartbeat
-  buzzerHeartbeat();
+  buzzerHeartbeat_tick();
 
   // Only send data or check end condition once per second
-  if (!HM_FlashIsEraseComplete(_curFlashId)) {
-    if ((HM_Millis() - last_time) > SEND_PERIOD) {
+  if (!hm_flashIsEraseComplete(_curFlashId)) {
+    if ((hm_millis() - last_time) > SEND_PERIOD) {
       // Inform user that erase operation is still in progress
-      cliSend("Erasing...");
-      last_time = HM_Millis();
+      cli_send("Erasing...");
+      last_time = hm_millis();
     }
   } else {
     _curFlashId++;
     if (_curFlashId == NUM_FLASH) {
       return EndCondition_e::CliCommandComplete;
     }
-    data_log_flash_erase(_curFlashId);
+    dataLog_flashErase(_curFlashId);
   }
   return EndCondition_e::NoChange;
 }
 
 void CliEraseFlashState::cleanup() {
   // Re-write current configs so that they persist
-  data_log_write_cli_configs();
+  dataLog_writeCliConfigs();
   // Send complete message to CLI. No way of knowing if there is a failure
   // currently.
-  cliSendComplete(true, nullptr);
+  cli_sendComplete(true, nullptr);
 }

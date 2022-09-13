@@ -19,11 +19,11 @@ static RadioPacket_s transmitPacket[NUM_RADIO];
 
 static const char *call = "KM6GNL";
 
-void RadioManager_init() {
+void radioManager_init() {
   for (int i = 0; i < NUM_RADIO; i++) {
-    cbInit(&(dataRx[i].rxBuffer), dataRx[i].rxArray, RX_BUFF_LEN,
-           sizeof(RadioRecievedPacket_s));
-    HM_RadioRegisterConsumer(i, &dataRx[i].rxBuffer);
+    cb_init(&(dataRx[i].rxBuffer), dataRx[i].rxArray, RX_BUFF_LEN,
+            sizeof(RadioRecievedPacket_s));
+    hm_radioRegisterConsumer(i, &dataRx[i].rxBuffer);
 
     strncpy(transmitPacket[i].callsign, call, 8);
 
@@ -32,36 +32,36 @@ void RadioManager_init() {
 #endif
     transmitPacket[i].board_serial_num = 0;  // TODO set this;
 
-    HM_RadioSetChannel(i, 2);
+    hm_radioSetChannel(i, 2);
   }
 }
 
 //! Must be called periodically to output data over CLI or USB
-void RadioManager_tick() {
+void radioManager_tick() {
   static RadioRecievedPacket_s packet;
 
   // Try to dequeue all the packets we've gotten
   for (int i = 0; i < NUM_RADIO; i++) {
     static size_t len = sizeof(packet);
-    while (cbCount(&dataRx[i].rxBuffer)) {
-      cbPeek(&dataRx[i].rxBuffer, &packet, &len);
+    while (cb_count(&dataRx[i].rxBuffer)) {
+      cb_peek(&dataRx[i].rxBuffer, &packet, &len);
       if (len) {
         // Send to all our callbacks
         for (int j = 0; j < dataRx[i].numCallbacks; j++) {
           if (dataRx[i].callbacks[j]) dataRx[i].callbacks[j](&packet);
         }
 
-        cbDequeue(&dataRx[i].rxBuffer, 1);
+        cb_dequeue(&dataRx[i].rxBuffer, 1);
       } else {
-        cbFlush(&dataRx[i].rxBuffer);
+        cb_flush(&dataRx[i].rxBuffer);
       }
     }
   }
 }
 
-void RadioManager_send_internal(int radioId) {
+void radioManager_sendInternal(int radioId) {
   // if (true) {
-  HM_RadioSend(radioId, (uint8_t *)&transmitPacket[radioId],
+  hm_radioSend(radioId, (uint8_t *)&transmitPacket[radioId],
                sizeof(RadioPacket_s));
   /*
    } else {
@@ -71,12 +71,12 @@ void RadioManager_send_internal(int radioId) {
      packet.rssi = 1;
      packet.radioId = TELEMETRY_RADIO;
      memcpy(packet.data, &transmitPacket, RADIO_PACKET_SIZE);
-     HM_UsbTransmit((uint8_t *)&packet, sizeof(packet));
+     hm_usbTransmit((uint8_t *)&packet, sizeof(packet));
    }
    */
 }
 
-void RadioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
+void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
   dataRx[radioId].callbacks[dataRx[radioId].numCallbacks] = callback;
   dataRx[radioId].numCallbacks++;
 }
@@ -86,9 +86,9 @@ void RadioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
 #define POSITION_RATE 10
 #define TRIGGER_INFO_RATE 1
 
-void RadioManager_transmitData(int radioId, SensorData_s *sensorData,
+void radioManager_transmitData(int radioId, SensorData_s *sensorData,
                                FilterData_s *filterData, uint8_t state) {
-  uint32_t currentTime = HM_Millis();
+  uint32_t currentTime = hm_millis();
   transmitPacket[radioId].timestampMs = currentTime;
 
   /*
@@ -103,7 +103,7 @@ void RadioManager_transmitData(int radioId, SensorData_s *sensorData,
     transmitPacket[radioId].packetType = 1;
     transmitPacket[radioId].payload = data;
     lastSent[radioId].propStuffLastSent = 0;
-    RadioManager_send_internal(radioId);
+    radioManager_sendInternal(radioId);
   }
   */
 
@@ -135,7 +135,7 @@ void RadioManager_transmitData(int radioId, SensorData_s *sensorData,
     transmitPacket[radioId].payload.orientation = data;
     lastSent[radioId].orientationLastSent = currentTime;
 
-    RadioManager_send_internal(radioId);
+    radioManager_sendInternal(radioId);
   }
 
   if (currentTime - lastSent[radioId].positionLastSent >=
@@ -181,7 +181,7 @@ void RadioManager_transmitData(int radioId, SensorData_s *sensorData,
     transmitPacket[radioId].payload.positionData = data;
     lastSent[radioId].positionLastSent = currentTime;
 
-    RadioManager_send_internal(radioId);
+    radioManager_sendInternal(radioId);
   }
 
 #if HAS_DEV(BAROMETER)
@@ -190,15 +190,15 @@ void RadioManager_transmitData(int radioId, SensorData_s *sensorData,
     for (int i = 0; i < NUM_BAROMETER; i++) {
       data.pressure[i] = sensorData->barometerData[i].pressureAtm;
     }
-    data.pressureRef = filterGetPressureRef();
-    data.groundElevation = cliGetConfigs()->groundElevationM;
-    data.groundTemp = cliGetConfigs()->groundTemperatureC;
+    data.pressureRef = filter_getPressureRef();
+    data.groundElevation = cli_getConfigs()->groundElevationM;
+    data.groundTemp = cli_getConfigs()->groundTemperatureC;
 
     transmitPacket[radioId].packetType = TELEMETRY_ID_ALT_INFO;
     transmitPacket[radioId].payload.altitudeInfo = data;
     lastSent[radioId].altInfoLastSent = currentTime;
 
-    RadioManager_send_internal(radioId);
+    radioManager_sendInternal(radioId);
   }
 #endif  // HAS_DEV(BAROMETER)
 
@@ -208,13 +208,13 @@ void RadioManager_transmitData(int radioId, SensorData_s *sensorData,
     uint8_t pyroCont = 0;
     for (int i = 0; i < NUM_PYRO_CONT; i++)
       pyroCont |= ((sensorData->pyroContData[i] & 0x01) << i);
-    TriggerInfoPacket_s data = {pyroCont, TriggerManager_Status()};
+    TriggerInfoPacket_s data = {pyroCont, triggerManager_status()};
 
     transmitPacket[radioId].packetType = TELEMETRY_ID_TRIGGER_INFO;
     transmitPacket[radioId].payload.triggerInfo = data;
     lastSent[radioId].triggerInfoLastSent = currentTime;
 
-    RadioManager_send_internal(radioId);
+    radioManager_sendInternal(radioId);
   }
 #endif  // HAS_DEV(PYRO_CONT)
 
@@ -223,10 +223,10 @@ void RadioManager_transmitData(int radioId, SensorData_s *sensorData,
     for (int i = 0; i <= NUM_LINE_CUTTER; i++) {
       transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER;
       transmitPacket[radioId].payload.lineCutter.data =
-          *HM_GetLineCutterData(i);
+          *hm_getLineCutterData(i);
       lastSent[radioId].lineCutterLastSent = currentTime;
 
-      RadioManager_send_internal(radioId);
+      radioManager_sendInternal(radioId);
     }
   }
 
@@ -234,10 +234,10 @@ void RadioManager_transmitData(int radioId, SensorData_s *sensorData,
     for (int i = 0; i <= NUM_LINE_CUTTER; i++) {
       transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER_VARS;
       transmitPacket[radioId].payload.lineCutterFlightVars.data =
-          *HM_GetLineCutterFlightVariables(i);
+          *hm_getLineCutterFlightVariables(i);
       lastSent[radioId].lineCutterVarsLastSent = currentTime;
 
-      RadioManager_send_internal(radioId);
+      radioManager_sendInternal(radioId);
     }
   }
 #endif  // HAS_DEV(LINE_CUTTER)
@@ -245,11 +245,11 @@ void RadioManager_transmitData(int radioId, SensorData_s *sensorData,
 
 #define min(a, b) (a < b) ? a : b
 
-void RadioManager_transmitString(int radioId, uint8_t *data, size_t len) {
+void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
   while (len) {
     uint8_t txLen = min(len, RADIO_MAX_STRING);
 
-    transmitPacket[radioId].timestampMs = HM_Millis();
+    transmitPacket[radioId].timestampMs = hm_millis();
     transmitPacket[radioId].packetType = TELEMETRY_ID_STRING;
 
     // copy txLen many bytes into the string, and set the rest to null chars
@@ -258,17 +258,17 @@ void RadioManager_transmitString(int radioId, uint8_t *data, size_t len) {
     memcpy(transmitPacket[radioId].payload.cliString.string, data, txLen);
     transmitPacket[radioId].payload.cliString.len = txLen;
 
-    RadioManager_send_internal(radioId);
+    radioManager_sendInternal(radioId);
 
     // The radio seems to not actually send the packet unless we actually call
     // RadioUpdate a bunch
     // TODO: This is a HACK
     for (int i = 0; i < 10; i++) {
-      HM_RadioUpdate();
-      uint32_t start = HM_Millis();
-      while ((HM_Millis() - start) < 15) {
+      hm_radioUpdate();
+      uint32_t start = hm_millis();
+      while ((hm_millis() - start) < 15) {
       }
-      HM_WatchdogRefresh();
+      hm_watchdogRefresh();
     }
 
     len -= txLen;
@@ -276,6 +276,6 @@ void RadioManager_transmitString(int radioId, uint8_t *data, size_t len) {
   }
 }
 
-void RadioManager_transmitStringDefault(uint8_t *data, size_t len) {
-  RadioManager_transmitString(RADIO_CLI_ID, data, len);
+void radioManager_transmitStringDefault(uint8_t *data, size_t len) {
+  radioManager_transmitString(RADIO_CLI_ID, data, len);
 }

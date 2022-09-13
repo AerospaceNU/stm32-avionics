@@ -13,23 +13,23 @@
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
 
 void InitializeState::init() {
-  HM_HardwareInit();
+  hm_hardwareInit();
 
   // This is needed to tell the Kalman filter the nominal dt for prediction
-  filterInit(this->period_ms_ / 1000.0);
+  filter_init(this->period_ms_ / 1000.0);
 
   // Initiliaze radio circular buffers and things
-  RadioManager_init();
+  radioManager_init();
 
-  data_log_init();
-  data_log_load_cli_configs();
+  dataLog_init();
+  dataLog_loadCliConfigs();
 
   // Start CLI, which will run in the background in other states
-  cliInit();
+  cli_init();
 
   // Set up line cutters to forward strings to radio
 #if HAS_DEV(LINE_CUTTER_BLE)
-  lineCutterBle_registerForwardStringCb(RadioManager_transmitStringDefault);
+  lineCutterBle_registerForwardStringCb(radioManager_transmitStringDefault);
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
 }
 

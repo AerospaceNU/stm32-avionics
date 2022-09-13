@@ -19,16 +19,16 @@
 static bool triggerFireStatus[MAX_TRIGGER] = {0};
 static uint64_t apogeeTimestamp;
 
-void TriggerManager_Init() {
+void triggerManager_init() {
   for (int i = 0; i < MAX_TRIGGER; ++i) triggerFireStatus[i] = 0;
   apogeeTimestamp = 0;
 }
 
-void TriggerManager_SetApogeeTime(uint64_t timestamp) {
+void triggerManager_setApogeeTime(uint64_t timestamp) {
   apogeeTimestamp = timestamp;
 }
 
-uint8_t TriggerManager_Status() {
+uint8_t triggerManager_status() {
   uint8_t status = 0;
   for (int i = 0; i < MAX_TRIGGER; ++i) {
     status |= triggerFireStatus[i] << i;
@@ -36,46 +36,47 @@ uint8_t TriggerManager_Status() {
   return status;
 }
 
-void TriggerManager_SetTriggerFireStatus(uint8_t status) {
+void triggerManager_setTriggerFireStatus(uint8_t status) {
   for (int i = 0; i < MAX_TRIGGER; ++i) {
     triggerFireStatus[i] = status >> i & 0x1;
   }
 }
 
-void TriggerManager_Update(FilterData_s* filterData, bool hasPassedLaunch,
+void triggerManager_update(FilterData_s* filterData, bool hasPassedLaunch,
                            bool hasPassedApogee, bool hasPassedTouchdown) {
   // Turns off expired pyros (this is only a pyro thing, the line cutters
   // shut themselves off
-  HM_PyroUpdate();
-  TriggerConfig_s* triggerConfiguration = cliGetConfigs()->triggerConfiguration;
+  hm_pyroUpdate();
+  TriggerConfig_s* triggerConfiguration =
+      cli_getConfigs()->triggerConfiguration;
   for (int i = 0; i < MAX_TRIGGER; i++) {
     if (!triggerFireStatus[i]) {
       if (triggerConfiguration->flags == FLAG_LAUNCH && hasPassedLaunch) {
-        TriggerManager_TriggerFire(i, true);
+        triggerManager_triggerFire(i, true);
       }
       if (triggerConfiguration->flags == FLAG_TOUCHDOWN && hasPassedTouchdown) {
-        TriggerManager_TriggerFire(i, true);
+        triggerManager_triggerFire(i, true);
       }
       // Check if we want to check for descent altitude
       if (triggerConfiguration->flags == FLAG_ALT_DURING_DESCENT &&
           hasPassedApogee) {
         if (filterData->pos_z < triggerConfiguration->configValue) {
-          TriggerManager_TriggerFire(i, true);
+          triggerManager_triggerFire(i, true);
         }
       } else if (triggerConfiguration->flags == FLAG_APOGEE &&
                  hasPassedApogee) {
         // Start apogee pyro
-        TriggerManager_TriggerFire(i, true);
+        triggerManager_triggerFire(i, true);
       } else if (triggerConfiguration->flags == FLAG_APOGEE_DELAY &&
                  hasPassedApogee) {
-        if (HM_Millis() - apogeeTimestamp >
+        if (hm_millis() - apogeeTimestamp >
             1000 * triggerConfiguration->configValue) {
-          TriggerManager_TriggerFire(i, true);
+          triggerManager_triggerFire(i, true);
         }
       } else if (triggerConfiguration->flags == FLAG_CUSTOM_MARMON_CLAMP) {
         if (hasPassedLaunch && filterData->world_vel_z < 18.3 &&
             filterData->world_acc_z < 10) {
-          TriggerManager_TriggerFire(i, true);
+          triggerManager_triggerFire(i, true);
         }
       }
     }
@@ -83,31 +84,31 @@ void TriggerManager_Update(FilterData_s* filterData, bool hasPassedLaunch,
   }
 }
 
-void TriggerManager_TriggerFire(uint8_t triggerNum, bool logFire) {
+void triggerManager_triggerFire(uint8_t triggerNum, bool logFire) {
   // Pyro type
   TriggerConfig_s* triggerConfig =
-      triggerNum + cliGetConfigs()->triggerConfiguration;
+      triggerNum + cli_getConfigs()->triggerConfiguration;
   if (triggerConfig->mode == TRIGGER_TYPE_PYRO) {
     if (!(triggerConfig->port >= 0 && triggerConfig->port < NUM_PYRO)) return;
-    HM_PyroFire(triggerConfig->port, 1000);
+    hm_pyroFire(triggerConfig->port, 1000);
 
   } else if (triggerConfig->mode == TRIGGER_TYPE_DIGITAL_ON_PYRO) {
     if (!(triggerConfig->port >= 0 && triggerConfig->port < NUM_PYRO)) return;
-    HM_PyroSet(triggerConfig->port, true);
+    hm_pyroSet(triggerConfig->port, true);
 
   } else if (triggerConfig->mode == TRIGGER_TYPE_DIGITAL_OFF_PYRO) {
     if (!(triggerConfig->port >= 0 && triggerConfig->port < NUM_PYRO)) return;
-    HM_PyroSet(triggerConfig->port, false);
+    hm_pyroSet(triggerConfig->port, false);
 
     // Line cutter type
   } else if (triggerConfig->mode == TRIGGER_TYPE_LINE_CUTTER) {
-    HM_LineCuttersSendCut(triggerConfig->port);
+    hm_lineCuttersSendCut(triggerConfig->port);
   } else {
     // Invalid type
     return;
   }
 
   if (logFire) triggerFireStatus[triggerNum] = true;
-  data_log_get_flight_metadata()->triggerFireStatus = ~TriggerManager_Status();
-  data_log_write_flight_metadata();
+  dataLog_getFlightMetadata()->triggerFireStatus = ~triggerManager_status();
+  dataLog_writeFlightMetadata();
 }

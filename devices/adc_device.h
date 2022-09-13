@@ -31,21 +31,21 @@ typedef struct {
  * @param minVal: correlates to raw 0
  * @param maxVal: correlates to highest raw value of ADC's resolution
  */
-void adcInit(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
-             float minVal, float maxVal, bool bSingleEnded);
+void adcDev_init(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
+                 float minVal, float maxVal, bool bSingleEnded);
 
 /**
  * Starts a one-time ADC read/conversion. This type of conversion takes time, so
  * starting read gives flexibility for higher code to perform other tasks while
  * the read/conversion is occurring
  */
-void adcStartSingleRead(AdcDevCtrl_s *adc);
+void adcDev_startSingleRead(AdcDevCtrl_s *adc);
 
 /**
  * Returns true with converted ADC value if available, otherwise returns false
  * (hardware conversion hasn't completed)
  */
-bool adcGetValue(AdcDevCtrl_s *adc, float *pval, uint32_t timeoutMS);
+bool adcDev_getValue(AdcDevCtrl_s *adc, float *pval, uint32_t timeoutMS);
 
 #ifdef __cplusplus
 }

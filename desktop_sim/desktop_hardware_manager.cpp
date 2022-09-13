@@ -114,7 +114,7 @@ std::string output_file;     // NOLINT
 
 extern "C" {
 
-void HM_HardwareInit() {
+void hm_hardwareInit() {
   printf("STARTING: output %s, ext flash %s, int flash %s\n",
          output_file.c_str(), ext_flash_path.c_str(), int_flash_path.c_str());
 
@@ -162,53 +162,53 @@ void HM_HardwareInit() {
 #endif  // HAS_DEV(IMU)
 }
 
-uint32_t HM_Millis() {
+uint32_t hm_millis() {
   std::chrono::milliseconds ms =
       std::chrono::duration_cast<std::chrono::milliseconds>(
           std::chrono::system_clock::now().time_since_epoch());
   return ms.count();
 }
 
-bool HM_FlashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
+bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
                        uint8_t *pData) {
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
   if (IS_DEVICE(flashId, FLASH_DESKTOP_FILE_BACKED)) {
     return externalFlash[flashId - FIRST_ID_FLASH_DESKTOP_FILE_BACKED]
-        ->ReadStart(startLoc, numBytes, pData);
+        ->readStart(startLoc, numBytes, pData);
   }
 #endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
 
   return false;
 }
 
-bool HM_FlashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
+bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
                         uint8_t *data) {
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
   if (IS_DEVICE(flashId, FLASH_DESKTOP_FILE_BACKED)) {
     return externalFlash[flashId - FIRST_ID_FLASH_DESKTOP_FILE_BACKED]
-        ->WriteStart(startLoc, numBytes, data);
+        ->writeStart(startLoc, numBytes, data);
   }
 #endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
 
   return false;
 }
 
-bool HM_FlashEraseSectorStart(int flashId, uint32_t sectorNum) { return false; }
-bool HM_FlashEraseChipStart(int flashId) { return false; }
-bool HM_FlashIsReadComplete(int flashId) { return true; }
-bool HM_FlashIsWriteComplete(int flashId) { return true; }
-bool HM_FlashIsEraseComplete(int flashId) { return true; }
+bool hm_flashEraseSectorStart(int flashId, uint32_t sectorNum) { return false; }
+bool hm_flashEraseChipStart(int flashId) { return false; }
+bool hm_flashIsReadComplete(int flashId) { return true; }
+bool hm_flashIsWriteComplete(int flashId) { return true; }
+bool hm_flashIsEraseComplete(int flashId) { return true; }
 
-void HM_BuzzerSetFrequency(int buzzerId, float fHz) {}
-void HM_BuzzerStart(int buzzerId) {}
-void HM_BuzzerStop(int buzzerId) {}
+void hm_buzzerSetFrequency(int buzzerId, float fHz) {}
+void hm_buzzerStart(int buzzerId) {}
+void hm_buzzerStop(int buzzerId) {}
 
-void HM_ServoSetAngle(int servoId, float degrees) {}
+void hm_servoSetAngle(int servoId, float degrees) {}
 
-void HM_LedSet(int ledId, bool set) {}
-void HM_LedToggle(int ledId) {}
+void hm_ledSet(int ledId, bool set) {}
+void hm_ledToggle(int ledId) {}
 
-bool HM_RadioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
+bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
   static RadioRecievedPacket_s packet;
   packet.crc = true;
   packet.lqi = 4;
@@ -226,39 +226,39 @@ bool HM_RadioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
   return false;
 }
 
-void HM_RadioUpdate() {}
-void HM_RadioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {}
-void HM_RadioSetChannel(int radioNum, int channel) {}
+void hm_radioUpdate() {}
+void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {}
+void hm_radioSetChannel(int radioNum, int channel) {}
 
-bool HM_UsbIsConnected(int usbId) { return false; }
-bool HM_UsbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
+bool hm_usbIsConnected(int usbId) { return false; }
+bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
   std::cout << data << std::endl;
   return true;
 }
-CircularBuffer_s *HM_UsbGetRxBuffer(int usbId) { return nullptr; }
+CircularBuffer_s *hm_usbGetRxBuffer(int usbId) { return nullptr; }
 
-bool HM_BleClientConnected(int bleClientId) { return false; }
-bool HM_BleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
+bool hm_bleClientConnected(int bleClientId) { return false; }
+bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
   return false;
 }
-CircularBuffer_s *HM_BleClientGetRxBuffer(int bleClientId) { return nullptr; }
-void HM_BleTick() {}
+CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) { return nullptr; }
+void hm_bleTick() {}
 
-LineCutterData_s *HM_GetLineCutterData(int lineCutterId) { return nullptr; }
-LineCutterFlightVars_s *HM_GetLineCutterFlightVariables(int lineCutterId) {
+LineCutterData_s *hm_getLineCutterData(int lineCutterId) { return nullptr; }
+LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
   return nullptr;
 }
-bool HM_LineCutterSendString(int lineCutterNumber, char *string) {
+bool hm_lineCutterSendString(int lineCutterNumber, char *string) {
   return true;
 }
-bool HM_LineCuttersSendCut(int chan) {
+bool hm_lineCuttersSendCut(int chan) {
   printf("Line cutter chan %i cut sent!\n", chan);
   return true;
 }
 
-void HM_WatchdogRefresh() {}
+void hm_watchdogRefresh() {}
 
-void HM_PyroFire(int pyroId, uint32_t duration) {
+void hm_pyroFire(int pyroId, uint32_t duration) {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   if (IS_DEVICE(pyroId, PYRO_DESKTOP_PRINT)) {
     printPyro_start(&printPyro[pyroId - FIRST_ID_PYRO_DESKTOP_PRINT], duration);
@@ -266,7 +266,7 @@ void HM_PyroFire(int pyroId, uint32_t duration) {
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
 
-void HM_PyroSet(int pyroId, bool enable) {
+void hm_pyroSet(int pyroId, bool enable) {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   if (IS_DEVICE(pyroId, PYRO_DESKTOP_PRINT)) {
     printPyro_set(&printPyro[pyroId - FIRST_ID_PYRO_DESKTOP_PRINT], enable);
@@ -274,7 +274,7 @@ void HM_PyroSet(int pyroId, bool enable) {
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
 
-void HM_PyroUpdate() {
+void hm_pyroUpdate() {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   for (int i = 0; i < NUM_PYRO_DESKTOP_PRINT; i++) {
     printPyro_tick(&printPyro[i]);
@@ -282,17 +282,17 @@ void HM_PyroUpdate() {
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
 
-void HM_DCMotorSetPercent(int dcMotorId, double percent) {}
+void hm_dcMotorSetPercent(int dcMotorId, double percent) {}
 
-void HM_ReadSensorData() { flightReplay->GetNext(&sensorData); }
+void hm_readSensorData() { flightReplay->getNext(&sensorData); }
 
-SensorData_s *HM_GetSensorData() { return &sensorData; }
+SensorData_s *hm_getSensorData() { return &sensorData; }
 
-SensorProperties_s *HM_GetSensorProperties() { return &sensorProperties; }
+SensorProperties_s *hm_getSensorProperties() { return &sensorProperties; }
 
-void HM_EnableSimMode(CircularBuffer_s *rxBuffer) {}
+void hm_enableSimMode(CircularBuffer_s *rxBuffer) {}
 
-void HM_DisableSimMode() {}
+void hm_disableSimMode() {}
 
-bool HM_InSimMode() { return false; }
+bool hm_inSimMode() { return false; }
 }  // extern "C"

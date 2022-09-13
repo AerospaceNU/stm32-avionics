@@ -38,7 +38,7 @@ typedef struct {
   double qw;
 } FilterData_s;
 
-void filterInit(double dt);
+void filter_init(double dt);
 
 /**
  * @brief Applies filters based on current sensor data
@@ -47,21 +47,21 @@ void filterInit(double dt);
  * @param hasPassedApogee: Whether rocket has passed apogee (true) or not
  * (false)
  */
-void filterApplyData(SensorData_s* curSensorVals,
-                     SensorProperties_s* sensorProperties,
-                     bool hasPassedApogee);
+void filter_applyData(SensorData_s* curSensorVals,
+                      SensorProperties_s* sensorProperties,
+                      bool hasPassedApogee);
 
 /**
  * @brief Get average pressure from sensor data
  * @param curSensorVals: Current sensor values to get average pressure of
  */
-double filterGetAveragePressure(SensorData_s* curSensorVals);
+double filter_getAveragePressure(SensorData_s* curSensorVals);
 
 /**
  * @brief Adds reference pressure to the running list of pressures
  * @param curSensorVals: Current sensor values to use pressure from
  */
-void filterAddPressureRef(SensorData_s* curSensorVals);
+void filter_addPressureRef(SensorData_s* curSensorVals);
 
 /**
  * @brief Adds a reference acceleration value to calculate gravity direction
@@ -69,30 +69,30 @@ void filterAddPressureRef(SensorData_s* curSensorVals);
  * Does not take in any values, just controls when the filter fetches them
  */
 
-void filterAddGravityRef();
+void filter_addGravityRef();
 
 /**
  * @brief Adds a reference angular velocity reading from all gyroscopes
  * Used to calculate zero offset to correctly bias the gyroscopes
  */
 
-void filterAddGyroRef();
+void filter_addGyroRef();
 
 /**
  * @brief Sets reference pressure used for converting pressure to altitude
  * @param pres: Must be same unit as sensor data pressure
  */
-void filterSetPressureRef(double pres);
+void filter_setPressureRef(double pres);
 
 /**
  * @brief Returns reference pressure
  */
-double filterGetPressureRef();
+double filter_getPressureRef();
 
 /**
  * @brief Returns most recent filtered data
  */
-FilterData_s* filterGetData();
+FilterData_s* filter_getData();
 
 #ifdef __cplusplus
 }

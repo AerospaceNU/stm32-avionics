@@ -11,7 +11,7 @@
 
 CsvReplay::CsvReplay(std::string path) : doc{path} {}
 
-void CsvReplay::GetNext(SensorData_s* data) {
+void CsvReplay::getNext(SensorData_s* data) {
   try {
     char rowName[30];
 

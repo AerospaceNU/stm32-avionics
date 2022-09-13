@@ -128,7 +128,7 @@ static void parseString(GpsCtrl_s *gps, char line[]) {
   }
 }
 
-void gps_process_data(GpsCtrl_s *gps) {
+static void gps_processData(GpsCtrl_s *gps) {
   char *buff = &gps->rx_buff[0];
   // if half is true, increment buff pointer by 2048
   if (gps->half) buff += GPS_RX_BUF_HALF;
@@ -162,9 +162,9 @@ void gps_RxCpltCallback(void *gps) {
   pgps->half = true;
 }
 
-bool gps_new_data(GpsCtrl_s *gps) {
+bool gps_newData(GpsCtrl_s *gps) {
   if (gps->data_available) {
-    gps_process_data(gps);
+    gps_processData(gps);
     return true;
   }
   return false;
@@ -174,9 +174,10 @@ void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type) {
   gps->gps_uart = huart;
   gps->type = type;
 
-  register_HAL_UART_RxHalfCpltCallback(gps->gps_uart, gps_RxHalfCpltCallback,
-                                       gps);
-  register_HAL_UART_RxCpltCallback(gps->gps_uart, gps_RxCpltCallback, gps);
+  halCallbacks_registerUartRxHalfCpltCallback(gps->gps_uart,
+                                              gps_RxHalfCpltCallback, gps);
+  halCallbacks_registerUartRxCpltCallback(gps->gps_uart, gps_RxCpltCallback,
+                                          gps);
 
   HAL_UART_Receive_DMA(gps->gps_uart, (uint8_t *)gps->rx_buff,
                        sizeof(gps->rx_buff));

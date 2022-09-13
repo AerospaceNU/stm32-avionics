@@ -31,23 +31,23 @@
 #define X_AXIS_ENABLE (1 << 0)
 
 static uint8_t whoAmI(AccelH3lis331dlCtrl_s *sensor) {
-  return SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_WHO_AM_I);
+  return spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_WHO_AM_I);
 }
 
 static void accelH3lis331dl_getDataRaw(AccelH3lis331dlCtrl_s *sensor) {
   // Takes x, y, and z axis readings
   uint8_t x_l =
-      SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_X_L);
+      spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_X_L);
   uint8_t x_h =
-      SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_X_H);
+      spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_X_H);
   uint8_t y_l =
-      SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Y_L);
+      spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Y_L);
   uint8_t y_h =
-      SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Y_H);
+      spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Y_H);
   uint8_t z_l =
-      SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Z_L);
+      spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Z_L);
   uint8_t z_h =
-      SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Z_H);
+      spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Z_H);
 
   // Writes combined h and l byte to struct
   sensor->val.raw.x = ((int16_t)x_h << 8) | (x_l);
@@ -84,7 +84,7 @@ bool accelH3lis331dl_init(AccelH3lis331dlCtrl_s *sensor, SpiCtrl_t spi) {
   if (me == 0x00 || me == 0xFF) {
     return false;
   }
-  SPI_WriteRegister(&sensor->spi, REG_CTRL1,
+  spi_writeRegister(&sensor->spi, REG_CTRL1,
                     PWR_MODE_ON | DATA_RATE_100HZ | Z_AXIS_ENABLE |
                         Y_AXIS_ENABLE | X_AXIS_ENABLE);
   accelH3lis331dl_getGain(sensor);

@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-double small_strtod(char* str, char** endptr);
+double smallStrtod(char* str, char** endptr);
 
 #ifdef __cplusplus
 }

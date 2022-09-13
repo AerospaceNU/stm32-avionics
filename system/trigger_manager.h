@@ -44,27 +44,27 @@ typedef struct {
 /**
  * @brief Initializes Trigger Manager
  */
-void TriggerManager_Init();
+void triggerManager_init();
 
 /**
  * @brief Sets apogee timestamp
  * @param timestamp: Timestamp of apogee detection
  */
-void TriggerManager_SetApogeeTime(uint64_t timestamp);
+void triggerManager_setApogeeTime(uint64_t timestamp);
 
 /**
  * @brief Returns which triggers have happened and which have not
  * @return Status of triggers as an 8 bit int where each bit represents if that
  * trigger has happened
  */
-uint8_t TriggerManager_Status();
+uint8_t triggerManager_status();
 
 /**
  * @brief Set the status of triggers based on a 1 byte input
  * @param Status of triggers as an 8 bit int where each bit represents if that
  * trigger has happened
  */
-void TriggerManager_SetTriggerFireStatus(uint8_t status);
+void triggerManager_setTriggerFireStatus(uint8_t status);
 
 /**
  * @brief Update the TriggerManager with new data
@@ -73,7 +73,7 @@ void TriggerManager_SetTriggerFireStatus(uint8_t status);
  * @param hasPassedApogee: Whether or not we have passed apogee
  * @param hasPassedTouchdown: Whether or not we have passed touchdown
  */
-void TriggerManager_Update(FilterData_s* filterData, bool hasPassedLaunch,
+void triggerManager_update(FilterData_s* filterData, bool hasPassedLaunch,
                            bool hasPassedApogee, bool hasPassedTouchdown);
 
 /**
@@ -83,7 +83,7 @@ void TriggerManager_Update(FilterData_s* filterData, bool hasPassedLaunch,
  * the fire and the trigger will not fire again during a flight without
  * restarting the board
  */
-void TriggerManager_TriggerFire(uint8_t triggerNum, bool logFire);
+void triggerManager_triggerFire(uint8_t triggerNum, bool logFire);
 
 #ifdef __cplusplus
 }

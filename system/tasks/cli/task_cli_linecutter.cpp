@@ -5,26 +5,26 @@
 #include "cli_tasks.h"
 #include "hardware_manager.h"
 
-void cli_tasks::cliSendLineCutterstring() {
-  CliOptionVals_s options = cliGetOptions();
+void CliTasks::sendLineCutterString() {
+  CliOptionVals_s options = cli_getOptions();
   if (!options.lcId || !options.lcCmd) {
-    cliSendAck(false, "Command (-c) and ID (-i) required but not provided");
+    cli_sendAck(false, "Command (-c) and ID (-i) required but not provided");
     return;  // verify non-void pointers
   }
 
   char* endPtr;
   int id = strtol(options.lcId, &endPtr, 0);
   if (*endPtr != '\0') {
-    cliSendAck(false, "Got invalid LC ID");
+    cli_sendAck(false, "Got invalid LC ID");
     return;
   }
 
   if (*options.lcCmd == '\0') {
-    cliSendAck(false, "Got invalid LC command");
+    cli_sendAck(false, "Got invalid LC command");
     return;
   }
 
-  cliSendAck(true, nullptr);
-  HM_LineCutterSendString(id, options.lcCmd);
-  cliSendComplete(true, nullptr);
+  cli_sendAck(true, nullptr);
+  hm_lineCutterSendString(id, options.lcCmd);
+  cli_sendComplete(true, nullptr);
 }

@@ -221,7 +221,7 @@ static size_t SENSOR_DATA_SIZE = sizeof(SensorData_s);
 static bool inSim = false;
 static CircularBuffer_s *simRxBuffer = NULL;
 
-void HM_HardwareInit() {
+void hm_hardwareInit() {
   /* Accelerometers */
 #if HAS_DEV(ACCEL_H3LIS331DL)
   for (int i = 0; i < NUM_ACCEL_H3LIS331DL; i++) {
@@ -268,7 +268,7 @@ void HM_HardwareInit() {
   /* Buzzers */
 #if HAS_DEV(BUZZER_PWM)
   for (int i = 0; i < NUM_BUZZER_PWM; i++) {
-    buzzerPwmInit(&buzzerPwm[i], buzzerPwmHtim[i], buzzerPwmChannel[i], 500);
+    buzzerPwm_init(&buzzerPwm[i], buzzerPwmHtim[i], buzzerPwmChannel[i], 500);
     hardwareStatusBuzzer[FIRST_ID_BUZZER_PWM + i] = true;
   }
 #endif  // HAS_DEV(BUZZER_PWM)
@@ -276,7 +276,7 @@ void HM_HardwareInit() {
   /* DC Motors */
 #if HAS_DEV(DC_MOTOR_PWM)
   for (int i = 0; i < NUM_DC_MOTOR_PWM; i++) {
-    dcMotorPwmInit(&dcMotorPwm[i], dcMotorPwmHtim[i], dcMotorPwmChannel[i]);
+    dcMotorPwm_init(&dcMotorPwm[i], dcMotorPwmHtim[i], dcMotorPwmChannel[i]);
     hardwareStatusDcMotor[FIRST_ID_DC_MOTOR_PWM + i] = true;
   }
 #endif  // HAS_DEV(DC_MOTOR_PWM)
@@ -284,8 +284,9 @@ void HM_HardwareInit() {
   /* Flash */
 #if HAS_DEV(FLASH_S25FLX)
   for (int i = 0; i < NUM_FLASH_S25FLX; i++) {
-    S25FLX_init(&(flashS25flx[i]), flashS25flxHspi[i], flashS25flxCsGpioPort[i],
-                flashS25flxCsPin[i], kFlashSizeBytes[i]);
+    flashS25flx_init(&(flashS25flx[i]), flashS25flxHspi[i],
+                     flashS25flxCsGpioPort[i], flashS25flxCsPin[i],
+                     kFlashSizeBytes[i]);
     hardwareStatusFlash[FIRST_ID_FLASH_S25FLX + i] = true;
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
@@ -331,7 +332,7 @@ void HM_HardwareInit() {
   for (int i = 0; i < NUM_PYRO_DIGITAL; i++) {
     pyroDigital[i].port = pyroDigitalGpioPort[i];
     pyroDigital[i].pin = pyroDigitalPin[i];
-    PyroDigital_init(&pyroDigital[i]);
+    pyroDigital_init(&pyroDigital[i]);
     hardwareStatusPyro[FIRST_ID_PYRO_DIGITAL + i] = true;
   }
 #endif  // HAS_DEV(PYRO_DIGITAL)
@@ -356,8 +357,8 @@ void HM_HardwareInit() {
   // Why???
   double voltageDividerMax = 3.3 * (127.0 / 27.0) * 10 / 3;
   for (int i = 0; i < NUM_PYRO_CONT_ADC; i++) {
-    adcInit(&pyroContAdc[i], pyroContAdcHadc[i], pyroContAdcRank[i], 0,
-            voltageDividerMax, true);
+    adcDev_init(&pyroContAdc[i], pyroContAdcHadc[i], pyroContAdcRank[i], 0,
+                voltageDividerMax, true);
     hardwareStatusPyroCont[FIRST_ID_PYRO_CONT_ADC + i] = true;
   }
 #endif  // HAS_DEV(PYRO_CONT_ADC)
@@ -398,7 +399,7 @@ void HM_HardwareInit() {
 
     // Enable our radio and configure pins
     hardwareStatusRadio[FIRST_ID_RADIO_TI_433 + i] =
-        tiRadio_Init(&radioTi433[i]);
+        tiRadio_init(&radioTi433[i]);
   }
 #endif  // HAS_DEV(RADIO_TI_433)
 
@@ -431,7 +432,7 @@ void HM_HardwareInit() {
 
     // Enable our radio and configure pins
     hardwareStatusRadio[FIRST_ID_RADIO_TI_915 + i] =
-        tiRadio_Init(&radioTi915[i]);
+        tiRadio_init(&radioTi915[i]);
 
 #if (RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200)
     // PA/LNA control pins. TODO this seems somewhat code-smell-y since we
@@ -441,9 +442,9 @@ void HM_HardwareInit() {
     // is fine since we never go into sleep state anyways
 
     // IO0 is PA_EN, so should be high in TX
-    tiRadio_ConfigGPIO(&radioTi915[i], TIRADIO_IOCFG0, TIRADIO_nPA_PD, true);
+    tiRadio_configGpio(&radioTi915[i], TIRADIO_IOCFG0, TIRADIO_nPA_PD, true);
     // IO2 is LNA_EN, so high in RX
-    tiRadio_ConfigGPIO(&radioTi915[i], TIRADIO_IOCFG2, TIRADIO_nLNA_PD, true);
+    tiRadio_configGpio(&radioTi915[i], TIRADIO_IOCFG2, TIRADIO_nLNA_PD, true);
 
     // Enable HGM on CC1200s TODO: Make function to enable HGM in radio
     HAL_GPIO_WritePin(radioTi915HgmGpioPort[i], radioTi915HgmPin[i],
@@ -456,14 +457,14 @@ void HM_HardwareInit() {
 #if HAS_DEV(SERVO_PWM)
   for (int i = 0; i < NUM_SERVO_PWM; i++) {
     hardwareStatusServo[FIRST_ID_SERVO_PWM + i] =
-        servoPwmInit(&servoPwm[i], servoPwmHtim[i], servoPwmChannel[i], 20,
-                     servoPwmMinPulseMs[i], servoPwmMaxPulseMs[i], -90, 90);
+        servoPwm_init(&servoPwm[i], servoPwmHtim[i], servoPwmChannel[i], 20,
+                      servoPwmMinPulseMs[i], servoPwmMaxPulseMs[i], -90, 90);
   }
 #endif  // HAS_DEV(SERVO_PWM)
 
   /* USB */
 #if HAS_DEV(USB_STD)
-  usbStdInit();
+  usbStd_init();
   hardwareStatusUsb[FIRST_ID_USB_STD] = true;
 #endif  // HAS_DEV(USB_STD)
 
@@ -476,9 +477,9 @@ void HM_HardwareInit() {
   // buffered
   // TODO why does 67 make things work?
   for (int i = 0; i < NUM_VBAT_ADC; i++) {
-    adcInit(&vbatAdc[i], vbatAdcHadc[i], vbatAdcRank[i], 0, vbatMax, true);
-    adcInit(&vbatAdcCurrent[i], vbatAdcCurrentHadc[i], vbatAdcCurrentRank[i],
-            -12.5, 17.5, true);
+    adcDev_init(&vbatAdc[i], vbatAdcHadc[i], vbatAdcRank[i], 0, vbatMax, true);
+    adcDev_init(&vbatAdcCurrent[i], vbatAdcCurrentHadc[i],
+                vbatAdcCurrentRank[i], -12.5, 17.5, true);
     hardwareStatusVbat[FIRST_ID_VBAT_ADC + i] = true;
     hardwareStatusVbat[FIRST_ID_VBAT_ADC + i] = true;
   }
@@ -495,36 +496,38 @@ void HM_HardwareInit() {
 #endif  // HAS_DEV(VBAT_INA226)
 }
 
-uint32_t HM_Millis() { return HAL_GetTick(); }
+uint32_t hm_millis() { return HAL_GetTick(); }
 
-bool HM_FlashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
+bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
                        uint8_t *pData) {
 #if HAS_DEV(FLASH_S25FLX)
   if (IS_DEVICE(flashId, FLASH_S25FLX)) {
-    return S25FLX_read_start(&(flashS25flx[flashId - FIRST_ID_FLASH_S25FLX]),
-                             startLoc, numBytes, pData);
+    return flashS25flx_readStart(
+        &(flashS25flx[flashId - FIRST_ID_FLASH_S25FLX]), startLoc, numBytes,
+        pData);
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
 
   return false;
 }
 
-bool HM_FlashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
+bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
                         uint8_t *data) {
 #if HAS_DEV(FLASH_S25FLX)
   if (IS_DEVICE(flashId, FLASH_S25FLX)) {
-    return S25FLX_write_start(&(flashS25flx[flashId - FIRST_ID_FLASH_S25FLX]),
-                              startLoc, numBytes, data);
+    return flashS25flx_writeStart(
+        &(flashS25flx[flashId - FIRST_ID_FLASH_S25FLX]), startLoc, numBytes,
+        data);
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
 
   return false;
 }
 
-bool HM_FlashEraseSectorStart(int flashId, uint32_t sectorNum) {
+bool hm_flashEraseSectorStart(int flashId, uint32_t sectorNum) {
 #if HAS_DEV(FLASH_S25FLX)
   if (IS_DEVICE(flashId, FLASH_S25FLX)) {
-    return S25FLX_erase_sector_start(
+    return flashS25flx_eraseSectorStart(
         &(flashS25flx[flashId - FIRST_ID_FLASH_S25FLX]), sectorNum);
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
@@ -532,10 +535,10 @@ bool HM_FlashEraseSectorStart(int flashId, uint32_t sectorNum) {
   return false;
 }
 
-bool HM_FlashEraseChipStart(int flashId) {
+bool hm_flashEraseChipStart(int flashId) {
 #if HAS_DEV(FLASH_S25FLX)
   if (IS_DEVICE(flashId, FLASH_S25FLX)) {
-    return S25FLX_erase_chip_start(
+    return flashS25flx_eraseChipStart(
         &(flashS25flx[flashId - FIRST_ID_FLASH_S25FLX]));
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
@@ -543,11 +546,11 @@ bool HM_FlashEraseChipStart(int flashId) {
   return false;
 }
 
-bool HM_FlashIsReadComplete(int flashId) {
+bool hm_flashIsReadComplete(int flashId) {
 #if HAS_DEV(FLASH_S25FLX)
   if (IS_DEVICE(flashId, FLASH_S25FLX)) {
 #ifdef USE_S25FLx_DMA
-    return S25FLX_is_read_complete(
+    return flashS25flx_isReadComplete(
         &(flashS25flx[flashId - FIRST_ID_FLASH_S25FLX]));
 #else
     return true;
@@ -558,10 +561,10 @@ bool HM_FlashIsReadComplete(int flashId) {
   return false;
 }
 
-bool HM_FlashIsWriteComplete(int flashId) {
+bool hm_flashIsWriteComplete(int flashId) {
 #if HAS_DEV(FLASH_S25FLX)
   if (IS_DEVICE(flashId, FLASH_S25FLX)) {
-    return S25FLX_is_write_complete(
+    return flashS25flx_isWriteComplete(
         &(flashS25flx[flashId - FIRST_ID_FLASH_S25FLX]));
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
@@ -569,10 +572,10 @@ bool HM_FlashIsWriteComplete(int flashId) {
   return false;
 }
 
-bool HM_FlashIsEraseComplete(int flashId) {
+bool hm_flashIsEraseComplete(int flashId) {
 #if HAS_DEV(FLASH_S25FLX)
   if (IS_DEVICE(flashId, FLASH_S25FLX)) {
-    return S25FLX_is_erase_complete(
+    return flashS25flx_isEraseComplete(
         &(flashS25flx[flashId - FIRST_ID_FLASH_S25FLX]));
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
@@ -580,39 +583,39 @@ bool HM_FlashIsEraseComplete(int flashId) {
   return false;
 }
 
-void HM_BuzzerSetFrequency(int buzzerId, float fHz) {
+void hm_buzzerSetFrequency(int buzzerId, float fHz) {
 #if HAS_DEV(BUZZER_PWM)
   if (IS_DEVICE(buzzerId, BUZZER_PWM)) {
-    buzzerPwmSetFrequency(&buzzerPwm[buzzerId - FIRST_ID_BUZZER_PWM], fHz);
+    buzzerPwm_setFrequency(&buzzerPwm[buzzerId - FIRST_ID_BUZZER_PWM], fHz);
   }
 #endif  // HAS_DEV(BUZZER_PWM)
 }
 
-void HM_BuzzerStart(int buzzerId) {
+void hm_buzzerStart(int buzzerId) {
 #if HAS_DEV(BUZZER_PWM)
   if (IS_DEVICE(buzzerId, BUZZER_PWM)) {
-    buzzerPwmStart(&buzzerPwm[buzzerId - FIRST_ID_BUZZER_PWM]);
+    buzzerPwm_start(&buzzerPwm[buzzerId - FIRST_ID_BUZZER_PWM]);
   }
 #endif  // HAS_DEV(BUZZER_PWM)
 }
 
-void HM_BuzzerStop(int buzzerId) {
+void hm_buzzerStop(int buzzerId) {
 #if HAS_DEV(BUZZER_PWM)
   if (IS_DEVICE(buzzerId, BUZZER_PWM)) {
-    buzzerPwmStop(&buzzerPwm[buzzerId - FIRST_ID_BUZZER_PWM]);
+    buzzerPwm_stop(&buzzerPwm[buzzerId - FIRST_ID_BUZZER_PWM]);
   }
 #endif  // HAS_DEV(BUZZER_PWM)
 }
 
-void HM_ServoSetAngle(int servoId, float degrees) {
+void hm_servoSetAngle(int servoId, float degrees) {
 #if HAS_DEV(SERVO_PWM)
   if (IS_DEVICE(servoId, SERVO_PWM)) {
-    servoPwmSetAngle(&servoPwm[servoId - FIRST_ID_SERVO_PWM], degrees);
+    servoPwm_setAngle(&servoPwm[servoId - FIRST_ID_SERVO_PWM], degrees);
   }
 #endif  // HAS_DEV(SERVO_PWM)
 }
 
-void HM_LedSet(int ledId, bool set) {
+void hm_ledSet(int ledId, bool set) {
 #if HAS_DEV(LED_DIGITAL)
   if (IS_DEVICE(ledId, LED_DIGITAL)) {
     HAL_GPIO_WritePin(ledDigitalGpioPort[ledId - FIRST_ID_LED_DIGITAL],
@@ -621,7 +624,7 @@ void HM_LedSet(int ledId, bool set) {
 #endif  // HAS_DEV(LED_DIGITAL)
 }
 
-void HM_LedToggle(int ledId) {
+void hm_ledToggle(int ledId) {
 #if HAS_DEV(LED_DIGITAL)
   if (IS_DEVICE(ledId, LED_DIGITAL)) {
     HAL_GPIO_TogglePin(ledDigitalGpioPort[ledId - FIRST_ID_LED_DIGITAL],
@@ -630,61 +633,61 @@ void HM_LedToggle(int ledId) {
 #endif  // HAS_DEV(LED_DIGITAL)
 }
 
-bool HM_RadioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
+bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
 #if HAS_DEV(RADIO_TI_433)
   if (IS_DEVICE(radioNum, RADIO_TI_433)) {
     TiRadioCtrl_s *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
-    return tiRadio_AddTxPacket(pRadio, data, pRadio->payloadSize);
+    return tiRadio_addTxPacket(pRadio, data, pRadio->payloadSize);
   }
 #endif  // HAS_DEV(RADIO_TI_433)
 
 #if HAS_DEV(RADIO_TI_915)
   if (IS_DEVICE(radioNum, RADIO_TI_915)) {
     TiRadioCtrl_s *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
-    return tiRadio_AddTxPacket(pRadio, data, pRadio->payloadSize);
+    return tiRadio_addTxPacket(pRadio, data, pRadio->payloadSize);
   }
 #endif  // HAS_DEV(RADIO_TI_915)
 
   return false;
 }
 
-void HM_RadioUpdate() {
+void hm_radioUpdate() {
 #if HAS_DEV(RADIO_TI_433)
   for (int i = 0; i < NUM_RADIO_TI_433; i++) {
-    tiRadio_Update(&radioTi433[i]);
+    tiRadio_update(&radioTi433[i]);
   }
 #endif  // HAS_DEV(RADIO_TI_433)
 
 #if HAS_DEV(RADIO_TI_915)
   for (int i = 0; i < NUM_RADIO_TI_915; i++) {
-    tiRadio_Update(&radioTi915[i]);
+    tiRadio_update(&radioTi915[i]);
   }
 #endif  // HAS_DEV(RADIO_TI_915)
 }
 
-void HM_RadioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {
+void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {
 #if HAS_DEV(RADIO_TI_433)
   if (IS_DEVICE(radioNum, RADIO_TI_433)) {
     TiRadioCtrl_s *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
-    tiRadio_RegisterConsumer(pRadio, rxBuffer);
+    tiRadio_registerConsumer(pRadio, rxBuffer);
   }
 #endif  // HAS_DEV(RADIO_TI_433)
 
 #if HAS_DEV(RADIO_TI_915)
   if (IS_DEVICE(radioNum, RADIO_TI_915)) {
     TiRadioCtrl_s *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
-    tiRadio_RegisterConsumer(pRadio, rxBuffer);
+    tiRadio_registerConsumer(pRadio, rxBuffer);
   }
 #endif  // HAS_DEV(RADIO_TI_915)
 }
 
-void HM_RadioSetChannel(int radioNum, int channel) {
+void hm_radioSetChannel(int radioNum, int channel) {
 #if HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915)
   // We set channels by starting from channel 0's frequency and incrementing
   // by a fixed bandwidth between channels
   float centerFrequency;
   TiRadioCtrl_s *rad = NULL;
-  enum TIRADIO_Band band;
+  TiRadioBand_e band;
 
 #if HAS_DEV(RADIO_TI_433)
   if (IS_DEVICE(radioNum, RADIO_TI_433)) {
@@ -703,41 +706,41 @@ void HM_RadioSetChannel(int radioNum, int channel) {
 #endif  // HAS_DEV(RADIO_TI_915)
 
   centerFrequency += channel * RADIO_CHANNEL_BANDWIDTH;
-  tiRadio_SetRadioFrequency(rad, band, centerFrequency);
+  tiRadio_setRadioFrequency(rad, band, centerFrequency);
 #endif  // HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915)
 }
 
-bool HM_UsbIsConnected(int usbId) {
+bool hm_usbIsConnected(int usbId) {
 #if HAS_DEV(USB_STD)
   if (IS_DEVICE(usbId, USB_STD)) {
-    return usbStdIsConnected();
+    return usbStd_isConnected();
   }
 #endif  // HAS_DEV(USB_STD)
 
   return false;
 }
 
-bool HM_UsbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
+bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
 #if HAS_DEV(USB_STD)
   if (IS_DEVICE(usbId, USB_STD)) {
-    return usbStdTransmit(data, numBytes);
+    return usbStd_transmit(data, numBytes);
   }
 #endif  // HAS_DEV(USB_STD)
 
   return false;
 }
 
-CircularBuffer_s *HM_UsbGetRxBuffer(int usbId) {
+CircularBuffer_s *hm_usbGetRxBuffer(int usbId) {
 #if HAS_DEV(USB_STD)
   if (IS_DEVICE(usbId, USB_STD)) {
-    return usbStdGetRxBuffer();
+    return usbStd_getRxBuffer();
   }
 #endif  // HAS_DEV(USB_STD)
 
   return NULL;
 }
 
-bool HM_BleClientConnected(int bleClientId) {
+bool hm_bleClientConnected(int bleClientId) {
 #if HAS_DEV(BLE_CLIENT_STD)
   if (IS_DEVICE(bleClientId, BLE_CLIENT_STD)) {
     return bleClientStd[bleClientId - FIRST_ID_BLE_CLIENT_STD]
@@ -749,7 +752,7 @@ bool HM_BleClientConnected(int bleClientId) {
   return false;
 }
 
-bool HM_BleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
+bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
 #if HAS_DEV(BLE_CLIENT_STD)
   if (IS_DEVICE(bleClientId, BLE_CLIENT_STD)) {
     return bleClientStd[bleClientId - FIRST_ID_BLE_CLIENT_STD]
@@ -762,7 +765,7 @@ bool HM_BleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
   return false;
 }
 
-CircularBuffer_s *HM_BleClientGetRxBuffer(int bleClientId) {
+CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) {
 #if HAS_DEV(BLE_CLIENT_STD)
   if (IS_DEVICE(bleClientId, BLE_CLIENT_STD)) {
     return &bleClientStd[bleClientId - FIRST_ID_BLE_CLIENT_STD].parsedBuffer;
@@ -771,7 +774,7 @@ CircularBuffer_s *HM_BleClientGetRxBuffer(int bleClientId) {
   return NULL;
 }
 
-void HM_BleTick() {
+void hm_bleTick() {
 #if HAS_DEV(BLE_CHIP_NRF)
   for (int i = 0; i < NUM_BLE_CHIP_NRF; i++) {
     bleChipNrf_tick(&bleChipNrf[i]);
@@ -791,7 +794,7 @@ void HM_BleTick() {
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
 }
 
-LineCutterData_s *HM_GetLineCutterData(int lineCutterId) {
+LineCutterData_s *hm_getLineCutterData(int lineCutterId) {
 #if HAS_DEV(LINE_CUTTER_BLE)
   if (IS_DEVICE(lineCutterId, LINE_CUTTER_BLE)) {
     return &lineCutterBle[lineCutterId - FIRST_ID_LINE_CUTTER_BLE].lastData;
@@ -800,7 +803,7 @@ LineCutterData_s *HM_GetLineCutterData(int lineCutterId) {
   return NULL;
 }
 
-LineCutterFlightVars_s *HM_GetLineCutterFlightVariables(int lineCutterId) {
+LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
 #if HAS_DEV(LINE_CUTTER_BLE)
   if (IS_DEVICE(lineCutterId, LINE_CUTTER_BLE)) {
     return &lineCutterBle[lineCutterId - FIRST_ID_LINE_CUTTER_BLE].flightVars;
@@ -809,7 +812,7 @@ LineCutterFlightVars_s *HM_GetLineCutterFlightVariables(int lineCutterId) {
   return NULL;
 }
 
-bool HM_LineCutterSendString(int lineCutterNumber, char *string) {
+bool hm_lineCutterSendString(int lineCutterNumber, char *string) {
   if (!string) return false;
 #if HAS_DEV(LINE_CUTTER_BLE)
   for (int i = 0; i < NUM_LINE_CUTTER_BLE; i++) {
@@ -821,7 +824,7 @@ bool HM_LineCutterSendString(int lineCutterNumber, char *string) {
   return false;
 }
 
-bool HM_LineCuttersSendCut(int chan) {
+bool hm_lineCuttersSendCut(int chan) {
   // We want to check that both succeed, not that one succeeds
   // This means we gotta be careful about short-circuiting!
   bool ret = true;
@@ -841,7 +844,7 @@ bool HM_LineCuttersSendCut(int chan) {
   return ret;
 }
 
-void HM_WatchdogRefresh() {
+void hm_watchdogRefresh() {
 #if HAS_DEV(WATCHDOG_INTERNAL)
   for (int i = 0; i < NUM_WATCHDOG_INTERNAL; i++) {
     HAL_IWDG_Refresh(watchdogInternalHiwdg[i]);
@@ -849,65 +852,65 @@ void HM_WatchdogRefresh() {
 #endif  // HAS_DEV(WATCHDOG_INTERNAL)
 }
 
-void HM_PyroFire(int pyroId, uint32_t duration) {
+void hm_pyroFire(int pyroId, uint32_t duration) {
 #if HAS_DEV(PYRO_DIGITAL)
   if (IS_DEVICE(pyroId, PYRO_DIGITAL)) {
-    PyroDigital_start(&pyroDigital[pyroId - FIRST_ID_PYRO_DIGITAL], duration);
+    pyroDigital_start(&pyroDigital[pyroId - FIRST_ID_PYRO_DIGITAL], duration);
   }
 #endif  // HAS_DEV(PYRO_DIGITAL)
 }
 
-void HM_PyroSet(int pyroId, bool enable) {
+void hm_pyroSet(int pyroId, bool enable) {
 #if HAS_DEV(PYRO_DIGITAL)
   if (IS_DEVICE(pyroId, PYRO_DIGITAL)) {
-    PyroDigital_set(&pyroDigital[pyroId - FIRST_ID_PYRO_DIGITAL], enable);
+    pyroDigital_set(&pyroDigital[pyroId - FIRST_ID_PYRO_DIGITAL], enable);
   }
 #endif  // HAS_DEV(PYRO_DIGITAL)
 }
 
-void HM_PyroUpdate() {
+void hm_pyroUpdate() {
 #if HAS_DEV(PYRO_DIGITAL)
   for (int i = 0; i < NUM_PYRO_DIGITAL; i++) {
-    PyroDigital_tick(&pyroDigital[i]);
+    pyroDigital_tick(&pyroDigital[i]);
   }
 #endif  // HAS_DEV(PYRO_DIGITAL)
 }
 
-void HM_DCMotorSetPercent(int dcMotorId, double percent) {
+void hm_dcMotorSetPercent(int dcMotorId, double percent) {
   if (fabs(percent) > 100) return;
 
 #if HAS_DEV(DC_MOTOR_PWM)
   if (IS_DEVICE(dcMotorId, DC_MOTOR_PWM)) {
-    dcMotorPwmSetPercent(&dcMotorPwm[dcMotorId - FIRST_ID_DC_MOTOR_PWM],
-                         percent);
+    dcMotorPwm_setPercent(&dcMotorPwm[dcMotorId - FIRST_ID_DC_MOTOR_PWM],
+                          percent);
   }
 #endif  // HAS_DEV(DC_MOTOR_PWM)
 }
 
-static void HM_SimReadSensorData() {
+static void hm_simReadSensorData() {
   size_t buffCount =
-      cbCount(simRxBuffer);  // This might change if in middle of reception,
-                             // so use consistently across function
+      cb_count(simRxBuffer);  // This might change if in middle of reception,
+                              // so use consistently across function
 
   // If buffer full, throw everything away since it's probably bad
-  if (cbFull(simRxBuffer)) {
-    cbFlush(simRxBuffer);
+  if (cb_full(simRxBuffer)) {
+    cb_flush(simRxBuffer);
   } else {
     // Buffer isn't full, continue as normal
     // First throw away any old data that wasn't processed in time
     if (buffCount > SENSOR_DATA_SIZE) {
-      cbDequeue(simRxBuffer, buffCount - SENSOR_DATA_SIZE);
+      cb_dequeue(simRxBuffer, buffCount - SENSOR_DATA_SIZE);
       buffCount = SENSOR_DATA_SIZE;
     }
     // If right amount of bytes are seen, grab them as sensor data
     if (buffCount == SENSOR_DATA_SIZE) {
-      cbPeek(simRxBuffer, &sensorData, &SENSOR_DATA_SIZE);
-      cbFlush(simRxBuffer);
+      cb_peek(simRxBuffer, &sensorData, &SENSOR_DATA_SIZE);
+      cb_flush(simRxBuffer);
     }
   }
 }
 
-void HM_ReadSensorData() {
+void hm_readSensorData() {
   if (!inSim) {
     // Accelerometer data
 #if HAS_DEV(ACCEL_H3LIS331DL)
@@ -931,7 +934,7 @@ void HM_ReadSensorData() {
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
     // TODO: Poll GPS status to determine if data is good
     for (int i = 0; i < NUM_GPS_STD + NUM_GPS_UBLOX; i++) {
-      gps_new_data(&gps[i]);
+      gps_newData(&gps[i]);
       sensorData.gpsData[i + FIRST_ID_GPS_STD] = gps[i].data;
     }
 #endif  // HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
@@ -948,8 +951,8 @@ void HM_ReadSensorData() {
 #if HAS_DEV(PYRO_CONT_ADC)
     for (int i = 0; i < NUM_PYRO_CONT_ADC; i++) {
       float adcVal = 0;
-      adcStartSingleRead(&pyroContAdc[i]);
-      sensorData.pyroContData[i] = adcGetValue(&pyroContAdc[i], &adcVal, 5)
+      adcDev_startSingleRead(&pyroContAdc[i]);
+      sensorData.pyroContData[i] = adcDev_getValue(&pyroContAdc[i], &adcVal, 5)
                                        ? adcVal > PYRO_CONTINUITY_THRESHOLD
                                        : false;
     }
@@ -959,9 +962,9 @@ void HM_ReadSensorData() {
 #if HAS_DEV(VBAT_ADC)
     for (int i = 0; i < NUM_VBAT_ADC; i++) {
       float adcVal = 0;
-      adcStartSingleRead(&vbatAdc[i]);
+      adcDev_startSingleRead(&vbatAdc[i]);
       sensorData.vbatData[FIRST_ID_VBAT_ADC + i] =
-          adcGetValue(&vbatAdc[i], &adcVal, 5) ? adcVal : 0;
+          adcDev_getValue(&vbatAdc[i], &adcVal, 5) ? adcVal : 0;
     }
 #endif  // HAS_DEV(VBAT_ADC)
 #if HAS_DEV(VBAT_INA226)
@@ -973,23 +976,23 @@ void HM_ReadSensorData() {
 
     // Timestamp data
     // TODO: Make sensor data timestamp get time from PPS-updated timer
-    sensorData.timestampS = HM_Millis();
+    sensorData.timestampS = hm_millis();
 
   } else {
     // Simming
-    HM_SimReadSensorData();
+    hm_simReadSensorData();
   }
 }
 
-SensorData_s *HM_GetSensorData() { return &sensorData; }
+SensorData_s *hm_getSensorData() { return &sensorData; }
 
-SensorProperties_s *HM_GetSensorProperties() { return &sensorProperties; }
+SensorProperties_s *hm_getSensorProperties() { return &sensorProperties; }
 
-void HM_EnableSimMode(CircularBuffer_s *rxBuffer) {
+void hm_enableSimMode(CircularBuffer_s *rxBuffer) {
   inSim = true;
   simRxBuffer = rxBuffer;
 }
 
-void HM_DisableSimMode(CircularBuffer_s *rxBuffer) { inSim = false; }
+void hm_disableSimMode(CircularBuffer_s *rxBuffer) { inSim = false; }
 
-bool HM_InSimMode() { return inSim; }
+bool hm_inSimMode() { return inSim; }

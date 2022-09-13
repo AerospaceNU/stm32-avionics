@@ -24,10 +24,10 @@ typedef struct {
   float maxAngle;
 } ServoPwmCtrl_t;
 
-bool servoPwmInit(ServoPwmCtrl_t *servo, TIM_HandleTypeDef *htim,
-                  uint32_t channel, uint32_t periodMS, float minPulseMS,
-                  float maxPulseMS, float minAngle, float maxAngle);
-void servoPwmSetAngle(ServoPwmCtrl_t *servo, float degrees);
+bool servoPwm_init(ServoPwmCtrl_t *servo, TIM_HandleTypeDef *htim,
+                   uint32_t channel, uint32_t periodMS, float minPulseMS,
+                   float maxPulseMS, float minAngle, float maxAngle);
+void servoPwm_setAngle(ServoPwmCtrl_t *servo, float degrees);
 
 #ifdef __cplusplus
 }

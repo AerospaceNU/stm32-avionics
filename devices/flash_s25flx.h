@@ -31,19 +31,21 @@ typedef struct {
 #endif
 } FlashS25flxCtrl_s;
 
-void S25FLX_init(FlashS25flxCtrl_s *s25flx, SPI_HandleTypeDef *hspi,
-                 GPIO_TypeDef *csPort, uint16_t csPin, uint32_t flashSizeBytes);
-bool S25FLX_read_start(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
-                       uint32_t numBytes, uint8_t *pData);
-bool S25FLX_write_start(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
-                        uint32_t numBytes, uint8_t *data);
-bool S25FLX_erase_sector_start(FlashS25flxCtrl_s *s25flx, uint32_t sectorNum);
-bool S25FLX_erase_chip_start(FlashS25flxCtrl_s *s25flx);
+void flashS25flx_init(FlashS25flxCtrl_s *s25flx, SPI_HandleTypeDef *hspi,
+                      GPIO_TypeDef *csPort, uint16_t csPin,
+                      uint32_t flashSizeBytes);
+bool flashS25flx_readStart(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
+                           uint32_t numBytes, uint8_t *pData);
+bool flashS25flx_writeStart(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
+                            uint32_t numBytes, uint8_t *data);
+bool flashS25flx_eraseSectorStart(FlashS25flxCtrl_s *s25flx,
+                                  uint32_t sectorNum);
+bool flashS25flx_eraseChipStart(FlashS25flxCtrl_s *s25flx);
 #ifdef USE_S25FLx_DMA
-bool S25FLX_is_read_complete(const FlashS25flxCtrl_s *s25flx);
+bool flashS25flx_isReadComplete(const FlashS25flxCtrl_s *s25flx);
 #endif
-bool S25FLX_is_write_complete(FlashS25flxCtrl_s *s25flx);
-bool S25FLX_is_erase_complete(FlashS25flxCtrl_s *s25flx);
+bool flashS25flx_isWriteComplete(FlashS25flxCtrl_s *s25flx);
+bool flashS25flx_isEraseComplete(FlashS25flxCtrl_s *s25flx);
 
 #ifdef __cplusplus
 }

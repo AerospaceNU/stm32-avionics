@@ -21,31 +21,31 @@ uint32_t readAddress = STATE_START_ADDRESS;
 uint8_t curRead;
 uint8_t prevRead;
 
-void state_log_reload_flight() {
-  data_log_load_last_stored_flight_metadata();  // Load the previous flight
-                                                // metadata into the data log
-  FlightMetadata_s oldMetadataPacket = *data_log_get_flight_metadata();
+void stateLog_reloadFlight() {
+  dataLog_loadLastStoredFlightMetadata();  // Load the previous flight
+                                           // metadata into the data log
+  FlightMetadata_s oldMetadataPacket = *dataLog_getFlightMetadata();
 
   // Load in recovered values
-  filterSetPressureRef(oldMetadataPacket.pressureRef);
-  TriggerManager_Init();
-  TriggerManager_SetApogeeTime(HM_Millis());
-  TriggerManager_SetTriggerFireStatus(~oldMetadataPacket.triggerFireStatus);
+  filter_setPressureRef(oldMetadataPacket.pressureRef);
+  triggerManager_init();
+  triggerManager_setApogeeTime(hm_millis());
+  triggerManager_setTriggerFireStatus(~oldMetadataPacket.triggerFireStatus);
 
   // Assign a new flight
-  data_log_assign_flight();
+  dataLog_assignFlight();
 
   // Set new metadata to values in old packet
-  *data_log_get_flight_metadata() = oldMetadataPacket;
-  data_log_write_flight_metadata();
+  *dataLog_getFlightMetadata() = oldMetadataPacket;
+  dataLog_writeFlightMetadata();
 }
 
-void state_log_write(int currentState) {
+void stateLog_write(int currentState) {
   uint8_t stateWriteBuffer;  // Buffer to store the byte that needs to be
                              // written to flash
   uint8_t stateReadBuffer;
   while (1) {
-    internal_flash_read(writeAddress, &stateReadBuffer, 1);
+    internalFlash_read(writeAddress, &stateReadBuffer, 1);
     curRead = stateReadBuffer;  // Read from the address
     if (curRead == 255) {       // Find the first empty address
       break;
@@ -66,18 +66,18 @@ void state_log_write(int currentState) {
     stateWriteBuffer = (uint8_t)(currentState);  // Otherwise write the state
   }
 
-  internal_flash_write(writeAddress, &stateWriteBuffer, 1);
+  internalFlash_write(writeAddress, &stateWriteBuffer, 1);
 }
 
-void state_log_write_complete() {
-  state_log_write(0xEE);  // Write 0xEE to the flash to indicate that the flight
-                          // ended and nothing should be resumed
+void stateLog_writeComplete() {
+  stateLog_write(0xEE);  // Write 0xEE to the flash to indicate that the flight
+                         // ended and nothing should be resumed
 }
 
-int state_log_read() {
+int stateLog_read() {
   uint8_t stateReadBuffer;
   readAddress = STATE_START_ADDRESS;
-  internal_flash_read(readAddress, &stateReadBuffer, 1);
+  internalFlash_read(readAddress, &stateReadBuffer, 1);
   prevRead = stateReadBuffer;
 
   if (prevRead == 255) {  // If we immediately read 255, the state log is empty,
@@ -86,7 +86,7 @@ int state_log_read() {
   }
 
   while (1) {
-    internal_flash_read(readAddress, &stateReadBuffer, 1);
+    internalFlash_read(readAddress, &stateReadBuffer, 1);
     curRead = stateReadBuffer;
     readAddress += 32;
 

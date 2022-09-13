@@ -8,8 +8,7 @@
 #include "dtoa.h"
 #include "hardware_manager.h"
 
-static void flash_usage_bar(char* barStr, uint8_t usage,
-                            uint8_t totalBarWidth) {
+static void flashUsageBar(char* barStr, uint8_t usage, uint8_t totalBarWidth) {
   barStr[0] = '[';
   int i;
   for (i = 1; i <= (usage / 100.0) * totalBarWidth; ++i) {
@@ -23,22 +22,22 @@ static void flash_usage_bar(char* barStr, uint8_t usage,
   barStr[k] = '\0';
 }
 
-void cli_tasks::cliSense() {
+void CliTasks::sense() {
   // Send ack of command
-  cliSendAck(true, nullptr);
+  cli_sendAck(true, nullptr);
 
   // Read sensor data and send in human-readable format
-  HM_ReadSensorData();
-  SensorData_s* data = HM_GetSensorData();
+  hm_readSensorData();
+  SensorData_s* data = hm_getSensorData();
   char cliStr[60];
   char float1[10];
   char float2[10];
   char float3[10];
 
-  cliSend("\r\n");
+  cli_send("\r\n");
   snprintf(cliStr, sizeof(cliStr), "Timestamp (ms): %" PRIu32 "\r\n",
            data->timestampS);
-  cliSend(cliStr);
+  cli_send(cliStr);
 #if HAS_DEV(IMU)
   for (int i = 0; i < NUM_IMU; i++) {
     dtoa(float1, sizeof(float1), data->imuData[i].accelRealMps2.x, 3);
@@ -46,19 +45,19 @@ void cli_tasks::cliSense() {
     dtoa(float3, sizeof(float3), data->imuData[i].accelRealMps2.z, 3);
     snprintf(cliStr, sizeof(cliStr), "IMU %d Accel XYZ (m/s^2): %s %s %s\r\n",
              i, float1, float2, float3);
-    cliSend(cliStr);
+    cli_send(cliStr);
     dtoa(float1, sizeof(float1), data->imuData[i].angVelRealRadps.x, 3);
     dtoa(float2, sizeof(float2), data->imuData[i].angVelRealRadps.y, 3);
     dtoa(float3, sizeof(float3), data->imuData[i].angVelRealRadps.z, 3);
     snprintf(cliStr, sizeof(cliStr), "IMU %d Gyro XYZ (rad/s): %s %s %s\r\n", i,
              float1, float2, float3);
-    cliSend(cliStr);
+    cli_send(cliStr);
     dtoa(float1, sizeof(float1), data->imuData[i].magRealG.x, 3);
     dtoa(float2, sizeof(float2), data->imuData[i].magRealG.y, 3);
     dtoa(float3, sizeof(float3), data->imuData[i].magRealG.z, 3);
     snprintf(cliStr, sizeof(cliStr), "IMU %d Mag XYZ (gauss): %s %s %s\r\n", i,
              float1, float2, float3);
-    cliSend(cliStr);
+    cli_send(cliStr);
   }
 #endif  // HAS_DEV(IMU)
 #if HAS_DEV(ACCEL)
@@ -68,7 +67,7 @@ void cli_tasks::cliSense() {
     dtoa(float3, sizeof(float3), data->accelData[i].realMps2.z, 3);
     snprintf(cliStr, sizeof(cliStr), "Accel %d XYZ (m/s^2): %s %s %s\r\n", i,
              float1, float2, float3);
-    cliSend(cliStr);
+    cli_send(cliStr);
   }
 #endif  // HAS_DEV(ACCEL)
 #if HAS_DEV(BAROMETER)
@@ -76,10 +75,10 @@ void cli_tasks::cliSense() {
     dtoa(float1, sizeof(float1), data->barometerData[i].pressureAtm, 5);
     snprintf(cliStr, sizeof(cliStr), "Baro %d Pressure (atm): %s\r\n", i,
              float1);
-    cliSend(cliStr);
+    cli_send(cliStr);
     dtoa(float1, sizeof(float1), data->barometerData[i].temperatureC, 1);
     snprintf(cliStr, sizeof(cliStr), "Baro %d Temp (C): %s\r\n", i, float1);
-    cliSend(cliStr);
+    cli_send(cliStr);
   }
 #endif  // HAS_DEV(BAROMETER)
 #if HAS_DEV(GPS)
@@ -88,16 +87,16 @@ void cli_tasks::cliSense() {
     dtoa(float2, sizeof(float2), data->gpsData[i].longitude / 100.0, 5);
     snprintf(cliStr, sizeof(cliStr), "GPS %d Lat/Lon: %s %s\r\n", i, float1,
              float2);
-    cliSend(cliStr);
+    cli_send(cliStr);
     dtoa(float1, sizeof(float1), data->gpsData[i].altitude, 3);
     snprintf(cliStr, sizeof(cliStr), "GPS %d Alt (m): %s\r\n", i, float1);
-    cliSend(cliStr);
+    cli_send(cliStr);
     snprintf(cliStr, sizeof(cliStr),
              "GPS %d Time: %02i:%02i:%02i %02i/%02i/%04i\r\n", i,
              data->gpsData[i].hours, data->gpsData[i].minutes,
              data->gpsData[i].seconds, data->gpsData[i].month,
              data->gpsData[i].day, data->gpsData[i].year);
-    cliSend(cliStr);
+    cli_send(cliStr);
   }
 #endif  // HAS_DEV(GPS)
 #if HAS_DEV(VBAT)
@@ -105,29 +104,29 @@ void cli_tasks::cliSense() {
     dtoa(float1, sizeof(float1), data->vbatData[i], 3);
     snprintf(cliStr, sizeof(cliStr), "Battery Voltage %d (V): %s\r\n", i,
              float1);
-    cliSend(cliStr);
+    cli_send(cliStr);
   }
 #endif  // HAS_DEV(VBAT)
 #if HAS_DEV(PYRO_CONT)
   snprintf(cliStr, sizeof(cliStr), "Pyro Continuity 1-%" PRIu32 ":",
            (uint32_t)(NUM_PYRO_CONT));
-  cliSend(cliStr);
+  cli_send(cliStr);
   for (int i = 0; i < NUM_PYRO_CONT; i++) {
     snprintf(cliStr, sizeof(cliStr), " %i", data->pyroContData[i]);
-    cliSend(cliStr);
+    cli_send(cliStr);
   }
 #endif  // HAS_DEV(PYRO_CONT)
 #if HAS_DEV(FLASH)
   char flashStr[43];
-  uint8_t flash_usage_percent = data_log_get_flash_usage();
-  flash_usage_bar(flashStr, flash_usage_percent, 40);
+  uint8_t flash_usage_percent = dataLog_getFlashUsage();
+  flashUsageBar(flashStr, flash_usage_percent, 40);
   snprintf(cliStr, sizeof(cliStr), "\r\nCurrent Flash Usage: %u%%\r\n",
            flash_usage_percent);
-  cliSend(cliStr);
-  cliSend(flashStr);
+  cli_send(cliStr);
+  cli_send(flashStr);
 #endif  // HAS_DEV(FLASH)
   snprintf(cliStr, sizeof(cliStr), "\r\n");
-  cliSend(cliStr);
+  cli_send(cliStr);
 
-  cliSendComplete(true, nullptr);
+  cli_sendComplete(true, nullptr);
 }

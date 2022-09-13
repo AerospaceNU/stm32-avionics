@@ -11,60 +11,60 @@
 
 #define LSM9DS1_SPI_REG_MASK (1 << 7)
 
-static uint8_t AG_whoAmI(Lsm9ds1AgCtrl_s *sensor) {
-  return SPI_ReadRegister(&sensor->lsm9ds1Spi,
+static uint8_t agWhoAmI(Lsm9ds1AgCtrl_s *sensor) {
+  return spi_readRegister(&sensor->lsm9ds1Spi,
                           LSM9DS1_SPI_REG_MASK | REG_WHO_AM_I_AG);
 }
 
-static uint8_t M_whoAmI(Lsm9ds1MCtrl_s *sensor) {
-  return SPI_ReadRegister(&sensor->lsm9ds1Spi,
+static uint8_t mWhoAmI(Lsm9ds1MCtrl_s *sensor) {
+  return spi_readRegister(&sensor->lsm9ds1Spi,
                           LSM9DS1_SPI_REG_MASK | REG_WHO_AM_I_M);
 }
 
 static void lsm9ds1_getDataRaw(ImuLsm9ds1Ctrl_s *sensor) {
   // Takes x, y, and z axis readings
-  uint8_t x_l_xl = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t x_l_xl = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                     LSM9DS1_SPI_REG_MASK | OUT_X_L_XL);
-  uint8_t x_h_xl = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t x_h_xl = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                     LSM9DS1_SPI_REG_MASK | OUT_X_H_XL);
-  uint8_t y_l_xl = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t y_l_xl = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                     LSM9DS1_SPI_REG_MASK | OUT_Y_L_XL);
-  uint8_t y_h_xl = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t y_h_xl = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                     LSM9DS1_SPI_REG_MASK | OUT_Y_H_XL);
-  uint8_t z_l_xl = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t z_l_xl = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                     LSM9DS1_SPI_REG_MASK | OUT_Z_L_XL);
-  uint8_t z_h_xl = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t z_h_xl = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                     LSM9DS1_SPI_REG_MASK | OUT_Z_H_XL);
 
-  uint8_t x_l_g = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t x_l_g = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                    LSM9DS1_SPI_REG_MASK | OUT_X_L_G);
-  uint8_t x_h_g = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t x_h_g = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                    LSM9DS1_SPI_REG_MASK | OUT_X_H_G);
-  uint8_t y_l_g = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t y_l_g = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                    LSM9DS1_SPI_REG_MASK | OUT_Y_L_G);
-  uint8_t y_h_g = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t y_h_g = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                    LSM9DS1_SPI_REG_MASK | OUT_Y_H_G);
-  uint8_t z_l_g = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t z_l_g = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                    LSM9DS1_SPI_REG_MASK | OUT_Z_L_G);
-  uint8_t z_h_g = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t z_h_g = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                    LSM9DS1_SPI_REG_MASK | OUT_Z_H_G);
 
   uint8_t x_l_m =
-      SPI_ReadRegister(&sensor->m.lsm9ds1Spi, LSM9DS1_SPI_REG_MASK | OUT_X_L_M);
+      spi_readRegister(&sensor->m.lsm9ds1Spi, LSM9DS1_SPI_REG_MASK | OUT_X_L_M);
   uint8_t x_h_m =
-      SPI_ReadRegister(&sensor->m.lsm9ds1Spi, LSM9DS1_SPI_REG_MASK | OUT_X_H_M);
+      spi_readRegister(&sensor->m.lsm9ds1Spi, LSM9DS1_SPI_REG_MASK | OUT_X_H_M);
   uint8_t y_l_m =
-      SPI_ReadRegister(&sensor->m.lsm9ds1Spi, LSM9DS1_SPI_REG_MASK | OUT_Y_L_M);
+      spi_readRegister(&sensor->m.lsm9ds1Spi, LSM9DS1_SPI_REG_MASK | OUT_Y_L_M);
   uint8_t y_h_m =
-      SPI_ReadRegister(&sensor->m.lsm9ds1Spi, LSM9DS1_SPI_REG_MASK | OUT_Y_H_M);
+      spi_readRegister(&sensor->m.lsm9ds1Spi, LSM9DS1_SPI_REG_MASK | OUT_Y_H_M);
   uint8_t z_l_m =
-      SPI_ReadRegister(&sensor->m.lsm9ds1Spi, LSM9DS1_SPI_REG_MASK | OUT_Z_L_M);
+      spi_readRegister(&sensor->m.lsm9ds1Spi, LSM9DS1_SPI_REG_MASK | OUT_Z_L_M);
   uint8_t z_h_m =
-      SPI_ReadRegister(&sensor->m.lsm9ds1Spi, LSM9DS1_SPI_REG_MASK | OUT_Z_H_M);
+      spi_readRegister(&sensor->m.lsm9ds1Spi, LSM9DS1_SPI_REG_MASK | OUT_Z_H_M);
 
-  uint8_t t_l = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t t_l = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                  LSM9DS1_SPI_REG_MASK | OUT_TEMP_L);
-  uint8_t t_h = SPI_ReadRegister(&sensor->ag.lsm9ds1Spi,
+  uint8_t t_h = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                  LSM9DS1_SPI_REG_MASK | OUT_TEMP_H);
 
   // Writes combined h and l byte to struct
@@ -190,29 +190,29 @@ bool lsm9ds1_init(ImuLsm9ds1Ctrl_s *sensor) {
                     GPIO_PIN_SET);
 
   // Verify whoAmI
-  uint8_t iam = AG_whoAmI(&sensor->ag);
+  uint8_t iam = agWhoAmI(&sensor->ag);
   if (iam == 0xFF || iam == 0x00) {
     return false;
   }
-  iam = M_whoAmI(&sensor->m);
+  iam = mWhoAmI(&sensor->m);
   if (iam == 0xFF || iam == 0x00) {
     return false;
   }
 
   // Initialize Gyroscope
-  SPI_WriteRegister(&sensor->ag.lsm9ds1Spi, CTRL_REG1_G,
+  spi_writeRegister(&sensor->ag.lsm9ds1Spi, CTRL_REG1_G,
                     ODR_G_238 | sensor->ag.gFs | BW_G_2);
 
   // Initialize Accelerometer
-  SPI_WriteRegister(&sensor->ag.lsm9ds1Spi, CTRL_REG6_XL,
+  spi_writeRegister(&sensor->ag.lsm9ds1Spi, CTRL_REG6_XL,
                     ODR_XL_50 | sensor->ag.aFs);
 
   // Initialize Magnetometer
-  SPI_WriteRegister(&sensor->m.lsm9ds1Spi, CTRL_REG3_M,
+  spi_writeRegister(&sensor->m.lsm9ds1Spi, CTRL_REG3_M,
                     I2C_DISABLE_M_0 | SIM_M_0 | MD_M_CC);
-  SPI_WriteRegister(&sensor->m.lsm9ds1Spi, CTRL_REG1_M, OM_M_MP | DO_M_5);
-  SPI_WriteRegister(&sensor->m.lsm9ds1Spi, CTRL_REG2_M, sensor->m.mFs);
-  SPI_WriteRegister(&sensor->m.lsm9ds1Spi, CTRL_REG4_M, OMZ_M_MP);
+  spi_writeRegister(&sensor->m.lsm9ds1Spi, CTRL_REG1_M, OM_M_MP | DO_M_5);
+  spi_writeRegister(&sensor->m.lsm9ds1Spi, CTRL_REG2_M, sensor->m.mFs);
+  spi_writeRegister(&sensor->m.lsm9ds1Spi, CTRL_REG4_M, OMZ_M_MP);
 
   lsm9ds1_calcRes(sensor);
   lsm9ds1_getAdj(sensor);

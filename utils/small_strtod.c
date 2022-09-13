@@ -14,7 +14,7 @@
 
 #define IS_DIGIT(ch) (ch >= '0' && ch <= '9')
 
-double small_strtod(char* str, char** endptr) {
+double smallStrtod(char* str, char** endptr) {
   char* current = str;
   double sum = 0;
   bool before_decimal = true;

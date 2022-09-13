@@ -30,21 +30,21 @@ static int8_t usbReceive(uint8_t *buf, uint32_t *len) {
   USBD_CDC_HandleTypeDef *pClassData =
       (USBD_CDC_HandleTypeDef *)hUsbDeviceFS.pClassData;
   for (uint32_t i = 0; i < pClassData->RxLength; i++) {
-    cbEnqueue(&rxCircBuffer, pClassData->RxBuffer + i);
+    cb_enqueue(&rxCircBuffer, pClassData->RxBuffer + i);
   }
   return ret;
 }
 
-void usbStdInit() {
+void usbStd_init() {
   // Initialize circular buffer
-  cbInit(&rxCircBuffer, rxBuffer, APP_RX_DATA_SIZE, sizeof(uint8_t));
+  cb_init(&rxCircBuffer, rxBuffer, APP_RX_DATA_SIZE, sizeof(uint8_t));
 
   // Re-route CDC receive
   cdcRxReceive = USBD_Interface_fops_FS.Receive;
   USBD_Interface_fops_FS.Receive = usbReceive;
 }
 
-bool usbStdTransmit(uint8_t *buf, uint16_t len) {
+bool usbStd_transmit(uint8_t *buf, uint16_t len) {
   // Wait for time since last transmit
   while (HAL_GetTick() - lastTransmit < TIME_BETWEEN_TRANSMITS_MS) {
   }
@@ -52,9 +52,9 @@ bool usbStdTransmit(uint8_t *buf, uint16_t len) {
   return CDC_Transmit_FS(buf, len) == USBD_OK;
 }
 
-CircularBuffer_s *usbStdGetRxBuffer() { return &rxCircBuffer; }
+CircularBuffer_s *usbStd_getRxBuffer() { return &rxCircBuffer; }
 
-bool usbStdIsConnected() {
+bool usbStd_isConnected() {
   return hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED;
 }
 

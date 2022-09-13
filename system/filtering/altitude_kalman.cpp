@@ -4,7 +4,7 @@ constexpr const double AltitudeKalman::DEFAULT_KALMAN_GAIN[];
 
 AltitudeKalman::AltitudeKalman(double dt) : m_dt(dt) {}
 
-void AltitudeKalman::Predict(const double az) {
+void AltitudeKalman::predict(const double az) {
   // x_k+1 = A x_k + B u_k
   // x_k+1 = [pos] = [old pos + vel * m_dt] + [1/2 acceleration m_dt^2]
   //         [vel]   [old vel           ]   [acceleration * m_dt    ]
@@ -13,7 +13,7 @@ void AltitudeKalman::Predict(const double az) {
   xHat.estimatedVelocity += az * m_dt;
 }
 
-void AltitudeKalman::Correct(const double baroAltitude,
+void AltitudeKalman::correct(const double baroAltitude,
                              const double kalman_gain[2]) {
   // xhat = xhat + K(y-Cx-Du)
   // x_corrected = [old pos] + [k1] * [ [barometric altitude] - [1, 0] *
@@ -28,8 +28,8 @@ void AltitudeKalman::Correct(const double baroAltitude,
   xHat.estimatedVelocity += kalman_gain[1] * deltaAltitude;
 }
 
-const AltitudeKalmanOutput_s AltitudeKalman::GetXhat() const { return xHat; }
+const AltitudeKalmanOutput_s AltitudeKalman::getXhat() const { return xHat; }
 
-void AltitudeKalman::SetDt(double dt) { m_dt = dt; }
+void AltitudeKalman::setDt(double dt) { m_dt = dt; }
 
-void AltitudeKalman::Reset() { xHat = {0, 0}; }
+void AltitudeKalman::reset() { xHat = {0, 0}; }

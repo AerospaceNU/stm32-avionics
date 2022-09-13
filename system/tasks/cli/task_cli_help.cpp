@@ -17,15 +17,15 @@ static void generateDoc(const char* primaryCommand, const char* args,
                         const char* desc) {
   snprintf(doc, sizeof(doc), "%-15s %-15s %-150s\r\n", primaryCommand, args,
            desc);
-  cliSend(doc);
+  cli_send(doc);
 }
 
-void cli_tasks::cliHelp() {
+void CliTasks::help() {
   // Send initial ACK to CLI
-  cliSendAck(true, nullptr);
+  cli_sendAck(true, nullptr);
 
   // Send help docs to user
-  cliSend("\r\n");
+  cli_send("\r\n");
   generateDoc("--config", "-t int*1",
               "Configure a trigger with additional flag: ");
   generateDoc("", "     -m int*1", "Trigger type (required)");
@@ -63,5 +63,5 @@ void cli_tasks::cliHelp() {
   generateDoc("--sense", "", "Reads back most recent sensor data");
   generateDoc("--sim", "", "Simulate past flights in hardware");
   generateDoc("--version", "", "Send Git version and tag info");
-  cliSendComplete(true, nullptr);
+  cli_sendComplete(true, nullptr);
 }

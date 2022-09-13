@@ -8,7 +8,7 @@
 
 #include <cstring>
 
-bool FileBackedFlash::WriteStart(uint32_t startLoc, uint32_t numBytes,
+bool FileBackedFlash::writeStart(uint32_t startLoc, uint32_t numBytes,
                                  uint8_t *pdata) {
   // Open a new output stream in binary mode
   std::fstream ofs{filepath};
@@ -23,7 +23,7 @@ bool FileBackedFlash::WriteStart(uint32_t startLoc, uint32_t numBytes,
   return true;
 }
 
-bool FileBackedFlash::ReadStart(uint32_t startLoc, uint32_t numBytes,
+bool FileBackedFlash::readStart(uint32_t startLoc, uint32_t numBytes,
                                 uint8_t *pdata) {
   // Open a new input stream in binary mode
   std::ifstream ifs;
@@ -47,7 +47,7 @@ bool fileExists(const std::string &filename) {
   return false;
 }
 
-void FileBackedFlash::Reinit() {
+void FileBackedFlash::reinit() {
   if (fileExists(filepath)) {
     return;
   }

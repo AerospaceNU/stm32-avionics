@@ -65,12 +65,12 @@ typedef struct __attribute__((__packed__)) {
   double acc_x, acc_y, acc_z;
   double qx, qy, qz, qw;
   uint8_t state;
-} FCBLogData_s;
+} FcbLogData_s;
 
 #define LOG_ID_LINE_CUTTER 1
 
 typedef union {
-  FCBLogData_s fcbData;
+  FcbLogData_s fcbData;
   LineCutterData_s lineCutterData;
 } LogDataPacket_s;
 
@@ -104,18 +104,18 @@ static void addressToFlashId(uint32_t startLoc, int *flashId,
   }
 }
 
-static void flash_read(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
+static void flashRead(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
   int flashId = -1;
   uint32_t flashOffset = 0;
   addressToFlashId(startLoc, &flashId, &flashOffset);
-  HM_FlashReadStart(flashId, flashOffset, numBytes, pData);
-  uint32_t waitStartMS = HM_Millis();
-  while (!HM_FlashIsReadComplete(flashId) &&
-         HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+  hm_flashReadStart(flashId, flashOffset, numBytes, pData);
+  uint32_t waitStartMS = hm_millis();
+  while (!hm_flashIsReadComplete(flashId) &&
+         hm_millis() - waitStartMS < FLASH_TIMEOUT) {
   }
 }
 
-static void flash_write(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
+static void flashWrite(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
   int flashId = -1;
   uint32_t flashOffset = 0;
   addressToFlashId(startLoc, &flashId, &flashOffset);
@@ -125,39 +125,39 @@ static void flash_write(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
       (startLoc + numBytes) % FLASH_MIN_PAGE_SIZE_BYTES;
   if (second_page_bytes >= numBytes) second_page_bytes = 0;
   uint32_t first_page_bytes = numBytes - second_page_bytes;
-  HM_FlashWriteStart(flashId, flashOffset, first_page_bytes, pData);
-  uint32_t waitStartMS = HM_Millis();
-  while (!HM_FlashIsWriteComplete(flashId) &&
-         HM_Millis() - waitStartMS < FLASH_TIMEOUT) {
+  hm_flashWriteStart(flashId, flashOffset, first_page_bytes, pData);
+  uint32_t waitStartMS = hm_millis();
+  while (!hm_flashIsWriteComplete(flashId) &&
+         hm_millis() - waitStartMS < FLASH_TIMEOUT) {
   }
   if (second_page_bytes > 0) {
     addressToFlashId(startLoc + first_page_bytes, &flashId, &flashOffset);
     if (flashId == -1) return;
-    HM_FlashWriteStart(flashId, flashOffset, second_page_bytes,
+    hm_flashWriteStart(flashId, flashOffset, second_page_bytes,
                        pData + first_page_bytes);
-    waitStartMS = HM_Millis();
-    while (!HM_FlashIsWriteComplete(flashId) &&
-           HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+    waitStartMS = hm_millis();
+    while (!hm_flashIsWriteComplete(flashId) &&
+           hm_millis() - waitStartMS < FLASH_TIMEOUT_MS) {
     }
   }
 }
 
-static void flash_erase_sector(uint32_t sectorNum) {
+static void flashEraseSector(uint32_t sectorNum) {
   int flashId = -1;
   uint32_t flashOffset = 0;
   addressToFlashId(sectorNum * FLASH_MAX_SECTOR_BYTES, &flashId, &flashOffset);
   if (flashId == -1) return;
 
   curErasingFlashId = flashId;
-  HM_FlashEraseSectorStart(curErasingFlashId,
+  hm_flashEraseSectorStart(curErasingFlashId,
                            flashOffset / FLASH_MAX_SECTOR_BYTES);
-  uint32_t waitStartMS = HM_Millis();
-  while (!HM_FlashIsEraseComplete(flashId) &&
-         HM_Millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+  uint32_t waitStartMS = hm_millis();
+  while (!hm_flashIsEraseComplete(flashId) &&
+         hm_millis() - waitStartMS < FLASH_TIMEOUT_MS) {
   }
 }
 
-void data_log_init() {
+void dataLog_init() {
   // Sum number of bytes in full flash
   logSizeBytes = 0;
   for (int i = 0; i < NUM_FLASH; i++) {
@@ -165,15 +165,15 @@ void data_log_init() {
   }
 }
 
-void data_log_flash_erase(int flashId) {
-  HM_FlashEraseChipStart(flashId);
+void dataLog_flashErase(int flashId) {
+  hm_flashEraseChipStart(flashId);
   if (flashId == 0) currentConfigAddress = CONFIG_START_ADDRESS;
 }
 
-static uint32_t data_log_get_last_flight_num_type(bool launched) {
+static uint32_t dataLog_getLastFlightNumType(bool launched) {
   uint32_t lastFlightNum = 0;
   uint8_t rxBuffVersions[2] = {0};
-  flash_read(0, 2, rxBuffVersions);
+  flashRead(0, 2, rxBuffVersions);
   uint8_t boardVersion = (rxBuffVersions[0] >> 4) & 0x0F;
   uint8_t boardID = rxBuffVersions[0] & 0x0F;
   uint8_t softwareVersion = rxBuffVersions[1];
@@ -192,15 +192,15 @@ static uint32_t data_log_get_last_flight_num_type(bool launched) {
                                                   // metadata
     uint32_t metadataReadAddress;
     while (!flightNumFound) {
-      flash_read(curSectorNum * 2, 2, sectorRxBuff);
+      flashRead(curSectorNum * 2, 2, sectorRxBuff);
       uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
       if (tempFlightNum == 0xFFFF) {
         flightNumFound = true;
       } else {
         if (launched) {  // Need to check for launched to mark as last flight
           metadataReadAddress = curSectorNum * FLASH_MAX_SECTOR_BYTES;
-          flash_read(metadataReadAddress, kFlightMetadata_sSize,
-                     metadataBuff);  // Read the metadata
+          flashRead(metadataReadAddress, kFlightMetadata_sSize,
+                    metadataBuff);  // Read the metadata
           FlightMetadata_sPacket = *(FlightMetadata_s *)&metadataBuff;
           if (FlightMetadata_sPacket.launched ==
               1) {  // Only update last if it was launched
@@ -217,17 +217,16 @@ static uint32_t data_log_get_last_flight_num_type(bool launched) {
   return lastFlightNum;
 }
 
-uint32_t data_log_get_last_flight_num() {
-  return data_log_get_last_flight_num_type(false);
+uint32_t dataLog_getLastFlightNum() {
+  return dataLog_getLastFlightNumType(false);
 }
 
-uint32_t data_log_get_last_launched_flight_num() {
-  return data_log_get_last_flight_num_type(true);
+uint32_t dataLog_getLastLaunchedFlightNum() {
+  return dataLog_getLastFlightNumType(true);
 }
 
-static void data_log_get_flight_sectors(uint32_t flightNum,
-                                        uint32_t *firstSector,
-                                        uint32_t *lastSector) {
+static void dataLog_getFlightSectors(uint32_t flightNum, uint32_t *firstSector,
+                                     uint32_t *lastSector) {
   *firstSector = 0;
   *lastSector = 0;
   uint32_t tempCurSectorNum = 1;
@@ -235,7 +234,7 @@ static void data_log_get_flight_sectors(uint32_t flightNum,
 
   while (*firstSector == 0 &&
          tempCurSectorNum < logSizeBytes / FLASH_MAX_SECTOR_BYTES) {
-    flash_read(tempCurSectorNum * 2, 2, sectorRxBuff);
+    flashRead(tempCurSectorNum * 2, 2, sectorRxBuff);
     uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
     if (tempFlightNum == flightNum) {
       *firstSector = tempCurSectorNum;
@@ -252,7 +251,7 @@ static void data_log_get_flight_sectors(uint32_t flightNum,
   // Find last sector of flight num using metadata.
   while (*lastSector == 0 &&
          tempCurSectorNum < logSizeBytes / FLASH_MAX_SECTOR_BYTES) {
-    flash_read(tempCurSectorNum * 2, 2, sectorRxBuff);
+    flashRead(tempCurSectorNum * 2, 2, sectorRxBuff);
 
     uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
     if (tempFlightNum != flightNum) {
@@ -268,23 +267,23 @@ static void data_log_get_flight_sectors(uint32_t flightNum,
   }
 }
 
-void data_log_assign_flight() {
+void dataLog_assignFlight() {
   // Initialize circular buffer of packets
-  cbInit(&logPacketBuffer, logPackets, MAX_LOG_PACKETS, kLogData_sSize);
+  cb_init(&logPacketBuffer, logPackets, MAX_LOG_PACKETS, kLogData_sSize);
 
   // Assign flight number
-  flightNum = data_log_get_last_flight_num() + 1;
+  flightNum = dataLog_getLastFlightNum() + 1;
   if (flightNum == 1) {
     // Erase sector since metadata indicates the versions are not the expected
-    flash_erase_sector(0);
+    flashEraseSector(0);
     // Write board version, id, and software version
     uint8_t txBuffVersions[] = {(uint16_t)(BOARD_VERSION) << 4 | BOARD_ID,
                                 SOFTWARE_VERSION};
-    flash_write(0, 2, txBuffVersions);
+    flashWrite(0, 2, txBuffVersions);
   }
 
   // Erase sector where flight metadata will go
-  flash_erase_sector(curSectorNum);
+  flashEraseSector(curSectorNum);
 
   // Empty metadata packet
   memset(&FlightMetadata_sPacket, 0xFF, kFlightMetadata_sSize);
@@ -295,48 +294,48 @@ void data_log_assign_flight() {
 
   // We can't have a flight past the last sector
   if (curSectorNum * FLASH_MAX_SECTOR_BYTES < logSizeBytes)
-    flash_write(curSectorNum * 2, 2, flightTxBuff);
+    flashWrite(curSectorNum * 2, 2, flightTxBuff);
 
   flightFirstSectorNum = curSectorNum;
   curWriteAddress = curSectorNum * FLASH_MAX_SECTOR_BYTES +
                     FLIGHT_METADATA_PAGES * FLASH_MIN_PAGE_SIZE_BYTES;
 }
 
-void data_log_load_last_stored_flight_metadata() {
+void dataLog_loadLastStoredFlightMetadata() {
   uint32_t flightNum =
-      data_log_get_last_flight_num();  // Load the previous flight number
-  data_log_read_flight_num_metadata(flightNum);
+      dataLog_getLastFlightNum();  // Load the previous flight number
+  dataLog_readFlightNumMetadata(flightNum);
 }
 
-void data_log_read_flight_num_metadata(uint8_t flightNum) {
+void dataLog_readFlightNumMetadata(uint8_t flightNum) {
   uint32_t firstSector, lastSector;
-  data_log_get_flight_sectors(flightNum, &firstSector, &lastSector);
+  dataLog_getFlightSectors(flightNum, &firstSector, &lastSector);
   // Create a buffer for the metadata
   uint8_t metadataBuff[kFlightMetadata_sSize];
   uint32_t metadataReadAddress = firstSector * FLASH_MAX_SECTOR_BYTES;
   // Read the metadata
-  flash_read(metadataReadAddress, kFlightMetadata_sSize, metadataBuff);
+  flashRead(metadataReadAddress, kFlightMetadata_sSize, metadataBuff);
   FlightMetadata_sPacket = *(FlightMetadata_s *)metadataBuff;
 }
 
-FlightMetadata_s *data_log_get_flight_metadata() {
+FlightMetadata_s *dataLog_getFlightMetadata() {
   return &FlightMetadata_sPacket;
 }
 
-void data_log_write_flight_metadata() {
+void dataLog_writeFlightMetadata() {
   if (flightNum > 0) {
     uint32_t metadataWriteAddress =
         flightFirstSectorNum *
         FLASH_MAX_SECTOR_BYTES;  // Metadata is located at the start of the
                                  // flight sector
-    flash_write(
+    flashWrite(
         metadataWriteAddress, kFlightMetadata_sSize,
         (uint8_t *)&FlightMetadata_sPacket);  // Write the metadata packet
   }
 }
 
-void data_log_write(SensorData_s *sensorData, FilterData_s *filterData,
-                    uint8_t state) {
+void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
+                   uint8_t state) {
   if (flightNum > 0) {
     // Check if current sector is beyond flash capacity. If so, stop
     if (curSectorNum >= logSizeBytes / FLASH_MAX_SECTOR_BYTES) return;
@@ -345,7 +344,7 @@ void data_log_write(SensorData_s *sensorData, FilterData_s *filterData,
     logPacket.packetType = LOG_ID_FCB;
     logPacket.timestampS = sensorData->timestampS;
     logPacket.timestampUs = sensorData->timestampUs;
-    FCBLogData_s *fcbLogData = &(logPacket.dataPacket.fcbData);
+    FcbLogData_s *fcbLogData = &(logPacket.dataPacket.fcbData);
 #if HAS_DEV(IMU)
     for (int i = 0; i < NUM_IMU; i++) {
       fcbLogData->imuData[i].accel = sensorData->imuData[i].accelRaw;
@@ -381,7 +380,7 @@ void data_log_write(SensorData_s *sensorData, FilterData_s *filterData,
       fcbLogData->pyroContinuity |= ((sensorData->pyroContData[i] & 0x01) << i);
     }
 #endif  // HAS_DEV(PYRO_CONT)
-    fcbLogData->triggerStatus = TriggerManager_Status();
+    fcbLogData->triggerStatus = triggerManager_status();
     fcbLogData->heading = filterData->heading;
     fcbLogData->vtg = filterData->vtg;
     fcbLogData->pos_x = filterData->pos_x;
@@ -400,21 +399,21 @@ void data_log_write(SensorData_s *sensorData, FilterData_s *filterData,
     fcbLogData->state = state;
 
     // Add newest log packet to buffer, overriding oldest packet
-    if (cbFull(&logPacketBuffer)) {
-      cbDequeue(&logPacketBuffer, 1);
+    if (cb_full(&logPacketBuffer)) {
+      cb_dequeue(&logPacketBuffer, 1);
     }
-    cbEnqueue(&logPacketBuffer, &logPacket);
+    cb_enqueue(&logPacketBuffer, &logPacket);
 
 #if HAS_DEV(LINE_CUTTER_BLE)
     for (int i = 0; i < NUM_LINE_CUTTER_BLE; ++i) {
-      if (lineCutterLastLogTime[i] < HM_GetLineCutterData(i)->timestamp) {
+      if (lineCutterLastLogTime[i] < hm_getLineCutterData(i)->timestamp) {
         logPacket.packetType = LOG_ID_LINE_CUTTER;
-        logPacket.dataPacket.lineCutterData = *HM_GetLineCutterData(i);
-        lineCutterLastLogTime[i] = HM_GetLineCutterData(i)->timestamp;
+        logPacket.dataPacket.lineCutterData = *hm_getLineCutterData(i);
+        lineCutterLastLogTime[i] = hm_getLineCutterData(i)->timestamp;
         // Line cutter data is less important so don't dequeue other data if it
         // can't fit
-        if (!cbFull(&logPacketBuffer)) {
-          cbEnqueue(&logPacketBuffer, &logPacket);
+        if (!cb_full(&logPacketBuffer)) {
+          cb_enqueue(&logPacketBuffer, &logPacket);
         }
       }
     }
@@ -423,7 +422,7 @@ void data_log_write(SensorData_s *sensorData, FilterData_s *filterData,
     static bool erasing = false;
     if (erasing) {
       // If currently erasing, check if erase is complete
-      erasing = !HM_FlashIsEraseComplete(curErasingFlashId);
+      erasing = !hm_flashIsEraseComplete(curErasingFlashId);
     } else {
       // Check if a new sector has been entered. If so, record in file system
       // and start erasing the sector
@@ -432,31 +431,30 @@ void data_log_write(SensorData_s *sensorData, FilterData_s *filterData,
         curSectorNum++;
         // Write flight number and sector to metadata
         uint8_t flightTxBuff[2] = {(flightNum >> 8) & 0xFF, flightNum & 0xFF};
-        flash_write(curSectorNum * 2, 2, flightTxBuff);
+        flashWrite(curSectorNum * 2, 2, flightTxBuff);
         // Start erasing the upcoming sector
-        flash_erase_sector(curSectorNum);
+        flashEraseSector(curSectorNum);
         erasing = true;
       } else {
         // Write whole log buffer. No need to worry about erasing future
         // sector since log buffer is only 1 sector long.
         LogData_s dequeuedData;
         size_t numElements = 1;
-        cbPeek(&logPacketBuffer, &dequeuedData, &numElements);
+        cb_peek(&logPacketBuffer, &dequeuedData, &numElements);
         while (numElements != 0) {
-          cbDequeue(&logPacketBuffer, 1);
-          flash_write(curWriteAddress, kLogData_sSize,
-                      (uint8_t *)&dequeuedData);
+          cb_dequeue(&logPacketBuffer, 1);
+          flashWrite(curWriteAddress, kLogData_sSize, (uint8_t *)&dequeuedData);
           // Increment write address to be next address to write to
           curWriteAddress += kLogData_sSize;
-          cbPeek(&logPacketBuffer, &dequeuedData, &numElements);
+          cb_peek(&logPacketBuffer, &dequeuedData, &numElements);
         }
       }
     }
   }
 }
 
-uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata,
-                       bool reset) {
+uint32_t dataLog_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata,
+                      bool reset) {
   static uint32_t firstSector;
   static uint32_t lastSector;
   static uint32_t lastFlightNum;
@@ -465,14 +463,14 @@ uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata,
   if ((flightNum != lastFlightNum) || reset) {
     lastFlightNum = flightNum;
     readOffset = 0;
-    data_log_get_flight_sectors(flightNum, &firstSector, &lastSector);
+    dataLog_getFlightSectors(flightNum, &firstSector, &lastSector);
   }
 
   // Read from flight at the appropriate offset (excluding metadata)
   uint32_t readAddress = firstSector * FLASH_MAX_SECTOR_BYTES +
                          FLIGHT_METADATA_PAGES * FLASH_MIN_PAGE_SIZE_BYTES +
                          readOffset;
-  flash_read(readAddress, maxBytes, pdata);
+  flashRead(readAddress, maxBytes, pdata);
   // If the last sector has been passed, return only the bytes that count
   if ((readAddress + maxBytes) > FLASH_MAX_SECTOR_BYTES * (lastSector + 1)) {
     uint32_t bytesRead =
@@ -496,16 +494,16 @@ uint32_t data_log_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata,
   return maxBytes;
 }
 
-static bool packet_is_empty(uint8_t *buffer, uint16_t packetSize) {
+static bool packetIsEmpty(uint8_t *buffer, uint16_t packetSize) {
   for (int i = 0; i < packetSize; ++i) {
     if (buffer[i] != 0xFF) return false;
   }
   return true;
 }
 
-static uint32_t data_log_get_last_packet_type(uint32_t firstAddress,
-                                              uint32_t maxCount,
-                                              uint16_t packetSize) {
+static uint32_t dataLog_getLastPacketType(uint32_t firstAddress,
+                                          uint32_t maxCount,
+                                          uint16_t packetSize) {
   // Binary search to find the last packet
   uint32_t low = 0;
   uint32_t high = maxCount;
@@ -514,9 +512,9 @@ static uint32_t data_log_get_last_packet_type(uint32_t firstAddress,
 
   while (low < mid) {
     pReadAddress = firstAddress + mid * packetSize;
-    flash_read(pReadAddress, packetSize, packetBuffer);
+    flashRead(pReadAddress, packetSize, packetBuffer);
     // All FFs = too high
-    if (packet_is_empty(packetBuffer, packetSize)) {
+    if (packetIsEmpty(packetBuffer, packetSize)) {
       high = mid;
       mid = (high + low) / 2;
     } else {
@@ -525,16 +523,16 @@ static uint32_t data_log_get_last_packet_type(uint32_t firstAddress,
     }
   }
   pReadAddress = firstAddress + mid * packetSize;
-  flash_read(pReadAddress, packetSize, packetBuffer);
+  flashRead(pReadAddress, packetSize, packetBuffer);
   return pReadAddress;
 }
 
-uint32_t data_log_get_last_flight_timestamp(uint32_t flightNum) {
+uint32_t dataLog_getLastFlightTimestamp(uint32_t flightNum) {
   LogData_s *dataPacket;
   uint32_t firstSector;
   uint32_t lastSector;
   // Find sectors of flight num using metadata
-  data_log_get_flight_sectors(flightNum, &firstSector, &lastSector);
+  dataLog_getFlightSectors(flightNum, &firstSector, &lastSector);
 
   uint32_t firstAddress = firstSector * FLASH_MAX_SECTOR_BYTES +
                           FLIGHT_METADATA_PAGES * FLASH_MIN_PAGE_SIZE_BYTES;
@@ -546,15 +544,15 @@ uint32_t data_log_get_last_flight_timestamp(uint32_t flightNum) {
   uint32_t maxCount =
       (sectorBytes - FLIGHT_METADATA_PAGES * FLASH_MIN_PAGE_SIZE_BYTES) /
       kLogData_sSize;
-  data_log_get_last_packet_type(firstAddress, maxCount, kLogData_sSize);
+  dataLog_getLastPacketType(firstAddress, maxCount, kLogData_sSize);
   dataPacket = (LogData_s *)packetBuffer;
 
   return dataPacket->timestampS;
 }
 
-uint8_t data_log_get_flash_usage() {
+uint8_t dataLog_getFlashUsage() {
   if (flightNum == 0) {  // In a cli state, curWriteAddress is not valid
-    data_log_get_last_flight_num();
+    dataLog_getLastFlightNum();
     curWriteAddress = curSectorNum * FLASH_MAX_SECTOR_BYTES +
                       FLIGHT_METADATA_PAGES * FLASH_MIN_PAGE_SIZE_BYTES;
   }
@@ -562,43 +560,43 @@ uint8_t data_log_get_flash_usage() {
   return usage;
 }
 
-void data_log_load_cli_configs() {
-  CliConfigs_s *cliConfig = cliGetConfigs();
+void dataLog_loadCliConfigs() {
+  CliConfigs_s *cliConfig = cli_getConfigs();
   uint32_t firstAddress = CONFIG_START_ADDRESS;
   uint32_t maxCount =
       (FLASH_MAX_SECTOR_BYTES - CONFIG_START_ADDRESS) / kCliConfigSize;
   currentConfigAddress =
       kCliConfigSize +
-      data_log_get_last_packet_type(firstAddress, maxCount, kCliConfigSize);
+      dataLog_getLastPacketType(firstAddress, maxCount, kCliConfigSize);
   *cliConfig = *(CliConfigs_s *)packetBuffer;
-  if (packet_is_empty((uint8_t *)cliConfig, kCliConfigSize)) {
-    cliSetDefaultConfig();
+  if (packetIsEmpty((uint8_t *)cliConfig, kCliConfigSize)) {
+    cli_setDefaultConfig();
   }
 #if HAS_DEV(RADIO)
   // Set the radio channel to be whatever we are using from the cli configs,
   // since we may have something saved that isn't the default that gets
   // initially set on init
-  HM_RadioSetChannel(RADIO_CLI_ID, cliConfig->radioChannel);
+  hm_radioSetChannel(RADIO_CLI_ID, cliConfig->radioChannel);
 #endif  // HAS_DEV(RADIO)
 }
 
-void data_log_write_cli_configs() {
-  CliConfigs_s *cliConfig = cliGetConfigs();
+void dataLog_writeCliConfigs() {
+  CliConfigs_s *cliConfig = cli_getConfigs();
   uint32_t second_page_bytes =
       (currentConfigAddress + kCliConfigSize) % FLASH_MIN_PAGE_SIZE_BYTES;
   if (second_page_bytes >= kCliConfigSize) second_page_bytes = 0;
   uint32_t first_page_bytes = kCliConfigSize - second_page_bytes;
   // Write to first page and, if necessary, second page
-  flash_write(currentConfigAddress, first_page_bytes, (uint8_t *)cliConfig);
+  flashWrite(currentConfigAddress, first_page_bytes, (uint8_t *)cliConfig);
   if (second_page_bytes > 0) {
-    flash_write(currentConfigAddress + first_page_bytes, second_page_bytes,
-                (uint8_t *)cliConfig + first_page_bytes);
+    flashWrite(currentConfigAddress + first_page_bytes, second_page_bytes,
+               (uint8_t *)cliConfig + first_page_bytes);
   }
   currentConfigAddress += kCliConfigSize;
   if (currentConfigAddress > FLASH_MAX_SECTOR_BYTES - kCliConfigSize) {
-    flash_read(0, CONFIG_START_ADDRESS, packetBuffer);
-    flash_erase_sector(0);
-    flash_write(0, CONFIG_START_ADDRESS, packetBuffer);
+    flashRead(0, CONFIG_START_ADDRESS, packetBuffer);
+    flashEraseSector(0);
+    flashWrite(0, CONFIG_START_ADDRESS, packetBuffer);
     currentConfigAddress = CONFIG_START_ADDRESS;
   }
 }

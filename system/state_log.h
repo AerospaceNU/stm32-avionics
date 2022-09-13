@@ -9,24 +9,24 @@
 extern "C" {
 #endif
 
-void state_log_reload_flight();
+void stateLog_reloadFlight();
 
 /**
  * @brief Writes an integer state id to the state log
  * @param currentState: int representation of the state id
  */
-void state_log_write(int currentState);
+void stateLog_write(int currentState);
 
 /**
  * @brief mark that a flight has completed and no states should be resumed
  */
-void state_log_write_complete();
+void stateLog_writeComplete();
 
 /**
  * @brief reads the most recent state from the state log
  * @return int representing the state id
  */
-int state_log_read();
+int stateLog_read();
 
 #ifdef __cplusplus
 }

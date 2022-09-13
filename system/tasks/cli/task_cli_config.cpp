@@ -15,12 +15,12 @@ static char msg[110 + 4];
 
 static void generateConfigHelp(const char* name, const char* value) {
   snprintf(msg, sizeof(msg), "%-30s %-80s\r\n", name, value);
-  cliSend(msg);
+  cli_send(msg);
 }
 
-void cli_tasks::cliConfig() {
+void CliTasks::config() {
   // Get command line options
-  CliOptionVals_s options = cliGetOptions();
+  CliOptionVals_s options = cli_getOptions();
   // Configure triggers
   char* endPtr;
 
@@ -28,24 +28,24 @@ void cli_tasks::cliConfig() {
     // Configuring triggers
     int triggerNum = strtol(options.t, &endPtr, 10);
     if (*endPtr != '\0' || triggerNum < 0 || triggerNum >= MAX_TRIGGER) {
-      cliSendAck(false, "Invalid trigger number");
+      cli_sendAck(false, "Invalid trigger number");
       return;
     }
 
     TriggerConfig_s* triggerConfig =
-        cliGetConfigs()->triggerConfiguration + triggerNum;
+        cli_getConfigs()->triggerConfiguration + triggerNum;
     // Get trigger type
     if (!options.m) {
-      cliSendAck(false, "-m flag must be provided");
+      cli_sendAck(false, "-m flag must be provided");
       return;
     }
     if (!options.p) {
-      cliSendAck(false, "-p flag must be provided");
+      cli_sendAck(false, "-p flag must be provided");
       return;
     }
     int mode = strtol(options.m, &endPtr, 10);
     if (*endPtr != '\0') {
-      cliSendAck(false, "Invalid trigger mode");
+      cli_sendAck(false, "Invalid trigger mode");
       return;
     }
 
@@ -60,7 +60,7 @@ void cli_tasks::cliConfig() {
         maxPort = 255;  // Max uint8 value
         break;
       default:
-        cliSendAck(false, "Invalid trigger mode");
+        cli_sendAck(false, "Invalid trigger mode");
         return;
     }
 
@@ -68,7 +68,7 @@ void cli_tasks::cliConfig() {
 
     int port = strtol(options.p, &endPtr, 10);
     if (*endPtr != '\0' || port < 0 || port >= maxPort) {
-      cliSendAck(false, "Invalid port number");
+      cli_sendAck(false, "Invalid port number");
       return;
     }
 
@@ -85,53 +85,53 @@ void cli_tasks::cliConfig() {
     } else if (options.C) {
       triggerConfig->flags = FLAG_CUSTOM_MARMON_CLAMP;
     } else if (options.H) {
-      double pyroAlt = small_strtod(options.H, &endPtr);
+      double pyroAlt = smallStrtod(options.H, &endPtr);
       if (*endPtr != '\0') {
-        cliSendAck(false, "Trigger deploy altitude invalid float");
+        cli_sendAck(false, "Trigger deploy altitude invalid float");
         return;
       }
       triggerConfig->flags = FLAG_ALT_DURING_DESCENT;
       triggerConfig->configValue = pyroAlt;
     } else if (options.D) {
-      double apogeeDelay = small_strtod(options.D, &endPtr);
+      double apogeeDelay = smallStrtod(options.D, &endPtr);
       if (*endPtr != '\0') {
-        cliSendAck(false, "Apogee delay invalid float");
+        cli_sendAck(false, "Apogee delay invalid float");
         return;
       }
       triggerConfig->flags = FLAG_APOGEE_DELAY;
       triggerConfig->configValue = apogeeDelay;
     } else {
-      cliSendAck(false,
-                 "Trigger config must either specify a condition (see --help "
-                 "for details)");
+      cli_sendAck(false,
+                  "Trigger config must either specify a condition (see --help "
+                  "for details)");
       return;
     }
     // Write new cli configs to flash
-    data_log_write_cli_configs();
+    dataLog_writeCliConfigs();
   }
 
   // Configure ground elevation
   if (options.e) {
-    double elevation = small_strtod(options.e, &endPtr);
+    double elevation = smallStrtod(options.e, &endPtr);
     if (*endPtr != '\0') {
-      cliSendAck(false, "Ground elevation invalid float");
+      cli_sendAck(false, "Ground elevation invalid float");
       return;
     }
-    cliGetConfigs()->groundElevationM = elevation;
+    cli_getConfigs()->groundElevationM = elevation;
     // Write new cli configs to flash
-    data_log_write_cli_configs();
+    dataLog_writeCliConfigs();
   }
 
   // Configure ground temperature
   if (options.r) {
-    double temperature = small_strtod(options.r, &endPtr);
+    double temperature = smallStrtod(options.r, &endPtr);
     if (*endPtr != '\0') {
-      cliSendAck(false, "Ground temperature invalid float");
+      cli_sendAck(false, "Ground temperature invalid float");
       return;
     }
-    cliGetConfigs()->groundTemperatureC = temperature;
+    cli_getConfigs()->groundTemperatureC = temperature;
     // Write new cli configs to flash
-    data_log_write_cli_configs();
+    dataLog_writeCliConfigs();
   }
 
   // Configure radio channel
@@ -139,20 +139,20 @@ void cli_tasks::cliConfig() {
     errno = 0;
     int channel = strtol(options.c, &endPtr, 0);
     if (*endPtr != '\0' || (errno != 0 && channel == 0)) {
-      cliSendAck(false, "Invalid channel integer");
+      cli_sendAck(false, "Invalid channel integer");
       return;
     }
-    cliGetConfigs()->radioChannel = channel;
+    cli_getConfigs()->radioChannel = channel;
     // Write new cli configs to flash
-    data_log_write_cli_configs();
+    dataLog_writeCliConfigs();
     // For now, set all channels since there's no support for multiple radios
     for (int i = 0; i < NUM_RADIO; i++) {
-      HM_RadioSetChannel(i, channel);
+      hm_radioSetChannel(i, channel);
     }
   }
 
   // Send positive ACK (all inputs have been appropriately processed)
-  cliSendAck(true, nullptr);
+  cli_sendAck(true, nullptr);
 
   // Send help message to cli
   if (options.h) {
@@ -160,12 +160,12 @@ void cli_tasks::cliConfig() {
     char val[80];
     char float_buff[10];
     // New line
-    cliSend("\r\n");
+    cli_send("\r\n");
     // Print all triggers
     for (int i = 0; i < MAX_TRIGGER; i++) {
       snprintf(name, sizeof(name), "Trigger %i Configuration:", i);
       TriggerConfig_s* triggerConfig =
-          (cliGetConfigs()->triggerConfiguration + i);
+          (cli_getConfigs()->triggerConfiguration + i);
       dtoa(float_buff, sizeof(float_buff), triggerConfig->configValue, 2);
       const char* deviceText;
 
@@ -223,18 +223,18 @@ void cli_tasks::cliConfig() {
       generateConfigHelp(name, val);
     }
     // Ground elevation
-    dtoa(val, sizeof(val), cliGetConfigs()->groundElevationM, 3);
+    dtoa(val, sizeof(val), cli_getConfigs()->groundElevationM, 3);
     generateConfigHelp("Ground Elevation (m):", val);
     // Ground temperature
 
-    dtoa(val, sizeof(val), cliGetConfigs()->groundTemperatureC, 3);
+    dtoa(val, sizeof(val), cli_getConfigs()->groundTemperatureC, 3);
     generateConfigHelp("Ground Temperature (C):", val);
     // Radio channel
-    snprintf(val, sizeof(val), "%i", cliGetConfigs()->radioChannel);
+    snprintf(val, sizeof(val), "%i", cli_getConfigs()->radioChannel);
     generateConfigHelp("Radio Channel:", val);
   }
 
   // If reached, send complete message to CLI
-  cliSendComplete(true, nullptr);
+  cli_sendComplete(true, nullptr);
   return;
 }

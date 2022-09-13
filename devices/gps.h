@@ -30,8 +30,6 @@ typedef struct {
 
 void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type);
 
-void gps_process_data(GpsCtrl_s *gps);
-
-bool gps_new_data(GpsCtrl_s *gps);
+bool gps_newData(GpsCtrl_s *gps);
 
 #endif  // DEVICES_GPS_H_

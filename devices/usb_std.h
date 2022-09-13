@@ -21,7 +21,7 @@ extern "C" {
 /**
  * @brief Initialize USB device. RX occurs automatically
  */
-void usbStdInit();
+void usbStd_init();
 
 /**
  * @brief Transmit data over USB
@@ -29,19 +29,19 @@ void usbStdInit();
  * @param[in] len: Length of data to transmit
  * @return True on success, False on failure
  */
-bool usbStdTransmit(uint8_t* buf, uint16_t len);
+bool usbStd_transmit(uint8_t* buf, uint16_t len);
 
 /**
  * @brief Retrieve circular RX buffer
  * @return Pointer to circular buffer
  */
-CircularBuffer_s* usbStdGetRxBuffer();
+CircularBuffer_s* usbStd_getRxBuffer();
 
 /**
  * @brief Whether USB is connected or not
  * @return Connected (true) or disconnected (false)
  */
-bool usbStdIsConnected();
+bool usbStd_isConnected();
 
 #ifdef __cplusplus
 }
