@@ -40,6 +40,8 @@ void cli_tasks::cliHelp() {
               "Clear state log and move back to preflight");
   generateDoc("--erase", "", "Fully erases on-board flash");
   generateDoc("--help", "", "FCB produces standard command line help string");
+  generateDoc("--linecutter", "-i int*1 -c string*1",
+              "Send linecutter with given ID a given command");
   generateDoc("--offload", "",
               "Offloads the last flight recorded on the board");
   generateDoc("", "-f int*1", "Offload a specific flight number off the board");
