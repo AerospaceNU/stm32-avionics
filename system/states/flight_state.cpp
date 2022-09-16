@@ -13,8 +13,8 @@
 #include "cli_tasks.h"
 #include "data_log.h"
 #include "hardware_manager.h"
-#include "pyro_manager.h"
 #include "radio_manager.h"
+#include "trigger_manager.h"
 
 EndCondition_e FlightState::m_lastCliEndConn;
 
@@ -27,7 +27,7 @@ EndCondition_e FlightState::run_state() {
   // Collect, filter, and log all sensor data
   HM_ReadSensorData();
   SensorData_s* sensorData = HM_GetSensorData();
-  filterApplyData(sensorData, HM_GetSensorProperties(), m_hasPastApogee);
+  filterApplyData(sensorData, HM_GetSensorProperties(), m_hasPassedApogee);
   FilterData_s* filterData = filterGetData();
 
   // For now, transmit data to all attached radios
@@ -36,7 +36,8 @@ EndCondition_e FlightState::run_state() {
   }
 
   // Update pyros
-  PyroManager_Update(filterData, m_hasPastApogee);
+  TriggerManager_Update(filterData, m_hasPassedLaunch, m_hasPassedApogee,
+                        m_hasPassedTouchdown);
 
   // Run buzzer heartbeat
   buzzerHeartbeat();

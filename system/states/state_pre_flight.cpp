@@ -8,7 +8,7 @@
 #include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
-#include "pyro_manager.h"
+#include "trigger_manager.h"
 
 void PreFlightState::init() {
   transitionResetTimer = HM_Millis();
@@ -25,7 +25,7 @@ void PreFlightState::init() {
 
   simModeStarted = false;
   gpsTimestamp = false;
-  PyroManager_Init();
+  TriggerManager_Init();
   filterInit(this->period_ms_ / 1000.0);
   HM_ReadSensorData();
   filterSetPressureRef(filterGetAveragePressure(HM_GetSensorData()));

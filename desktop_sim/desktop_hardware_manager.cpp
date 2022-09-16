@@ -266,6 +266,14 @@ void HM_PyroFire(int pyroId, uint32_t duration) {
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
 
+void HM_PyroSet(int pyroId, bool enable) {
+#if HAS_DEV(PYRO_DESKTOP_PRINT)
+  if (IS_DEVICE(pyroId, PYRO_DESKTOP_PRINT)) {
+    printPyro_set(&printPyro[pyroId - FIRST_ID_PYRO_DESKTOP_PRINT], enable);
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+}
+
 void HM_PyroUpdate() {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   for (int i = 0; i < NUM_PYRO_DESKTOP_PRINT; i++) {

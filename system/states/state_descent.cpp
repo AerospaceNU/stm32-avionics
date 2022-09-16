@@ -23,18 +23,6 @@ EndCondition_e DescentState::run() {
   FilterData_s* filterData = filterGetData();
   data_log_write(sensorData, filterData, this->getID());
 
-  // TODO this logic does NOT belong here!
-
-  // If below X meters, disreef
-  if (filterData->pos_z < 400 && !sentCut1) {
-    HM_LineCuttersSendCut(1);
-    sentCut1 = true;
-  }
-  if (filterData->pos_z < 200 && !sentCut2) {
-    HM_LineCuttersSendCut(2);
-    sentCut2 = true;
-  }
-
   // Reset touchdown threshold counter if recent change in z position is large
   // enough
   if (fabs(altitude - filterData->pos_z) > kTouchdownZPosChangeThreshold) {

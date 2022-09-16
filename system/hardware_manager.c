@@ -857,6 +857,14 @@ void HM_PyroFire(int pyroId, uint32_t duration) {
 #endif  // HAS_DEV(PYRO_DIGITAL)
 }
 
+void HM_PyroSet(int pyroId, bool enable) {
+#if HAS_DEV(PYRO_DIGITAL)
+  if (IS_DEVICE(pyroId, PYRO_DIGITAL)) {
+    PyroDigital_set(&pyroDigital[pyroId - FIRST_ID_PYRO_DIGITAL], enable);
+  }
+#endif  // HAS_DEV(PYRO_DIGITAL)
+}
+
 void HM_PyroUpdate() {
 #if HAS_DEV(PYRO_DIGITAL)
   for (int i = 0; i < NUM_PYRO_DIGITAL; i++) {

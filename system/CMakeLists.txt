@@ -4,14 +4,14 @@ set(SYSTEM_FILES_LIST
         scheduler.cpp
         state_log.c
         data_log.c
-        pyro_manager.c
+        trigger_manager.c
 
         tasks/buzzer_heartbeat.c
         tasks/data_offload.c
         tasks/cli/task_cli_config.cpp
         tasks/cli/task_cli_help.cpp
         tasks/cli/task_cli_main.cpp
-        tasks/cli/task_cli_pyro.cpp
+        tasks/cli/task_cli_trigger.cpp
         tasks/cli/task_cli_sense.cpp
         tasks/cli/task_cli_linecutter.cpp
         tasks/cli/task_cli_version.cpp

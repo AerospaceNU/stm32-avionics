@@ -33,7 +33,7 @@
 
 #define NUM_LINE_CUTTER_BLE 0
 
-#define NUM_PYRO_DIGITAL 3
+#define NUM_PYRO_DIGITAL 6
 
 #define NUM_PYRO_CONT_ADC 6
 

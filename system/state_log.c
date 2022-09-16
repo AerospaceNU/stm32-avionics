@@ -10,7 +10,7 @@
 #include "filters.h"
 #include "hardware_manager.h"
 #include "internal_flash.h"
-#include "pyro_manager.h"
+#include "trigger_manager.h"
 
 #define STATE_START_ADDRESS \
   0x00000000;  // Starting flash location for the state log, relative to start
@@ -28,9 +28,9 @@ void state_log_reload_flight() {
 
   // Load in recovered values
   filterSetPressureRef(oldMetadataPacket.pressureRef);
-  PyroManager_Init();
-  PyroManager_SetApogeeTime(HM_Millis());
-  PyroManager_SetPyroFireStatus(~oldMetadataPacket.pyroFireStatus);
+  TriggerManager_Init();
+  TriggerManager_SetApogeeTime(HM_Millis());
+  TriggerManager_SetTriggerFireStatus(~oldMetadataPacket.triggerFireStatus);
 
   // Assign a new flight
   data_log_assign_flight();

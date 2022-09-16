@@ -21,6 +21,7 @@ typedef struct {
 
 void printPyro_init(PrintPyroCtrl_s *pyro, int id);
 void printPyro_start(PrintPyroCtrl_s *pyro, uint32_t duration);
+void printPyro_set(PrintPyroCtrl_s *pyro, bool enable);
 void printPyro_tick(PrintPyroCtrl_s *pyro);
 
 #ifdef __cplusplus

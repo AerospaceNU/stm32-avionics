@@ -5,8 +5,8 @@
 #include "data_log.h"
 #include "filters.h"
 #include "hardware_manager.h"
-#include "pyro_manager.h"
 #include "state_log.h"
+#include "trigger_manager.h"
 
 void AscentState::init() {
   // Write launched status
@@ -37,4 +37,4 @@ EndCondition_e AscentState::run() {
   return EndCondition_e::NoChange;
 }
 
-void AscentState::cleanup() { PyroManager_SetApogeeTime(HM_Millis()); }
+void AscentState::cleanup() { TriggerManager_SetApogeeTime(HM_Millis()); }

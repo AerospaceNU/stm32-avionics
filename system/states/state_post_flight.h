@@ -6,7 +6,7 @@
 class PostFlightState : public FlightState {
  public:
   PostFlightState(int id, uint32_t period_ms)
-      : FlightState(id, period_ms, true) {}
+      : FlightState(id, period_ms, true, true, true) {}
 
   void init(void) override;
 

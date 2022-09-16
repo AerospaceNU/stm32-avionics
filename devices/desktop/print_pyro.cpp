@@ -18,6 +18,10 @@ void printPyro_start(PrintPyroCtrl_s *pyro, uint32_t duration) {
   printf("Writing pyro %i to ON\n", pyro->id);
 }
 
+void printPyro_set(PrintPyroCtrl_s *pyro, bool enable) {
+  printf("Setting pyro %i to %s\n", enable ? "ON" : "OFF");
+}
+
 void printPyro_tick(PrintPyroCtrl_s *pyro) {
   if (pyro->expireTime != 0 &&
       std::chrono::duration_cast<std::chrono::milliseconds>(

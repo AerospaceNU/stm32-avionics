@@ -26,7 +26,7 @@ typedef struct {
   uint32_t lineCutterLastSent;
   uint32_t lineCutterVarsLastSent;
   uint32_t altInfoLastSent;
-  uint32_t pyroInfoLastSent;
+  uint32_t triggerInfoLastSent;
   uint32_t cliStringLastSent;
 } DataTransmitState_s;
 

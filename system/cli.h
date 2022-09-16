@@ -15,7 +15,7 @@ extern "C" {
 #include "board_config_common.h"
 #include "circular_buffer.h"
 #include "data_structures.h"
-#include "pyro_manager.h"
+#include "trigger_manager.h"
 
 /**
  * Ways the command line can receive information
@@ -35,7 +35,7 @@ typedef enum {
   SENSE,
   SIM,
   HELP,
-  PYROFIRE,
+  TRIGGERFIRE,
   VERSION,
   NUM_CLI_COMMANDS,
 } CliCommand_e;
@@ -45,12 +45,17 @@ typedef enum {
  */
 typedef struct {
   char* f;      // flight number
-  char* p;      // pyro number
-  char* H;      // pyro deploy altitude
-  char* D;      // pyro deploy apogee delay
-  bool A;       // pyro mode
+  char* t;      // trigger number
+  char* m;      // trigger mode
+  char* p;      // device port, e.g. pyro port or line cutter channel
+  char* H;      // trigger deploy altitude
+  char* D;      // trigger deploy apogee delay
+  bool A;       // trigger mode (apogee)
+  bool L;       // trigger mode (launch)
+  bool T;       // trigger mode (touchdown)
+  bool M;       // trigger mode (manual)
   char* e;      // ground elevation
-  char* t;      // ground temperature
+  char* r;      // ground temperature
   bool h;       // help flag
   char* c;      // Radio channel, can be negative
   char* lcCmd;  // Line cuttter command
@@ -61,9 +66,7 @@ typedef struct {
  * Configs that can be changed via CLI
  */
 typedef struct {
-#if HAS_DEV(PYRO)
-  PyroConfig_s pyroConfiguration[NUM_PYRO];
-#endif  // HAS_DEV(PYRO)
+  TriggerConfig_s triggerConfiguration[MAX_TRIGGER];
   double groundElevationM;
   double groundTemperatureC;
   int radioChannel;

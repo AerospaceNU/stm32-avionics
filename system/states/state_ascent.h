@@ -5,7 +5,8 @@
 
 class AscentState : public FlightState {
  public:
-  AscentState(int id, uint32_t period_ms) : FlightState(id, period_ms, false) {}
+  AscentState(int id, uint32_t period_ms)
+      : FlightState(id, period_ms, true, false, false) {}
 
   void init(void) override;
 

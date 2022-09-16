@@ -12,15 +12,21 @@
 
 class FlightState : public State {
  public:
-  FlightState(int id, uint32_t period_ms, bool hasPastApogee)
-      : State(id, period_ms), m_hasPastApogee{hasPastApogee} {}
+  FlightState(int id, uint32_t period_ms, bool hasPassedLaunch,
+              bool hasPassedApogee, bool hasPassedTouchdown)
+      : State(id, period_ms),
+        m_hasPassedLaunch{hasPassedLaunch},
+        m_hasPassedApogee{hasPassedApogee},
+        m_hasPassedTouchdown{hasPassedTouchdown} {}
 
   ~FlightState() = default;
 
   EndCondition_e run_state() override;
 
  protected:
-  bool m_hasPastApogee;
+  bool m_hasPassedLaunch;
+  bool m_hasPassedApogee;
+  bool m_hasPassedTouchdown;
 
  public:
   static EndCondition_e m_lastCliEndConn;

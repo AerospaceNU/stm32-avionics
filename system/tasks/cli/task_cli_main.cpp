@@ -93,9 +93,9 @@ EndCondition_e cli_tasks::cliTick() {
         } else {
           ILLEGAL_TRANSITION
         }
-      case CliCommand_e::PYROFIRE:
-        if (allowedTransitions[CliCommand_e::PYROFIRE]) {
-          cliPyroFire();
+      case CliCommand_e::TRIGGERFIRE:
+        if (allowedTransitions[CliCommand_e::TRIGGERFIRE]) {
+          cliTriggerFire();
         } else {
           ILLEGAL_TRANSITION
         }

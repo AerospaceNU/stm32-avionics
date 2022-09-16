@@ -23,13 +23,19 @@ static char
 static uint8_t radioRxBuffer[INPUT_BUFFER_SIZE];
 static CircularBuffer_s radioRxCircBuffer;
 
-static CliOptionVals_s cliOptionVals = {.p = NULL,
+static CliOptionVals_s cliOptionVals = {.f = NULL,
+                                        .t = NULL,
+                                        .m = NULL,
+                                        .p = NULL,
                                         .H = NULL,
                                         .D = NULL,
                                         .e = NULL,
-                                        .t = NULL,
-                                        .f = NULL,
+                                        .r = NULL,
+                                        .c = NULL,
                                         .A = false,
+                                        .L = false,
+                                        .T = false,
+                                        .M = false,
                                         .h = false,
                                         .lcCmd = NULL,
                                         .lcId = NULL};
@@ -44,12 +50,12 @@ static struct option longOptions[] = {
     {"offload", no_argument, &primaryCommand, OFFLOAD},
     {"sim", no_argument, &primaryCommand, SIM},
     {"sense", no_argument, &primaryCommand, SENSE},
-    {"pyrofire", no_argument, &primaryCommand, PYROFIRE},
+    {"triggerfire", no_argument, &primaryCommand, TRIGGERFIRE},
     {"linecutter", no_argument, &primaryCommand, LINECUTTER},
     {"version", no_argument, &primaryCommand, VERSION},
     {0, 0, 0, 0}};
 
-static CliConfigs_s cliConfigs;
+static CliConfigs_s cliConfigs = {0};
 
 static CliComms_e lastCommsType;  // Used to help send ack to right places
 
@@ -81,10 +87,14 @@ CliConfigs_s* cliGetConfigs() { return &cliConfigs; }
 
 void cliSetDefaultConfig() {
 #if NUM_PYRO > 0
-  cliConfigs.pyroConfiguration[0].flags = 0b1;  // FLAG_APOGEE
+  cliConfigs.triggerConfiguration[0].mode = TRIGGER_TYPE_PYRO;
+  cliConfigs.triggerConfiguration[0].port = 0;  // Pyro # 1
+  cliConfigs.triggerConfiguration[0].flags = FLAG_APOGEE;
 #if NUM_PYRO > 1
-  cliConfigs.pyroConfiguration[1].flags = 0b10;  // FLAG_DESCENT_ALT_THRESHOLD
-  cliConfigs.pyroConfiguration[1].configValue = 230;  // 230 m deploy
+  cliConfigs.triggerConfiguration[0].mode = TRIGGER_TYPE_PYRO;
+  cliConfigs.triggerConfiguration[0].port = 1;  // Pyro # 2
+  cliConfigs.triggerConfiguration[1].flags = FLAG_ALT_DURING_DESCENT;
+  cliConfigs.triggerConfiguration[1].configValue = 230;  // 230 m deploy
 
 #endif  // NUM_PYRO > 1
 #endif  // NUM_PYRO > 0
@@ -179,19 +189,25 @@ CliCommand_e cliParse(CliComms_e commsType) {
   int optionIndex = 0;
   optind = 0;
   primaryCommand = NONE;
-  while ((opt = getopt_long(argc, argv, "p:H:D:e:t:f:c:i:Ah", longOptions,
-                            &optionIndex)) != -1) {
+  while ((opt = getopt_long(argc, argv, "m:r:p:H:D:e:t:f:c:i:ALTMh",
+                            longOptions, &optionIndex)) != -1) {
     switch (opt) {
       case 0:
         // New primary command was set
+        cliOptionVals.f = NULL;
+        cliOptionVals.t = NULL;
+        cliOptionVals.m = NULL;
         cliOptionVals.p = NULL;
         cliOptionVals.H = NULL;
-        cliOptionVals.A = false;
-        cliOptionVals.f = NULL;
+        cliOptionVals.D = NULL;
         cliOptionVals.e = NULL;
-        cliOptionVals.t = NULL;
-        cliOptionVals.h = false;
+        cliOptionVals.r = NULL;
         cliOptionVals.c = NULL;
+        cliOptionVals.A = false;
+        cliOptionVals.L = false;
+        cliOptionVals.T = false;
+        cliOptionVals.M = false;
+        cliOptionVals.h = false;
         cliOptionVals.lcCmd = NULL;
         cliOptionVals.lcId = NULL;
         break;
@@ -200,19 +216,39 @@ CliCommand_e cliParse(CliComms_e commsType) {
           cliOptionVals.f = optarg;
         }
         break;
-      case 'h':
-        if (primaryCommand == OFFLOAD || primaryCommand == CONFIG) {
-          cliOptionVals.h = true;
+      case 't':
+        if (primaryCommand == CONFIG || primaryCommand == TRIGGERFIRE) {
+          cliOptionVals.t = optarg;
+        }
+        break;
+      case 'm':
+        if (primaryCommand == CONFIG) {
+          cliOptionVals.m = optarg;
         }
         break;
       case 'p':
-        if (primaryCommand == CONFIG || primaryCommand == PYROFIRE) {
+        if (primaryCommand == CONFIG) {
           cliOptionVals.p = optarg;
         }
         break;
       case 'A':
         if (primaryCommand == CONFIG) {
           cliOptionVals.A = true;
+        }
+        break;
+      case 'L':
+        if (primaryCommand == CONFIG) {
+          cliOptionVals.L = true;
+        }
+        break;
+      case 'T':
+        if (primaryCommand == CONFIG) {
+          cliOptionVals.T = true;
+        }
+        break;
+      case 'M':
+        if (primaryCommand == CONFIG) {
+          cliOptionVals.M = true;
         }
         break;
       case 'H':
@@ -225,14 +261,20 @@ CliCommand_e cliParse(CliComms_e commsType) {
           cliOptionVals.D = optarg;
         }
         break;
+      case 'h':
+        if (primaryCommand == OFFLOAD || primaryCommand == CONFIG) {
+          cliOptionVals.h = true;
+        }
+        break;
+
       case 'e':
         if (primaryCommand == CONFIG) {
           cliOptionVals.e = optarg;
         }
         break;
-      case 't':
+      case 'r':
         if (primaryCommand == CONFIG) {
-          cliOptionVals.t = optarg;
+          cliOptionVals.r = optarg;
         }
         break;
       case 'c':

@@ -13,7 +13,7 @@ void ConfigureForGround();
 void cliConfig();
 void cliSense();
 void cliHelp();
-void cliPyroFire();
+void cliTriggerFire();
 void cliSendLineCutterstring();  // Send a string to a line cutter
 void cliVersion();
 

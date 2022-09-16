@@ -54,9 +54,7 @@ typedef struct __attribute__((__packed__)) {
 #if HAS_DEV(PYRO_CONT)
   uint8_t pyroContinuity;
 #endif  // HAS_DEV(PYRO_CONT)
-#if HAS_DEV(PYRO)
-  uint8_t pyroStatus;
-#endif  // HAS_DEV(PYRO)
+  uint8_t triggerStatus;
   double heading, vtg;
   double pos_x, pos_y, pos_z;
   double vel_x, vel_y, vel_z;
@@ -364,9 +362,7 @@ void data_log_write(SensorData_s *sensorData, FilterData_s *filterData,
       logPacket.pyroContinuity |= ((sensorData->pyroContData[i] & 0x01) << i);
     }
 #endif  // HAS_DEV(PYRO_CONT)
-#if HAS_DEV(PYRO)
-    logPacket.pyroStatus = PyroManager_Status();
-#endif  // HAS_DEV(PYRO)
+    logPacket.triggerStatus = TriggerManager_Status();
     logPacket.heading = filterData->heading;
     logPacket.vtg = filterData->vtg;
     logPacket.pos_x = filterData->pos_x;

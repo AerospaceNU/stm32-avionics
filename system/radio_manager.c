@@ -84,7 +84,7 @@ void RadioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
 // Packet rates, in hz
 #define ORIENTATION_RATE 10
 #define POSITION_RATE 10
-#define PYRO_INFO_RATE 1
+#define TRIGGER_INFO_RATE 1
 
 void RadioManager_transmitData(int radioId, SensorData_s *sensorData,
                                FilterData_s *filterData, uint8_t state) {
@@ -203,16 +203,16 @@ void RadioManager_transmitData(int radioId, SensorData_s *sensorData,
 #endif  // HAS_DEV(BAROMETER)
 
 #if HAS_DEV(PYRO_CONT)
-  if (currentTime - lastSent[radioId].pyroInfoLastSent >=
-      1000 / PYRO_INFO_RATE) {
+  if (currentTime - lastSent[radioId].triggerInfoLastSent >=
+      1000 / TRIGGER_INFO_RATE) {
     uint8_t pyroCont = 0;
     for (int i = 0; i < NUM_PYRO_CONT; i++)
       pyroCont |= ((sensorData->pyroContData[i] & 0x01) << i);
-    PyroInfoPacket_s data = {pyroCont, PyroManager_Status()};
+    TriggerInfoPacket_s data = {pyroCont, TriggerManager_Status()};
 
-    transmitPacket[radioId].packetType = TELEMETRY_ID_PYRO_INFO;
-    transmitPacket[radioId].payload.pyroInfo = data;
-    lastSent[radioId].pyroInfoLastSent = currentTime;
+    transmitPacket[radioId].packetType = TELEMETRY_ID_TRIGGER_INFO;
+    transmitPacket[radioId].payload.triggerInfo = data;
+    lastSent[radioId].triggerInfoLastSent = currentTime;
 
     RadioManager_send_internal(radioId);
   }

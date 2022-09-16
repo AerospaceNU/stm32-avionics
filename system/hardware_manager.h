@@ -157,6 +157,7 @@ bool HM_LineCuttersSendCut(int chan);
 /* Outputs */
 void HM_ServoSetAngle(int servoId, float degrees);
 void HM_PyroFire(int pyroId, uint32_t duration);
+void HM_PyroSet(int pyroId, bool enabled);
 void HM_PyroUpdate();
 void HM_DCMotorSetPercent(int dcMotorId, double percent);
 

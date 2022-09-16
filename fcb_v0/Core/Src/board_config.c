@@ -136,8 +136,10 @@ uint8_t lineCutterBleAddress[NUM_LINE_CUTTER_BLE];
 
 #if HAS_DEV(PYRO_DIGITAL)
 GPIO_TypeDef* pyroDigitalGpioPort[NUM_PYRO_DIGITAL] = {
-    FIRE1_GPIO_Port, FIRE2_GPIO_Port, FIRE3_GPIO_Port};
-uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL] = {FIRE1_Pin, FIRE2_Pin, FIRE3_Pin};
+    FIRE1_GPIO_Port, FIRE2_GPIO_Port, FIRE3_GPIO_Port,
+    FIRE4_GPIO_Port, FIRE5_GPIO_Port, FIRE6_GPIO_Port};
+uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL] = {FIRE1_Pin, FIRE2_Pin, FIRE3_Pin,
+                                             FIRE4_Pin, FIRE5_Pin, FIRE6_Pin};
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
 /* Pyro continuity */
