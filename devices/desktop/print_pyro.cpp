@@ -19,7 +19,7 @@ void printPyro_start(PrintPyroCtrl_s *pyro, uint32_t duration) {
 }
 
 void printPyro_set(PrintPyroCtrl_s *pyro, bool enable) {
-  printf("Setting pyro %i to %s\n", enable ? "ON" : "OFF");
+  printf("Setting pyro %i to %s\n", pyro->id, enable ? "ON" : "OFF");
 }
 
 void printPyro_tick(PrintPyroCtrl_s *pyro) {
