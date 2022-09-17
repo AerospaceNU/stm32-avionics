@@ -11,9 +11,10 @@
 #include "hardware_manager.h"
 #include "small_strtod.h"
 
+static char msg[110 + 4];
+
 static void generateConfigHelp(const char* name, const char* value) {
-  char msg[70 + 4];
-  snprintf(msg, sizeof(msg), "%-30s %-40s\r\n", name, value);
+  snprintf(msg, sizeof(msg), "%-30s %-80s\r\n", name, value);
   cliSend(msg);
 }
 
@@ -81,6 +82,8 @@ void cli_tasks::cliConfig() {
       triggerConfig->flags = FLAG_TOUCHDOWN;
     } else if (options.M) {
       triggerConfig->flags = FLAG_MANUAL;
+    } else if (options.C) {
+      triggerConfig->flags = FLAG_CUSTOM_MARMON_CLAMP;
     } else if (options.H) {
       double pyroAlt = small_strtod(options.H, &endPtr);
       if (*endPtr != '\0') {
@@ -208,6 +211,10 @@ void cli_tasks::cliConfig() {
         case FLAG_MANUAL:
           snprintf(val, sizeof(val), "%s %i manually", deviceText,
                    triggerConfig->port);
+          break;
+        case FLAG_CUSTOM_MARMON_CLAMP:
+          snprintf(val, sizeof(val), "%s %i under 20 m/s before apogee",
+                   deviceText, triggerConfig->port);
           break;
         default:
           snprintf(val, sizeof(val), "None");

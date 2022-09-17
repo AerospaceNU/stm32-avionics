@@ -30,7 +30,8 @@ typedef enum {
   FLAG_APOGEE_DELAY,
   FLAG_LAUNCH,
   FLAG_TOUCHDOWN,
-  FLAG_MANUAL
+  FLAG_MANUAL,
+  FLAG_CUSTOM_MARMON_CLAMP
 } TriggerFlag_e;
 
 typedef struct {

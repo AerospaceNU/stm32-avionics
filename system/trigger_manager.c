@@ -72,6 +72,11 @@ void TriggerManager_Update(FilterData_s* filterData, bool hasPassedLaunch,
             1000 * triggerConfiguration->configValue) {
           TriggerManager_TriggerFire(i, true);
         }
+      } else if (triggerConfiguration->flags == FLAG_CUSTOM_MARMON_CLAMP) {
+        if (hasPassedLaunch && filterData->world_vel_z < 18.3 &&
+            filterData->world_acc_z < 10) {
+          TriggerManager_TriggerFire(i, true);
+        }
       }
     }
     ++triggerConfiguration;

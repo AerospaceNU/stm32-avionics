@@ -36,6 +36,7 @@ static CliOptionVals_s cliOptionVals = {.f = NULL,
                                         .L = false,
                                         .T = false,
                                         .M = false,
+                                        .C = false,
                                         .h = false,
                                         .lcCmd = NULL,
                                         .lcId = NULL};
@@ -189,7 +190,7 @@ CliCommand_e cliParse(CliComms_e commsType) {
   int optionIndex = 0;
   optind = 0;
   primaryCommand = NONE;
-  while ((opt = getopt_long(argc, argv, "m:r:p:H:D:e:t:f:c:i:ALTMh",
+  while ((opt = getopt_long(argc, argv, "m:r:p:H:D:e:t:f:c:i:ALTMhC",
                             longOptions, &optionIndex)) != -1) {
     switch (opt) {
       case 0:
@@ -207,6 +208,7 @@ CliCommand_e cliParse(CliComms_e commsType) {
         cliOptionVals.L = false;
         cliOptionVals.T = false;
         cliOptionVals.M = false;
+        cliOptionVals.C = false;
         cliOptionVals.h = false;
         cliOptionVals.lcCmd = NULL;
         cliOptionVals.lcId = NULL;
@@ -249,6 +251,11 @@ CliCommand_e cliParse(CliComms_e commsType) {
       case 'M':
         if (primaryCommand == CONFIG) {
           cliOptionVals.M = true;
+        }
+        break;
+      case 'C':
+        if (primaryCommand == CONFIG) {
+          cliOptionVals.C = true;
         }
         break;
       case 'H':

@@ -30,7 +30,7 @@ EndCondition_e AscentState::run() {
 
   // Detect apogee if under max z position and negative velocity
   if (maxPosZ - filterData->pos_z > kPosDiffThreshold &&
-      filterData->rocket_vel_x < 0) {
+      filterData->world_vel_z < 0) {
     return EndCondition_e::Apogee;
   }
 

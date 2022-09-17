@@ -29,8 +29,8 @@ void Scheduler::run(void) {
       PreFlightState(StateId_e::PreFlight, defaultPeriod);
   CliTempState tempState = CliTempState(StateId_e::SimTempState, defaultPeriod);
 
-  State* states[] = {&cliEraseFlash, &cliOffload, &ascent,    &initialize,
-                     &descent,       &postFlight, &preFlight, &tempState};
+  State* states[] = {&cliEraseFlash, &cliOffload, &ascent,    &descent,
+                     &initialize,    &postFlight, &preFlight, &tempState};
 
   // Initialize the current and next states
   pCurrentState_ = nullptr;

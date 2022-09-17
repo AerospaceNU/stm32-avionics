@@ -13,7 +13,7 @@
 
 #include "usbd_cdc_if.h"
 
-#define TIME_BETWEEN_TRANSMITS_MS 1
+#define TIME_BETWEEN_TRANSMITS_MS 2
 
 static uint8_t rxBuffer[APP_RX_DATA_SIZE];
 static CircularBuffer_s rxCircBuffer;

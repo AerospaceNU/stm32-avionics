@@ -4,6 +4,8 @@
 #include "cli_tasks.h"
 #include "hardware_manager.h"
 
+static char doc[180 + 5];
+
 /**
  * @brief Generate a single doc line by sending to command line with correct
  * formatting
@@ -13,7 +15,6 @@
  */
 static void generateDoc(const char* primaryCommand, const char* args,
                         const char* desc) {
-  char doc[180 + 5];
   snprintf(doc, sizeof(doc), "%-15s %-15s %-150s\r\n", primaryCommand, args,
            desc);
   cliSend(doc);
@@ -37,6 +38,7 @@ void cli_tasks::cliHelp() {
   generateDoc("", "     -A", "Deploy at apogee");
   generateDoc("", "     -T", "Deploy on touchdown");
   generateDoc("", "     -M", "Deploy manually only");
+  generateDoc("", "     -C", "Custom marmon clamp deploy");
   generateDoc("", "     -D float*1", "Deploy n seconds after apogee");
   generateDoc("", "     -H float*1", "Deploy at given descent altitude");
   generateDoc("", "-e float*1", "Configure ground elevation (in meters)");
@@ -49,8 +51,9 @@ void cli_tasks::cliHelp() {
               "Clear state log and move back to preflight");
   generateDoc("--erase", "", "Fully erases on-board flash");
   generateDoc("--help", "", "FCB produces standard command line help string");
-  generateDoc("--linecutter", "-i int*1 -c string*1",
-              "Send linecutter with given ID a given command");
+  generateDoc("--linecutter", "-i int*1",
+              "Send linecutter cut with given ID (required)");
+  generateDoc("", "-c string*1", "Send a command (required)");
   generateDoc("--offload", "",
               "Offloads the last flight recorded on the board");
   generateDoc("", "-f int*1", "Offload a specific flight number off the board");
