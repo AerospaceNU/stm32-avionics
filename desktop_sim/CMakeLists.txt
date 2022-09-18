@@ -24,7 +24,10 @@ target_link_libraries(desktop_sim PRIVATE Threads::Threads)
 enable_testing()
 
 set(TEST_FILES
-        tests/test_file_flash.cpp)
+        tests/test_file_flash.cpp
+        tests/test_flight.cpp
+        desktop_hardware_manager.cpp board_config.c
+        )
 add_executable(
   desktop_sim_test
   ${TEST_FILES}
@@ -35,6 +38,7 @@ target_link_libraries(
   system
   devices
 )
+target_include_directories(desktop_sim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 include(GoogleTest)
 gtest_discover_tests(desktop_sim_test)

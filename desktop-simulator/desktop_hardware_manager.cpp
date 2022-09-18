@@ -27,6 +27,7 @@ static TcpSocket *radioSocket;
 std::string int_flash_path;
 std::string ext_flash_path;
 std::string output_file;
+bool do_networking = true;
 
 extern "C" {
 
@@ -45,8 +46,9 @@ void HM_HardwareInit() {
   internalFlash = new FileBackedFlash(int_flash_path, FLASH_SIZE_BYTES);
   flightReplay = new CsvReplay(output_file);
   
+  if (do_networking) {
     radioSocket = new TcpSocket{8080};
-
+  }
 
   // TODO this resets the state log, but we start at the
   // beginning of the CSV anyways, so we shouldn't ever
@@ -75,7 +77,7 @@ bool HM_RadioSend(Hardware_t radio, uint8_t *data, uint16_t numBytes) {
 
   memcpy(packet.data, data, numBytes);
 
-  if(radioSocket) {
+  if (radioSocket) {
     radioSocket->writeData((uint8_t *)&packet, sizeof(packet));
   }
 
@@ -153,7 +155,9 @@ void HM_ServoSetAngle(int servoNum, float degrees) {}
 
 void HM_LedSet(int ledNum, bool set) {}
 
-void HM_LedToggle(int ledNum) {}
+void HM_LedToggle(int ledNum) {
+  // std::cout << "LED" << std::endl;
+}
 
 void HM_RadioUpdate() {}
 
