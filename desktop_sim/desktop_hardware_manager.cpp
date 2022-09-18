@@ -88,7 +88,7 @@ bool hardwareStatusVbat[NUM_VBAT];
 FileBackedFlash *internalFlash;
 bool do_networking;
 CircularBuffer_s bleBuffer;
-uint8_t bleArray[1024];
+uint8_t bleArray[1024] = {0};
 
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
@@ -130,7 +130,7 @@ void HM_HardwareInit() {
 
   // TODO stick in ifdef
   cbInit(&bleBuffer, bleArray, sizeof(bleArray), 1);
-  const char* testString = "--linecutter -i n -c \"!arm\"";
+  const char* testString = "--linecutter -i 1 -c \"!arm\"\n";
   for(int i = 0; i < strlen(testString); i++) {
     cbEnqueue(&bleBuffer, &testString[i]);
   }
@@ -269,6 +269,7 @@ LineCutterFlightVars_s *HM_GetLineCutterFlightVariables(int lineCutterId) {
   return nullptr;
 }
 bool HM_LineCutterSendString(int lineCutterNumber, char *string) {
+  printf("[Sent to LC %i] %s\n", lineCutterNumber, string);
   return true;
 }
 bool HM_LineCuttersSendCut(int chan) {

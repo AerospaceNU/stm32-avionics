@@ -15,6 +15,7 @@
 #pragma once
 
 #include <algorithm>
+#include <limits>
 #include <cassert>
 #include <cmath>
 #ifdef HAS_CODECVT
