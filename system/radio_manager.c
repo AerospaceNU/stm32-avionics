@@ -12,17 +12,17 @@
 #include "data_structures.h"
 #include "hardware_manager.h"
 
-static DataRecieveState_t dataRx[NUM_RADIO];
-static DataTransmitState_t lastSent[NUM_RADIO];
+static DataRecieveState_s dataRx[NUM_RADIO];
+static DataTransmitState_s lastSent[NUM_RADIO];
 
-static RadioPacket_t transmitPacket[NUM_RADIO];
+static RadioPacket_s transmitPacket[NUM_RADIO];
 
 static const char *call = "KM6GNL";
 
 void RadioManager_init() {
   for (int i = 0; i < NUM_RADIO; i++) {
     cbInit(&(dataRx[i].rxBuffer), dataRx[i].rxArray, RX_BUFF_LEN,
-           sizeof(RecievedPacket_t));
+           sizeof(RadioRecievedPacket_s));
     HM_RadioRegisterConsumer(i, &dataRx[i].rxBuffer);
 
     strncpy(transmitPacket[i].callsign, call, 8);
@@ -38,7 +38,7 @@ void RadioManager_init() {
 
 //! Must be called periodically to output data over CLI or USB
 void RadioManager_tick() {
-  static RecievedPacket_t packet;
+  static RadioRecievedPacket_s packet;
 
   // Try to dequeue all the packets we've gotten
   for (int i = 0; i < NUM_RADIO; i++) {
@@ -62,10 +62,10 @@ void RadioManager_tick() {
 void RadioManager_send_internal(int radioId) {
   // if (true) {
   HM_RadioSend(radioId, (uint8_t *)&transmitPacket[radioId],
-               sizeof(RadioPacket_t));
+               sizeof(RadioPacket_s));
   /*
    } else {
-     static RecievedPacket_t packet;
+     static RadioRecievedPacket_s packet;
      packet.crc = true;
      packet.lqi = 1;
      packet.rssi = 1;
@@ -84,16 +84,16 @@ void RadioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
 // Packet rates, in hz
 #define ORIENTATION_RATE 10
 #define POSITION_RATE 10
-#define PYRO_INFO_RATE 1
+#define TRIGGER_INFO_RATE 1
 
-void RadioManager_transmitData(int radioId, SensorData_t *sensorData,
-                               FilterData_t *filterData, uint8_t state) {
+void RadioManager_transmitData(int radioId, SensorData_s *sensorData,
+                               FilterData_s *filterData, uint8_t state) {
   uint32_t currentTime = HM_Millis();
   transmitPacket[radioId].timestampMs = currentTime;
 
   /*
   if (currentTime - lastSent[radioId].propStuffLastSent >= 500) {
-    PropulsionPacket_t data = {
+    PropulsionPacket_s data = {
         sensorData->loxTankDucer,  sensorData->kerTankDucer,
         sensorData->purgeDucer,    sensorData->loxInletDucer,
         sensorData->kerInletDucer, sensorData->loxVenturi,
@@ -109,7 +109,7 @@ void RadioManager_transmitData(int radioId, SensorData_t *sensorData,
 
   if (currentTime - lastSent[radioId].orientationLastSent >=
       1000 / ORIENTATION_RATE) {
-    OrientationPacket_t data = {
+    OrientationPacket_s data = {
       state,
       filterData->qw * 100.0,
       filterData->qx * 100.0,
@@ -140,7 +140,7 @@ void RadioManager_transmitData(int radioId, SensorData_t *sensorData,
 
   if (currentTime - lastSent[radioId].positionLastSent >=
       1000 / POSITION_RATE) {
-    PositionPacket_t data = {
+    PositionPacket_s data = {
 #if HAS_DEV(BAROMETER)
       sensorData->barometerData[0].temperatureC,
 #else
@@ -186,7 +186,7 @@ void RadioManager_transmitData(int radioId, SensorData_t *sensorData,
 
 #if HAS_DEV(BAROMETER)
   if (currentTime - lastSent[radioId].altInfoLastSent >= 1213) {
-    AltInfoPacket_t data;
+    AltInfoPacket_s data;
     for (int i = 0; i < NUM_BAROMETER; i++) {
       data.pressure[i] = sensorData->barometerData[i].pressureAtm;
     }
@@ -203,16 +203,16 @@ void RadioManager_transmitData(int radioId, SensorData_t *sensorData,
 #endif  // HAS_DEV(BAROMETER)
 
 #if HAS_DEV(PYRO_CONT)
-  if (currentTime - lastSent[radioId].pyroInfoLastSent >=
-      1000 / PYRO_INFO_RATE) {
+  if (currentTime - lastSent[radioId].triggerInfoLastSent >=
+      1000 / TRIGGER_INFO_RATE) {
     uint8_t pyroCont = 0;
     for (int i = 0; i < NUM_PYRO_CONT; i++)
       pyroCont |= ((sensorData->pyroContData[i] & 0x01) << i);
-    PyroInfoPacket_t data = {pyroCont, PyroManager_Status()};
+    TriggerInfoPacket_s data = {pyroCont, TriggerManager_Status()};
 
-    transmitPacket[radioId].packetType = TELEMETRY_ID_PYRO_INFO;
-    transmitPacket[radioId].payload.pyroInfo = data;
-    lastSent[radioId].pyroInfoLastSent = currentTime;
+    transmitPacket[radioId].packetType = TELEMETRY_ID_TRIGGER_INFO;
+    transmitPacket[radioId].payload.triggerInfo = data;
+    lastSent[radioId].triggerInfoLastSent = currentTime;
 
     RadioManager_send_internal(radioId);
   }

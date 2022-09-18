@@ -86,6 +86,9 @@ bool hardwareStatusVbat[NUM_VBAT];
 /* Hardware objects */
 
 FileBackedFlash *internalFlash;
+bool do_networking;
+CircularBuffer_s bleBuffer;
+uint8_t bleArray[1024];
 
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
@@ -120,6 +123,18 @@ void HM_HardwareInit() {
 
   internalFlash = new FileBackedFlash(int_flash_path, kFlashSizeBytes[0]);
 
+  // TODO this resets the state log, but we start at the
+  // beginning of the CSV anyways, so we shouldn't ever
+  // try to resad from it regardless
+  internalFlash->Reinit(true);
+
+  // TODO stick in ifdef
+  cbInit(&bleBuffer, bleArray, sizeof(bleArray), 1);
+  const char* testString = "--linecutter -i n -c \"!arm\"";
+  for(int i = 0; i < strlen(testString); i++) {
+    cbEnqueue(&bleBuffer, &testString[i]);
+  }
+
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
@@ -141,9 +156,11 @@ void HM_HardwareInit() {
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 
 #if HAS_DEV(RADIO_DESKTOP_SOCKET)
-  for (int i = 0; i < NUM_RADIO_DESKTOP_SOCKET; i++) {
-    radioSocket[i] = new TcpSocket{radioDesktopSocketPort[i]};
-    hardwareStatusRadio[FIRST_ID_RADIO_DESKTOP_SOCKET + i] = true;
+  if (do_networking) {
+    for (int i = 0; i < NUM_RADIO_DESKTOP_SOCKET; i++) {
+      radioSocket[i] = new TcpSocket{radioDesktopSocketPort[i]};
+      hardwareStatusRadio[FIRST_ID_RADIO_DESKTOP_SOCKET + i] = true;
+    }
   }
 #endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
 
@@ -241,7 +258,10 @@ bool HM_BleClientConnected(int bleClientId) { return false; }
 bool HM_BleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
   return false;
 }
-CircularBuffer_s *HM_BleClientGetRxBuffer(int bleClientId) { return nullptr; }
+
+CircularBuffer_s *HM_BleClientGetRxBuffer(int bleClientId) { 
+  return &bleBuffer;
+}
 void HM_BleTick() {}
 
 LineCutterData_s *HM_GetLineCutterData(int lineCutterId) { return nullptr; }

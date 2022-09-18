@@ -1,11 +1,15 @@
+execute_process(
+  COMMAND (echo "#ifndef UTILS_GIT_INFO_H_" && echo "#define UTILS_GIT_INFO_H_" && echo "#ifdef __cplusplus" && echo "extern \"C\" {" && echo "#endif" && echo "const char* GIT_DESCRIBE = \"`git describe`\";" && echo `git log --pretty=format:"const char* GIT_COMMIT_TIME = \"%ci\";" -n 1` && echo `git log --pretty=format:"const char* GIT_COMMIT_MESSAGE = \"%<(50,trunc)%s\";" -n 1` && echo "#ifdef __cplusplus" && echo "}" && echo "#endif" && echo "#endif  // UTILS_GIT_INFO_H_") > git_info.h
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 set(SIMULATOR_FILES_LIST
         main.cpp desktop_hardware_manager.cpp board_config.c)
 
 add_executable(desktop_sim ${SIMULATOR_FILES_LIST})
 
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(desktop_sim PRIVATE system)
-target_link_libraries(desktop_sim PRIVATE devices)
+target_link_libraries(desktop_sim PRIVATE system devices)
 target_include_directories(desktop_sim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 include(FetchContent)
@@ -19,19 +23,20 @@ FetchContent_MakeAvailable(googletest)
 find_package(Threads REQUIRED)
 target_link_libraries(desktop_sim PRIVATE Threads::Threads)
 
-# target_include_directories(desktop_sim PUBLIC ../../external)
-
 enable_testing()
 
 set(TEST_FILES
         tests/test_file_flash.cpp
         tests/test_flight.cpp
+        tests/test_cli_parse.cpp
         desktop_hardware_manager.cpp board_config.c
         )
+
 add_executable(
   desktop_sim_test
   ${TEST_FILES}
 )
+
 target_link_libraries(
   desktop_sim_test
   gtest_main
