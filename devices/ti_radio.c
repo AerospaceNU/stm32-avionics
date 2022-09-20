@@ -121,6 +121,15 @@ void tiRadio_Update(TiRadioCtrl_s *radio) {
   // Don't let anything happen if radio isn't initialized
   if (!radio->initialized) return;
 
+  uint8_t marcstate;
+  cc1120SpiReadReg(radio, TIRADIO_MARC_STATUS1, &marcstate, 1);
+  if (marcstate >= 0x07 &&
+      marcstate <= 0x0A) {  // TX overflow 7-8, RX overflow 9-10
+    tiRadio_ForceIdle(radio);
+    cc1120TrxSpiCmdStrobe(radio, TIRADIO_SFTX);
+    cc1120TrxSpiCmdStrobe(radio, TIRADIO_SFRX);
+  }
+
   // Check for new packets until the GPIO goes low
   // realistically, we'll only ever get like 2, but
   // it doesn't hurt since the cost for each check
@@ -203,7 +212,7 @@ static bool cc1120TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
   // At the same time, page 42 says that in LBT mode we'll keep trying to enter
   // TX mode
 
-  static uint8_t marcstat;
+  uint8_t marcstat;
   cc1120SpiReadReg(radio, TIRADIO_MARC_STATUS1, &marcstat, 1);
   if (marcstat == TIRADIO_CCA_FAILED) {
     // We shouldn't add another packet, but should try sending it again
