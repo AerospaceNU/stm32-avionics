@@ -7,7 +7,10 @@
 
 void cli_tasks::cliSendLineCutterstring() {
   CliOptionVals_s options = cliGetOptions();
-  if (!options.lcId || !options.lcCmd) return;  // verify non-void pointers
+  if (!options.lcId || !options.lcCmd) {
+    cliSendAck(false, "Command (-c) and ID (-i) required but not provided");
+    return;  // verify non-void pointers
+  }
 
   char* endPtr;
   int id = strtol(options.lcId, &endPtr, 0);
