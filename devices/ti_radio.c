@@ -121,8 +121,33 @@ void tiRadio_update(TiRadioCtrl_s *radio) {
   // Don't let anything happen if radio isn't initialized
   if (!radio->initialized) return;
 
+  // The MARC_STATUS1 register "tells us what caused MCU_WAKEUP to be asserted"
+  // We don't actually check if it's been asserted here, though -- that's probably not ideal
+  // instead, we just use it to figure out of the TX or RX FIFO queues inside the radio
+  // chip have overflowed. 
+  
+  // Due (probably) to another bug with how we enqueue packets to send to the radio,
+  // spamming CLI commands from ground station up to the rocket can make the TX FIFO
+  // overflow, causing the radio to become stuck in the TX state forever. This makes
+  // everything hang. When this happens, MARC_STATUS1 will read 7 (TX FIFO overflow) and the
+  // radio state will be stuck in TX.
+
+  // To get out of this state, we can't use SFTX or SFRX directly (states that flush the FIFOs),
+  // as we're still in the TX state, not the TX FIFO error state. So first, we have to 
+  // force the radio chip to IDLE (See the state machine on page 6 of the CC1200 programming manual)
+
+  // But this alone isn't sufficient, since there's there can still be some residual data
+  // left in the TX FIFOs. Essentially, this means all future packets will be offset by some
+  // number of bytes lmao. Page 13 says that sending SFTX is allowed in IDLE, so we should be good
+
+  // TODO 1) we should be checking that the TX FIFO is _empty_ before adding a packet to it in the TX function,
+  // and figuring out if we need to flush there to ensure the FIFO is actually empty before we stuff our packet in
+  // TODO 2) we should probably attach the MCU_WAKEUP interrupt to something, and replace the FIFO_THRESH GPIO I think?
+  // It's unclear if it's undefined behavior to try to read MARC_STATUS1 at some random time, not just when MCU_WAKEUP happens
+
   uint8_t marcstate;
   tiRadio_spiReadReg(radio, TIRADIO_MARC_STATUS1, &marcstate, 1);
+  // TX over-/underflow 7-8, RX over-/underflow 9-10 -- want to flush in any of these cases
   if (marcstate >= 0x07 &&
       marcstate <= 0x0A) {  // TX overflow 7-8, RX overflow 9-10
     tiRadio_forceIdle(radio);
