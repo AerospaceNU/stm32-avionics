@@ -83,11 +83,11 @@ typedef struct __attribute__((__packed__)) {
 static LogData_s logPackets[MAX_LOG_PACKETS];
 static CircularBuffer_s logPacketBuffer;
 
-static FlightMetadata_s FlightMetadata_sPacket;
+static FlightMetadata_s flightMetadataPacket;
 
 static const uint16_t kLogData_sSize = sizeof(LogData_s);
 
-static const uint16_t kFlightMetadata_sSize = sizeof(FlightMetadata_s);
+static const uint16_t kFlightMetadataSize = sizeof(FlightMetadata_s);
 
 static const uint16_t kCliConfigSize = sizeof(CliConfigs_s);
 
@@ -188,8 +188,8 @@ static uint32_t dataLog_getLastFlightNumType(bool launched) {
     bool flightNumFound = false;
     curSectorNum = 1;
     uint8_t sectorRxBuff[2] = {0};
-    uint8_t metadataBuff[kFlightMetadata_sSize];  // Create a buffer for the
-                                                  // metadata
+    uint8_t metadataBuff[kFlightMetadataSize];  // Create a buffer for the
+                                                // metadata
     uint32_t metadataReadAddress;
     while (!flightNumFound) {
       flashRead(curSectorNum * 2, 2, sectorRxBuff);
@@ -199,10 +199,10 @@ static uint32_t dataLog_getLastFlightNumType(bool launched) {
       } else {
         if (launched) {  // Need to check for launched to mark as last flight
           metadataReadAddress = curSectorNum * FLASH_MAX_SECTOR_BYTES;
-          flashRead(metadataReadAddress, kFlightMetadata_sSize,
+          flashRead(metadataReadAddress, kFlightMetadataSize,
                     metadataBuff);  // Read the metadata
-          FlightMetadata_sPacket = *(FlightMetadata_s *)&metadataBuff;
-          if (FlightMetadata_sPacket.launched ==
+          flightMetadataPacket = *(FlightMetadata_s *)&metadataBuff;
+          if (flightMetadataPacket.launched ==
               1) {  // Only update last if it was launched
             lastFlightNum = tempFlightNum;
           }
@@ -286,7 +286,7 @@ void dataLog_assignFlight() {
   flashEraseSector(curSectorNum);
 
   // Empty metadata packet
-  memset(&FlightMetadata_sPacket, 0xFF, kFlightMetadata_sSize);
+  memset(&flightMetadataPacket, 0xFF, kFlightMetadataSize);
 
   // Write flight number and sector to metadata (since flight metadata written
   // to it)
@@ -311,16 +311,14 @@ void dataLog_readFlightNumMetadata(uint8_t flightNum) {
   uint32_t firstSector, lastSector;
   dataLog_getFlightSectors(flightNum, &firstSector, &lastSector);
   // Create a buffer for the metadata
-  uint8_t metadataBuff[kFlightMetadata_sSize];
+  uint8_t metadataBuff[kFlightMetadataSize];
   uint32_t metadataReadAddress = firstSector * FLASH_MAX_SECTOR_BYTES;
   // Read the metadata
-  flashRead(metadataReadAddress, kFlightMetadata_sSize, metadataBuff);
-  FlightMetadata_sPacket = *(FlightMetadata_s *)metadataBuff;
+  flashRead(metadataReadAddress, kFlightMetadataSize, metadataBuff);
+  flightMetadataPacket = *(FlightMetadata_s *)metadataBuff;
 }
 
-FlightMetadata_s *dataLog_getFlightMetadata() {
-  return &FlightMetadata_sPacket;
-}
+FlightMetadata_s *dataLog_getFlightMetadata() { return &flightMetadataPacket; }
 
 void dataLog_writeFlightMetadata() {
   if (flightNum > 0) {
@@ -328,9 +326,8 @@ void dataLog_writeFlightMetadata() {
         flightFirstSectorNum *
         FLASH_MAX_SECTOR_BYTES;  // Metadata is located at the start of the
                                  // flight sector
-    flashWrite(
-        metadataWriteAddress, kFlightMetadata_sSize,
-        (uint8_t *)&FlightMetadata_sPacket);  // Write the metadata packet
+    flashWrite(metadataWriteAddress, kFlightMetadataSize,
+               (uint8_t *)&flightMetadataPacket);  // Write the metadata packet
   }
 }
 

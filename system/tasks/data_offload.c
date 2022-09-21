@@ -8,12 +8,23 @@
 
 #define FLASH_READ_BUF_SIZE 2048
 
+static bool metadataReadComplete = false;
 static bool readComplete_ = false;
 static uint32_t flightId_ = 0;
 uint8_t flashBuf_[FLASH_READ_BUF_SIZE];
 
 // Reads data of current flight ID and transmits it over USB
 bool dataOffload_tick() {
+  if (!metadataReadComplete) {
+    dataLog_readFlightNumMetadata(flightId_);
+    FlightMetadata_s* metadata = dataLog_getFlightMetadata();
+    metadataReadComplete = true;
+    hm_usbTransmit(USB_CLI_ID, (uint8_t*)metadata, sizeof(FlightMetadata_s));
+    // TODO: Either transmit rest of sector as 0xFF to allow for variable-sized
+    // metadata across systems, or transmit number of each hardware
+    // at beginning of metadata
+    return false;
+  }
   if (!readComplete_) {
     uint32_t bytesRead =
         dataLog_read(flightId_, FLASH_READ_BUF_SIZE, flashBuf_, false);
@@ -29,7 +40,8 @@ bool dataOffload_tick() {
 void dataOffload_setFlightId(uint32_t flightId) {
   flightId_ = flightId;
   readComplete_ = false;
-  dataLog_read(
-      flightId_, 0, NULL,
-      true);  // Reset flight in case same flight ID is offloaded twice in a row
+  metadataReadComplete = false;
+  dataLog_read(flightId_, 0, NULL,
+               true);  // Reset flight in case same flight ID is offloaded
+                       // twice in a row
 }
