@@ -41,9 +41,10 @@ typedef enum {
 
   TIRADIO_CRC_OK = 7,
   TIRADIO_PKT_CRC_OK = 19,
-  
+
   // MCU Wakeup, read MARC_STATUS1 to determine the cause. Signal is (allegedly)
-  // a "pulse", so best to attach an interrupt if used? See page 20 of CC1200 programming reference
+  // a "pulse", so best to attach an interrupt if used? See page 20 of CC1200
+  // programming reference
   TIRADIO_MCU_WAKEUP = 20,
 
   TIRADIO_nLNA_PD = 24,     // control external LNA. Active low. Low in sleep!
