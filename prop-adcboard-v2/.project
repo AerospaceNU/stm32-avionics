@@ -29,4 +29,16 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>devices</name>
+			<type>2</type>
+			<location>C:/Users/mcmorley/Documents/GitHub/stm32-avionics/devices</location>
+		</link>
+		<link>
+			<name>utils</name>
+			<type>2</type>
+			<location>C:/Users/mcmorley/Documents/GitHub/stm32-avionics/utils</location>
+		</link>
+	</linkedResources>
 </projectDescription>

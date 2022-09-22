@@ -7,6 +7,7 @@
 #include "data_structures.h"
 #include "minmea.h"
 
+#if (HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX))
 #define GPS_RX_BUF_SIZE 1024
 #define NMEA_LENGTH 129  // +1 for null term
 
@@ -35,5 +36,6 @@ bool gps_newData(GpsCtrl_s *gps);
 void gps_rxEventCallback(void *gps, size_t Size);
 
 void gps_RxCpltCallback(void *gps);
+#endif
 
 #endif  // DEVICES_GPS_H_

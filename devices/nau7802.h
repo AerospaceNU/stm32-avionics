@@ -10,6 +10,9 @@
 
 #include "board_config.h"
 #include HAL_HEADER
+#include "board_config_common.h"
+
+#if HAS_DEV(NAU7902)
 
 #include "I2C_driver.h"
 #include "stdbool.h"
@@ -35,5 +38,7 @@ bool NAU7802_Init(NAU7802Ctrl_t *sensor);
 //! reset, true if no error
 bool NAU7802_Reset(NAU7802Ctrl_t *sensor);
 bool NAU7802_Enable(NAU7802Ctrl_t *sensor, bool is_on);
+
+#endif
 
 #endif  // DEVICES_NAU7802_H_

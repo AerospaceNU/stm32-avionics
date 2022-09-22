@@ -31,6 +31,8 @@ calibration registers for the best possible accuracy.
 #include "bit_helper.h"
 #include "nau7802.h"
 
+#if HAS_DEV(NAU7902)
+
 static void NAU7802_SetBit(NAU7802Ctrl_t *sensor, uint8_t reg, uint8_t offset) {
   uint8_t reg_val = I2C_ReadRegister(sensor->dev, reg);
   I2C_WriteRegister(sensor->dev, reg, set_bit(reg_val, offset));
@@ -83,3 +85,5 @@ bool NAU7802_Enable(NAU7802Ctrl_t *sensor, bool is_on) {
     return get_bit(I2C_ReadRegister(sensor->dev, NAU7802_PU_CTRL), 3) == 1;
   }
 }
+
+#endif

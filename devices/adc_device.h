@@ -18,6 +18,8 @@ extern "C" {
 
 #define MAX_CHANNELS 14
 
+#if (HAS_DEV(PYRO_CONT_ADC) || HAS_DEV(VBAT_ADC))
+
 typedef struct {
   ADC_HandleTypeDef *hadc;
   uint8_t rank;
@@ -49,6 +51,8 @@ void adcDev_startSingleRead(AdcDevCtrl_s *adc);
  * (hardware conversion hasn't completed)
  */
 bool adcDev_getValue(AdcDevCtrl_s *adc, float *pval, uint32_t timeoutMS);
+
+#endif
 
 #ifdef __cplusplus
 }

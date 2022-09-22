@@ -9,6 +9,8 @@ extern "C" {
 
 #include "board_config_common.h"
 
+#if HAS_DEV(VBAT_INA226)
+
 #define INA226_VBUSMAX 36
 #define INA226_VSHUNTMAX 0.08192f
 #define INA226_I2CTIMEOUT 10
@@ -99,6 +101,8 @@ VbatIna226Avg_e vbatIna226_getAverages(VbatIna226Ctrl_s* ina226);
 VbatIna226Vbusct_e vbatIna226_getBusConversionTime(VbatIna226Ctrl_s* ina226);
 VbatIna226Vshct_e vbatIna226_getShuntConversionTime(VbatIna226Ctrl_s* ina226);
 VbatIna226Mode_e vbatIna226_getMode(VbatIna226Ctrl_s* ina226);
+
+#endif
 
 #ifdef __cplusplus
 }

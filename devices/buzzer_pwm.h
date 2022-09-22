@@ -13,6 +13,8 @@ extern "C" {
 
 #include "board_config_common.h"
 
+#if HAS_DEV(NUM_BUZZER_PWM)
+
 typedef struct {
   TIM_HandleTypeDef *htim;
   uint32_t channel;
@@ -24,6 +26,8 @@ void buzzerPwm_init(BuzzerPwmCtrl_s *buzzer, TIM_HandleTypeDef *htim,
 void buzzerPwm_setFrequency(BuzzerPwmCtrl_s *buzzer, float fHz);
 void buzzerPwm_start(BuzzerPwmCtrl_s *buzzer);
 void buzzerPwm_stop(BuzzerPwmCtrl_s *buzzer);
+
+#endif
 
 #ifdef __cplusplus
 }

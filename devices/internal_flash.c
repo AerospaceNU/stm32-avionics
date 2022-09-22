@@ -122,8 +122,11 @@ bool internalFlash_write(uint32_t RelFlashAddress, uint8_t *data,
 
     sofar += copyBytes;
 
+    // TODO this is broekn on prop adcboard
+#ifdef FLASH_TYPEPROGRAM_FLASHWORD
     Internal_Flash_Program(FLASH_TYPEPROGRAM_FLASHWORD, writeAddress,
                            (uint32_t)&flashWriteBuffer);  // Write to the flash
+#endif
     writeAddress += FLASH_BYTE_INCREMENT;
   }
   HAL_FLASH_Lock();
