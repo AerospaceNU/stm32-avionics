@@ -173,8 +173,16 @@ static int mcp356x_modify_reg24(AdcMcp3564Ctrl_s *dev,
     return 0;
 }
 
-int mcp356x_init(AdcMcp3564Ctrl_s *dev) {
-    int ec;
+int mcp3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
+            GPIO_TypeDef *csPort, uint16_t csPin,
+            GPIO_TypeDef *intPort, uint16_t intPin) {
+	  dev->hspi = hspi;
+	  dev->csPort = csPort;
+	  dev->csPin = csPin;
+	  dev->intPort = intPort;
+	  dev->intPin = intPin;
+
+	int ec;
 
     // CONFIG0: Configure:
     //  - VREF_SEL -> no buffer
@@ -305,6 +313,8 @@ int mcp356x_read(AdcMcp3564Ctrl_s *dev) {
     if (rx_read_buf[0] & 0x4) {
         return -EBUSY;
     }
+
+    dev->result = rx_read_buf;
 
     return 0;
 }

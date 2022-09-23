@@ -17,6 +17,7 @@ extern "C" {
 
 #include "board_config_common.h"
 #include "circular_buffer.h"
+#include "board_config.h"
 
 /**
  * @brief Initialize USB device. RX occurs automatically

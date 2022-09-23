@@ -23,6 +23,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "temp_max31855.h"
+#include "adc_mcp3564.h"
+#include "errno.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -97,6 +101,12 @@ int main(void)
   MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
 
+  TempMax31855Ctrl_s tc_reader;
+  tempMax31855_init(&tc_reader, &hspi2, TC_CS1_GPIO_Port, TC_CS1_Pin);
+
+  AdcMcp3564Ctrl_s adc;
+  mcp3564_init(&adc, &hspi1, ADC1_CS_GPIO_Port, ADC1_CS_Pin, ADC1_INT_GPIO_Port, ADC1_INT_Pin);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,6 +116,18 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+	  tempMax31855_read(&tc_reader);
+	  printf("TC temp: %i internal: %i\n", (int)tc_reader.data.thermocoupleTemp, (int)tc_reader.data.internalTemp);
+
+	  mcp356x_channel_setup(&adc, 0);
+
+	  int ec_fetch;
+	  do {
+		  ec_fetch = mcp356x_read(&adc);
+	  } while (ec_fetch == -EBUSY);
+
+	  printf("ADC conversion chan 0: %li\n", adc.result);
   }
   /* USER CODE END 3 */
 }
@@ -178,7 +200,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -216,7 +238,7 @@ static void MX_SPI2_Init(void)
   hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -254,7 +276,7 @@ static void MX_SPI3_Init(void)
   hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi3.Init.NSS = SPI_NSS_SOFT;
-  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
   hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;

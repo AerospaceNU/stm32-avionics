@@ -10,4 +10,6 @@
 
 #define HAL_HEADER "stm32f4xx.h"
 
+#define NUM_USB_STD 1
+
 #endif /* INC_BOARD_CONFIG_H_ */

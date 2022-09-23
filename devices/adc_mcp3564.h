@@ -17,12 +17,14 @@ typedef struct {
   uint16_t csPin;
   GPIO_TypeDef *intPort;
   uint16_t intPin;
+
+  int32_t result;
 } AdcMcp3564Ctrl_s;
 
-void adcMCP3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
-            GPIO_TypeDef *csPort, uint16_t csPin, 
+int mcp356x_read(AdcMcp3564Ctrl_s *dev);
+int mcp356x_channel_setup(AdcMcp3564Ctrl_s *dev,
+                          const int channel_id);
+int mcp3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
+            GPIO_TypeDef *csPort, uint16_t csPin,
             GPIO_TypeDef *intPort, uint16_t intPin);
-
-void adcMCP3564_readChan(AdcMcp3564Ctrl_s *dev, int chan);
-
 #endif
