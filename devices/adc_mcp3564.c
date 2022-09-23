@@ -311,12 +311,16 @@ int mcp356x_read(AdcMcp3564Ctrl_s *dev) {
     }
 
     // third byte from bottom, DR_STATUS
-    // Active low, cleared when ready
+    // Active low, cleared when ready (figure 6-1)
     if (rx_read_buf[0] & 0x4) {
         return -EBUSY;
     }
 
-    dev->result = rx_read_buf;
+    // First byte of rx_read_buf should be the status byte
+    // Next 3 are big (?) endian data, per figure 5-8
+	uint32_t raw = rx_read_buf[1] << 16 | rx_read_buf[2] << 8 | rx_read_buf[3];
+    // TODO signe extension
+	dev->result = *((int24_t*)&raw);
 
     return 0;
 }
