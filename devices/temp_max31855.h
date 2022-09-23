@@ -13,15 +13,16 @@
 
 #include "stdbool.h"
 
+// Page 10 of max31855 datasheet
 typedef struct {
-	bool openCircuit : 1;
-	bool gndFault: 1;
-	bool vccFault: 1;
-	uint8_t res: 1; // Reserved
-	unsigned int rawInternalTemp: 12;
-	bool faulted : 1;
-	uint8_t res2: 1; // Reserved
 	unsigned int rawThermocoupleTemp: 14;
+	uint8_t res1: 1; // Reserved
+	bool faulted : 1;
+	unsigned int rawInternalTemp: 12;
+	uint8_t res2: 1; // Reserved
+	bool vccFault: 1;
+	bool gndFault: 1;
+	bool openCircuit : 1;
 } Max31855Raw_s;
 
 typedef struct __attribute__((packed)) {
