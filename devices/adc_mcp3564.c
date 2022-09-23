@@ -55,6 +55,20 @@
 // TODO wtf does this do?
 static const uint8_t DEV_ADDR = 0x01;
 
+//! Converts a 24-bit reading from the ADC to a int32
+static int32_t adc_24bit_reading_to_int32(uint32_t reg) {
+        // The register we get has the top 8 bits blank,
+        // and the bottom 24 bits are the actual adc reading
+        // as a signed, 24-bit integer
+        // When we assign f.v, the compiler will deal with converting
+        // to an actual int32 by "extending" the sign bits (see: 2's compliment)
+        // Note that structs are MSB to LSB, read left to right
+        // (or top to bottom)
+        struct { int unused:8; int v:24; } f;
+        f.v = reg;
+        return f.v;
+}
+
 // ======== End chip defines ========
 
 /**
@@ -319,8 +333,8 @@ int mcp356x_read(AdcMcp3564Ctrl_s *dev) {
     // First byte of rx_read_buf should be the status byte
     // Next 3 are big (?) endian data, per figure 5-8
 	uint32_t raw = rx_read_buf[1] << 16 | rx_read_buf[2] << 8 | rx_read_buf[3];
-    // TODO signe extension
-	dev->result = *((int24_t*)&raw);
+	// TODO make this respect different DATA_FORMAT modes
+	dev->result = adc_24bit_reading_to_int32(raw);
 
     return 0;
 }
