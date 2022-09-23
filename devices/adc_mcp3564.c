@@ -310,6 +310,8 @@ int mcp356x_read(AdcMcp3564Ctrl_s *dev) {
         return ec_read;
     }
 
+    // third byte from bottom, DR_STATUS
+    // Active low, cleared when ready
     if (rx_read_buf[0] & 0x4) {
         return -EBUSY;
     }
