@@ -48,7 +48,7 @@ void tempMax31855_read(TempMax31855Ctrl_s *dev) {
   // Read 32 bits from SPI
   uint8_t rxBuff[4] = {0};
   HAL_GPIO_WritePin(dev->csPort, dev->csPin, GPIO_PIN_RESET);
-  HAL_SPI_Recieve(dev->hspi, rxBuff, 4, SPI_TIMEOUT_MS);
+  HAL_SPI_Receive(dev->hspi, rxBuff, 4, SPI_TIMEOUT_MS);
   HAL_GPIO_WritePin(dev->csPort, dev->csPin, GPIO_PIN_SET);
 
   // Fun pointer wizardry to convert to our struct

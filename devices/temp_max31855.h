@@ -11,6 +11,8 @@
 #include "board_config.h"
 #include HAL_HEADER
 
+#include "stdbool.h"
+
 typedef struct {
 	bool openCircuit : 1;
 	bool gndFault: 1;
