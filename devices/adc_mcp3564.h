@@ -21,6 +21,51 @@ typedef struct {
   int32_t result;
 } AdcMcp3564Ctrl_s;
 
+// Channel IDs, see table 5-14
+typedef enum {
+	SINGLE_CH0 = 0,
+	SINGLE_CH1,
+	SINGLE_CH2,
+	SINGLE_CH3,
+	SINGLE_CH4,
+	SINGLE_CH5,
+	SINGLE_CH6,
+	SINGLE_CH7,
+	DIFF_CHA,
+	DIFF_CHB,
+	DIFF_CHC,
+	DIFF_CHD,
+	TEMP, // 1x gain
+	AVDD, // 0.33x gain
+	VCM, // 1x gain
+	OFFSET
+} AdcMcp3564Channels_e;
+
+//! Struct for data_format = 00
+typedef struct {
+	int data:24;
+} AdcMcp3564_DataFormat_00;
+
+//! Struct for data_format = 01
+typedef struct {
+	int unused:8;
+	int data:24;
+} AdcMcp3564_DataFormat_01;
+
+//! Struct for data_format = 10
+// The top 8 bits just repeats the sign bit (page 42)
+typedef struct {
+	int data:25;
+	int unused:7;
+} AdcMcp3564_DataFormat_10;
+
+//! Struct for data_format = 11
+typedef struct {
+	int data:25;
+	int unused:3;
+	AdcMcp3564Channels_e channel_id: 4; // (See table 5-14, page 54)
+} AdcMcp3564_DataFormat_11;
+
 int mcp356x_read(AdcMcp3564Ctrl_s *dev);
 int mcp356x_channel_setup(AdcMcp3564Ctrl_s *dev,
                           const int channel_id);

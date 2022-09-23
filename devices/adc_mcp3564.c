@@ -47,30 +47,9 @@
 #define MCP356X_REG_LOCK 0xD
 #define MCP356X_REG_CRFCFG 0xF
 
-// Number of available channels on the MUX register
-// Technically there are 8 channels but I'd like to permit
-// the other 8 channels to be read for debugging purposes
-#define MCP356X_MUX_N_CHAN 16
-
-// TODO wtf does this do?
+// So apparently Microchip put a device address into these chips,
+// but only sells them with it hard coded to 1. LOL
 static const uint8_t DEV_ADDR = 0x01;
-
-//! Converts a 24-bit reading from the ADC to a int32
-static int32_t adc_24bit_reading_to_int32(uint32_t reg) {
-        // The register we get has the top 8 bits blank,
-        // and the bottom 24 bits are the actual adc reading
-        // as a signed, 24-bit integer
-        // When we assign f.v, the compiler will deal with converting
-        // to an actual int32 by "extending" the sign bits (see: 2's compliment)
-        // Note that structs are LSB to MSB, or left to right
-		// so since the top 8 bits are unused, they go second
-		// (But in datasheets, they're usually on the left)
-		typedef struct { int v:24; int unused:8; } adcreg_s;
-
-	    // Reinterpret the register we got as the above struct
-		adcreg_s f = *((adcreg_s*)(&reg));
-	    return f.v;
-}
 
 // ======== End chip defines ========
 
@@ -336,8 +315,9 @@ int mcp356x_read(AdcMcp3564Ctrl_s *dev) {
     // First byte of rx_read_buf should be the status byte
     // Next 3 are big (?) endian data, per figure 5-8
 	uint32_t raw = rx_read_buf[1] << 16 | rx_read_buf[2] << 8 | rx_read_buf[3];
+
 	// TODO make this respect different DATA_FORMAT modes
-	dev->result = adc_24bit_reading_to_int32(raw);
+	dev->result = ((AdcMcp3564_DataFormat_00*)&raw)->data;
 
     return 0;
 }
