@@ -62,11 +62,14 @@ static int32_t adc_24bit_reading_to_int32(uint32_t reg) {
         // as a signed, 24-bit integer
         // When we assign f.v, the compiler will deal with converting
         // to an actual int32 by "extending" the sign bits (see: 2's compliment)
-        // Note that structs are MSB to LSB, read left to right
-        // (or top to bottom)
-        struct { int unused:8; int v:24; } f;
-        f.v = reg;
-        return f.v;
+        // Note that structs are LSB to MSB, or left to right
+		// so since the top 8 bits are unused, they go second
+		// (But in datasheets, they're usually on the left)
+		typedef struct { int v:24; int unused:8; } adcreg_s;
+
+	    // Reinterpret the register we got as the above struct
+		adcreg_s f = *((adcreg_s*)(&reg));
+	    return f.v;
 }
 
 // ======== End chip defines ========
