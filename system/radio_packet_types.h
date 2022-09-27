@@ -67,12 +67,13 @@ PACKED_STRUCT {
 AltInfoPacket_s;
 #endif  // HAS_DEV(BAROMETER)
 
-#define TELEMETRY_ID_TRIGGER_INFO 7
+#define TELEMETRY_ID_HARDWARE_STATUS 7
 PACKED_STRUCT {
   uint8_t pyroContinuity;
   uint8_t triggerFireStatus;
+  uint8_t flashUsage;
 }
-TriggerInfoPacket_s;
+HardwareStatusPacket_s;
 
 #define TELEMETRY_ID_LINECUTTER_VARS 8
 PACKED_STRUCT { LineCutterFlightVars_s data; }
@@ -88,7 +89,7 @@ typedef union {
 #if HAS_DEV(BAROMETER)
   AltInfoPacket_s altitudeInfo;
 #endif  // HAS_DEV(BAROMETER)
-  TriggerInfoPacket_s triggerInfo;
+  HardwareStatusPacket_s hardwareStatus;
 } PayloadPacket_u;
 
 PACKED_STRUCT {

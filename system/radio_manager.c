@@ -9,6 +9,7 @@
 
 #include "board_config_common.h"
 #include "cli.h"
+#include "data_log.h"
 #include "data_structures.h"
 #include "hardware_manager.h"
 
@@ -84,7 +85,7 @@ void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
 // Packet rates, in hz
 #define ORIENTATION_RATE 10
 #define POSITION_RATE 10
-#define TRIGGER_INFO_RATE 1
+#define HARDWARE_STATUS_RATE 1
 
 void radioManager_transmitData(int radioId, SensorData_s *sensorData,
                                FilterData_s *filterData, uint8_t state) {
@@ -203,16 +204,17 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 #endif  // HAS_DEV(BAROMETER)
 
 #if HAS_DEV(PYRO_CONT)
-  if (currentTime - lastSent[radioId].triggerInfoLastSent >=
-      1000 / TRIGGER_INFO_RATE) {
+  if (currentTime - lastSent[radioId].hardwareStatusLastSent >=
+      1000 / HARDWARE_STATUS_RATE) {
     uint8_t pyroCont = 0;
     for (int i = 0; i < NUM_PYRO_CONT; i++)
       pyroCont |= ((sensorData->pyroContData[i] & 0x01) << i);
-    TriggerInfoPacket_s data = {pyroCont, triggerManager_status()};
+    HardwareStatusPacket_s data = {pyroCont, triggerManager_status(),
+                                   dataLog_getFlashUsage()};
 
-    transmitPacket[radioId].packetType = TELEMETRY_ID_TRIGGER_INFO;
-    transmitPacket[radioId].payload.triggerInfo = data;
-    lastSent[radioId].triggerInfoLastSent = currentTime;
+    transmitPacket[radioId].packetType = TELEMETRY_ID_HARDWARE_STATUS;
+    transmitPacket[radioId].payload.hardwareStatus = data;
+    lastSent[radioId].hardwareStatusLastSent = currentTime;
 
     radioManager_sendInternal(radioId);
   }
