@@ -18,10 +18,10 @@ typedef struct {
 	bool gndFault: 1;
 	bool vccFault: 1;
 	uint8_t res: 1; // Reserved
-	unsigned int rawInternalTemp: 12;
+	int rawInternalTemp: 12;
 	bool faulted : 1;
 	uint8_t res2: 1; // Reserved
-	unsigned int rawThermocoupleTemp: 14;
+	int rawThermocoupleTemp: 14;
 } Max31855Raw_s;
 
 typedef struct __attribute__((packed)) {
