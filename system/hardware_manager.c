@@ -47,6 +47,10 @@
 #include "pyro_digital.h"
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
+#if HAS_DEV(LED_DIGITAL)
+#include "led.h"
+#endif  // HAS_DEV(LED_DIGITAL)
+
 #if HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915)
 #include "ti_radio.h"
 #endif
@@ -185,6 +189,11 @@ static LineCutterBleCtrl_t lineCutterBle[NUM_LINE_CUTTER_BLE];
 static PyroDigitalCtrl_s pyroDigital[NUM_PYRO_DIGITAL];
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
+/* Leds */
+#if HAS_DEV(LED_DIGITAL)
+static LedCtrl_s ledDigital[NUM_LED_DIGITAL];
+#endif  // HAS_DEV(LED_DIGITAL)
+
 /* Pyro continuity */
 #if HAS_DEV(PYRO_CONT_ADC)
 static AdcDevCtrl_s pyroContAdc[NUM_PYRO_CONT_ADC];
@@ -322,7 +331,9 @@ void hm_hardwareInit() {
   /* LEDs */
 #if HAS_DEV(LED_DIGITAL)
   for (int i = 0; i < NUM_LED_DIGITAL; i++) {
-    HAL_GPIO_WritePin(ledDigitalGpioPort[i], ledDigitalPin[i], GPIO_PIN_RESET);
+    ledDigital[i].port = ledDigitalGpioPort[i];
+    ledDigital[i].pin = ledDigitalPin[i];
+    led_init(&ledDigital[i]);
     hardwareStatusLed[FIRST_ID_LED_DIGITAL + i] = true;
   }
 #endif  // HAS_DEV(LED_DIGITAL)
@@ -618,8 +629,7 @@ void hm_servoSetAngle(int servoId, float degrees) {
 void hm_ledSet(int ledId, bool set) {
 #if HAS_DEV(LED_DIGITAL)
   if (IS_DEVICE(ledId, LED_DIGITAL)) {
-    HAL_GPIO_WritePin(ledDigitalGpioPort[ledId - FIRST_ID_LED_DIGITAL],
-                      ledDigitalPin[ledId - FIRST_ID_LED_DIGITAL], set);
+    led_set(&ledDigital[ledId - FIRST_ID_LED_DIGITAL], set);
   }
 #endif  // HAS_DEV(LED_DIGITAL)
 }
@@ -627,8 +637,7 @@ void hm_ledSet(int ledId, bool set) {
 void hm_ledToggle(int ledId) {
 #if HAS_DEV(LED_DIGITAL)
   if (IS_DEVICE(ledId, LED_DIGITAL)) {
-    HAL_GPIO_TogglePin(ledDigitalGpioPort[ledId - FIRST_ID_LED_DIGITAL],
-                       ledDigitalPin[ledId - FIRST_ID_LED_DIGITAL]);
+    led_toggle(&ledDigital[ledId - FIRST_ID_LED_DIGITAL]);
   }
 #endif  // HAS_DEV(LED_DIGITAL)
 }
