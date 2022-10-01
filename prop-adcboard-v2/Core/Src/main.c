@@ -143,13 +143,16 @@ int main(void) {
       mcp356x_channel_setup(&adc, MUX_CH0 + i, MUX_AGND);
 
       int ec_fetch;
+      uint32_t start = HAL_GetTick();
       do {
         ec_fetch = mcp356x_read(&adc);
-      } while (ec_fetch == -EBUSY);
+      } while (ec_fetch == -EBUSY && (HAL_GetTick() - start) < 5);
 
-      static const int fullscale = pow(2, 23);
-      printf("%i, %i, %f\n", HAL_GetTick(), i,
-             (float)adc.result / fullscale * 25400 / 15400 * 3.3);
+      if (!ec_fetch) {
+        static const int fullscale = pow(2, 23);
+        printf("%lu, %i, %f\n", HAL_GetTick(), i,
+               (float)adc.result / fullscale * 25400 / 15400 * 3.3);
+      }
     }
 
     //    HAL_Delay(0);
@@ -220,7 +223,7 @@ static void MX_SPI1_Init(void) {
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -288,7 +291,7 @@ static void MX_SPI3_Init(void) {
   hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi3.Init.NSS = SPI_NSS_SOFT;
-  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
   hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
