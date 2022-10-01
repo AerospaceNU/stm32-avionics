@@ -14,9 +14,14 @@
 #include "hardware_manager.h"
 #include "orientation_estimator.h"
 
-#define R_DRY_AIR 287.0474909  // J/K/kg
-#define G_ACCEL_EARTH 9.80665  // m/s**2
-#define BARO_MAX_SPEED 248     // m/s over which to not call correct()
+#define R_DRY_AIR 287.0474909             // J/K/kg
+#define G_ACCEL_EARTH 9.80665             // m/s**2
+#define STANDARD_TEMPERATURE 273.15 + 15  // Degrees K
+#define BARO_MAX_SPEED 248  // m/s over which to not call correct()
+#define LAPSE_RATE \
+  -0.0065                      // valid below 11000m, use lookup table for
+                               // lapse rate when altitude is higher
+#define GROUND_PRESSURE_ATM 1  // 1 atmosphere at 0m MSL
 
 #define ACCEL_FS_THRESHOLD \
   0.9  // How close IMU accel should be to fullscale before ignoring values
@@ -47,8 +52,9 @@ static CircularBuffer_s gyroZRefBuffer;
 static float gyroZOffset;
 
 static FilterData_s filterData;
-static double presRef = 1.0;   // atm
-static int8_t gravityRef = 1;  // direction of gravity
+static double presRef = 1.0;          // atm
+static double groundAltitudeMsl = 0;  // meters
+static int8_t gravityRef = 1;         // direction of gravity
 
 static double medianArray[kPrevPresMedianCount + kPrevPresCount];
 
@@ -282,24 +288,41 @@ void filter_addGyroRef() {
   updateGyroOffsetOneAxis(&gyroZRefBuffer, noOffset, &gyroZOffset);
 }
 
+static double filter_calculateBaroAltitude(double averagePressure) {
+  double tempRef = cli_getConfigs()->groundTemperatureC + 273.15;  // C to K
+
+  // Note that this must be MSL for the equations on wikipedia to be valid
+  // Reference:
+  // https://archive.psas.pdx.edu/RocketScience/PressureAltitude_Derived.pdf
+  double baroAltMsl = fabs(averagePressure) < 0.001
+                          ? 0
+                          : (tempRef / LAPSE_RATE) *
+                                (pow(averagePressure / GROUND_PRESSURE_ATM,
+                                     -R_DRY_AIR * LAPSE_RATE / G_ACCEL_EARTH) -
+                                 1);
+  return baroAltMsl;
+}
+
 static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
   // For now, just convert pressure to altitude using the following formula
   // without any sort of real filtering
   // https://en.wikipedia.org/wiki/Barometric_formula
 #if HAS_DEV(BAROMETER)
-  double lapseRate = -0.0065;  // valid below 11000m, use lookup table for
-                               // lapse rate when altitude is higher
   double tempRef = cli_getConfigs()->groundTemperatureC + 273.15;  // C to K
-  double elevRef = cli_getConfigs()->groundElevationM;
 
   double presAvg = filter_getAveragePressure(curSensorVals);
-  double baroAlt =
-      fabs(presAvg) < 0.001
-          ? 0
-          : (tempRef / lapseRate) *
-                    (1 - pow(presAvg / presRef,
-                             R_DRY_AIR * lapseRate / G_ACCEL_EARTH)) +
-                elevRef;
+  double altMsl = filter_calculateBaroAltitude(presAvg);
+  double rocketAltAgl = altMsl - groundAltitudeMsl;
+
+  // Nakka base temperature correction, from
+  // http://www.nakka-rocketry.net/apogee.html See also: ldrsmeme.py in
+  // groundstation. Note that the equation on his website confusing because he
+  // assumes a positive lapse rate, but we use a negative one!
+  double correctionMeters =
+      rocketAltAgl * (STANDARD_TEMPERATURE - tempRef) /
+      (tempRef + 0.5 * LAPSE_RATE * (rocketAltAgl + groundAltitudeMsl));
+  double correctedBaroAlt = rocketAltAgl = correctionMeters;
+
 #endif  // HAS_DEV(BAROMETER)
 
   // Kalman filtering, assuming Z is always up
@@ -308,9 +331,9 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
   // If we're descending, we can't trust the acceleration from our
   // accelerometer
   // -- the rocket's flapping around on a parachute! Otherwise, our "global
-  // acceleration" is the measured acceleration minus 9.81 (since earth pulls
-  // us down). Under parachute it's about zero, since we're about-ish in
-  // equilibrium
+  // acceleration" is the measured acceleration minus 9.81 (since earth
+  // pulls us down). Under parachute it's about zero, since we're about-ish
+  // in equilibrium
   double accz = hasPassedApogee ? 0 : filterData.world_acc_z - 9.81;
 
   // TODO check what order these "should" run in. Worst case we're off by one
@@ -321,7 +344,7 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
 #if HAS_DEV(BAROMETER)
   // Only correct if below max speed (above, baro readings untrustworthy)
   if (fabs(kalman.getXhat().estimatedVelocity) < BARO_MAX_SPEED) {
-    kalman.correct(baroAlt, kalman.DEFAULT_KALMAN_GAIN);
+    kalman.correct(correctedBaroAlt, kalman.DEFAULT_KALMAN_GAIN);
   }
 #endif  // HAS_DEV(BAROMETER)
 
@@ -385,6 +408,11 @@ void filter_addGravityRef() {
   }
 }
 
+static void updatePressureRefInternal(double newRef) {
+  presRef = newRef;
+  groundAltitudeMsl = filter_calculateBaroAltitude(presRef);
+}
+
 void filter_addPressureRef(SensorData_s* curSensorVals) {
   // Average current pressures
   double currentPres = filter_getAveragePressure(curSensorVals);
@@ -393,7 +421,7 @@ void filter_addPressureRef(SensorData_s* curSensorVals) {
   // just set the current pressure ref so we don't depend on
   // a single initial value
   if (runningPresMedianCount == 0) {
-    presRef = currentPres;
+    updatePressureRefInternal(currentPres);
   }
   // Make room for new value, discarding oldest pressure stored if full
   if (cb_full(&runningPresBuffer)) {
@@ -426,12 +454,12 @@ void filter_addPressureRef(SensorData_s* curSensorVals) {
       // current ref
       size_t numMedElements = kPrevPresMedianCount;
       cb_peek(&runningPresMediansBuffer, medianArray, &numMedElements);
-      presRef = median(medianArray, kPrevPresMedianCount);
+      updatePressureRefInternal(median(medianArray, kPrevPresMedianCount));
     } else {
       // Otherwise (for the first 100 seconds) set current pressure ref to the
       // median of the last 10 seconds so that we have at least a somewhat
       // trustworthy reference
-      presRef = runningPresMedians[0];
+      updatePressureRefInternal(runningPresMedians[0]);
     }
   }
 }
