@@ -33,12 +33,12 @@
 		<link>
 			<name>devices</name>
 			<type>2</type>
-			<location>C:/Users/mcmorley/Documents/GitHub/stm32-avionics/devices</location>
+			<locationURI>PARENT-1-PROJECT_LOC/devices</locationURI>
 		</link>
 		<link>
 			<name>utils</name>
 			<type>2</type>
-			<location>C:/Users/mcmorley/Documents/GitHub/stm32-avionics/utils</location>
+			<locationURI>PARENT-1-PROJECT_LOC/utils</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
