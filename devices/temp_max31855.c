@@ -41,8 +41,17 @@ void tempMax31855_read(TempMax31855Ctrl_s *dev) {
   HAL_SPI_Receive(dev->hspi, rxBuff, 4, SPI_TIMEOUT_MS);
   HAL_GPIO_WritePin(dev->csPort, dev->csPin, GPIO_PIN_SET);
 
+  uint32_t d;
+  d = rxBuff[0];
+  d <<= 8;
+  d |= rxBuff[1];
+  d <<= 8;
+  d |= rxBuff[2];
+  d <<= 8;
+  d |= rxBuff[3];
+
   // Fun pointer wizardry to convert to our struct
-  Max31855Raw_s *raw = (Max31855Raw_s *)rxBuff;
+  Max31855Raw_s *raw = (Max31855Raw_s *)&d;
 
   // Convert to real numbers
   convert_reference_junction(dev, d >> 4);

@@ -102,8 +102,12 @@ int main(void) {
   MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
 
-  TempMax31855Ctrl_s tc_reader;
-  tempMax31855_init(&tc_reader, &hspi2, TC_CS1_GPIO_Port, TC_CS1_Pin);
+  TempMax31855Ctrl_s tc_readers[4] = {0};
+
+  tempMax31855_init(&tc_readers[0], &hspi2, TC_CS1_GPIO_Port, TC_CS1_Pin);
+  tempMax31855_init(&tc_readers[1], &hspi2, TC_CS2_GPIO_Port, TC_CS2_Pin);
+  tempMax31855_init(&tc_readers[2], &hspi2, TC_CS3_GPIO_Port, TC_CS3_Pin);
+  tempMax31855_init(&tc_readers[3], &hspi2, TC_CS4_GPIO_Port, TC_CS4_Pin);
 
   // SPI3 = ADC2
   // ADC2 has physical channels IN0 through IN7 on pins AIN0 through AIN7
@@ -126,9 +130,13 @@ int main(void) {
 
     /* USER CODE BEGIN 3 */
 
-    tempMax31855_read(&tc_reader);
-    printf("TC temp: %i internal: %i\n", (int)tc_reader.data.thermocoupleTemp,
-           (int)tc_reader.data.internalTemp);
+    for (int i = 0; i < 4; i++) {
+      TempMax31855Ctrl_s *it = tc_readers + i;
+      tempMax31855_read(it);
+      printf("TC %i temp: %i internal: %i faults %u\n", i,
+             (int)it->data.thermocoupleTemp, (int)it->data.internalTemp,
+             (unsigned int)it->data.faultFlags);
+    }
 
     mcp356x_channel_setup(&adc, MUX_REFIN_P, MUX_REFIN_N);
 
@@ -306,10 +314,10 @@ static void MX_GPIO_Init(void) {
   HAL_GPIO_WritePin(ADC1_CS_GPIO_Port, ADC1_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, TC_CS1_Pin | TC_CS2_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOB, TC_CS4_Pin | TC_CS3_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, TC_CS3_Pin | TC_CS4_Pin | ADC2_CS_Pin,
+  HAL_GPIO_WritePin(GPIOB, TC_CS2_Pin | TC_CS1_Pin | ADC2_CS_Pin,
                     GPIO_PIN_RESET);
 
   /*Configure GPIO pin : ADC1_INT_Pin */
@@ -325,15 +333,15 @@ static void MX_GPIO_Init(void) {
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(ADC1_CS_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : TC_CS1_Pin TC_CS2_Pin */
-  GPIO_InitStruct.Pin = TC_CS1_Pin | TC_CS2_Pin;
+  /*Configure GPIO pins : TC_CS4_Pin TC_CS3_Pin */
+  GPIO_InitStruct.Pin = TC_CS4_Pin | TC_CS3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : TC_CS3_Pin TC_CS4_Pin ADC2_CS_Pin */
-  GPIO_InitStruct.Pin = TC_CS3_Pin | TC_CS4_Pin | ADC2_CS_Pin;
+  /*Configure GPIO pins : TC_CS2_Pin TC_CS1_Pin ADC2_CS_Pin */
+  GPIO_InitStruct.Pin = TC_CS2_Pin | TC_CS1_Pin | ADC2_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
