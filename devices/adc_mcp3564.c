@@ -193,8 +193,8 @@ int mcp3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
     return ec;
   }
 
-  // CONFIG1: Force defaults
-  ec = mcp356x_modify_reg8(dev, MCP356X_REG_CONFIG1, (1 << 8) - 1, 0b00001100);
+  // CONFIG1: Force defaults (OSR=128, AMCLK=MCLK)
+  ec = mcp356x_modify_reg8(dev, MCP356X_REG_CONFIG1, (1 << 8) - 1, 0b00001000);
   if (ec) {
     return ec;
   }

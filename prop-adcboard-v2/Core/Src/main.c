@@ -26,6 +26,7 @@
 
 #include "adc_mcp3564.h"
 #include "errno.h"
+#include "math.h"
 #include "temp_max31855.h"
 
 /* USER CODE END Includes */
@@ -130,24 +131,28 @@ int main(void) {
 
     /* USER CODE BEGIN 3 */
 
-    for (int i = 0; i < 4; i++) {
-      TempMax31855Ctrl_s *it = tc_readers + i;
-      tempMax31855_read(it);
-      printf("TC %i temp: %i internal: %i faults %u\n", i,
-             (int)it->data.thermocoupleTemp, (int)it->data.internalTemp,
-             (unsigned int)it->data.faultFlags);
+    //    for (int i = 0; i < 4; i++) {
+    //      TempMax31855Ctrl_s *it = tc_readers + i;
+    //      tempMax31855_read(it);
+    //      printf("TC %i temp: %i internal: %i faults %u\n", i,
+    //             (int)it->data.thermocoupleTemp, (int)it->data.internalTemp,
+    //             (unsigned int)it->data.faultFlags);
+    //    }
+
+    for (int i = 0; i < 8; i++) {
+      mcp356x_channel_setup(&adc, MUX_CH0 + i, MUX_AGND);
+
+      int ec_fetch;
+      do {
+        ec_fetch = mcp356x_read(&adc);
+      } while (ec_fetch == -EBUSY);
+
+      static const int fullscale = pow(2, 23);
+      printf("%i, %i, %f\n", HAL_GetTick(), i,
+             (float)adc.result / fullscale * 25400 / 15400 * 3.3);
     }
 
-    mcp356x_channel_setup(&adc, MUX_REFIN_P, MUX_REFIN_N);
-
-    int ec_fetch;
-    do {
-      ec_fetch = mcp356x_read(&adc);
-    } while (ec_fetch == -EBUSY);
-
-    printf("ADC conversion chan 0: %li\n", adc.result);
-
-    HAL_Delay(400);
+    //    HAL_Delay(0);
   }
   /* USER CODE END 3 */
 }
