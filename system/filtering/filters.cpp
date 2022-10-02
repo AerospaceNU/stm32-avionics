@@ -291,16 +291,20 @@ void filter_addGyroRef() {
 static double filter_calculateBaroAltitude(double averagePressure) {
   double tempRef = cli_getConfigs()->groundTemperatureC + 273.15;  // C to K
 
-  // Note that this must be MSL for the equations on wikipedia to be valid
+  // TODO how should we handle very low pressures?
+  if (fabs(averagePressure) < 0.001) {
+    return 0;
+  }
+
+  // Note that this must be MSL for the equations on Wikipedia to be valid
   // Reference:
   // https://archive.psas.pdx.edu/RocketScience/PressureAltitude_Derived.pdf
-  double baroAltMsl = fabs(averagePressure) < 0.001
-                          ? 0
-                          : (tempRef / LAPSE_RATE) *
-                                (pow(averagePressure / GROUND_PRESSURE_ATM,
-                                     -R_DRY_AIR * LAPSE_RATE / G_ACCEL_EARTH) -
-                                 1);
-  return baroAltMsl;
+
+  // cpplint butchers this equation, sadly
+  return (tempRef / LAPSE_RATE) *
+         (pow(averagePressure / GROUND_PRESSURE_ATM,
+              -R_DRY_AIR * LAPSE_RATE / G_ACCEL_EARTH) -
+          1);
 }
 
 static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
