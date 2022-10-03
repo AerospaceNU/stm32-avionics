@@ -24,12 +24,12 @@ EndCondition_e AscentState::run() {
   dataLog_write(sensorData, filterData, this->getID());
 
   // Detect if new maximum Z position has been reached and record the time
-  if (filterData->pos_z > maxPosZ) {
-    maxPosZ = filterData->pos_z;
+  if (filterData->pos_z_agl > maxPosZ) {
+    maxPosZ = filterData->pos_z_agl;
   }
 
   // Detect apogee if under max z position and negative velocity
-  if (maxPosZ - filterData->pos_z > kPosDiffThreshold &&
+  if (maxPosZ - filterData->pos_z_agl > kPosDiffThreshold &&
       filterData->world_vel_z < 0) {
     return EndCondition_e::Apogee;
   }

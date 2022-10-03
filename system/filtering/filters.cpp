@@ -290,16 +290,15 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
   double lapseRate = -0.0065;  // valid below 11000m, use lookup table for
                                // lapse rate when altitude is higher
   double tempRef = cli_getConfigs()->groundTemperatureC + 273.15;  // C to K
-  double elevRef = cli_getConfigs()->groundElevationM;
 
   double presAvg = filter_getAveragePressure(curSensorVals);
-  double baroAlt =
-      fabs(presAvg) < 0.001
-          ? 0
-          : (tempRef / lapseRate) *
-                    (1 - pow(presAvg / presRef,
-                             R_DRY_AIR * lapseRate / G_ACCEL_EARTH)) +
-                elevRef;
+
+  double baroAltAgl = 0;
+  if (fabs(presAvg) > 0.001) {
+    baroAltAgl =
+        (tempRef / lapseRate) *
+        (pow(presAvg / presRef, -R_DRY_AIR * lapseRate / G_ACCEL_EARTH) - 1);
+  }
 #endif  // HAS_DEV(BAROMETER)
 
   // Kalman filtering, assuming Z is always up
@@ -307,10 +306,10 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
 
   // If we're descending, we can't trust the acceleration from our
   // accelerometer
-  // -- the rocket's flapping around on a parachute! Otherwise, our "global
-  // acceleration" is the measured acceleration minus 9.81 (since earth pulls
-  // us down). Under parachute it's about zero, since we're about-ish in
-  // equilibrium
+  // -- the rocket's flapping around on a parachute! Otherwise, our
+  // "global acceleration" is the measured acceleration minus 9.81
+  // (since earth pulls us down). Under parachute it's about zero, since
+  // we're about-ish in equilibrium
   double accz = hasPassedApogee ? 0 : filterData.world_acc_z - 9.81;
 
   // TODO check what order these "should" run in. Worst case we're off by one
@@ -321,12 +320,12 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
 #if HAS_DEV(BAROMETER)
   // Only correct if below max speed (above, baro readings untrustworthy)
   if (fabs(kalman.getXhat().estimatedVelocity) < BARO_MAX_SPEED) {
-    kalman.correct(baroAlt, kalman.DEFAULT_KALMAN_GAIN);
+    kalman.correct(baroAltAgl, kalman.DEFAULT_KALMAN_GAIN);
   }
 #endif  // HAS_DEV(BAROMETER)
 
   auto kalmanOutput = kalman.getXhat();
-  filterData.pos_z = kalmanOutput.estimatedAltitude;
+  filterData.pos_z_agl = kalmanOutput.estimatedAltitude;
   filterData.rocket_vel_x = kalmanOutput.estimatedVelocity;
 }
 

@@ -146,7 +146,7 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 #else
       0,
 #endif  // HAS_DEV(BAROMETER)
-      filterData->pos_z,
+      filterData->pos_z_agl,
       filterData->world_vel_z,
 #if HAS_DEV(GPS)
       sensorData->gpsData[0].latitude,

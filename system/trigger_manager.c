@@ -60,7 +60,7 @@ void triggerManager_update(FilterData_s* filterData, bool hasPassedLaunch,
       // Check if we want to check for descent altitude
       if (triggerConfiguration->flags == FLAG_ALT_DURING_DESCENT &&
           hasPassedApogee) {
-        if (filterData->pos_z < triggerConfiguration->configValue) {
+        if (filterData->pos_z_agl < triggerConfiguration->configValue) {
           triggerManager_triggerFire(i, true);
         }
       } else if (triggerConfiguration->flags == FLAG_APOGEE &&

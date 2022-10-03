@@ -16,7 +16,7 @@ typedef struct {
   double vtg;
   double pos_x;
   double pos_y;
-  double pos_z;
+  double pos_z_agl;
   double rocket_vel_x;
   double rocket_vel_y;
   double rocket_vel_z;

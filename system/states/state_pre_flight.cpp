@@ -85,7 +85,7 @@ EndCondition_e PreFlightState::run() {
   // Or a significantly large enough position change to override lack of
   // acceleration data
   double elevRef = cli_getConfigs()->groundElevationM;
-  if (filterData->pos_z - elevRef > kLaunchPosZDiffFailsafeThreshold) {
+  if (filterData->pos_z_agl > kLaunchPosZDiffFailsafeThreshold) {
     // This used to be in cleanup, but since it only happens via this
     // exit condition, it might be easier to live here
 

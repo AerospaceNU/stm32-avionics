@@ -382,7 +382,7 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
     fcbLogData->vtg = filterData->vtg;
     fcbLogData->pos_x = filterData->pos_x;
     fcbLogData->pos_y = filterData->pos_y;
-    fcbLogData->pos_z = filterData->pos_z;
+    fcbLogData->pos_z = filterData->pos_z_agl;
     fcbLogData->vel_x = filterData->world_vel_x;
     fcbLogData->vel_y = filterData->world_vel_y;
     fcbLogData->vel_z = filterData->world_vel_z;

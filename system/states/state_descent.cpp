@@ -25,8 +25,8 @@ EndCondition_e DescentState::run() {
 
   // Reset touchdown threshold counter if recent change in z position is large
   // enough
-  if (fabs(altitude - filterData->pos_z) > kTouchdownZPosChangeThreshold) {
-    altitude = filterData->pos_z;
+  if (fabs(altitude - filterData->pos_z_agl) > kTouchdownZPosChangeThreshold) {
+    altitude = filterData->pos_z_agl;
     transitionResetTimer = hm_millis();
   } else {
     if (hm_millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
