@@ -567,6 +567,7 @@ void dataLog_loadCliConfigs() {
       dataLog_getLastPacketType(firstAddress, maxCount, kCliConfigSize);
   *cliConfig = *(CliConfigs_s *)packetBuffer;
   if (packetIsEmpty((uint8_t *)cliConfig, kCliConfigSize)) {
+    currentConfigAddress -= kCliConfigSize;
     cli_setDefaultConfig();
   }
 #if HAS_DEV(RADIO)

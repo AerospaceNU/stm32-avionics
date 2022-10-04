@@ -37,6 +37,8 @@ EndCondition_e CliEraseFlashState::run() {
 }
 
 void CliEraseFlashState::cleanup() {
+  // Assign new flight initially to have a place to start logging again
+  dataLog_assignFlight();
   // Re-write current configs so that they persist
   dataLog_writeCliConfigs();
   // Send complete message to CLI. No way of knowing if there is a failure

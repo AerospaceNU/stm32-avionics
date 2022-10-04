@@ -17,10 +17,8 @@ void PreFlightState::init() {
 
   // We only want to create a new flight in flash if
   // we came from Erase flash (offload, sim, etc shouldn't)
-  if (!hm_inSimMode() &&
-      (m_lastCliEndConn == EraseFlashCommand || m_lastCliEndConn == NoChange)) {
+  if (!hm_inSimMode() && m_lastCliEndConn == NoChange) {
     dataLog_assignFlight();
-    m_lastCliEndConn = NoChange;
   }
 
   simModeStarted = false;
