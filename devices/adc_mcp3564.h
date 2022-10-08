@@ -18,7 +18,9 @@ typedef struct {
   GPIO_TypeDef *intPort;
   uint16_t intPin;
 
-  int32_t result;
+  int32_t result[8];
+  uint8_t rx_read_buf[5];
+  uint8_t tx_read_buf[5];
 } AdcMcp3564Ctrl_s;
 
 // Channel IDs, see table 5-14
@@ -87,7 +89,8 @@ typedef struct {
   AdcMcp3564ScanModeChannels_e channel_id : 4;  // (See table 5-14, page 54)
 } AdcMcp3564_DataFormat_11;
 
-int mcp356x_read(AdcMcp3564Ctrl_s *dev);
+void mcp356x_read(void *pdev);
+int mcp356x_process(AdcMcp3564Ctrl_s *dev);
 int mcp356x_channel_setup(AdcMcp3564Ctrl_s *dev,
                           const AdcMcp3564MuxChannels_e in_p,
                           const AdcMcp3564MuxChannels_e in_n);

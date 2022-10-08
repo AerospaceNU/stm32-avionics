@@ -15,4 +15,4 @@ uint8_t clear_bit(uint8_t value, uint8_t offset);
 
 uint8_t get_bit(uint8_t value, uint8_t place);
 
-#endif /* UTILS_BIT_HELPER_H_ */
+#endif  // UTILS_BIT_HELPER_H_

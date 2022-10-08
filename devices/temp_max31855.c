@@ -7,9 +7,21 @@
 
 #include "temp_max31855.h"
 
+#include <math.h>
 #include <stdio.h>
 
 #define SPI_TIMEOUT_MS 50
+#define K_THERMOCOUPLE_SENSITIVITY 41.276
+
+// Calculates voltage to temperature
+// using factors from
+// https://www.conaxtechnologies.com/wp-content/uploads/2016/04/EMF_Type_K_Thermocouple_Conversion_Table_Celsius.pdf
+static float voltage_to_temperature(float voltage) {
+  float temp = 0.1602 * (pow(voltage, 5)) + 2.2934 * (pow(voltage, 4)) +
+               11.869 * (pow(voltage, 3)) + 25.009 * (pow(voltage, 2)) +
+               46.013 * voltage + 3.8124;
+  return temp;
+}
 
 // From
 // https://github.com/Tuckie/max31855/blob/71b2724f6280a0970ff094290c63e01c889126c3/max31855.py#L111
@@ -22,6 +34,13 @@ static void convert_thermocouple(TempMax31855Ctrl_s *dev, uint32_t raw) {
   reg.raw_temp = raw;
   dev->data.rawThermocouple = reg.raw_temp;
   dev->data.thermocoupleTemp = reg.raw_temp * 0.25;
+  float thermocoupleVoltage =
+      K_THERMOCOUPLE_SENSITIVITY * dev->data.thermocoupleTemp;
+  if (thermocoupleVoltage < 0) {
+    // only recalibrate if voltage is negative
+    dev->data.thermocoupleTemp =
+        voltage_to_temperature(thermocoupleVoltage / 1000);
+  }
 }
 
 // Calculate internal raw counts, given the register value

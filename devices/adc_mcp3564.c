@@ -8,6 +8,7 @@
 #include "adc_mcp3564.h"
 
 #include "errno.h"
+#include "hal_callbacks.h"
 
 #define SPI_TIMEOUT_MS 50
 
@@ -53,7 +54,7 @@
 static const uint8_t DEV_ADDR = 0x1;
 
 #define CHIP_SELECT HAL_GPIO_WritePin(dev->csPort, dev->csPin, GPIO_PIN_RESET);
-#define CHIP_DESELCT HAL_GPIO_WritePin(dev->csPort, dev->csPin, GPIO_PIN_SET);
+#define CHIP_DESELECT HAL_GPIO_WritePin(dev->csPort, dev->csPin, GPIO_PIN_SET);
 
 // ======== End chip defines ========
 
@@ -80,7 +81,7 @@ static int mcp356x_modify_reg8(AdcMcp3564Ctrl_s *dev, int reg_addr, int mask,
   CHIP_SELECT
   int ec_read_reg =
       HAL_SPI_TransmitReceive(dev->hspi, tx_read, rx_read, 2, SPI_TIMEOUT_MS);
-  CHIP_DESELCT
+  CHIP_DESELECT
 
   if (ec_read_reg) {
     return ec_read_reg;
@@ -98,7 +99,7 @@ static int mcp356x_modify_reg8(AdcMcp3564Ctrl_s *dev, int reg_addr, int mask,
 
   CHIP_SELECT
   int ec_write_reg = HAL_SPI_Transmit(dev->hspi, tx_write, 2, SPI_TIMEOUT_MS);
-  CHIP_DESELCT
+  CHIP_DESELECT
 
   if (ec_write_reg) {
     return ec_write_reg;
@@ -130,7 +131,7 @@ static int mcp356x_modify_reg24(AdcMcp3564Ctrl_s *dev, int reg_addr, int mask,
   CHIP_SELECT
   int ec_read_reg =
       HAL_SPI_TransmitReceive(dev->hspi, tx_read, rx_read, 4, SPI_TIMEOUT_MS);
-  CHIP_DESELCT
+  CHIP_DESELECT
 
   if (ec_read_reg) {
     return ec_read_reg;
@@ -150,13 +151,44 @@ static int mcp356x_modify_reg24(AdcMcp3564Ctrl_s *dev, int reg_addr, int mask,
 
   CHIP_SELECT
   int ec_write_reg = HAL_SPI_Transmit(dev->hspi, tx_write, 4, SPI_TIMEOUT_MS);
-  CHIP_DESELCT
+  CHIP_DESELECT
 
   if (ec_write_reg) {
     return ec_write_reg;
   }
 
   return 0;
+}
+
+void mcp356x_TxRxCpltCallback(void *pdev) {
+  AdcMcp3564Ctrl_s *dev = (AdcMcp3564Ctrl_s *)pdev;
+
+  CHIP_DESELECT
+  // third byte from bottom, DR_STATUS
+  // Active low, cleared when ready (figure 6-1)
+  if (dev->rx_read_buf[0] & 0x4) {
+    return;
+  }
+  // First byte of rx_read_buf should be the status byte
+  // Next byte has the channel id and a sign extension
+  // Next 4 bytes are big (?) endian data, per figure 5-8
+  uint32_t raw = dev->rx_read_buf[1] << 24 | dev->rx_read_buf[2] << 16 |
+                 dev->rx_read_buf[3] << 8 | dev->rx_read_buf[4];
+
+  // TODO make this respect different DATA_FORMAT modes
+  AdcMcp3564_DataFormat_11 *output = ((AdcMcp3564_DataFormat_11 *)&raw);
+  uint8_t channelID = output->channel_id;
+  dev->result[channelID] = output->data;
+}
+
+void mcp356x_read(void *pdev) {
+  AdcMcp3564Ctrl_s *dev = (AdcMcp3564Ctrl_s *)pdev;
+  // Static read (Table 6-2)
+  dev->tx_read_buf[0] = DEV_ADDR << 6 | MCP356X_REG_ADCDATA << 2 |
+                        (MCP356X_CMD_TYPE_STATIC_READ & 0x3);
+
+  CHIP_SELECT
+  HAL_SPI_TransmitReceive_DMA(dev->hspi, dev->tx_read_buf, dev->rx_read_buf, 5);
 }
 
 int mcp3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
@@ -168,16 +200,13 @@ int mcp3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
   dev->intPort = intPort;
   dev->intPin = intPin;
 
-  CHIP_DESELCT
-  HAL_Delay(10);  // IDK, just make sure it's really reset
-
   // Send a FULL_RESET fast command (page 60)
   uint8_t tx_conv_buf[1] = {DEV_ADDR << 6 | MCP356X_FAST_CMD_FULL_RESET << 2 |
                             (MCP356X_CMD_TYPE_FAST_CMD & 0x3)};
 
   CHIP_SELECT
   int ec = HAL_SPI_Transmit(dev->hspi, tx_conv_buf, 1, SPI_TIMEOUT_MS);
-  CHIP_DESELCT
+  CHIP_DESELECT
   if (ec) {
     return ec;
   }
@@ -185,16 +214,21 @@ int mcp3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
   // CONFIG0: Configure:
   //  - VREF_SEL -> no buffer
   //  - CLK_SEL -> internal
-  //  - ADC_MODE -> standby
+  //  - ADC_MODE -> conversion
+
   ec =
       mcp356x_modify_reg8(dev, MCP356X_REG_CONFIG0, 0b1 << 6 | 0b11 << 4 | 0b11,
-                          0b0 << 6 | 0b10 << 4 | 0b10);
+                          0b0 << 6 | 0b10 << 4 | 0b11);
   if (ec) {
     return ec;
   }
 
-  // CONFIG1: Force defaults (OSR=128, AMCLK=MCLK)
-  ec = mcp356x_modify_reg8(dev, MCP356X_REG_CONFIG1, (1 << 8) - 1, 0b00001000);
+  // CONFIG1: Configure:
+  // AMCLK = MCLK, Prescaler = 1
+  // OSR = 128
+  //
+  ec = mcp356x_modify_reg8(dev, MCP356X_REG_CONFIG1, (1 << 8) - 1,
+                           0b00 << 6 | 0b0010 << 2 | 0b00);
   if (ec) {
     return ec;
   }
@@ -206,29 +240,40 @@ int mcp3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
   }
 
   // CONFIG3: Configure:
-  //   - CONV_MODE -> one shot to standby
-  //   - DATA_FORMAT -> force 24 bit
+  //   - CONV_MODE -> continuous
+  //   - DATA_FORMAT -> force 32 bit
   //   - OFFCAL -> force to off
   //   - GAINCAL -> force to off
   ec = mcp356x_modify_reg8(dev, MCP356X_REG_CONFIG3,
                            0b11 << 6 | 0b11 << 4 | 0b11,
-                           0b10 << 6 | 0b00 << 4 | 0b11);
+                           0b11 << 6 | 0b11 << 4 | 0b00);
   if (ec) {
     return ec;
   }
 
   // IRQ
-  //  - IRQ_MODE -> use internal pullup
-  ec = mcp356x_modify_reg8(dev, MCP356X_REG_IRQ, 0b1 << 2, 0b1 << 2);
+  // IRQ_MODE -> High Z, use internal pullup
+  // enable fast commands
+  // Conversion start interrupt off
+  ec = mcp356x_modify_reg8(dev, MCP356X_REG_IRQ, (1 << 8) - 1,
+                           0b00 << 2 | 0b1 << 1 | 0b0);
   if (ec) {
     return ec;
   }
 
-  // SCAN: Disable SCAN
-  ec = mcp356x_modify_reg24(dev, MCP356X_REG_SCAN, (1 << 24) - 1, 0);
+  // SCAN: Configure:
+  // Delay: none
+  // Disable differential channels
+  // Enable all single ended channels
+  ec = mcp356x_modify_reg24(
+      dev, MCP356X_REG_SCAN, (1 << 24) - 1,
+      (0b00000000 << 16) | (0b00000000 << 8) | ((1 << 8) - 1));
   if (ec) {
     return ec;
   }
+
+  // TIMER: Consecutive scan
+  ec = mcp356x_modify_reg24(dev, MCP356X_REG_TIMER, 0xFFFFFF, 0);
 
   // OFFSETCAL: Force to 0
   ec = mcp356x_modify_reg24(dev, MCP356X_REG_OFFSETCAL, (1 << 24) - 1, 0);
@@ -242,6 +287,12 @@ int mcp3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
     return ec;
   }
 
+  // Register the external interrupt callback
+  halCallbacks_registerExtInterruptCallback(dev->intPin, mcp356x_read, dev);
+
+  // Register callback for spi transfer complete
+  halCallbacks_registerSpiTxRxCpltCallback(dev->hspi, mcp356x_TxRxCpltCallback,
+                                           dev);
   return 0;
 }
 
@@ -265,46 +316,11 @@ int mcp356x_channel_setup(AdcMcp3564Ctrl_s *dev,
 
   CHIP_SELECT
   int ec_conv = HAL_SPI_Transmit(dev->hspi, tx_conv_buf, 1, SPI_TIMEOUT_MS);
-  CHIP_DESELCT
+  CHIP_DESELECT
 
   if (ec_conv) {
     return ec_conv;
   }
-
-  return 0;
-}
-
-int mcp356x_read(AdcMcp3564Ctrl_s *dev) {
-  // 3: Read data from ADCDATA register
-  uint8_t tx_read_buf[4] = {0};
-
-  // Static read (Table 6-2)
-  tx_read_buf[0] = DEV_ADDR << 6 | MCP356X_REG_ADCDATA << 2 |
-                   (MCP356X_CMD_TYPE_STATIC_READ & 0x3);
-
-  uint8_t rx_read_buf[4] = {0};
-
-  CHIP_SELECT
-  int ec_read = HAL_SPI_TransmitReceive(dev->hspi, tx_read_buf, rx_read_buf, 4,
-                                        SPI_TIMEOUT_MS);
-  CHIP_DESELCT
-
-  if (ec_read) {
-    return ec_read;
-  }
-
-  // third byte from bottom, DR_STATUS
-  // Active low, cleared when ready (figure 6-1)
-  if (rx_read_buf[0] & 0x4) {
-    return -EBUSY;
-  }
-
-  // First byte of rx_read_buf should be the status byte
-  // Next 3 are big (?) endian data, per figure 5-8
-  uint32_t raw = rx_read_buf[1] << 16 | rx_read_buf[2] << 8 | rx_read_buf[3];
-
-  // TODO make this respect different DATA_FORMAT modes
-  dev->result = ((AdcMcp3564_DataFormat_00 *)&raw)->data;
 
   return 0;
 }

@@ -34,4 +34,10 @@ void halCallbacks_registerUartRxIdleCallback(UART_HandleTypeDef *huart,
                                              void *userData);
 #endif  // HAL_UART_MODULE_ENABLED
 
+#ifdef HAL_EXTI_MODULE_ENABLED
+void halCallbacks_registerExtInterruptCallback(uint16_t gpioPin,
+                                               void (*callback)(void *),
+                                               void *userData);
+#endif  // HAL_EXTI_MODULE_ENABLED
+
 #endif  // DEVICES_HAL_CALLBACKS_H_

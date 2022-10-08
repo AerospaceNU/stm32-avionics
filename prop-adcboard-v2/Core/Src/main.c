@@ -49,6 +49,10 @@
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
 SPI_HandleTypeDef hspi3;
+DMA_HandleTypeDef hdma_spi1_rx;
+DMA_HandleTypeDef hdma_spi1_tx;
+DMA_HandleTypeDef hdma_spi3_rx;
+DMA_HandleTypeDef hdma_spi3_tx;
 
 /* USER CODE BEGIN PV */
 
@@ -57,6 +61,7 @@ SPI_HandleTypeDef hspi3;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_SPI3_Init(void);
@@ -66,7 +71,6 @@ static void MX_SPI3_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 
 /**
@@ -97,6 +101,7 @@ int main(void) {
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_SPI1_Init();
   MX_USB_DEVICE_Init();
   MX_SPI2_Init();
@@ -116,11 +121,12 @@ int main(void) {
   // SPI1 = ADC1
   // ADC1 has physical channels IN8 through IN15 on pins AIN0 through AIN7
 
-  AdcMcp3564Ctrl_s adc;
-  mcp3564_init(&adc, &hspi3, ADC2_CS_GPIO_Port, ADC2_CS_Pin, ADC2_INT_GPIO_Port,
-               ADC2_INT_Pin);
-  // mcp3564_init(&adc, &hspi1, ADC1_CS_GPIO_Port, ADC1_CS_Pin,
-  //  ADC1_INT_GPIO_Port, ADC1_INT_Pin);
+  AdcMcp3564Ctrl_s adc2;
+  mcp3564_init(&adc2, &hspi3, ADC2_CS_GPIO_Port, ADC2_CS_Pin,
+               ADC2_INT_GPIO_Port, ADC2_INT_Pin);
+  AdcMcp3564Ctrl_s adc1;
+  mcp3564_init(&adc1, &hspi1, ADC1_CS_GPIO_Port, ADC1_CS_Pin,
+               ADC1_INT_GPIO_Port, ADC1_INT_Pin);
 
   /* USER CODE END 2 */
 
@@ -140,22 +146,12 @@ int main(void) {
     //    }
 
     for (int i = 0; i < 8; i++) {
-      mcp356x_channel_setup(&adc, MUX_CH0 + i, MUX_AGND);
-
-      int ec_fetch;
-      uint32_t start = HAL_GetTick();
-      do {
-        ec_fetch = mcp356x_read(&adc);
-      } while (ec_fetch == -EBUSY && (HAL_GetTick() - start) < 5);
-
-      if (!ec_fetch) {
-        static const int fullscale = pow(2, 23);
-        printf("%lu, %i, %f\n", HAL_GetTick(), i,
-               (float)adc.result / fullscale * 25400 / 15400 * 3.3);
-      }
+      static const int fullscale = pow(2, 23);
+      printf("%lu, %i, %f\n", HAL_GetTick(), i,
+             (float)adc1.result[i] / fullscale * 25400 / 15400 * 3.3);
     }
 
-    //    HAL_Delay(0);
+    HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
@@ -223,7 +219,7 @@ static void MX_SPI1_Init(void) {
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -291,7 +287,7 @@ static void MX_SPI3_Init(void) {
   hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi3.Init.NSS = SPI_NSS_SOFT;
-  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
   hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -302,6 +298,29 @@ static void MX_SPI3_Init(void) {
   /* USER CODE BEGIN SPI3_Init 2 */
 
   /* USER CODE END SPI3_Init 2 */
+}
+
+/**
+ * Enable DMA controller clock
+ */
+static void MX_DMA_Init(void) {
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+  /* DMA1_Stream5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
+  /* DMA2_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+  /* DMA2_Stream3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 }
 
 /**
@@ -330,8 +349,8 @@ static void MX_GPIO_Init(void) {
 
   /*Configure GPIO pin : ADC1_INT_Pin */
   GPIO_InitStruct.Pin = ADC1_INT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(ADC1_INT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : ADC1_CS_Pin */
@@ -357,13 +376,19 @@ static void MX_GPIO_Init(void) {
 
   /*Configure GPIO pin : ADC2_INT_Pin */
   GPIO_InitStruct.Pin = ADC2_INT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(ADC2_INT_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 }
 
 /* USER CODE BEGIN 4 */
-
 /* USER CODE END 4 */
 
 /**
