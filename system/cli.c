@@ -59,12 +59,18 @@ static struct option longOptions[] = {
 static CliConfigs_s cliConfigs = {0};
 
 static CliComms_e lastCommsType;  // Used to help send ack to right places
+static uint8_t lastStringId = 0xFF;
 
 static void cli_parseRadio(RadioRecievedPacket_s* packet) {
   // Only accept packets with good CRC
   RadioPacket_s* parsedPacket = (RadioPacket_s*)&packet->data;
   if (parsedPacket->packetType == TELEMETRY_ID_STRING) {
     if (packet->crc) {
+      if (parsedPacket->payload.cliString.id == lastStringId) {
+        // duplicate string, do nothing
+        return;
+      }
+      lastStringId = parsedPacket->payload.cliString.id;
       const uint8_t len = parsedPacket->payload.cliString.len;
       const uint8_t* pdata = parsedPacket->payload.cliString.string;
       for (size_t i = 0; i < len; i++) {

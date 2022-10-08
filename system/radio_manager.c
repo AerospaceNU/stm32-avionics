@@ -13,6 +13,9 @@
 #include "data_structures.h"
 #include "hardware_manager.h"
 
+#define RADIO_INTERVAL_MS 200
+#define RADIO_SEND_MS 100
+
 static DataRecieveState_s dataRx[NUM_RADIO];
 static DataTransmitState_s lastSent[NUM_RADIO];
 
@@ -61,20 +64,8 @@ void radioManager_tick() {
 }
 
 void radioManager_sendInternal(int radioId) {
-  // if (true) {
   hm_radioSend(radioId, (uint8_t *)&transmitPacket[radioId],
                sizeof(RadioPacket_s));
-  /*
-   } else {
-     static RadioRecievedPacket_s packet;
-     packet.crc = true;
-     packet.lqi = 1;
-     packet.rssi = 1;
-     packet.radioId = TELEMETRY_RADIO;
-     memcpy(packet.data, &transmitPacket, RADIO_PACKET_SIZE);
-     hm_usbTransmit((uint8_t *)&packet, sizeof(packet));
-   }
-   */
 }
 
 void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
@@ -90,6 +81,7 @@ void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
 void radioManager_transmitData(int radioId, SensorData_s *sensorData,
                                FilterData_s *filterData, uint8_t state) {
   uint32_t currentTime = hm_millis();
+  if (currentTime % RADIO_INTERVAL_MS >= RADIO_SEND_MS) return;
   transmitPacket[radioId].timestampMs = currentTime;
 
   /*
@@ -248,6 +240,8 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 #define min(a, b) (a < b) ? a : b
 
 void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
+  static uint8_t lastTxId = 0;
+
   while (len) {
     uint8_t txLen = min(len, RADIO_MAX_STRING);
 
@@ -259,18 +253,25 @@ void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
            RADIO_MAX_STRING);
     memcpy(transmitPacket[radioId].payload.cliString.string, data, txLen);
     transmitPacket[radioId].payload.cliString.len = txLen;
+    transmitPacket[radioId].payload.cliString.id = lastTxId++;
 
-    radioManager_sendInternal(radioId);
+    for (int i = 0; i < 3; i++) {
+      // This is intended to be called twice to hopefully successfully send at
+      // least once
+      radioManager_sendInternal(radioId);
+      radioManager_sendInternal(radioId);
 
-    // The radio seems to not actually send the packet unless we actually call
-    // RadioUpdate a bunch
-    // TODO: This is a HACK
-    for (int i = 0; i < 10; i++) {
-      hm_radioUpdate();
-      uint32_t start = hm_millis();
-      while ((hm_millis() - start) < 15) {
+      // The radio seems to not actually send the packet unless we actually call
+      // RadioUpdate a bunch
+      // TODO: This is a HACK
+      uint32_t start;
+      for (int i = 0; i < 9; i++) {
+        hm_radioUpdate();
+        start = hm_millis();
+        while ((hm_millis() - start) < 5) {
+        }
+        hm_watchdogRefresh();
       }
-      hm_watchdogRefresh();
     }
 
     len -= txLen;

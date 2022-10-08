@@ -219,6 +219,7 @@ int main(void) {
         } else {
           int dest = command.destination == RAD_433 ? FIRST_ID_RADIO_TI_433
                                                     : FIRST_ID_RADIO_TI_915;
+
           radioManager_transmitString(dest, command.data, command.len);
         }
         cb_dequeue(buffer, count);
@@ -229,7 +230,7 @@ int main(void) {
       }
     }
 
-    HAL_Delay(10);
+    HAL_Delay(1);
 
     /* USER CODE END WHILE */
 
