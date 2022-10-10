@@ -93,6 +93,8 @@ EndCondition_e PreFlightState::run() {
       dataLog_write(&sensorDataBuffer[i], &filterDataBuffer[i], this->getID());
     }
     dataLog_getFlightMetadata()->pressureRef = filter_getPressureRef();
+    dataLog_getFlightMetadata()->gravityRef = filter_getGravityRef();
+    dataLog_getFlightMetadata()->launchedCliConfigs = *cli_getConfigs();
     dataLog_writeFlightMetadata();
     return EndCondition_e::Launch;
   }

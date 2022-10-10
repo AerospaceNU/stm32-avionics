@@ -11,16 +11,19 @@ extern "C" {
 
 #include <stdint.h>
 
+#include "cli.h"
 #include "filters.h"
 #include "hardware_manager.h"
 
 // Flight metadata shows what data will be logged in what relative location
 typedef struct __attribute__((__packed__)) {
   double pressureRef;
+  int8_t gravityRef;
   uint8_t launched;
   uint64_t gpsTimestamp;
-  uint64_t apogeeTimestamp;
+  uint32_t apogeeTimestamp;
   uint8_t triggerFireStatus;
+  CliConfigs_s launchedCliConfigs;
 } FlightMetadata_s;
 
 /**

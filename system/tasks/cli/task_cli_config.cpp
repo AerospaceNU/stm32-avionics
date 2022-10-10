@@ -1,4 +1,5 @@
 #include <cerrno>
+#include <cinttypes>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -230,7 +231,7 @@ void CliTasks::config() {
     dtoa(val, sizeof(val), cli_getConfigs()->groundTemperatureC, 3);
     generateConfigHelp("Ground Temperature (C):", val);
     // Radio channel
-    snprintf(val, sizeof(val), "%i", cli_getConfigs()->radioChannel);
+    snprintf(val, sizeof(val), "%" PRIi32, cli_getConfigs()->radioChannel);
     generateConfigHelp("Radio Channel:", val);
   }
 

@@ -37,4 +37,9 @@ EndCondition_e AscentState::run() {
   return EndCondition_e::NoChange;
 }
 
-void AscentState::cleanup() { triggerManager_setApogeeTime(hm_millis()); }
+void AscentState::cleanup() {
+  uint32_t apogeeTime = hm_millis();
+  triggerManager_setApogeeTime(apogeeTime);
+  dataLog_getFlightMetadata()->apogeeTimestamp = apogeeTime;
+  dataLog_writeFlightMetadata();
+}

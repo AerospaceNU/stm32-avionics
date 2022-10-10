@@ -66,11 +66,11 @@ typedef struct {
 /**
  * Configs that can be changed via CLI
  */
-typedef struct {
+typedef struct __attribute__((__packed__)) {
   TriggerConfig_s triggerConfiguration[MAX_TRIGGER];
   double groundElevationM;
   double groundTemperatureC;
-  int radioChannel;
+  int32_t radioChannel;
 } CliConfigs_s;
 
 /**

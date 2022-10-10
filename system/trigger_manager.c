@@ -17,14 +17,14 @@
 #include "hardware_manager.h"
 
 static bool triggerFireStatus[MAX_TRIGGER] = {0};
-static uint64_t apogeeTimestamp;
+static uint32_t apogeeTimestamp;
 
 void triggerManager_init() {
   for (int i = 0; i < MAX_TRIGGER; ++i) triggerFireStatus[i] = 0;
   apogeeTimestamp = 0;
 }
 
-void triggerManager_setApogeeTime(uint64_t timestamp) {
+void triggerManager_setApogeeTime(uint32_t timestamp) {
   apogeeTimestamp = timestamp;
 }
 
@@ -47,40 +47,35 @@ void triggerManager_update(FilterData_s* filterData, bool hasPassedLaunch,
   // Turns off expired pyros (this is only a pyro thing, the line cutters
   // shut themselves off
   hm_pyroUpdate();
-  TriggerConfig_s* triggerConfiguration =
-      cli_getConfigs()->triggerConfiguration;
   for (int i = 0; i < MAX_TRIGGER; i++) {
+    TriggerConfig_s* triggerConfig =
+        &(cli_getConfigs()->triggerConfiguration[i]);
     if (!triggerFireStatus[i]) {
-      if (triggerConfiguration->flags == FLAG_LAUNCH && hasPassedLaunch) {
+      if (triggerConfig->flags == FLAG_LAUNCH && hasPassedLaunch) {
         triggerManager_triggerFire(i, true);
       }
-      if (triggerConfiguration->flags == FLAG_TOUCHDOWN && hasPassedTouchdown) {
+      if (triggerConfig->flags == FLAG_TOUCHDOWN && hasPassedTouchdown) {
         triggerManager_triggerFire(i, true);
       }
       // Check if we want to check for descent altitude
-      if (triggerConfiguration->flags == FLAG_ALT_DURING_DESCENT &&
-          hasPassedApogee) {
-        if (filterData->pos_z_agl < triggerConfiguration->configValue) {
+      if (triggerConfig->flags == FLAG_ALT_DURING_DESCENT && hasPassedApogee) {
+        if (filterData->pos_z_agl < triggerConfig->configValue) {
           triggerManager_triggerFire(i, true);
         }
-      } else if (triggerConfiguration->flags == FLAG_APOGEE &&
-                 hasPassedApogee) {
+      } else if (triggerConfig->flags == FLAG_APOGEE && hasPassedApogee) {
         // Start apogee pyro
         triggerManager_triggerFire(i, true);
-      } else if (triggerConfiguration->flags == FLAG_APOGEE_DELAY &&
-                 hasPassedApogee) {
-        if (hm_millis() - apogeeTimestamp >
-            1000 * triggerConfiguration->configValue) {
+      } else if (triggerConfig->flags == FLAG_APOGEE_DELAY && hasPassedApogee) {
+        if (hm_millis() - apogeeTimestamp > 1000 * triggerConfig->configValue) {
           triggerManager_triggerFire(i, true);
         }
-      } else if (triggerConfiguration->flags == FLAG_CUSTOM_MARMON_CLAMP) {
+      } else if (triggerConfig->flags == FLAG_CUSTOM_MARMON_CLAMP) {
         if (hasPassedLaunch && filterData->world_vel_z < 18.3 &&
             filterData->world_acc_z < 10) {
           triggerManager_triggerFire(i, true);
         }
       }
     }
-    ++triggerConfiguration;
   }
 }
 

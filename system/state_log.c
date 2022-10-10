@@ -28,6 +28,7 @@ void stateLog_reloadFlight() {
 
   // Load in recovered values
   filter_setPressureRef(oldMetadataPacket.pressureRef);
+  filter_setGravityRef(oldMetadataPacket.gravityRef);
   triggerManager_init();
   triggerManager_setApogeeTime(hm_millis());
   triggerManager_setTriggerFireStatus(~oldMetadataPacket.triggerFireStatus);

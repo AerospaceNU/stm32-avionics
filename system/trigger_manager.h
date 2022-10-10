@@ -34,7 +34,7 @@ typedef enum {
   FLAG_CUSTOM_MARMON_CLAMP
 } TriggerFlag_e;
 
-typedef struct {
+typedef struct __attribute__((__packed__)) {
   uint8_t mode;
   uint8_t port;
   uint16_t flags;
@@ -50,7 +50,7 @@ void triggerManager_init();
  * @brief Sets apogee timestamp
  * @param timestamp: Timestamp of apogee detection
  */
-void triggerManager_setApogeeTime(uint64_t timestamp);
+void triggerManager_setApogeeTime(uint32_t timestamp);
 
 /**
  * @brief Returns which triggers have happened and which have not

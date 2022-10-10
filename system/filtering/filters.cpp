@@ -439,6 +439,10 @@ void filter_setPressureRef(double pres) { presRef = pres; }
 
 double filter_getPressureRef() { return presRef; }
 
+void filter_setGravityRef(int8_t reference) { gravityRef = reference; }
+
+int8_t filter_getGravityRef() { return gravityRef; }
+
 static void filter_setWorldReference() {
   /*
    * Data comes in through sensors relative to the board. Other filter functions

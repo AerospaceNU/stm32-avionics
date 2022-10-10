@@ -90,6 +90,17 @@ void filter_setPressureRef(double pres);
 double filter_getPressureRef();
 
 /**
+ * @brief Sets gravity reference direction
+ * @param reference: Direction of gravity reference
+ */
+void filter_setGravityRef(int8_t reference);
+
+/**
+ * @brief Returns gravity reference value
+ */
+int8_t filter_getGravityRef();
+
+/**
  * @brief Returns most recent filtered data
  */
 FilterData_s* filter_getData();
