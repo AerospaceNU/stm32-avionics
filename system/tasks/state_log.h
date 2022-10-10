@@ -2,8 +2,8 @@
  * state_log.h
  */
 
-#ifndef SYSTEM_STATE_LOG_H_
-#define SYSTEM_STATE_LOG_H_
+#ifndef SYSTEM_TASKS_STATE_LOG_H_
+#define SYSTEM_TASKS_STATE_LOG_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,4 +32,4 @@ int stateLog_read();
 }
 #endif
 
-#endif  // SYSTEM_STATE_LOG_H_
+#endif  // SYSTEM_TASKS_STATE_LOG_H_

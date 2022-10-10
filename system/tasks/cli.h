@@ -2,8 +2,8 @@
  * cli.h
  */
 
-#ifndef SYSTEM_CLI_H_
-#define SYSTEM_CLI_H_
+#ifndef SYSTEM_TASKS_CLI_H_
+#define SYSTEM_TASKS_CLI_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -141,4 +141,4 @@ CircularBuffer_s* cli_getRxBufferFor(CliComms_e source);
 }
 #endif
 
-#endif  // SYSTEM_CLI_H_
+#endif  // SYSTEM_TASKS_CLI_H_

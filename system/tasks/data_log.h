@@ -2,8 +2,8 @@
  * data_log.h
  */
 
-#ifndef SYSTEM_DATA_LOG_H_
-#define SYSTEM_DATA_LOG_H_
+#ifndef SYSTEM_TASKS_DATA_LOG_H_
+#define SYSTEM_TASKS_DATA_LOG_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -126,4 +126,4 @@ void dataLog_writeCliConfigs();
 }
 #endif
 
-#endif  // SYSTEM_DATA_LOG_H_
+#endif  // SYSTEM_TASKS_DATA_LOG_H_

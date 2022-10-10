@@ -5,8 +5,9 @@
  *      Author: sam
  */
 
-#ifndef SYSTEM_TRIGGER_MANAGER_H_
-#define SYSTEM_TRIGGER_MANAGER_H_
+#ifndef SYSTEM_TASKS_TRIGGER_MANAGER_H_
+#define SYSTEM_TASKS_TRIGGER_MANAGER_H_
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -88,4 +89,5 @@ void triggerManager_triggerFire(uint8_t triggerNum, bool logFire);
 #ifdef __cplusplus
 }
 #endif
-#endif  // SYSTEM_TRIGGER_MANAGER_H_
+
+#endif  // SYSTEM_TASKS_TRIGGER_MANAGER_H_

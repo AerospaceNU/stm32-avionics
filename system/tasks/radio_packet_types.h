@@ -2,8 +2,8 @@
  * radio_packet_types.h
  */
 
-#ifndef SYSTEM_RADIO_PACKET_TYPES_H_
-#define SYSTEM_RADIO_PACKET_TYPES_H_
+#ifndef SYSTEM_TASKS_RADIO_PACKET_TYPES_H_
+#define SYSTEM_TASKS_RADIO_PACKET_TYPES_H_
 
 #include <stdint.h>
 
@@ -100,4 +100,4 @@ PACKED_STRUCT {
 }
 RadioPacket_s;
 
-#endif  // SYSTEM_RADIO_PACKET_TYPES_H_
+#endif  // SYSTEM_TASKS_RADIO_PACKET_TYPES_H_

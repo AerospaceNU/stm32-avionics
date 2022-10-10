@@ -1,13 +1,13 @@
 set(SYSTEM_FILES_LIST
-        cli.c
-        radio_manager.c
         scheduler.cpp
-        state_log.c
-        data_log.c
-        trigger_manager.c
 
         tasks/buzzer_heartbeat.c
+        tasks/cli.c
+        tasks/data_log.c
         tasks/data_offload.c
+        tasks/radio_manager.c
+        tasks/state_log.c
+        tasks/trigger_manager.c
         tasks/cli/task_cli_config.cpp
         tasks/cli/task_cli_help.cpp
         tasks/cli/task_cli_main.cpp

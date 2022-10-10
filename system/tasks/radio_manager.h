@@ -2,8 +2,8 @@
  * radio_manager.h
  */
 
-#ifndef SYSTEM_RADIO_MANAGER_H_
-#define SYSTEM_RADIO_MANAGER_H_
+#ifndef SYSTEM_TASKS_RADIO_MANAGER_H_
+#define SYSTEM_TASKS_RADIO_MANAGER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,4 +60,4 @@ void radioManager_addMessageCallback(int radioId, RadioCallback_t callback);
 }
 #endif
 
-#endif  // SYSTEM_RADIO_MANAGER_H_
+#endif  // SYSTEM_TASKS_RADIO_MANAGER_H_
