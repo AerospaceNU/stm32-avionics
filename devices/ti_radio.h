@@ -25,7 +25,7 @@ extern "C" {
 
 #include HAL_HEADER
 
-#define tiRadio_STATUS_MASK 0xF0
+#define TI_RADIO_STATUS_MASK 0xF0
 
 #define MAX_COMSUMER 5
 

@@ -13,7 +13,7 @@ extern "C" {
 
 #include "board_config_common.h"
 
-#if HAS_DEV(NUM_BUZZER_PWM)
+#if HAS_DEV(BUZZER_PWM)
 
 typedef struct {
   TIM_HandleTypeDef *htim;
