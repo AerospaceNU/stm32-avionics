@@ -7,6 +7,9 @@
 
 #ifndef DEVICES_TEMP_MAX31855_H_
 #define DEVICES_TEMP_MAX31855_H_
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "board_config.h"
 #include HAL_HEADER
@@ -49,5 +52,9 @@ typedef struct {
 void tempMax31855_init(TempMax31855Ctrl_s *dev, SPI_HandleTypeDef *hspi,
                        GPIO_TypeDef *csPort, uint16_t csPin);
 void tempMax31855_read(TempMax31855Ctrl_s *dev);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // DEVICES_TEMP_MAX31855_H_

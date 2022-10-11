@@ -7,7 +7,9 @@
 
 #ifndef DEVICES_ADC_MCP3564_H_
 #define DEVICES_ADC_MCP3564_H_
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "board_config.h"
 #include HAL_HEADER
 
@@ -97,4 +99,8 @@ int mcp356x_channel_setup(AdcMcp3564Ctrl_s *dev,
 int mcp3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
                  GPIO_TypeDef *csPort, uint16_t csPin, GPIO_TypeDef *intPort,
                  uint16_t intPin);
+
+#ifdef __cplusplus
+}
+#endif
 #endif  // DEVICES_ADC_MCP3564_H_

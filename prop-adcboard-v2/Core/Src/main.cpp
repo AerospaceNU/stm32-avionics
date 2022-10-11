@@ -19,16 +19,20 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+#include <string.h>
+
 #include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 #include "adc_mcp3564.h"
+#include "board_config.h"
+#include "crc16.h"
 #include "errno.h"
 #include "math.h"
 #include "temp_max31855.h"
-
+#include "usbd_cdc_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -38,6 +42,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define USB_DELAY_MS 0
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -107,13 +112,23 @@ int main(void) {
   MX_SPI2_Init();
   MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
-
-  TempMax31855Ctrl_s tc_readers[4] = {0};
+  TempMax31855Ctrl_s tc_readers[NUM_TC_READER] = {0};
 
   tempMax31855_init(&tc_readers[0], &hspi2, TC_CS1_GPIO_Port, TC_CS1_Pin);
   tempMax31855_init(&tc_readers[1], &hspi2, TC_CS2_GPIO_Port, TC_CS2_Pin);
   tempMax31855_init(&tc_readers[2], &hspi2, TC_CS3_GPIO_Port, TC_CS3_Pin);
   tempMax31855_init(&tc_readers[3], &hspi2, TC_CS4_GPIO_Port, TC_CS4_Pin);
+  typedef struct __attribute__((__packed__)) {
+    uint32_t timestamp;
+    int32_t ducerRaw[15];
+    int32_t loadCellRaw;
+    float tcInternalTemp;
+    float tcTemp[4];
+    uint8_t tcFaultFlags[4];
+    uint16_t crc;
+  } AdcData_s;
+  AdcData_s adcData = {0};
+  CRC16 crc;
 
   // SPI3 = ADC2
   // ADC2 has physical channels IN0 through IN7 on pins AIN0 through AIN7
@@ -132,26 +147,38 @@ int main(void) {
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+  uint32_t prev_transmit = HAL_GetTick();
   while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 
-    //    for (int i = 0; i < 4; i++) {
-    //      TempMax31855Ctrl_s *it = tc_readers + i;
-    //      tempMax31855_read(it);
-    //      printf("TC %i temp: %i internal: %i faults %u\n", i,
-    //             (int)it->data.thermocoupleTemp, (int)it->data.internalTemp,
-    //             (unsigned int)it->data.faultFlags);
-    //    }
-
-    for (int i = 0; i < 8; i++) {
-      static const int fullscale = pow(2, 23);
-      printf("%lu, %i, %f\n", HAL_GetTick(), i,
-             (float)adc1.result[i] / fullscale * 25400 / 15400 * 3.3);
+    for (int i = 0; i < 4; i++) {
+      TempMax31855Ctrl_s *it = tc_readers + i;
+      tempMax31855_read(it);
     }
 
-    HAL_Delay(100);
+    while (HAL_GetTick() - prev_transmit < USB_DELAY_MS) {
+    }
+    prev_transmit = HAL_GetTick();
+    adcData.timestamp = HAL_GetTick();
+    // Copy adc1 ducer results
+    memcpy((uint8_t *)adcData.ducerRaw + ADC1_FIRST_DUCER_ID,
+           (uint8_t *)adc1.result, sizeof(int32_t) * ADC1_NUM_DUCER);
+    // Copy adc2 ducer results
+    memcpy((uint8_t *)adcData.ducerRaw + ADC2_FIRST_DUCER_ID,
+           (uint8_t *)adc2.result, sizeof(int32_t) * ADC2_NUM_DUCER);
+    adcData.loadCellRaw = adc1.result[7];
+    for (int i = 0; i < NUM_TC_READER; ++i) {
+      adcData.tcTemp[i] = tc_readers[i].data.thermocoupleTemp;
+      adcData.tcFaultFlags[i] = tc_readers[i].data.faultFlags;
+    }
+    adcData.tcInternalTemp = tc_readers[0].data.internalTemp;
+    crc.reset();
+    crc.add((uint8_t *)&adcData, sizeof(adcData) - sizeof(uint16_t));
+    adcData.crc = crc.getCRC();
+    CDC_Transmit_FS((uint8_t *)&adcData, sizeof(adcData));
   }
   /* USER CODE END 3 */
 }
