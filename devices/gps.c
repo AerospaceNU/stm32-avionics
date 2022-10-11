@@ -12,6 +12,11 @@
 
 #define GPS_UART_TIMEOUT_MS 50
 
+char *gps_getActiveBuff(GpsCtrl_s *gps, bool swapBuff) {
+  bool desiredBuff = swapBuff ? gps->firstBuf : !gps->firstBuf;
+  return desiredBuff ? gps->rx_firstBuff : gps->rx_secondBuff;
+}
+
 static void parseString(GpsCtrl_s *gps, char line[]) {
   switch (minmea_sentence_id(line, false)) {
     case MINMEA_SENTENCE_RMC: {
@@ -129,38 +134,50 @@ static void parseString(GpsCtrl_s *gps, char line[]) {
 }
 
 static void gps_processData(GpsCtrl_s *gps) {
-  char *buff = &gps->rx_buff[0];
-  // if half is true, increment buff pointer by 2048
-  if (gps->half) buff += GPS_RX_BUF_HALF;
+  // Get the buffer to use
+  // The false flips which buffer we get, as we want to parse
+  // the inactive buffer, not the active buffer
+  char *buff = gps_getActiveBuff(gps, false);
 
-  int len = GPS_RX_BUF_HALF;
-
-  for (int i = 0; i < len; i++) {
-    if (buff[i] == '\n') {
-      gps->line[gps->place] = '\n';
-      parseString(gps, gps->line);
-      // TODO: This might need to be changed
-      memset(gps->line, '\0', len);
-      gps->place = 0;
+  // Iterate over the entire buffer
+  for (int i = 0; i < GPS_RX_BUF_SIZE;) {
+    // Make sure we are at the start of a sentence
+    if (buff[i] == '$') {
+      // Make a copy and null terminate the line
+      for (int j = 0; j < NMEA_LENGTH - 2 && i < GPS_RX_BUF_SIZE; j++, i++) {
+        gps->line[j] = buff[i];
+        // If we made it to the end of a sentence
+        if (buff[i] == '\n') {
+          gps->line[j + 1] = '\0';
+          parseString(gps, gps->line);
+          break;
+        }
+      }
     } else {
-      gps->line[gps->place] = buff[i];
-      gps->place += 1;
+      i++;
     }
   }
+
+  // Reset buffer variables
+  memset(buff, 0, GPS_RX_BUF_SIZE);
   gps->data_available = false;
 }
 
-void gps_RxHalfCpltCallback(void *gps) {
+void gps_rxEventCallback(void *gps, size_t Size) {
+  // GPS data received
   GpsCtrl_s *pgps = (GpsCtrl_s *)gps;
   pgps->data_available = true;
-  pgps->half = false;
+
+  // Swap the buffer
+  pgps->firstBuf = !pgps->firstBuf;
+
+  // Reconfigure the UART
+  HAL_UARTEx_ReceiveToIdle_DMA(pgps->gps_uart,
+                               (uint8_t *)gps_getActiveBuff(pgps, true),
+                               GPS_RX_BUF_SIZE);
 }
 
-void gps_RxCpltCallback(void *gps) {
-  GpsCtrl_s *pgps = (GpsCtrl_s *)gps;
-  pgps->data_available = true;
-  pgps->half = true;
-}
+void gps_RxCpltCallback(void *gps) { gps_rxEventCallback(gps, 0); }
 
 bool gps_newData(GpsCtrl_s *gps) {
   if (gps->data_available) {
@@ -174,13 +191,16 @@ void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type) {
   gps->gps_uart = huart;
   gps->type = type;
 
-  halCallbacks_registerUartRxHalfCpltCallback(gps->gps_uart,
-                                              gps_RxHalfCpltCallback, gps);
+  // Register call backs
+  halCallbacks_registerUartRxIdleCallback(gps->gps_uart, gps_rxEventCallback,
+                                          gps);
   halCallbacks_registerUartRxCpltCallback(gps->gps_uart, gps_RxCpltCallback,
                                           gps);
 
-  HAL_UART_Receive_DMA(gps->gps_uart, (uint8_t *)gps->rx_buff,
-                       sizeof(gps->rx_buff));
+  // Tell HAL to receive DMA serial data
+  gps->firstBuf = true;
+  HAL_UARTEx_ReceiveToIdle_DMA(gps->gps_uart, (uint8_t *)gps->rx_firstBuff,
+                               GPS_RX_BUF_SIZE);
 
   if (gps->type == GPS_TYPE_UBLOX) {
     uint8_t nmea[16] = {0xB5,                    // CFG-MSG Header
