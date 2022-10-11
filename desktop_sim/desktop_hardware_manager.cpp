@@ -218,7 +218,9 @@ bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
 #if HAS_DEV(RADIO_DESKTOP_SOCKET)
   if (IS_DEVICE(radioNum, RADIO_DESKTOP_SOCKET)) {
     packet.radioId = radioNum;
-    radioSocket[radioNum]->writeData((uint8_t *)&packet, sizeof(packet));
+    if (radioSocket[radioNum]) {
+      radioSocket[radioNum]->writeData((uint8_t *)&packet, sizeof(packet));
+    }
     return true;
   }
 #endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
@@ -244,10 +246,27 @@ bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
 CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) { return nullptr; }
 void hm_bleTick() {}
 
-LineCutterData_s *hm_getLineCutterData(int lineCutterId) { return nullptr; }
-LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
-  return nullptr;
+LineCutterData_s dummyData[2] = {{
+                                     .lineCutterNumber = 1,
+                                 },
+                                 {
+                                     .lineCutterNumber = 2,
+                                 }};
+LineCutterFlightVars_s dummyVars[2] = {{
+                                           .lineCutterNumber = 1,
+                                       },
+                                       {
+                                           .lineCutterNumber = 2,
+                                       }};
+
+LineCutterData_s *hm_getLineCutterData(int lineCutterId) {
+  return dummyData + lineCutterId;
 }
+
+LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
+  return dummyVars + lineCutterId;
+}
+
 bool hm_lineCutterSendString(int lineCutterNumber, char *string) {
   return true;
 }

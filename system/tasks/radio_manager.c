@@ -214,7 +214,7 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 
 #if HAS_DEV(LINE_CUTTER)
   if (currentTime - lastSent[radioId].lineCutterLastSent >= 1000) {
-    for (int i = 0; i <= NUM_LINE_CUTTER; i++) {
+    for (int i = 0; i < NUM_LINE_CUTTER; i++) {
       transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER;
       transmitPacket[radioId].payload.lineCutter.data =
           *hm_getLineCutterData(i);
@@ -225,7 +225,7 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
   }
 
   if (currentTime - lastSent[radioId].lineCutterVarsLastSent >= 10000) {
-    for (int i = 0; i <= NUM_LINE_CUTTER; i++) {
+    for (int i = 0; i < NUM_LINE_CUTTER; i++) {
       transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER_VARS;
       transmitPacket[radioId].payload.lineCutterFlightVars.data =
           *hm_getLineCutterFlightVariables(i);
