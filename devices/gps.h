@@ -21,6 +21,7 @@ typedef struct {
 
   char rx_firstBuff[GPS_RX_BUF_SIZE];
   char rx_secondBuff[GPS_RX_BUF_SIZE];
+  int lastBufferedSize;
 
   char line[NMEA_LENGTH];
 
@@ -35,5 +36,13 @@ bool gps_newData(GpsCtrl_s *gps);
 void gps_rxEventCallback(void *gps, size_t Size);
 
 void gps_RxCpltCallback(void *gps);
+
+void gps_setRate(GpsCtrl_s *gps, uint16_t rate);
+
+void gps_setMessagesUsed(GpsCtrl_s *gps);
+
+void gps_enable4g(GpsCtrl_s *gps);
+
+void gps_addUbxChecksum(uint8_t *data, int len);
 
 #endif  // DEVICES_GPS_H_

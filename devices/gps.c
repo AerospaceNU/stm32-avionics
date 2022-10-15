@@ -168,6 +168,8 @@ void gps_rxEventCallback(void *gps, size_t Size) {
   GpsCtrl_s *pgps = (GpsCtrl_s *)gps;
   pgps->data_available = true;
 
+  pgps->lastBufferedSize = Size;
+
   // Swap the buffer
   pgps->firstBuf = !pgps->firstBuf;
 
@@ -177,7 +179,9 @@ void gps_rxEventCallback(void *gps, size_t Size) {
                                GPS_RX_BUF_SIZE);
 }
 
-void gps_RxCpltCallback(void *gps) { gps_rxEventCallback(gps, 0); }
+void gps_RxCpltCallback(void *gps) {
+  gps_rxEventCallback(gps, GPS_RX_BUF_SIZE);
+}
 
 bool gps_newData(GpsCtrl_s *gps) {
   if (gps->data_available) {
@@ -185,6 +189,170 @@ bool gps_newData(GpsCtrl_s *gps) {
     return true;
   }
   return false;
+}
+
+void gps_addUbxChecksum(uint8_t *data, int len) {
+  uint8_t CK_A = 0, CK_B = 0;
+  for (int i = 2; i < len - 2; i++) {
+    CK_A = CK_A + data[i];
+    CK_B = CK_B + CK_A;
+  }
+  data[len - 2] = CK_A;
+  data[len - 1] = CK_B;
+}
+
+void gps_setMessagesUsed(GpsCtrl_s *gps) {
+  // UBX->CFG->MSG
+
+  uint8_t ubloxBuff[] = {
+      // Header
+      0xB5,  // Sync
+      0x62,  // Sync
+      0x06,  // Class
+      0x01,  // ID
+      // Length
+      0x08,
+      0x00,
+      // Type: ZDA
+      0xF0,
+      0x08,
+      // Send rate for IO ports
+      0x01,  // Enable on I2C
+      0x01,  // Enable on UART1
+      0x00,  // Disable on UART2
+      0x01,  // Enable on USB
+      0x01,  // Enable on SPI
+      0x00,  // Always 0x00
+      // Checksum
+      0x00,
+      0x00,
+  };
+
+  // Leave on
+  /*
+   * GGA
+   */
+  ubloxBuff[7] = 0x00;
+  gps_addUbxChecksum(ubloxBuff, sizeof(ubloxBuff));
+  HAL_UART_Transmit(gps->gps_uart, ubloxBuff, sizeof(ubloxBuff),
+                    GPS_UART_TIMEOUT_MS);
+
+  /*
+   * ZDA
+   */
+  ubloxBuff[7] = 0x08;
+  ubloxBuff[8] = 0x0F;
+  ubloxBuff[9] = 0x0F;
+  ubloxBuff[10] = 0x00;
+  ubloxBuff[11] = 0x0F;
+  ubloxBuff[12] = 0x0F;
+  gps_addUbxChecksum(ubloxBuff, sizeof(ubloxBuff));
+  HAL_UART_Transmit(gps->gps_uart, ubloxBuff, sizeof(ubloxBuff),
+                    GPS_UART_TIMEOUT_MS);
+
+  // Turn off
+  /*
+   * RMC
+   */
+  ubloxBuff[7] = 0x04;
+  ubloxBuff[8] = 0x00;
+  ubloxBuff[9] = 0x00;
+  ubloxBuff[10] = 0x00;
+  ubloxBuff[11] = 0x00;
+  ubloxBuff[12] = 0x00;
+  gps_addUbxChecksum(ubloxBuff, sizeof(ubloxBuff));
+  HAL_UART_Transmit(gps->gps_uart, ubloxBuff, sizeof(ubloxBuff),
+                    GPS_UART_TIMEOUT_MS);
+
+  /*
+   * VTG
+   */
+  ubloxBuff[7] = 0x05;
+  gps_addUbxChecksum(ubloxBuff, sizeof(ubloxBuff));
+  HAL_UART_Transmit(gps->gps_uart, ubloxBuff, sizeof(ubloxBuff),
+                    GPS_UART_TIMEOUT_MS);
+
+  /*
+   * GSV
+   */
+  ubloxBuff[7] = 0x03;
+  gps_addUbxChecksum(ubloxBuff, sizeof(ubloxBuff));
+  HAL_UART_Transmit(gps->gps_uart, ubloxBuff, sizeof(ubloxBuff),
+                    GPS_UART_TIMEOUT_MS);
+
+  /*
+   * GSA
+   */
+  ubloxBuff[7] = 0x02;
+  gps_addUbxChecksum(ubloxBuff, sizeof(ubloxBuff));
+  HAL_UART_Transmit(gps->gps_uart, ubloxBuff, sizeof(ubloxBuff),
+                    GPS_UART_TIMEOUT_MS);
+
+  /*
+   * GLL
+   */
+  ubloxBuff[7] = 0x01;
+  gps_addUbxChecksum(ubloxBuff, sizeof(ubloxBuff));
+  HAL_UART_Transmit(gps->gps_uart, ubloxBuff, sizeof(ubloxBuff),
+                    GPS_UART_TIMEOUT_MS);
+}
+
+void gps_setRate(GpsCtrl_s *gps, uint16_t rate) {
+  // UBX->CFG->RATE
+  uint8_t ubloxBuff[14] = {
+      // Header
+      0xB5,  // Sync
+      0x62,  // Sync
+      0x06,  // Class
+      0x08,  // ID
+      // Length
+      0x06,
+      0x00,
+      // measRate
+      rate & 0xFF,
+      rate >> 8,
+      // navRate
+      0x01,
+      0x00,
+      // timeRef
+      0x01,
+      0x00,
+      // Checksum
+      0x00,
+      0x00,
+  };
+
+  // Compute and add checksum
+  gps_addUbxChecksum(ubloxBuff, sizeof(ubloxBuff));
+
+  // Send data
+  HAL_UART_Transmit(gps->gps_uart, ubloxBuff, sizeof(ubloxBuff),
+                    GPS_UART_TIMEOUT_MS);
+}
+
+void gps_enable4g(GpsCtrl_s *gps) {
+  // UBX->CFG->RATE
+  uint8_t ubloxBuff[36 + 2 + 4 + 2] = {
+      // Header
+      0xB5,  // Sync
+      0x62,  // Sync
+      0x06,  // Class
+      0x24,  // ID
+      // Length
+      0x24, 0x00,
+      // Change mast
+      0b00000001, 0x00,
+      // dynModel
+      0x08, 0x00,
+      // Unused + Checksum
+  };
+
+  // Compute and add checksum
+  gps_addUbxChecksum(ubloxBuff, sizeof(ubloxBuff));
+
+  // Send data
+  HAL_UART_Transmit(gps->gps_uart, ubloxBuff, sizeof(ubloxBuff),
+                    GPS_UART_TIMEOUT_MS);
 }
 
 void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type) {
@@ -203,19 +371,9 @@ void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type) {
                                GPS_RX_BUF_SIZE);
 
   if (gps->type == GPS_TYPE_UBLOX) {
-    uint8_t nmea[16] = {0xB5,                    // CFG-MSG Header
-                        0x62, 0x06, 0x01, 0x08,  // Payload length
-                        0x00, 0xF0,              // ZDA
-                        0x08, 0x01,              // Enable on I2C
-                        0x01,                    // Enable on UART1
-                        0x00,                    // Disable on UART2
-                        0x01,                    // Enable on USB
-                        0x01,                    // Enable on SPI
-                        0x00,                    // Always 0x00
-                        0x0B,                    // Checksum
-                        0x6B};
-    // Transmit configuration over UART
-    HAL_UART_Transmit(gps->gps_uart, nmea, sizeof(nmea), GPS_UART_TIMEOUT_MS);
+    gps_enable4g(gps);
+    gps_setMessagesUsed(gps);
+    gps_setRate(gps, 333);
   }
 }
 
