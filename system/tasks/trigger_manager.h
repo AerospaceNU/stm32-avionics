@@ -32,7 +32,8 @@ typedef enum {
   FLAG_LAUNCH,
   FLAG_TOUCHDOWN,
   FLAG_MANUAL,
-  FLAG_CUSTOM_MARMON_CLAMP
+  FLAG_CUSTOM_MARMAN_CLAMP,
+  FLAG_CUSTOM_MARMAN_DELAY
 } TriggerFlag_e;
 
 typedef struct __attribute__((__packed__)) {
@@ -52,6 +53,12 @@ void triggerManager_init();
  * @param timestamp: Timestamp of apogee detection
  */
 void triggerManager_setApogeeTime(uint32_t timestamp);
+
+/**
+ * @brief Sets touchdown timestamp
+ * @param timestamp: Timestamp of touchdown detection
+ */
+void triggerManager_setTouchdownTime(uint32_t timestamp);
 
 /**
  * @brief Returns which triggers have happened and which have not

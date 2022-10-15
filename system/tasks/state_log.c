@@ -30,7 +30,6 @@ void stateLog_reloadFlight() {
   filter_setPressureRef(oldMetadataPacket.pressureRef);
   filter_setGravityRef(oldMetadataPacket.gravityRef);
   triggerManager_init();
-  triggerManager_setApogeeTime(hm_millis());
   triggerManager_setTriggerFireStatus(~oldMetadataPacket.triggerFireStatus);
 
   // Assign a new flight

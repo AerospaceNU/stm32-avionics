@@ -54,7 +54,8 @@ typedef struct {
   bool L;       // trigger mode (launch)
   bool T;       // trigger mode (touchdown)
   bool M;       // trigger mode (manual)
-  bool C;       // trigger mode (custom marmon clamp)
+  bool C;       // trigger mode (custom marman clamp)
+  bool U;       // trigger mode (custom marman delay)
   char* e;      // ground elevation
   char* r;      // ground temperature
   bool h;       // help flag

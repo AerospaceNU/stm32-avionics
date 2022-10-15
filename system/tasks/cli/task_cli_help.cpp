@@ -36,9 +36,10 @@ void CliTasks::help() {
   generateDoc("", "     -p int*1", "Pyro num or cut channel (required)");
   generateDoc("", "     -L", "Deploy on launch");
   generateDoc("", "     -A", "Deploy at apogee");
-  generateDoc("", "     -T", "Deploy on touchdown");
+  generateDoc("", "     -T", "Deploy 60s after touchdown");
   generateDoc("", "     -M", "Deploy manually only");
-  generateDoc("", "     -C", "Custom marmon clamp deploy");
+  generateDoc("", "     -C", "Custom marman clamp deploy");
+  generateDoc("", "     -U", "Custom marman clamp deploy delay 1.5s");
   generateDoc("", "     -D float*1", "Deploy n seconds after apogee");
   generateDoc("", "     -H float*1", "Deploy at given descent altitude");
   generateDoc("", "-e float*1", "Configure ground elevation (in meters)");

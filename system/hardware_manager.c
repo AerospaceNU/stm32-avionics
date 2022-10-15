@@ -833,12 +833,13 @@ bool hm_lineCutterSendString(int lineCutterNumber, char *string) {
   return false;
 }
 
-bool hm_lineCuttersSendCut(int chan) {
+bool hm_lineCuttersSendCut(int device) {
   // We want to check that both succeed, not that one succeeds
   // This means we gotta be careful about short-circuiting!
   bool ret = true;
 
 #if HAS_DEV(LINE_CUTTER_BLE)
+  /*
   for (int i = 0; i < NUM_LINE_CUTTER_BLE; i++) {
     if (chan == 1) {
       ret &= lineCutterBle_cut1(&lineCutterBle[i]);
@@ -847,6 +848,10 @@ bool hm_lineCuttersSendCut(int chan) {
     } else {
       ret = false;
     }
+  }
+  */
+  if (IS_DEVICE(device, LINE_CUTTER_BLE)) {
+    ret &= lineCutterBle_cut1(&lineCutterBle[device]);
   }
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
 

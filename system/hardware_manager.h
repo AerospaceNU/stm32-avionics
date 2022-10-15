@@ -152,7 +152,7 @@ LineCutterData_s* hm_getLineCutterData(int lineCutterId);
 LineCutterFlightVars_s* hm_getLineCutterFlightVariables(int lineCutterId);
 
 bool hm_lineCutterSendString(int lineCutterNumber, char* string);
-bool hm_lineCuttersSendCut(int chan);
+bool hm_lineCuttersSendCut(int device);
 
 /* Outputs */
 void hm_servoSetAngle(int servoId, float degrees);

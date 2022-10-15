@@ -18,14 +18,24 @@
 
 static bool triggerFireStatus[MAX_TRIGGER] = {0};
 static uint32_t apogeeTimestamp;
+static uint32_t touchdownTimestamp;
+static uint32_t marmanCutTimestamp;
+static bool passedMarmanCut;
 
 void triggerManager_init() {
   for (int i = 0; i < MAX_TRIGGER; ++i) triggerFireStatus[i] = 0;
   apogeeTimestamp = 0;
+  touchdownTimestamp = 0;
+  marmanCutTimestamp = 0;
+  passedMarmanCut = false;
 }
 
 void triggerManager_setApogeeTime(uint32_t timestamp) {
   apogeeTimestamp = timestamp;
+}
+
+void triggerManager_setTouchdownTime(uint32_t timestamp) {
+  touchdownTimestamp = timestamp;
 }
 
 uint8_t triggerManager_status() {
@@ -47,6 +57,12 @@ void triggerManager_update(FilterData_s* filterData, bool hasPassedLaunch,
   // Turns off expired pyros (this is only a pyro thing, the line cutters
   // shut themselves off
   hm_pyroUpdate();
+  // Check marman cut event
+  if (!passedMarmanCut && hasPassedLaunch && filterData->world_vel_z < 18.3 &&
+      filterData->world_acc_z < 10) {
+    passedMarmanCut = true;
+    marmanCutTimestamp = hm_millis();
+  }
   for (int i = 0; i < MAX_TRIGGER; i++) {
     TriggerConfig_s* triggerConfig =
         &(cli_getConfigs()->triggerConfiguration[i]);
@@ -55,7 +71,10 @@ void triggerManager_update(FilterData_s* filterData, bool hasPassedLaunch,
         triggerManager_triggerFire(i, true);
       }
       if (triggerConfig->flags == FLAG_TOUCHDOWN && hasPassedTouchdown) {
-        triggerManager_triggerFire(i, true);
+        // Wait 60 seconds
+        if (hm_millis() - touchdownTimestamp > 60 * 1000) {
+          triggerManager_triggerFire(i, true);
+        }
       }
       // Check if we want to check for descent altitude
       if (triggerConfig->flags == FLAG_ALT_DURING_DESCENT && hasPassedApogee) {
@@ -69,9 +88,12 @@ void triggerManager_update(FilterData_s* filterData, bool hasPassedLaunch,
         if (hm_millis() - apogeeTimestamp > 1000 * triggerConfig->configValue) {
           triggerManager_triggerFire(i, true);
         }
-      } else if (triggerConfig->flags == FLAG_CUSTOM_MARMON_CLAMP) {
-        if (hasPassedLaunch && filterData->world_vel_z < 18.3 &&
-            filterData->world_acc_z < 10) {
+      } else if (triggerConfig->flags == FLAG_CUSTOM_MARMAN_CLAMP) {
+        if (passedMarmanCut) {
+          triggerManager_triggerFire(i, true);
+        }
+      } else if (triggerConfig->flags == FLAG_CUSTOM_MARMAN_DELAY) {
+        if (passedMarmanCut && (hm_millis() - marmanCutTimestamp > 1500)) {
           triggerManager_triggerFire(i, true);
         }
       }

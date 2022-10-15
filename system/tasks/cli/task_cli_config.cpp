@@ -58,7 +58,7 @@ void CliTasks::config() {
         maxPort = NUM_PYRO;
         break;
       case TRIGGER_TYPE_LINE_CUTTER:
-        maxPort = 255;  // Max uint8 value
+        maxPort = NUM_LINE_CUTTER;  // Max number of line cutters, 0 indexed
         break;
       default:
         cli_sendAck(false, "Invalid trigger mode");
@@ -84,7 +84,9 @@ void CliTasks::config() {
     } else if (options.M) {
       triggerConfig->flags = FLAG_MANUAL;
     } else if (options.C) {
-      triggerConfig->flags = FLAG_CUSTOM_MARMON_CLAMP;
+      triggerConfig->flags = FLAG_CUSTOM_MARMAN_CLAMP;
+    } else if (options.U) {
+      triggerConfig->flags = FLAG_CUSTOM_MARMAN_DELAY;
     } else if (options.H) {
       double pyroAlt = smallStrtod(options.H, &endPtr);
       if (*endPtr != '\0') {
@@ -213,8 +215,12 @@ void CliTasks::config() {
           snprintf(val, sizeof(val), "%s %i manually", deviceText,
                    triggerConfig->port);
           break;
-        case FLAG_CUSTOM_MARMON_CLAMP:
+        case FLAG_CUSTOM_MARMAN_CLAMP:
           snprintf(val, sizeof(val), "%s %i under 20 m/s before apogee",
+                   deviceText, triggerConfig->port);
+          break;
+        case FLAG_CUSTOM_MARMAN_DELAY:
+          snprintf(val, sizeof(val), "%s %i 1s after first marman cut",
                    deviceText, triggerConfig->port);
           break;
         default:
