@@ -83,23 +83,17 @@ EndCondition_e PreFlightState::run() {
   // Or a significantly large enough position change to override lack of
   // acceleration data
   if (filterData->pos_z_agl > kLaunchPosZDiffFailsafeThreshold) {
-    // This used to be in cleanup, but since it only happens via this
-    // exit condition, it might be easier to live here
-
-    // Write buffer onto data log. No need to add more code to stay in order
-    // since timestamps exist It won't hurt to write if some buffer values
-    // weren't filled
-    for (int i = 0; i < kBufferSize; i++) {
-      dataLog_write(&sensorDataBuffer[i], &filterDataBuffer[i], this->getID());
-    }
-    dataLog_getFlightMetadata()->pressureRef = filter_getPressureRef();
-    dataLog_getFlightMetadata()->gravityRef = filter_getGravityRef();
-    dataLog_getFlightMetadata()->launchedCliConfigs = *cli_getConfigs();
-    dataLog_writeFlightMetadata();
     return EndCondition_e::Launch;
   }
 
   return EndCondition_e::NoChange;
 }
 
-void PreFlightState::cleanup() {}
+void PreFlightState::cleanup() {
+  // Write buffer onto data log. No need to add more code to stay in order
+  // since timestamps exist. It won't hurt to write if some buffer values
+  // weren't filled
+  for (int i = 0; i < kBufferSize; i++) {
+    dataLog_write(&sensorDataBuffer[i], &filterDataBuffer[i], this->getID());
+  }
+}

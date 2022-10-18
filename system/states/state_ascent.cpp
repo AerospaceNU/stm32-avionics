@@ -10,6 +10,9 @@
 
 void AscentState::init() {
   // Write launched status
+  dataLog_getFlightMetadata()->pressureRef = filter_getPressureRef();
+  dataLog_getFlightMetadata()->gravityRef = filter_getGravityRef();
+  dataLog_getFlightMetadata()->launchedCliConfigs = *cli_getConfigs();
   dataLog_getFlightMetadata()->launched = 1;
   dataLog_writeFlightMetadata();
   maxPosZ = 0;
