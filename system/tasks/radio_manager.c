@@ -165,7 +165,7 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       0,
 #endif  // HAS_DEV(GPS)
       state,
-      0  // TODO bluetooth clients
+      hm_bleGetAllClientsConnected(0) // TODO where should this hard coded constant live?
     };
 
     transmitPacket[radioId].packetType = TELEMETRY_ID_POSITION;
@@ -214,8 +214,19 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
   if (currentTime - lastSent[radioId].lineCutterLastSent >= 1000) {
     for (int i = 0; i < NUM_LINE_CUTTER; i++) {
       transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER;
-      transmitPacket[radioId].payload.lineCutter.data =
-          *hm_getLineCutterData(i);
+
+      // We only check for has line cutter here, but the HM function
+      // can return null if we don't have a ble line cutter
+      // probably a good idea to null check
+      LineCutterData_s *data = hm_getLineCutterData(i);
+      if (data) {
+        transmitPacket[radioId].payload.lineCutter.data =
+          *data;
+      } else {
+        transmitPacket[radioId].payload.lineCutter.data = {0}
+      }
+      transmitPacket[radioId].payload.lineCutter.bleId = i;
+
       lastSent[radioId].lineCutterLastSent = currentTime;
 
       radioManager_sendInternal(radioId);
@@ -225,8 +236,19 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
   if (currentTime - lastSent[radioId].lineCutterVarsLastSent >= 10000) {
     for (int i = 0; i < NUM_LINE_CUTTER; i++) {
       transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER_VARS;
-      transmitPacket[radioId].payload.lineCutterFlightVars.data =
-          *hm_getLineCutterFlightVariables(i);
+      
+      // We only check for has line cutter here, but the HM function
+      // can return null if we don't have a ble line cutter
+      // probably a good idea to null check
+      LineCutterData_s *data = hm_getLineCutterFlightVariables(i);
+      if (data) {
+        transmitPacket[radioId].payload.lineCutterFlightVars.data =
+          *data;
+      } else {
+        transmitPacket[radioId].payload.lineCutterFlightVars.data = {0}
+      }
+      transmitPacket[radioId].payload.lineCutterFlightVars.bleId = i;
+
       lastSent[radioId].lineCutterVarsLastSent = currentTime;
 
       radioManager_sendInternal(radioId);

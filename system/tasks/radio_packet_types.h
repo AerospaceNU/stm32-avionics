@@ -37,13 +37,19 @@ PACKED_STRUCT {
   float temp, pos_z, vel_z, lat, lon, gps_alt, batt_volts, speedKnots,
       courseDeg;
   uint32_t gpsTime;
-  uint8_t sats, state, btClients;
-  // etc
+  uint8_t sats, state;
+
+  // bitfield showing ble clients connected to FCB
+  // TODO we don't really need this at 10hz do we? lol
+  uint8_t bleClients;
 }
 PositionPacket_s;
 
 #define TELEMETRY_ID_LINECUTTER 4
-PACKED_STRUCT { LineCutterData_s data; }
+PACKED_STRUCT {
+  LineCutterData_s data;
+  uint8_t bleId;
+}
 LineCutterPacket_s;
 
 // Uplinked string (not necessarily null-terminated)
@@ -74,7 +80,7 @@ PACKED_STRUCT {
 HardwareStatusPacket_s;
 
 #define TELEMETRY_ID_LINECUTTER_VARS 8
-PACKED_STRUCT { LineCutterFlightVars_s data; }
+PACKED_STRUCT { LineCutterFlightVars_s data; uint8_t bleId; }
 LineCutterVarsPacket_s;
 
 typedef union {

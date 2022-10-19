@@ -765,6 +765,16 @@ bool hm_bleClientConnected(int bleClientId) {
   return false;
 }
 
+uint8_t hm_bleGetAllClientsConnected(int chipId) {
+#if HAS_DEV(BLE_CHIP_NRF)
+  if (IS_DEVICE(chipId, BLE_CHIP_NRF)) {
+    return bleChipNrf[chipId - FIRST_ID_BLE_CLIENT_STD]
+        .connectedClients;
+  }
+#endif  // HAS_DEV(BLE_CLIENT_STD)
+  return 0;
+}
+
 bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
 #if HAS_DEV(BLE_CLIENT_STD)
   if (IS_DEVICE(bleClientId, BLE_CLIENT_STD)) {

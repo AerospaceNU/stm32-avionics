@@ -142,6 +142,7 @@ CircularBuffer_s* hm_usbGetRxBuffer(int usbId);
 
 /* Bluetooth functions */
 bool hm_bleClientConnected(int bleClientId);
+uint8_t hm_bleGetAllClientsConnected(int chipId);
 bool hm_bleClientSend(int bleClientId, const uint8_t* data, uint16_t numBytes);
 CircularBuffer_s* hm_bleClientGetRxBuffer(int bleClientId);
 
