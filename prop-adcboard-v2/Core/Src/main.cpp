@@ -164,11 +164,11 @@ int main(void) {
     prev_transmit = HAL_GetTick();
     adcData.timestamp = HAL_GetTick();
     // Copy adc1 ducer results
-    memcpy((uint8_t *)adcData.ducerRaw + ADC1_FIRST_DUCER_ID,
-           (uint8_t *)adc1.result, sizeof(int32_t) * ADC1_NUM_DUCER);
+    memcpy(adcData.ducerRaw + ADC1_FIRST_DUCER_ID,
+           adc1.result, sizeof(int32_t) * ADC1_NUM_DUCER);
     // Copy adc2 ducer results
-    memcpy((uint8_t *)adcData.ducerRaw + ADC2_FIRST_DUCER_ID,
-           (uint8_t *)adc2.result, sizeof(int32_t) * ADC2_NUM_DUCER);
+    memcpy(adcData.ducerRaw + ADC2_FIRST_DUCER_ID,
+           adc2.result, sizeof(int32_t) * ADC2_NUM_DUCER);
     adcData.loadCellRaw = adc1.result[7];
     for (int i = 0; i < NUM_TC_READER; ++i) {
       adcData.tcTemp[i] = tc_readers[i].data.thermocoupleTemp;
