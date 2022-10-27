@@ -165,7 +165,7 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       0,
 #endif  // HAS_DEV(GPS)
       state,
-      hm_bleGetAllClientsConnected(0) // TODO where should this hard coded constant live?
+      hm_bleGetAllClientsConnected(FIRST_ID_BLE_CHIP_NRF)
     };
 
     transmitPacket[radioId].packetType = TELEMETRY_ID_POSITION;
