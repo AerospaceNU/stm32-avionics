@@ -315,7 +315,7 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
   // TODO check what order these "should" run in. Worst case we're off by one
   // iteration We don't update accelerations till after this, so the z
   // acceleration should still be from the last timestep
-  kalman.predict(accz);
+  kalman.predict(accz);a
 
 #if HAS_DEV(BAROMETER)
   // Only correct if below max speed (above, baro readings untrustworthy)

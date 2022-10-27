@@ -12,6 +12,34 @@
 extern "C" {
 #endif
 
+enum class ParamType {
+  expression,
+  operation,
+  literal,
+  variable
+};
+
+enum class Operation {
+  leq,
+  le,
+  geq,
+  ge,
+  eq,
+  and,
+  or,
+  not,
+  after,
+  for,
+  add,
+  sub,
+  mul,
+  div
+};
+
+typedef struct {
+
+}
+
 #include <stdbool.h>
 
 #include "filters.h"
