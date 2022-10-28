@@ -30,6 +30,7 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
+#include <limits>
 
 #if defined(_MSC_VER)
 #include <BaseTsd.h>
