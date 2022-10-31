@@ -60,7 +60,7 @@ DMA_HandleTypeDef hdma_spi3_rx;
 DMA_HandleTypeDef hdma_spi3_tx;
 
 /* USER CODE BEGIN PV */
-
+IWDG_HandleTypeDef hiwdg;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -72,6 +72,7 @@ static void MX_SPI2_Init(void);
 static void MX_SPI3_Init(void);
 /* USER CODE BEGIN PFP */
 
+static void MX_IWDG_Init(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -111,6 +112,7 @@ int main(void) {
   MX_USB_DEVICE_Init();
   MX_SPI2_Init();
   MX_SPI3_Init();
+  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   TempMax31855Ctrl_s tc_readers[NUM_TC_READER] = {0};
 
@@ -179,6 +181,7 @@ int main(void) {
     crc.add((uint8_t *)&adcData, sizeof(adcData) - sizeof(uint16_t));
     adcData.crc = crc.getCRC();
     CDC_Transmit_FS((uint8_t *)&adcData, sizeof(adcData));
+    HAL_IWDG_Refresh(&hiwdg);
   }
   /* USER CODE END 3 */
 }
@@ -416,6 +419,28 @@ static void MX_GPIO_Init(void) {
 }
 
 /* USER CODE BEGIN 4 */
+static void MX_IWDG_Init(void)
+{
+
+  /* USER CODE BEGIN IWDG_Init 0 */
+
+  /* USER CODE END IWDG_Init 0 */
+
+  /* USER CODE BEGIN IWDG_Init 1 */
+
+  /* USER CODE END IWDG_Init 1 */
+  hiwdg.Instance = IWDG;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_4;
+  hiwdg.Init.Reload = 4095;
+  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN IWDG_Init 2 */
+
+  /* USER CODE END IWDG_Init 2 */
+
+}
 /* USER CODE END 4 */
 
 /**
