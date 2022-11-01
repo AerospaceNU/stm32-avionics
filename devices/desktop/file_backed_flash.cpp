@@ -11,7 +11,7 @@
 bool FileBackedFlash::WriteStart(uint32_t startLoc, uint32_t numBytes,
                                  uint8_t *pdata) {
   FILE *ptr;
-  ptr = fopen(filepath.c_str(),"wb");  // w for write, b for binary
+  ptr = fopen(filepath.c_str(),"r+b");  // w for write, b for binary
   if (!ptr) return false;
 
   // Seek to the start location and write
@@ -62,8 +62,9 @@ void FileBackedFlash::Reinit(bool overwrite) {
   std::ofstream ofs;
   ofs.open(filepath, std::ios::out | std::ios::binary);
   while (len > sizeof(ff)) {
-    ofs.write((char *)ff, sizeof(ff));
-    len -= sizeof(ff);
+    size_t bytes_to_write = std::min(sizeof(ff), len);
+    ofs.write((char *)ff, bytes_to_write);
+    len -= bytes_to_write;
   }
   ofs.write((char *)ff, len);
 }
