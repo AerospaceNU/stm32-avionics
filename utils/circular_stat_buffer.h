@@ -23,14 +23,25 @@ extern "C" {
  */
 template <typename T>
 class CircularStatBuffer {
- private:
+ public:
   T backingArray;
   CircularBuffer_s circBuffer;
   uint8_t currentSize;
   uint8_t capacity;
   size_t elementSize;
 
- public:
+  /**
+   * Constructor
+   */
+  CircularStatBuffer(T array, CircularBuffer_s circBuf, uint8_t curSize,
+                     uint8_t cap, size_t elemSize) {
+    backingArray = array;
+    circBuffer = circBuf;
+    currentSize = curSize;
+    capacity = cap;
+    elementSize = elemSize;
+  }
+
   /**
    * Average of values in running buffer.
    */
