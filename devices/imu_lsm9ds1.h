@@ -147,7 +147,6 @@ extern "C" {
 
 typedef struct {
   SpiCtrl_t lsm9ds1Spi;
-  Axis3dReal_s gAdj;
   uint8_t aFs;
   uint8_t gFs;
   double aRes;
@@ -158,7 +157,6 @@ typedef struct {
 
 typedef struct {
   SpiCtrl_t lsm9ds1Spi;
-  Axis3dReal_s mAdj;
   uint8_t mFs;
   double mRes;
 } Lsm9ds1MCtrl_s;

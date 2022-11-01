@@ -55,23 +55,6 @@ static void accelH3lis331dl_getDataRaw(AccelH3lis331dlCtrl_s *sensor) {
   sensor->val.raw.z = ((int16_t)z_h << 8) | (z_l);
 }
 
-static void accelH3lis331dl_getAdj(AccelH3lis331dlCtrl_s *sensor) {
-  int sampleCount = 100;
-  int adjx = 0;
-  int adjy = 0;
-  int adjz = 0;
-  for (int i = 0; i < sampleCount; i++) {
-    accelH3lis331dl_getDataRaw(sensor);
-    adjx += sensor->val.raw.x;
-    adjy += sensor->val.raw.y;
-    adjz += sensor->val.raw.z;
-    HAL_Delay(5);
-  }
-  sensor->adjVal.x = (adjx / sampleCount) * sensor->gain;
-  sensor->adjVal.y = (adjy / sampleCount) * sensor->gain;
-  sensor->adjVal.z = (adjz / sampleCount) * sensor->gain - 9.80665;
-}
-
 static void accelH3lis331dl_getGain(AccelH3lis331dlCtrl_s *sensor) {
   sensor->gain = 0.02942;
 }
@@ -88,18 +71,15 @@ bool accelH3lis331dl_init(AccelH3lis331dlCtrl_s *sensor, SpiCtrl_t spi) {
                     PWR_MODE_ON | DATA_RATE_100HZ | Z_AXIS_ENABLE |
                         Y_AXIS_ENABLE | X_AXIS_ENABLE);
   accelH3lis331dl_getGain(sensor);
-  accelH3lis331dl_getAdj(sensor);
+
   return true;
 }
 
 void accelH3lis331dl_getData(AccelH3lis331dlCtrl_s *sensor) {
   accelH3lis331dl_getDataRaw(sensor);
-  sensor->val.realMps2.x =
-      (sensor->gain * sensor->val.raw.x) - sensor->adjVal.x;
-  sensor->val.realMps2.y =
-      (sensor->gain * sensor->val.raw.y) - sensor->adjVal.y;
-  sensor->val.realMps2.z =
-      (sensor->gain * sensor->val.raw.z) - sensor->adjVal.z;
+  sensor->val.realMps2.x = sensor->gain * sensor->val.raw.x;
+  sensor->val.realMps2.y = sensor->gain * sensor->val.raw.y;
+  sensor->val.realMps2.z = sensor->gain * sensor->val.raw.z;
 }
 
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)

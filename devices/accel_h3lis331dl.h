@@ -18,7 +18,6 @@ extern "C" {
 
 typedef struct {
   SpiCtrl_t spi;
-  Axis3dReal_s adjVal;
   double gain;
   AccelData_s val;
 } AccelH3lis331dlCtrl_s;

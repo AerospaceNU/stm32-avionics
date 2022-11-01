@@ -89,45 +89,13 @@ void lsm9ds1_getData(ImuLsm9ds1Ctrl_s *sensor) {
   sensor->data.accelRealMps2.y = sensor->ag.aRes * sensor->data.accelRaw.y;
   sensor->data.accelRealMps2.z = sensor->ag.aRes * sensor->data.accelRaw.z;
 
-  sensor->data.angVelRealRadps.x =
-      (sensor->ag.gRes * sensor->data.angVelRaw.x) - sensor->ag.gAdj.x;
-  sensor->data.angVelRealRadps.y =
-      (sensor->ag.gRes * sensor->data.angVelRaw.y) - sensor->ag.gAdj.y;
-  sensor->data.angVelRealRadps.z =
-      (sensor->ag.gRes * sensor->data.angVelRaw.z) - sensor->ag.gAdj.z;
+  sensor->data.angVelRealRadps.x = sensor->ag.gRes * sensor->data.angVelRaw.x;
+  sensor->data.angVelRealRadps.y = sensor->ag.gRes * sensor->data.angVelRaw.y;
+  sensor->data.angVelRealRadps.z = sensor->ag.gRes * sensor->data.angVelRaw.z;
 
-  sensor->data.magRealG.x =
-      (sensor->m.mRes * sensor->data.magRaw.x) - sensor->m.mAdj.x;
-  sensor->data.magRealG.y =
-      (sensor->m.mRes * sensor->data.magRaw.y) - sensor->m.mAdj.y;
-  sensor->data.magRealG.z =
-      (sensor->m.mRes * sensor->data.magRaw.z) - sensor->m.mAdj.z;
-}
-
-static void lsm9ds1_getAdj(ImuLsm9ds1Ctrl_s *sensor) {
-  int sampleCount = 100;
-  int gAdjX = 0;
-  int gAdjY = 0;
-  int gAdjZ = 0;
-  int mAdjX = 0;
-  int mAdjY = 0;
-  int mAdjZ = 0;
-  for (int i = 0; i < sampleCount; i++) {
-    lsm9ds1_getDataRaw(sensor);
-    gAdjX += sensor->data.angVelRaw.x;
-    gAdjY += sensor->data.angVelRaw.y;
-    gAdjZ += sensor->data.angVelRaw.z;
-    mAdjX += sensor->data.magRaw.x;
-    mAdjY += sensor->data.magRaw.y;
-    mAdjZ += sensor->data.magRaw.z;
-    HAL_Delay(5);
-  }
-  sensor->ag.gAdj.x = (gAdjX / sampleCount) * sensor->ag.gRes;
-  sensor->ag.gAdj.y = (gAdjY / sampleCount) * sensor->ag.gRes;
-  sensor->ag.gAdj.z = (gAdjZ / sampleCount) * sensor->ag.gRes;
-  sensor->m.mAdj.x = (mAdjX / sampleCount) * sensor->m.mRes;
-  sensor->m.mAdj.y = (mAdjY / sampleCount) * sensor->m.mRes;
-  sensor->m.mAdj.z = (mAdjZ / sampleCount) * sensor->m.mRes;
+  sensor->data.magRealG.x = sensor->m.mRes * sensor->data.magRaw.x;
+  sensor->data.magRealG.y = sensor->m.mRes * sensor->data.magRaw.y;
+  sensor->data.magRealG.z = sensor->m.mRes * sensor->data.magRaw.z;
 }
 
 static void lsm9ds1_calcRes(ImuLsm9ds1Ctrl_s *sensor) {
@@ -215,7 +183,6 @@ bool lsm9ds1_init(ImuLsm9ds1Ctrl_s *sensor) {
   spi_writeRegister(&sensor->m.lsm9ds1Spi, CTRL_REG4_M, OMZ_M_MP);
 
   lsm9ds1_calcRes(sensor);
-  lsm9ds1_getAdj(sensor);
 
   return true;
 }
