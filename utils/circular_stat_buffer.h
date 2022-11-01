@@ -24,7 +24,7 @@ extern "C" {
 template <typename T>
 class CircularStatBuffer {
  public:
-  T backingArray;
+  T* backingArray;
   CircularBuffer_s circBuffer;
   uint8_t currentSize;
   uint8_t capacity;
@@ -33,13 +33,13 @@ class CircularStatBuffer {
   /**
    * Constructor
    */
-  CircularStatBuffer(T array, CircularBuffer_s circBuf, uint8_t curSize,
-                     uint8_t cap, size_t elemSize) {
-    backingArray = array;
-    circBuffer = circBuf;
-    currentSize = curSize;
+  CircularStatBuffer(T* backArray, uint8_t cap) {
+    CircularBuffer_s buffer;
+    backingArray = backArray;
+    currentSize = 0;
     capacity = cap;
-    elementSize = elemSize;
+    elementSize = sizeof(T);
+    circBuffer = cb_init(&buffer, backArray, capacity, elementSize);
   }
 
   /**
