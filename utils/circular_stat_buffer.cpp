@@ -17,7 +17,8 @@ T CircularStatBuffer<T>::csb_average() {
 }
 
 template <typename T>
-T CircularStatBuffer<T>::csb_median(T* input, uint8_t count) {
+T CircularStatBuffer<T>::csb_median(T* input) {
+  uint8_t count = csb_cur_size();
   // Insertion sort
   int8_t i, j;
   double tmp;

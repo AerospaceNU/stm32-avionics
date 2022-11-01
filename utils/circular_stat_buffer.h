@@ -39,7 +39,7 @@ class CircularStatBuffer {
   /**
    * Median of values in running buffer.
    */
-  T csb_median(T* input, uint8_t count);
+  T csb_median(T* input);
 
   /**
    * Empty the running buffer.
