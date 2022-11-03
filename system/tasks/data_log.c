@@ -44,7 +44,7 @@ typedef struct __attribute__((__packed__)) {
   BarometerData_s barometerData[NUM_BAROMETER];
 #endif  // HAS_DEV(BAROMETER)
 #if HAS_DEV(GPS)
-  float gpsLat[NUM_GPS], gpsLong[NUM_GPS], gpsAlt[NUM_GPS];
+  GpsGeneralData_s gpsData[NUM_GPS];
 #endif  // HAS_DEV(GPS)
 #if HAS_DEV(VBAT)
   double vbatData[NUM_VBAT];
@@ -348,9 +348,7 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
 #endif  // HAS_DEV(BAROMETER)
 #if HAS_DEV(GPS)
     for (int i = 0; i < NUM_GPS; i++) {
-      fcbLogData->gpsLat[i] = sensorData->gpsData[i].latitude;
-      fcbLogData->gpsLong[i] = sensorData->gpsData[i].longitude;
-      fcbLogData->gpsAlt[i] = sensorData->gpsData[i].altitude;
+      fcbLogData->gpsData[i] = sensorData->gpsData[i].generalData;
     }
 #endif  // HAS_DEV(GPS)
 #if HAS_DEV(VBAT)

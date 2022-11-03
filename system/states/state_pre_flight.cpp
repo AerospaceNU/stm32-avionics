@@ -16,12 +16,11 @@ void PreFlightState::init() {
   prefGravityRefTime = hm_millis();
 
   // We only want to create a new flight in flash if
-  // we came from Erase flash (offload, sim, etc shouldn't)
+  // we came from Erase flash or sim (offload shouldn't)
   if (!hm_inSimMode() && m_lastCliEndConn == NoChange) {
     dataLog_assignFlight();
   }
 
-  simModeStarted = false;
   gpsTimestamp = false;
   triggerManager_init();
   filter_init(this->period_ms_ / 1000.0);
@@ -36,9 +35,9 @@ EndCondition_e PreFlightState::run() {
   // Set GPS timestamp in metadata
   SensorData_s* sensorData = hm_getSensorData();
 #if HAS_DEV(GPS)
-  if (!gpsTimestamp && sensorData->gpsData[0].timestamp > 0) {
+  if (!gpsTimestamp && sensorData->gpsData[0].timeData.timestamp > 0) {
     dataLog_getFlightMetadata()->gpsTimestamp =
-        sensorData->gpsData[0].timestamp;
+        sensorData->gpsData[0].timeData.timestamp;
     dataLog_writeFlightMetadata();
     gpsTimestamp = true;
   }

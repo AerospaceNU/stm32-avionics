@@ -53,13 +53,12 @@ typedef struct __attribute__((packed)) {
   float latitude;
   float longitude;
   float altitude;
-  float speedKnots;
-  float courseDeg;
-  float latitudeDeviation;
-  float longitudeDeviation;
-  float altitudeDeviation;
-  float speedKph;
-  float speedKnots2;
+  uint8_t fixQuality;
+  uint8_t satsTracked;
+  float hdop;
+} GpsGeneralData_s;
+
+typedef struct __attribute__((packed)) {
   uint64_t timestamp;
   int seconds;
   int microseconds;
@@ -68,8 +67,11 @@ typedef struct __attribute__((packed)) {
   int day;
   int month;
   int year;
-  int num_sats;
-  char status;
+} GpsTimeData_s;
+
+typedef struct __attribute__((packed)) {
+  GpsGeneralData_s generalData;
+  GpsTimeData_s timeData;
 } GpsData_s;
 
 typedef struct __attribute__((packed)) {

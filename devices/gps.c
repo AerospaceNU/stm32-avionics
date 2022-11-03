@@ -19,111 +19,48 @@ char *gps_getActiveBuff(GpsCtrl_s *gps, bool swapBuff) {
 
 static void parseString(GpsCtrl_s *gps, char line[]) {
   switch (minmea_sentence_id(line, false)) {
-    case MINMEA_SENTENCE_RMC: {
-      struct minmea_sentence_rmc frame0;
-      if (minmea_parse_rmc(&frame0, line)) {
-        gps->data.hours = frame0.time.hours;
-        gps->data.minutes = frame0.time.minutes;
-        gps->data.seconds = frame0.time.seconds;
-        gps->data.speedKnots = minmea_tofloat(&frame0.speed);
-        gps->data.courseDeg = minmea_tofloat(&frame0.course);
-        if (!isnan(minmea_tofloat(&frame0.latitude)) &&
-            !isnan(minmea_tofloat(&frame0.longitude))) {
-          gps->data.latitude = minmea_tofloat(&frame0.latitude);
-          gps->data.longitude = minmea_tofloat(&frame0.longitude);
-        }
-      }
-      break;
-    }
     case MINMEA_SENTENCE_GGA: {
       struct minmea_sentence_gga frame1;
       if (minmea_parse_gga(&frame1, line)) {
-        gps->data.hours = frame1.time.hours;
-        gps->data.minutes = frame1.time.minutes;
-        gps->data.seconds = frame1.time.seconds;
         if (!isnan(minmea_tofloat(&frame1.latitude)) &&
             !isnan(minmea_tofloat(&frame1.longitude)) &&
-            !isnan(minmea_tofloat(&frame1.altitude))) {
-          gps->data.latitude = minmea_tofloat(&frame1.latitude);
-          gps->data.longitude = minmea_tofloat(&frame1.longitude);
-          gps->data.altitude = minmea_tofloat(&frame1.altitude);
+            !isnan(minmea_tofloat(&frame1.altitude)) &&
+            !isnan(minmea_tofloat(&frame1.hdop))) {
+          gps->data.generalData.latitude = minmea_tofloat(&frame1.latitude);
+          gps->data.generalData.longitude = minmea_tofloat(&frame1.longitude);
+          gps->data.generalData.altitude = minmea_tofloat(&frame1.altitude);
+          gps->data.generalData.fixQuality = frame1.fix_quality;
+          gps->data.generalData.satsTracked = frame1.satellites_tracked;
+          gps->data.generalData.hdop = minmea_tofloat(&frame1.hdop);
         }
-      }
-
-      break;
-    }
-    case MINMEA_SENTENCE_GLL: {
-      struct minmea_sentence_gll frame2;
-      if (minmea_parse_gll(&frame2, line)) {
-        gps->data.hours = frame2.time.hours;
-        gps->data.minutes = frame2.time.minutes;
-        gps->data.seconds = frame2.time.seconds;
-        gps->data.status = frame2.status;
-        if (!isnan(minmea_tofloat(&frame2.latitude)) &&
-            !isnan(minmea_tofloat(&frame2.longitude))) {
-          gps->data.latitude = minmea_tofloat(&frame2.latitude);
-          gps->data.longitude = minmea_tofloat(&frame2.longitude);
-        }
-      }
-      break;
-    }
-    case MINMEA_SENTENCE_GSA: {
-      break;
-    }
-    case MINMEA_SENTENCE_GST: {
-      struct minmea_sentence_gst frame3;
-      if (minmea_parse_gst(&frame3, line)) {
-        gps->data.hours = frame3.time.hours;
-        gps->data.minutes = frame3.time.minutes;
-        gps->data.seconds = frame3.time.seconds;
-        gps->data.latitudeDeviation =
-            minmea_tofloat(&frame3.latitude_error_deviation);
-        gps->data.longitudeDeviation =
-            minmea_tofloat(&frame3.longitude_error_deviation);
-        gps->data.altitudeDeviation =
-            minmea_tofloat(&frame3.altitude_error_deviation);
-      }
-      break;
-    }
-    case MINMEA_SENTENCE_GSV: {
-      struct minmea_sentence_gsv frame4;
-      if (minmea_parse_gsv(&frame4, line)) {
-        gps->data.num_sats = frame4.total_sats;
-      }
-      break;
-    }
-    case MINMEA_SENTENCE_VTG: {
-      struct minmea_sentence_vtg frame5;
-      if (minmea_parse_vtg(&frame5, line)) {
-        gps->data.speedKph = minmea_tofloat(&frame5.speed_kph);
-        gps->data.speedKnots2 = minmea_tofloat(&frame5.speed_knots);
       }
       break;
     }
     case MINMEA_SENTENCE_ZDA: {
       struct minmea_sentence_zda frame6;
       if (minmea_parse_zda(&frame6, line)) {
-        gps->data.hours = frame6.time.hours;
-        gps->data.minutes = frame6.time.minutes;
-        gps->data.seconds = frame6.time.seconds;
-        gps->data.microseconds = frame6.time.microseconds;
-        gps->data.day = frame6.date.day;
-        gps->data.month = frame6.date.month;
-        gps->data.year = frame6.date.year;
+        gps->data.timeData.hours = frame6.time.hours;
+        gps->data.timeData.minutes = frame6.time.minutes;
+        gps->data.timeData.seconds = frame6.time.seconds;
+        gps->data.timeData.microseconds = frame6.time.microseconds;
+        gps->data.timeData.day = frame6.date.day;
+        gps->data.timeData.month = frame6.date.month;
+        gps->data.timeData.year = frame6.date.year;
 
         struct timespec ts;
         memset(&ts, 0, sizeof(ts));
 
-        const struct minmea_date date = {gps->data.day, gps->data.month,
-                                         gps->data.year};
-        const struct minmea_time time = {gps->data.hours, gps->data.minutes,
-                                         gps->data.seconds,
-                                         gps->data.microseconds};
+        const struct minmea_date date = {gps->data.timeData.day,
+                                         gps->data.timeData.month,
+                                         gps->data.timeData.year};
+        const struct minmea_time time = {
+            gps->data.timeData.hours, gps->data.timeData.minutes,
+            gps->data.timeData.seconds, gps->data.timeData.microseconds};
 
         if (!minmea_gettime(&ts, &date, &time) &&
-            gps->data.year > GPS_MIN_VALID_YEAR &&
-            gps->data.year < GPS_MAX_VALID_YEAR) {
-          gps->data.timestamp = ts.tv_sec;
+            gps->data.timeData.year > GPS_MIN_VALID_YEAR &&
+            gps->data.timeData.year < GPS_MAX_VALID_YEAR) {
+          gps->data.timeData.timestamp = ts.tv_sec;
         }
       }
       break;

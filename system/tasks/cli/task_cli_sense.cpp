@@ -83,19 +83,21 @@ void CliTasks::sense() {
 #endif  // HAS_DEV(BAROMETER)
 #if HAS_DEV(GPS)
   for (int i = 0; i < NUM_GPS; i++) {
-    dtoa(float1, sizeof(float1), data->gpsData[i].latitude / 100.0, 5);
-    dtoa(float2, sizeof(float2), data->gpsData[i].longitude / 100.0, 5);
+    dtoa(float1, sizeof(float1), data->gpsData[i].generalData.latitude / 100.0,
+         5);
+    dtoa(float2, sizeof(float2), data->gpsData[i].generalData.longitude / 100.0,
+         5);
     snprintf(cliStr, sizeof(cliStr), "GPS %d Lat/Lon: %s %s\r\n", i, float1,
              float2);
     cli_send(cliStr);
-    dtoa(float1, sizeof(float1), data->gpsData[i].altitude, 3);
+    dtoa(float1, sizeof(float1), data->gpsData[i].generalData.altitude, 3);
     snprintf(cliStr, sizeof(cliStr), "GPS %d Alt (m): %s\r\n", i, float1);
     cli_send(cliStr);
     snprintf(cliStr, sizeof(cliStr),
              "GPS %d Time: %02i:%02i:%02i %02i/%02i/%04i\r\n", i,
-             data->gpsData[i].hours, data->gpsData[i].minutes,
-             data->gpsData[i].seconds, data->gpsData[i].month,
-             data->gpsData[i].day, data->gpsData[i].year);
+             data->gpsData[i].timeData.hours, data->gpsData[i].timeData.minutes,
+             data->gpsData[i].timeData.seconds, data->gpsData[i].timeData.month,
+             data->gpsData[i].timeData.day, data->gpsData[i].timeData.year);
     cli_send(cliStr);
   }
 #endif  // HAS_DEV(GPS)

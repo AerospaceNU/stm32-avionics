@@ -142,9 +142,9 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       filterData->pos_z_agl,
       filterData->world_vel_z,
 #if HAS_DEV(GPS)
-      sensorData->gpsData[0].latitude,
-      sensorData->gpsData[0].longitude,
-      sensorData->gpsData[0].altitude,
+      sensorData->gpsData[0].generalData.latitude,
+      sensorData->gpsData[0].generalData.longitude,
+      sensorData->gpsData[0].generalData.altitude,
 #else
       0,
       0,
@@ -155,14 +155,12 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 #else
       0,
 #endif  // HAS_DEV(VBAT)
+      0,
+      0,
 #if HAS_DEV(GPS)
-      sensorData->gpsData[0].speedKnots,
-      sensorData->gpsData[0].courseDeg,
-      sensorData->gpsData[0].timestamp,
-      sensorData->gpsData[0].num_sats,
+      sensorData->gpsData[0].timeData.timestamp,
+      sensorData->gpsData[0].generalData.satsTracked,
 #else
-      0,
-      0,
       0,
       0,
 #endif  // HAS_DEV(GPS)

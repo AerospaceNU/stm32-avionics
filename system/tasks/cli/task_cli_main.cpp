@@ -1,6 +1,7 @@
 #include "circular_buffer.h"
 #include "cli.h"
 #include "cli_tasks.h"
+#include "data_log.h"
 #include "hardware_manager.h"
 #include "state_log.h"
 
@@ -35,6 +36,7 @@ EndCondition_e CliTasks::tick() {
   if (simModeStarted &&
       cb_count(cli_getRxBufferFor(simModeSource)) >= sizeof(SensorData_s)) {
     hm_enableSimMode(cli_getRxBuffer());
+    dataLog_assignFlight();
     simModeStarted = false;
     return EndCondition_e::SimCommand;
   }

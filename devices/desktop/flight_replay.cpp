@@ -75,9 +75,12 @@ void CsvReplay::getNext(SensorData_s* data) {
 
 #if HAS_DEV(GPS_DESKTOP_FILE)
     for (int i = 0; i < NUM_GPS_DESKTOP_FILE; i++) {
-      data->gpsData[i].latitude = doc.GetCell<double>("gps_lat", m_row);
-      data->gpsData[i].longitude = doc.GetCell<double>("gps_long", m_row);
-      data->gpsData[i].altitude = doc.GetCell<double>("gps_alt", m_row);
+      data->gpsData[i].generalData.latitude =
+          doc.GetCell<double>("gps_lat", m_row);
+      data->gpsData[i].generalData.longitude =
+          doc.GetCell<double>("gps_long", m_row);
+      data->gpsData[i].generalData.altitude =
+          doc.GetCell<double>("gps_alt", m_row);
     }
 #endif  // HAS_DEV(GPS_DESKTOP_FILE)
 
