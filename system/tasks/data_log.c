@@ -70,7 +70,7 @@ typedef union {
 
 typedef struct __attribute__((__packed__)) {
   uint8_t packetType;
-  uint32_t timestampS, timestampUs;
+  uint32_t timestampMs;
   LogDataPacket_s dataPacket;
 } LogData_s;
 
@@ -326,8 +326,7 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
 
     LogData_s logPacket;
     logPacket.packetType = LOG_ID_FCB;
-    logPacket.timestampS = sensorData->timestampS;
-    logPacket.timestampUs = sensorData->timestampUs;
+    logPacket.timestampMs = sensorData->timestampMs;
     FcbLogData_s *fcbLogData = &(logPacket.dataPacket.fcbData);
 #if HAS_DEV(IMU)
     for (int i = 0; i < NUM_IMU; i++) {
@@ -530,7 +529,7 @@ uint32_t dataLog_getLastFlightTimestamp(uint32_t flightNum) {
   dataLog_getLastPacketType(firstAddress, maxCount, kLogDataSize);
   dataPacket = (LogData_s *)tempPacketBuffer;
 
-  return dataPacket->timestampS;
+  return dataPacket->timestampMs;
 }
 
 uint8_t dataLog_getFlashUsage() {

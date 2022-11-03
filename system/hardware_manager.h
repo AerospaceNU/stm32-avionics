@@ -24,8 +24,7 @@ extern "C" {
 #define RAD915_CHAN0 914 * MHZ_TO_HZ
 
 typedef struct __attribute__((__packed__)) {
-  uint32_t timestampS;
-  uint32_t timestampUs;
+  uint32_t timestampMs;
 #if HAS_DEV(IMU)
   ImuData_s imuData[NUM_IMU];
 #endif  // HAS_DEV(IMU)

@@ -36,7 +36,7 @@ void CliTasks::sense() {
 
   cli_send("\r\n");
   snprintf(cliStr, sizeof(cliStr), "Timestamp (ms): %" PRIu32 "\r\n",
-           data->timestampS);
+           data->timestampMs);
   cli_send(cliStr);
 #if HAS_DEV(IMU)
   for (int i = 0; i < NUM_IMU; i++) {

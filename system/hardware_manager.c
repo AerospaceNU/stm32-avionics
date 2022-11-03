@@ -990,7 +990,7 @@ void hm_readSensorData() {
 
     // Timestamp data
     // TODO: Make sensor data timestamp get time from PPS-updated timer
-    sensorData.timestampS = hm_millis();
+    sensorData.timestampMs = hm_millis();
 
   } else {
     // Simming

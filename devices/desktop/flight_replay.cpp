@@ -15,7 +15,7 @@ void CsvReplay::getNext(SensorData_s* data) {
   try {
     char rowName[30];
 
-    data->timestampS = doc.GetCell<double>("timestamp_s", m_row);
+    data->timestampMs = doc.GetCell<double>("timestamp_s", m_row);
 
 #if HAS_DEV(IMU_DESKTOP_FILE)
     for (int i = 0; i < NUM_IMU_DESKTOP_FILE; i++) {
