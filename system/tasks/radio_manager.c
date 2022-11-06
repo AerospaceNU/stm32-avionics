@@ -215,16 +215,12 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
     for (int i = 0; i < NUM_LINE_CUTTER; i++) {
       transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER;
 
-      // We only check for has line cutter here, but the HM function
-      // can return null if we don't have a ble line cutter
-      // probably a good idea to null check
+      // As long as we give the hardwaremanager a valid ID, we
+      // should be guaranteed a non-null pointer. That
+      // feels a bit sketch to me (Matt), but if it fails it'll
+      // fail right at boot
       LineCutterData_s *data = hm_getLineCutterData(i);
-      if (data) {
-        transmitPacket[radioId].payload.lineCutter.data =
-          *data;
-      } else {
-        transmitPacket[radioId].payload.lineCutter.data = {0}
-      }
+      transmitPacket[radioId].payload.lineCutter.data = *data;
       transmitPacket[radioId].payload.lineCutter.bleId = i;
 
       lastSent[radioId].lineCutterLastSent = currentTime;
@@ -236,17 +232,10 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
   if (currentTime - lastSent[radioId].lineCutterVarsLastSent >= 10000) {
     for (int i = 0; i < NUM_LINE_CUTTER; i++) {
       transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER_VARS;
-      
-      // We only check for has line cutter here, but the HM function
-      // can return null if we don't have a ble line cutter
-      // probably a good idea to null check
-      LineCutterData_s *data = hm_getLineCutterFlightVariables(i);
-      if (data) {
-        transmitPacket[radioId].payload.lineCutterFlightVars.data =
-          *data;
-      } else {
-        transmitPacket[radioId].payload.lineCutterFlightVars.data = {0}
-      }
+
+      // See comment above
+      LineCutterFlightVars_s *data = hm_getLineCutterFlightVariables(i);
+      transmitPacket[radioId].payload.lineCutterFlightVars.data = *data;
       transmitPacket[radioId].payload.lineCutterFlightVars.bleId = i;
 
       lastSent[radioId].lineCutterVarsLastSent = currentTime;

@@ -768,8 +768,7 @@ bool hm_bleClientConnected(int bleClientId) {
 uint8_t hm_bleGetAllClientsConnected(int chipId) {
 #if HAS_DEV(BLE_CHIP_NRF)
   if (IS_DEVICE(chipId, BLE_CHIP_NRF)) {
-    return bleChipNrf[chipId - FIRST_ID_BLE_CLIENT_STD]
-        .connectedClients;
+    return bleChipNrf[chipId - FIRST_ID_BLE_CHIP_NRF].connectedClients;
   }
 #endif  // HAS_DEV(BLE_CLIENT_STD)
   return 0;
