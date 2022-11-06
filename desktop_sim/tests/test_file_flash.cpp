@@ -65,6 +65,8 @@ TEST(FileFlash, WriteMiddle) {
         EXPECT_EQ(correct[i], readData[i]);
     }
 
+    EXPECT_TRUE(false);
+
 
     delete externalFlash;
 }
