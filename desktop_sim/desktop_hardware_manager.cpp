@@ -130,8 +130,8 @@ void HM_HardwareInit() {
 
   // TODO stick in ifdef
   cbInit(&bleBuffer, bleArray, sizeof(bleArray), 1);
-  const char* testString = "--linecutter -i 1 -c \"!arm\"\n";
-  for(int i = 0; i < strlen(testString); i++) {
+  const char *testString = "--linecutter -i 1 -c \"!arm\"\n";
+  for (int i = 0; i < strlen(testString); i++) {
     cbEnqueue(&bleBuffer, &testString[i]);
   }
 
@@ -259,7 +259,7 @@ bool HM_BleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
   return false;
 }
 
-CircularBuffer_s *HM_BleClientGetRxBuffer(int bleClientId) { 
+CircularBuffer_s *HM_BleClientGetRxBuffer(int bleClientId) {
   return &bleBuffer;
 }
 void HM_BleTick() {}

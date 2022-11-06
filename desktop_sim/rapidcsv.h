@@ -15,9 +15,9 @@
 #pragma once
 
 #include <algorithm>
-#include <limits>
 #include <cassert>
 #include <cmath>
+#include <limits>
 #ifdef HAS_CODECVT
 #include <codecvt>
 #include <locale>
@@ -25,12 +25,12 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <sstream>
 #include <string>
 #include <typeinfo>
 #include <vector>
-#include <limits>
 
 #if defined(_MSC_VER)
 #include <BaseTsd.h>

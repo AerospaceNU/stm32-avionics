@@ -11,7 +11,7 @@
 bool FileBackedFlash::WriteStart(uint32_t startLoc, uint32_t numBytes,
                                  uint8_t *pdata) {
   FILE *ptr;
-  ptr = fopen(filepath.c_str(),"r+b");  // w for write, b for binary
+  ptr = fopen(filepath.c_str(), "r+b");  // w for write, b for binary
   if (!ptr) return false;
 
   // Seek to the start location and write
@@ -28,7 +28,7 @@ bool FileBackedFlash::WriteStart(uint32_t startLoc, uint32_t numBytes,
 bool FileBackedFlash::ReadStart(uint32_t startLoc, uint32_t numBytes,
                                 uint8_t *pdata) {
   FILE *ptr;
-  ptr = fopen(filepath.c_str(),"rb");  // r for read, b for binary
+  ptr = fopen(filepath.c_str(), "rb");  // r for read, b for binary
   if (!ptr) return false;
 
   // Seek to the start location and read
