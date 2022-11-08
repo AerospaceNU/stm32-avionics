@@ -8,41 +8,20 @@
 #ifndef SYSTEM_TASKS_TRIGGER_MANAGER_H_
 #define SYSTEM_TASKS_TRIGGER_MANAGER_H_
 
+#include <stdbool.h>
+
+#include "filters.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-enum class ParamType {
-  expression,
-  operation,
-  literal,
-  variable
-};
-
-enum class Operation {
-  leq,
-  le,
-  geq,
-  ge,
-  eq,
-  and,
-  or,
-  not,
-  after,
-  for,
-  add,
-  sub,
-  mul,
-  div
-};
-
-typedef struct {
-
-}
-
-#include <stdbool.h>
-
-#include "filters.h"
+typedef enum {
+  EVENT_LAUNCH,
+  EVENT_APOGEE,
+  EVENT_TOUCHDOWN,
+  NUM_TRIGGER_FLIGHT_EVENT
+} TriggerFlightEvent_e;
 
 #define MAX_TRIGGER 8
 
@@ -50,7 +29,8 @@ typedef enum {
   TRIGGER_TYPE_PYRO = 1,
   TRIGGER_TYPE_LINE_CUTTER,
   TRIGGER_TYPE_DIGITAL_ON_PYRO,
-  TRIGGER_TYPE_DIGITAL_OFF_PYRO
+  TRIGGER_TYPE_DIGITAL_OFF_PYRO,
+  NUM_TRIGGER_TYPE
 } TriggerType_e;
 
 typedef enum {
@@ -101,6 +81,12 @@ uint8_t triggerManager_status();
  * trigger has happened
  */
 void triggerManager_setTriggerFireStatus(uint8_t status);
+
+/**
+ * @brief Marks the given event as occurred
+ * @param EventNum: Index of event, one of TriggerFlightEvent_e
+ */
+void triggerManager_logEvent(uint8_t EventNum);
 
 /**
  * @brief Update the TriggerManager with new data

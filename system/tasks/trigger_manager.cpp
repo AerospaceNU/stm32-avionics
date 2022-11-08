@@ -1,10 +1,3 @@
-/*
- * trigger_manager.c
- *
- *  Created on: Apr 4, 2022
- *      Author: sam
- */
-
 #include "trigger_manager.h"
 
 #include <math.h>
@@ -13,6 +6,8 @@
 #include "board_config_common.h"
 #include "cli.h"
 #include "data_log.h"
+#include "expression.h"
+#include "expression_store.h"
 #include "filters.h"
 #include "hardware_manager.h"
 
@@ -21,6 +16,17 @@ static uint32_t apogeeTimestamp;
 static uint32_t touchdownTimestamp;
 static uint32_t marmanCutTimestamp;
 static bool passedMarmanCut;
+
+static ExpressionStore exprStore;
+
+static bool events[NUM_TRIGGER_FLIGHT_EVENT];
+
+void triggerManager_logEvent(uint8_t eventNum) {
+  if (eventNum >= NUM_TRIGGER_FLIGHT_EVENT) {
+    return;
+  }
+  events[eventNum] = true;
+}
 
 void triggerManager_init() {
   for (int i = 0; i < MAX_TRIGGER; ++i) triggerFireStatus[i] = 0;
@@ -57,12 +63,9 @@ void triggerManager_update(FilterData_s* filterData, bool hasPassedLaunch,
   // Turns off expired pyros (this is only a pyro thing, the line cutters
   // shut themselves off
   hm_pyroUpdate();
-  // Check marman cut event
-  if (!passedMarmanCut && hasPassedLaunch && filterData->world_vel_z < 18.3 &&
-      filterData->world_acc_z < 10) {
-    passedMarmanCut = true;
-    marmanCutTimestamp = hm_millis();
-  }
+  // Update all expressions
+  exprStore.tick(filterData, events);
+
   for (int i = 0; i < MAX_TRIGGER; i++) {
     TriggerConfig_s* triggerConfig =
         &(cli_getConfigs()->triggerConfiguration[i]);
