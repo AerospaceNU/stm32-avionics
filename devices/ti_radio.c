@@ -6,6 +6,7 @@
  */
 
 #include "ti_radio.h"
+#include "rs-fec.h"
 
 #if HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915)
 
@@ -33,6 +34,7 @@ static void tiRadio_txRxReadWriteBurstSingle(TiRadioCtrl_s *radio, uint8_t addr,
 static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
                                    uint8_t payloadLength);
 
+// For now, only need to do software FEC on CC1120s
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
 static bool manualCalibration(TiRadioCtrl_s *radio);
 #endif
@@ -74,11 +76,20 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
   // Figure out what packet length/config we need to send to the radio
   uint8_t pkt_len = 0xFF;
   uint8_t pkt_cfg0 = 0x20;
-  if (radio->payloadSize == 0xFF) {
+  if (radio->rawPacketSize == 0xFF) {
     pkt_len = 0xFF;
     pkt_cfg0 = 0x20;
   } else {
-    pkt_len = radio->payloadSize;
+    // If we're doing software FEC, packets grow to (len + 4) * 2
+    if (radio->doSoftwareFEC) {
+    	radio->truePayloadSize = (radio->rawPacketSize) * 2;
+    	radio->pReedSolomon = fec_create(radio->rawPacketSize, radio->rawPacketSize);
+    } else {
+    	radio->truePayloadSize = radio->rawPacketSize;
+    }
+    pkt_len = radio->truePayloadSize;
+
+    // Tell radio to be in fixed-len mode
     pkt_cfg0 = 0x00;
   }
 
@@ -86,7 +97,7 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
   tiRadio_spiWriteReg(radio, TIRADIO_PKT_LEN, &pkt_len, 0x01);
   tiRadio_spiWriteReg(radio, TIRADIO_PKT_CFG0, &pkt_cfg0, 0x01);
 
-  tiRadio_spiWriteReg(radio, TIRADIO_FIFO_CFG, &radio->payloadSize, 0x01);
+  tiRadio_spiWriteReg(radio, TIRADIO_FIFO_CFG, &pkt_len, 0x01);
 
   // SetFrequency is broken, for now the prefered settings do this for us
   // tiRadio_setFrequency(radio);
@@ -173,14 +184,14 @@ void tiRadio_update(TiRadioCtrl_s *radio) {
   // overflow the TX FIFO. Alternately, we could write bytes
   // until the TX FIFO is full. But right now at least, a packet
   // takes 10ms or so to transmit anyways
-  if (cb_count(&radio->txBuffer) >= radio->payloadSize) {
-    // Try to dequeue radio->payloadSize many bytes
+  if (cb_count(&radio->txBuffer) >= radio->truePayloadSize) {
+    // Try to dequeue radio->truePayloadSize many bytes
     static uint8_t tempBuffer[128] = {0};
-    size_t size = radio->payloadSize;
+    size_t size = radio->truePayloadSize;
     cb_peek(&radio->txBuffer, tempBuffer, &size);
 
     // If we managed to dequeue bytes we're good
-    if (size == radio->payloadSize) {
+    if (size == radio->truePayloadSize) {
       bool added = tiRadio_TransmitPacket(radio, tempBuffer, size);
       if (added) cb_dequeue(&radio->txBuffer, size);
     }
@@ -250,7 +261,8 @@ static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
     added = false;
   } else {
     // FIFO empty; let's add our packet
-    if (radio->payloadSize == 0xFF &&
+
+    if (radio->truePayloadSize == 0xFF &&
         radio->packetCfg == TIRADIO_PKTLEN_VARIABLE) {
       // I think this is only for variable length?
       // Since we need to add a length byte to the message
@@ -322,17 +334,31 @@ bool tiRadio_addTxPacket(TiRadioCtrl_s *radio, uint8_t *packet, uint8_t len) {
   // Need to transmit in distinct packets, and we assume in fixed that there's
   // no delimination between packets This will require some refactoring to
   // support variable packet length
-  if (len != radio->payloadSize &&
+  if (len != radio->rawPacketSize &&
       radio->packetCfg == TIRADIO_PKTLEN_VARIABLE) {
     return false;
   }
 
+  uint8_t *txPtr;
+
+  // If we need to encode with FEC, do so now
+  if (radio->doSoftwareFEC) {
+	uint32_t start = HAL_GetTick();
+    fec_encode(radio->pReedSolomon, packet, radio->fecWorkspace);
+    volatile int delta = HAL_GetTick() - start;
+
+    txPtr = radio->fecWorkspace;
+  } else {
+    // No software FEC, directly enqueue packet
+    txPtr = packet;
+  }
+
   // Check if adding payloadSinze many bytes won't overflow
-  if (radio->payloadSize + cb_count(&radio->txBuffer) <=
+  if (radio->truePayloadSize + cb_count(&radio->txBuffer) <=
       cb_capacity(&radio->txBuffer)) {
     // Add our whole packet to the queue
-    for (int j = 0; j < radio->payloadSize; j++) {
-      cb_enqueue(&radio->txBuffer, packet + j);
+    for (int j = 0; j < radio->truePayloadSize; j++) {
+      cb_enqueue(&radio->txBuffer, txPtr + j);
     }
   } else {
     // Buffer full, all we can do is return
@@ -352,10 +378,12 @@ bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
   static uint8_t rxbytes = 0x00;
   static uint8_t rxBuffer[128] = {0};
 
+  tiRadio_spiReadReg(radio, TIRADIO_NUM_RXBYTES, &rxbytes, 1);
+
   // Read GPIO, should be high until the RX FIFO is empty
   if (HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_SET) {
     // Read number of bytes in RX FIFO
-    tiRadio_spiReadReg(radio, TIRADIO_NUM_RXBYTES, &rxbytes, 1);
+//    tiRadio_spiReadReg(radio, TIRADIO_NUM_RXBYTES, &rxbytes, 1);
     if (rxbytes < 1) {
       return false;
     }
@@ -381,15 +409,24 @@ bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
     } else {
       // Fixed means we have payloadSize many data bytes, then RSSI and CRC_LQI
       // appended
-      tiRadio_spiReadRxFifo(radio, rxBuffer, radio->payloadSize);
+      tiRadio_spiReadRxFifo(radio, rxBuffer, radio->truePayloadSize);
       tiRadio_spiReadRxFifo(radio, (uint8_t *)&radio->RSSI, 1);
       uint8_t crc_lqi;
       tiRadio_spiReadRxFifo(radio, &crc_lqi, 1);
 
       radio->LQI = crc_lqi & TIRADIO_LQI_EST_BM;
 
-      cc1120EnqueuePacket(radio, rxBuffer, radio->payloadSize,
-                          crc_lqi & TIRADIO_LQI_CRC_OK_BM);
+      if (radio->doSoftwareFEC) {
+    	  uint32_t start = HAL_GetTick();
+          fec_decode(radio->pReedSolomon, rxBuffer, radio->fecWorkspace);
+          volatile int delta = HAL_GetTick() - start;
+
+          cc1120EnqueuePacket(radio, radio->fecWorkspace, radio->rawPacketSize,
+                                    crc_lqi & TIRADIO_LQI_CRC_OK_BM);
+      } else {
+    	  cc1120EnqueuePacket(radio, rxBuffer, radio->rawPacketSize,
+    	                            crc_lqi & TIRADIO_LQI_CRC_OK_BM);
+      }
     }
 
     return true;

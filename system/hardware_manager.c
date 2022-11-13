@@ -394,7 +394,7 @@ void hm_hardwareInit() {
     radioTi433[i].GP2_pin = radioTi433Gp2Pin[i];
     radioTi433[i].GP3_port = radioTi433Gp3GpioPort[i];
     radioTi433[i].GP3_pin = radioTi433Gp3Pin[i];
-    radioTi433[i].payloadSize = sizeof(RadioPacket_s);
+    radioTi433[i].rawPacketSize = sizeof(RadioPacket_s);
     radioTi433[i].id = 0;
     radioTi433[i].packetCfg = TIRADIO_PKTLEN_FIXED;
     radioTi433[i].initialized = false;
@@ -405,11 +405,15 @@ void hm_hardwareInit() {
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
     radioTi433[i].settingsPtr = cc1200_433_1_2kbps_cfg;
     radioTi433[i].settingsSize = cc1200_433_1_2kbps_size;
+    radioTi433[i].doSoftwareFEC = true;
 #endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
 
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
     radioTi433[i].settingsPtr = cc1120_433_1_2kbps_cfg;
     radioTi433[i].settingsSize = sizeof(cc1120_433_1_2kbps_cfg);
+
+    // CC1120 doesn't have hardware FEC, so do it inn software
+    radioTi433[i].doSoftwareFEC = true;
 #endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
 
     // Enable our radio and configure pins
@@ -433,7 +437,7 @@ void hm_hardwareInit() {
     radioTi915[i].GP2_pin = radioTi915Gp2Pin[i];
     radioTi915[i].GP3_port = radioTi915Gp3GpioPort[i];
     radioTi915[i].GP3_pin = radioTi915Gp3Pin[i];
-    radioTi915[i].payloadSize = sizeof(RadioPacket_s);
+    radioTi915[i].rawPacketSize = sizeof(RadioPacket_s);
     radioTi915[i].id = 1;
     radioTi915[i].packetCfg = TIRADIO_PKTLEN_FIXED;
     radioTi915[i].initialized = false;
@@ -650,14 +654,14 @@ bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
 #if HAS_DEV(RADIO_TI_433)
   if (IS_DEVICE(radioNum, RADIO_TI_433)) {
     TiRadioCtrl_s *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
-    return tiRadio_addTxPacket(pRadio, data, pRadio->payloadSize);
+    return tiRadio_addTxPacket(pRadio, data, numBytes);
   }
 #endif  // HAS_DEV(RADIO_TI_433)
 
 #if HAS_DEV(RADIO_TI_915)
   if (IS_DEVICE(radioNum, RADIO_TI_915)) {
     TiRadioCtrl_s *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
-    return tiRadio_addTxPacket(pRadio, data, pRadio->payloadSize);
+    return tiRadio_addTxPacket(pRadio, data, numBytes);
   }
 #endif  // HAS_DEV(RADIO_TI_915)
 

@@ -11,6 +11,9 @@
 
 #define PACKED_STRUCT typedef struct __attribute__((__packed__))
 
+#define RADIO_MAX_STRING \
+  40  // The maximum length one string sent over radio can be. Longer must be
+      // segmented
 #define RX_BUFF_LEN 15
 
 // Prop data, from the link budget Google sheet
@@ -48,7 +51,6 @@ LineCutterPacket_s;
 
 // Uplinked string (not necessarily null-terminated)
 #define TELEMETRY_ID_STRING 5
-#define RADIO_MAX_STRING 48
 PACKED_STRUCT {
   uint8_t len;
   uint8_t id;

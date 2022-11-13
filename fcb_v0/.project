@@ -34,6 +34,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>altos</name>
+			<type>2</type>
+			<location>PARENT-1-PROJECT_LOC/altos</location>
+		</link>
+		<link>
 			<name>devices</name>
 			<type>2</type>
 			<locationURI>PARENT-1-PROJECT_LOC/devices</locationURI>

@@ -16,9 +16,10 @@ extern "C" {
 #include <stdint.h>
 
 #include "board_config_common.h"
+#include "radioconfig/cc1120_cc1200_defs.h"
 #include "circular_buffer.h"
 #include "data_structures.h"
-#include "smartrf_registersettings.h"
+#include "radioconfig/smartrf_registersettings.h"
 
 #define TI_RADIO_STATUS_MASK 0xF0
 
@@ -95,8 +96,12 @@ typedef struct {
   // If we have a CC1190 range-extender
   bool has_cc1190;
 
+  // Size of un-encoded packets
   // up to 128 in fixed, or 127 in variable
-  uint8_t payloadSize;
+  uint8_t rawPacketSize;
+
+  // Actual size, once encoded
+  uint8_t truePayloadSize;
 
   // Buffers for incoming/outgoing packets
   CircularBuffer_s *messageConsumers[MAX_COMSUMER];
@@ -115,6 +120,9 @@ typedef struct {
   // Set from smartRF config
   const RegisterSetting_s *settingsPtr;
   size_t settingsSize;
+  bool doSoftwareFEC;
+  uint8_t fecWorkspace[MAX_PACKET_SIZE];
+  void *pReedSolomon;
 
   bool initialized;
 } TiRadioCtrl_s;
