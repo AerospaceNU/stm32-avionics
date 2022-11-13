@@ -22,6 +22,7 @@ extern "C" {
 #include "circular_buffer.h"
 #include "data_structures.h"
 #include "smartrf_registersettings.h"
+#include "cc1120_cc1200_defs.h"
 
 #include HAL_HEADER
 
@@ -120,8 +121,12 @@ typedef struct {
   // Set from smartRF config
   const RegisterSetting_s *settingsPtr;
   size_t settingsSize;
+  bool doSoftwareFEC;
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
+  uint8_t fecWorkspace[(MAX_PACKET_SIZE + 4) * 2];
+#endif
 
-  bool initialized;
+      bool initialized;
 } TiRadioCtrl_s;
 
 bool tiRadio_init(TiRadioCtrl_s *radio);

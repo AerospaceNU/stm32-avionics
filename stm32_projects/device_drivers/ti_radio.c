@@ -7,6 +7,10 @@
 
 #include "ti_radio.h"
 
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
+#include "ao_fec.h"
+#endif
+
 #if HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915)
 
 #include <math.h>
@@ -34,6 +38,7 @@ static void tiRadio_txRxReadWriteBurstSingle(TiRadioCtrl_s *radio, uint8_t addr,
 static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
                                    uint8_t payloadLength);
 
+// For now, only need to do software FEC on CC1120s
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
 static bool manualCalibration(TiRadioCtrl_s *radio);
 #endif
@@ -79,7 +84,14 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
     pkt_len = 0xFF;
     pkt_cfg0 = 0x20;
   } else {
-    pkt_len = radio->payloadSize;
+    // If we're doing software FEC, packets grow to (len + 4) * 2
+    if (radio->doSoftwareFEC) {
+      pkt_len = (radio->payloadSize + 4) * 2;
+    } else {
+      pkt_len = radio->payloadSize;
+    }
+
+    // Tell radio to be in fixed-len mode
     pkt_cfg0 = 0x00;
   }
 
@@ -251,6 +263,7 @@ static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
     added = false;
   } else {
     // FIFO empty; let's add our packet
+
     if (radio->payloadSize == 0xFF &&
         radio->packetCfg == TIRADIO_PKTLEN_VARIABLE) {
       // I think this is only for variable length?
@@ -328,12 +341,34 @@ bool tiRadio_addTxPacket(TiRadioCtrl_s *radio, uint8_t *packet, uint8_t len) {
     return false;
   }
 
+  uint8_t *txPtr;
+
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
+  // If we need to encode with FEC, do so now
+  if (radio->doSoftwareFEC) {
+    uint8_t radioSendLen = ao_fec_encode(packet, len, radio->fecWorkspace);
+
+    // Packet len should already be correct -- if it's not, something's gone
+    // wrong
+    if (radioSendLen != radio->payloadSize) {
+      return false;
+    }
+
+    txPtr = radio->fecWorkspace;
+  } else {
+    // No software FEC, directly enqueue packet
+    txPtr = packet;
+  }
+#else
+  txPtr = packet;
+#endif
+
   // Check if adding payloadSinze many bytes won't overflow
   if (radio->payloadSize + cb_count(&radio->txBuffer) <=
       cb_capacity(&radio->txBuffer)) {
     // Add our whole packet to the queue
     for (int j = 0; j < radio->payloadSize; j++) {
-      cb_enqueue(&radio->txBuffer, (unknownPtr_t)packet + j);
+      cb_enqueue(&radio->txBuffer, (unknownPtr_t)txPtr + j);
     }
   } else {
     // Buffer full, all we can do is return

@@ -444,6 +444,7 @@ void hm_hardwareInit() {
     radioTi433[i].id = 0;
     radioTi433[i].packetCfg = TIRADIO_PKTLEN_FIXED;
     radioTi433[i].initialized = false;
+    radioTi433[i].doSoftwareFEC = true;
 
     // All 433 chips do NOT have a 1190 -- how can they?
     radioTi433[i].has_cc1190 = false;
