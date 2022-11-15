@@ -4,8 +4,8 @@
 
 #include "circular_stat_buffer.h"
 
-template <typename T>
-T CircularStatBuffer<T>::csb_average() {
+template <typename T, uint8_t size>
+T CircularStatBuffer<T, size>::csb_average() {
   T avg = 0;
 
   for (int i = 0; i < this->currentSize; i++) {
@@ -16,8 +16,8 @@ T CircularStatBuffer<T>::csb_average() {
   return avg;
 }
 
-template <typename T>
-T CircularStatBuffer<T>::csb_median(T* input) {
+template <typename T, uint8_t size>
+T CircularStatBuffer<T, size>::csb_median(T* input) {
   uint8_t count = csb_cur_size();
   // Insertion sort
   int8_t i, j;
@@ -39,8 +39,8 @@ T CircularStatBuffer<T>::csb_median(T* input) {
   }
 }
 
-template <typename T>
-void CircularStatBuffer<T>::csb_flush() {
+template <typename T, uint8_t size>
+void CircularStatBuffer<T, size>::csb_flush() {
   // set current size to 0
   this->currentSize = 0;
   // flush buffer
@@ -49,10 +49,10 @@ void CircularStatBuffer<T>::csb_flush() {
   memset(this->backingArray, 0, sizeof this->backingArray);
 }
 
-template <typename T>
-bool CircularStatBuffer<T>::csb_add_new_element(T newElem) {
+template <typename T, uint8_t size>
+bool CircularStatBuffer<T, size>::csb_add_new_element(T newElem) {
   // check if full
-  if (this->currentSize == this->capacity) {
+  if (this->currentSize == size) {
     return false;
   }
 
@@ -68,18 +68,18 @@ bool CircularStatBuffer<T>::csb_add_new_element(T newElem) {
   return true;
 }
 
-template <typename T>
-T CircularStatBuffer<T>::csb_get_element_at(uint8_t index) {
+template <typename T, uint8_t size>
+T CircularStatBuffer<T, size>::csb_get_element_at(uint8_t index) {
   return this->backingArray[index];
 }
 
-template <typename T>
-uint8_t CircularStatBuffer<T>::csb_cur_size() {
+template <typename T, uint8_t size>
+uint8_t CircularStatBuffer<T, size>::csb_cur_size() {
   return this->currentSize;
 }
 
-template <typename T>
-T CircularStatBuffer<T>::csb_sum() {
+template <typename T, uint8_t size>
+T CircularStatBuffer<T, size>::csb_sum() {
   int sum = 0;
   for (int i = 0; i < this->csb_cur_size(); i++) {
     sum += this->csb_get_element_at(i);

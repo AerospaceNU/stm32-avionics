@@ -10,6 +10,7 @@
 #include "altitude_kalman.h"
 #include "board_config_common.h"
 #include "circular_buffer.h"
+#include "circular_stat_buffer.h"
 #include "cli.h"
 #include "hardware_manager.h"
 #include "orientation_estimator.h"
@@ -25,23 +26,35 @@
 #define kGravityRefCount 10
 #define kGyroRefCount 10
 
-static double runningPresMedians[kPrevPresMedianCount + 1];
-static CircularBuffer_s runningPresMediansBuffer;
-static uint8_t runningPresMedianCount;
-static double runningPres[kPrevPresCount + 1];
-static CircularBuffer_s runningPresBuffer;
-static uint8_t runningPresCount;
+// backing array
+// static double runningPresMedians[kPrevPresMedianCount + 1];
+// static CircularBuffer_s runningPresMediansBuffer;
+// static uint8_t runningPresMedianCount;
+// csb for running pres medians
+static CircularStatBuffer<double, kPrevPresMedianCount + 1>
+    runningPresMedianCSB;
 
-static double gravityRefBuffer[kGravityRefCount];
-static double runningGravityRef[kGravityRefCount + 1];
-static CircularBuffer_s runningGravityRefBuffer;
+// static double runningPres[kPrevPresCount + 1];
+// static CircularBuffer_s runningPresBuffer;
+// static uint8_t runningPresCount;
+//  csb for running pressures
+static CircularStatBuffer<double, kPrevPresCount + 1> runningPresCSB;
 
+// static double gravityRefBuffer[kGravityRefCount];
+// static double runningGravityRef[kGravityRefCount + 1];
+// static CircularBuffer_s runningGravityRefBuffer;
+//  csb for gravity ref
+static CircularStatBuffer<double, kGravityRefCount + 1> gravityRefCSB;
+
+// gyros
 static float gyroXRefBack[kGyroRefCount + 1];
 static CircularBuffer_s gyroXRefBuffer;
 static float gyroXOffset;
+
 static float gyroYRefBack[kGyroRefCount + 1];
 static CircularBuffer_s gyroYRefBuffer;
 static float gyroYOffset;
+
 static float gyroZRefBack[kGyroRefCount + 1];
 static CircularBuffer_s gyroZRefBuffer;
 static float gyroZOffset;
@@ -62,19 +75,18 @@ void filter_init(double dt) {
   orientationEstimator.reset();
   orientationEstimator.setDt(dt);
   // Initialize circular buffers for running medians/running pressure values
-  cb_init(&runningPresMediansBuffer, runningPresMedians,
-          kPrevPresMedianCount + 1, sizeof(double));
-  cb_init(&runningPresBuffer, runningPres, kPrevPresCount + 1, sizeof(double));
-  cb_init(&runningGravityRefBuffer, runningGravityRef, kGravityRefCount + 1,
-          sizeof(double));
+  // cb_init(&runningPresMediansBuffer, runningPresMedians, kPrevPresMedianCount
+  // + 1, sizeof(double)); cb_init(&runningPresBuffer, runningPres,
+  // kPrevPresCount + 1, sizeof(double)); cb_init(&runningGravityRefBuffer,
+  // runningGravityRef, kGravityRefCount + 1, sizeof(double));
   cb_init(&gyroXRefBuffer, gyroXRefBack, kGyroRefCount + 1, sizeof(float));
   cb_init(&gyroYRefBuffer, gyroYRefBack, kGyroRefCount + 1, sizeof(float));
   cb_init(&gyroZRefBuffer, gyroZRefBack, kGyroRefCount + 1, sizeof(float));
   gyroXOffset = 0;
   gyroYOffset = 0;
   gyroZOffset = 0;
-  runningPresMedianCount = 0;
-  runningPresCount = 0;
+  // runningPresMedianCount = 0;
+  // runningPresCount = 0;
 }
 
 static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
@@ -351,18 +363,18 @@ static double median(double* input, uint8_t count) {
 }
 
 void filter_addGravityRef() {
-  if (cb_full(&runningGravityRefBuffer)) {
-    cb_dequeue(&runningGravityRefBuffer, 1);
+  if (cb_full(&gravityRefCSB.circBuffer)) {
+    cb_dequeue(&gravityRefCSB.circBuffer, 1);
   }
-  cb_enqueue(&runningGravityRefBuffer, &(filterData.rocket_acc_x));
+  cb_enqueue(&gravityRefCSB.circBuffer, &(filterData.rocket_acc_x));
 
-  cb_peek(&runningGravityRefBuffer, gravityRefBuffer, nullptr);
+  cb_peek(&gravityRefCSB.circBuffer, gravityRefCSB.backingArray, nullptr);
 
-  uint8_t gravCount = cb_count(&runningGravityRefBuffer);
+  uint8_t gravCount = cb_count(&gravityRefCSB.circBuffer);
 
   double accelSum = 0;
   for (uint8_t i = 0; i < gravCount; ++i) {
-    accelSum += gravityRefBuffer[i];
+    accelSum += gravityRefCSB.backingArray[i];
   }
 
   // Check that we are mostly in the direction of gravity in some direction.
@@ -380,7 +392,7 @@ void filter_addGravityRef() {
   // buffer
   if (accelSum < 0) {
     gravityRef *= -1;
-    cb_flush(&runningGravityRefBuffer);
+    cb_flush(&gravityRefCSB.circBuffer);
   }
 }
 
@@ -391,46 +403,47 @@ void filter_addPressureRef(SensorData_s* curSensorVals) {
   // For the first 10 seconds (before we have any current medians
   // just set the current pressure ref so we don't depend on
   // a single initial value
-  if (runningPresMedianCount == 0) {
+  if (runningPresMedianCSB.currentSize == 0) {
     presRef = currentPres;
   }
   // Make room for new value, discarding oldest pressure stored if full
-  if (cb_full(&runningPresBuffer)) {
-    cb_dequeue(&runningPresBuffer, 1);
+  if (cb_full(&runningPresCSB.circBuffer)) {
+    cb_dequeue(&runningPresCSB.circBuffer, 1);
   }
 
   // Add current pressure
-  cb_enqueue(&runningPresBuffer, &currentPres);
+  cb_enqueue(&runningPresCSB.circBuffer, &currentPres);
 
-  ++runningPresCount;
+  ++runningPresCSB.currentSize;
 
   // Add median to the running medians every n values
-  if (runningPresCount == kPrevPresCount) {
-    runningPresCount = 0;
-    if (runningPresMedianCount < kPrevPresMedianCount) ++runningPresMedianCount;
+  if (runningPresCSB.currentSize == kPrevPresCount) {
+    runningPresCSB.currentSize = 0;
+    if (runningPresMedianCSB.currentSize < kPrevPresMedianCount)
+      ++runningPresMedianCSB.currentSize;
     // Make room for new value, discarding oldest median stored if full
-    if (cb_full(&runningPresMediansBuffer)) {
-      cb_dequeue(&runningPresMediansBuffer, 1);
+    if (cb_full(&runningPresMedianCSB.circBuffer)) {
+      cb_dequeue(&runningPresMedianCSB.circBuffer, 1);
     }
 
     // Add median of most recent values
     size_t numElements = kPrevPresCount;
-    cb_peek(&runningPresBuffer, medianArray, &numElements);
+    cb_peek(&runningPresCSB.circBuffer, medianArray, &numElements);
     double currentMedian = median(medianArray, kPrevPresCount);
-    cb_enqueue(&runningPresMediansBuffer, &currentMedian);
+    cb_enqueue(&runningPresMedianCSB.circBuffer, &currentMedian);
 
     // Only set pressure ref if we have enough values recorded
-    if (runningPresMedianCount == kPrevPresMedianCount) {
+    if (runningPresMedianCSB.currentSize == kPrevPresMedianCount) {
       // Now, find median of the last 100 seconds of data and set that to be
       // current ref
       size_t numMedElements = kPrevPresMedianCount;
-      cb_peek(&runningPresMediansBuffer, medianArray, &numMedElements);
+      cb_peek(&runningPresMedianCSB.circBuffer, medianArray, &numMedElements);
       presRef = median(medianArray, kPrevPresMedianCount);
     } else {
       // Otherwise (for the first 100 seconds) set current pressure ref to the
       // median of the last 10 seconds so that we have at least a somewhat
       // trustworthy reference
-      presRef = runningPresMedians[0];
+      presRef = runningPresMedianCSB.backingArray[0];
     }
   }
 }

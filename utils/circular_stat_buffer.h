@@ -21,25 +21,22 @@ extern "C" {
 /**
  * Wrapper for running-buffers in filters
  */
-template <typename T>
+template <typename T, int size>
 class CircularStatBuffer {
  public:
-  T* backingArray;
+  uint8_t backingArray[size];  // NOLINT
   CircularBuffer_s circBuffer;
   uint8_t currentSize;
-  uint8_t capacity;
   size_t elementSize;
 
   /**
    * Constructor
    */
-  CircularStatBuffer(T* backArray, uint8_t cap) {
+  CircularStatBuffer() {
     CircularBuffer_s buffer;
-    backingArray = backArray;
     currentSize = 0;
-    capacity = cap;
     elementSize = sizeof(T);
-    circBuffer = cb_init(&buffer, backArray, capacity, elementSize);
+    circBuffer = cb_init(&buffer, backingArray, size, elementSize);
   }
 
   /**
