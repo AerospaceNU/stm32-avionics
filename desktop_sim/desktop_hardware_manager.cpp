@@ -209,7 +209,7 @@ void hm_ledSet(int ledId, bool set) {}
 void hm_ledToggle(int ledId) {}
 
 bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
-  static RadioRecievedPacket_s packet;
+  static RadioReceivedPacket_s packet;
   packet.crc = true;
   packet.lqi = 4;
   packet.rssi = 10;

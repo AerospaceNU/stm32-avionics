@@ -301,7 +301,7 @@ static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
 static void cc1120EnqueuePacket(TiRadioCtrl_s *radio, uint8_t *buff,
                                 uint8_t size, bool crc) {
   // Fill our packet
-  static RadioRecievedPacket_s packet;
+  static RadioReceivedPacket_s packet;
   packet.radioId = radio->id;
   packet.rssi = radio->RSSI;
   packet.crc = crc;

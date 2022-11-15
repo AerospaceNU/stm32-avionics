@@ -26,7 +26,7 @@ static const char *call = "KM6GNL";
 void radioManager_init() {
   for (int i = 0; i < NUM_RADIO; i++) {
     cb_init(&(dataRx[i].rxBuffer), dataRx[i].rxArray, RX_BUFF_LEN,
-            sizeof(RadioRecievedPacket_s));
+            sizeof(RadioReceivedPacket_s));
     hm_radioRegisterConsumer(i, &dataRx[i].rxBuffer);
 
     strncpy(transmitPacket[i].callsign, call, 8);
@@ -42,7 +42,7 @@ void radioManager_init() {
 
 //! Must be called periodically to output data over CLI or USB
 void radioManager_tick() {
-  static RadioRecievedPacket_s packet;
+  static RadioReceivedPacket_s packet;
 
   // Try to dequeue all the packets we've gotten
   for (int i = 0; i < NUM_RADIO; i++) {

@@ -31,12 +31,12 @@ typedef struct {
 } DataTransmitState_s;
 
 #define RADIO_MAX_CALLBACKS 10
-typedef void (*RadioCallback_t)(RadioRecievedPacket_s*);
+typedef void (*RadioCallback_t)(RadioReceivedPacket_s*);
 
 typedef struct {
   // The radio will enqueue packets here automatically
   CircularBuffer_s rxBuffer;
-  uint8_t rxArray[RX_BUFF_LEN * sizeof(RadioRecievedPacket_s)];
+  uint8_t rxArray[RX_BUFF_LEN * sizeof(RadioReceivedPacket_s)];
 
   RadioCallback_t callbacks[RADIO_MAX_CALLBACKS];
   size_t numCallbacks;

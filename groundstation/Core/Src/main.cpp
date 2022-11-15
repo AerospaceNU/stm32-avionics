@@ -34,6 +34,8 @@
 #include "board_config_common.h"
 #include "hardware_manager.h"
 #include "radio_manager.h"
+
+#include "crc16.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -90,6 +92,7 @@ typedef struct __attribute__((packed)) {
 #define CHANNEL_COMMAND_ID 1
 #define RADIO_HARDWARE_COMMAND_ID 2
 
+
 static void GroundstationParseCommand(GroundstationUsbCommand_s *command) {
   if (command->data[0] == CHANNEL_COMMAND_ID) {
     uint8_t radioHw = command->data[1];
@@ -97,17 +100,20 @@ static void GroundstationParseCommand(GroundstationUsbCommand_s *command) {
 
     hm_radioSetChannel((int)radioHw, channel);
   }
-
-  //  if (command->data[0] == CHANNEL_COMMAND_ID) {
-  //    uint8_t radioHw = command->data[1];
-  //    int8_t channel = command->data[2];
-  //
-  //    HM_RadioSetChannel(radioHw, channel);
-  //  }
 }
 
-static void OnDataRx(RadioRecievedPacket_s *packet) {
-  hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)packet, sizeof(*packet));
+
+static void OnDataRx(RadioReceivedPacket_s *packet) {
+  static GroundstationUsbPacket_s groundPacket;
+  static CRC16 crc;
+
+  crc.reset();
+  crc.add((uint8_t *)packet, sizeof(RadioReceivedPacket_s));
+
+  groundPacket.usbCRC = crc.getCRC();
+  groundPacket.receivedData = *packet;
+
+  hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)groundPacket, sizeof(*groundPacket));
 }
 
 #define min(a, b) (a < b) ? a : b
@@ -197,7 +203,7 @@ int main(void)
       heartbeat.groundTemp = hm_getSensorData()->barometerData[0].temperatureC;
 
       // Hack to make all packets the same length when sent over USB
-      static uint8_t heartbeatArr[sizeof(RadioRecievedPacket_s)] = {0};
+      static uint8_t heartbeatArr[sizeof(RadioReceivedPacket_s)] = {0};
       memset(heartbeatArr, 0, sizeof(heartbeatArr));
       memcpy(heartbeatArr, &heartbeat, sizeof(heartbeat));
       hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr,
