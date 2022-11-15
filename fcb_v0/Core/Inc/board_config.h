@@ -33,7 +33,8 @@
 
 #define NUM_LINE_CUTTER_BLE 0
 
-#define NUM_PYRO_DIGITAL 6
+#define NUM_PYRO_DIGITAL 5
+#define NUM_PYRO_PWM 1
 
 #define NUM_PYRO_CONT_ADC 6
 

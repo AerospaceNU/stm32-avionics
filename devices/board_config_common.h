@@ -65,6 +65,9 @@
 #ifndef NUM_PYRO_DIGITAL
 #define NUM_PYRO_DIGITAL 0
 #endif  // NUM_PYRO_DIGITAL
+#ifndef NUM_PYRO_PWM
+#define NUM_PYRO_PWM 0
+#endif  // NUM_PYRO_PWM
 #ifndef NUM_PYRO_CONT_ADC
 #define NUM_PYRO_CONT_ADC 0
 #endif  // NUM_PYRO_CONT_ADC
@@ -282,15 +285,20 @@ extern uint8_t lineCutterBleAddress[NUM_LINE_CUTTER_BLE];
 
 /* Pyro */
 
-#define NUM_PYRO (NUM_PYRO_DIGITAL + NUM_PYRO_DESKTOP_PRINT)
-
-#define FIRST_ID_PYRO_DIGITAL 0
+#define FIRST_ID_PYRO_PWM 0
+#define FIRST_ID_PYRO_DIGITAL (FIRST_ID_PYRO_PWM + NUM_PYRO_PWM)
 #define FIRST_ID_PYRO_DESKTOP_PRINT (FIRST_ID_PYRO_DIGITAL + NUM_PYRO_DIGITAL)
+#define NUM_PYRO (NUM_PYRO_PWM + NUM_PYRO_DIGITAL + NUM_PYRO_DESKTOP_PRINT)
 
 #if HAS_DEV(PYRO_DIGITAL)
 extern GPIO_TypeDef* pyroDigitalGpioPort[NUM_PYRO_DIGITAL];
 extern uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL];
 #endif  // HAS_DEV(PYRO_DIGITAL)
+
+#if HAS_DEV(PYRO_PWM)
+extern TIM_HandleTypeDef* pyroPwmHtim[NUM_PYRO_PWM];
+extern uint32_t pyroPwmChannel[NUM_PYRO_PWM];
+#endif  // HAS_DEV(PYRO_PWM)
 
 /* Pyro continuinty */
 

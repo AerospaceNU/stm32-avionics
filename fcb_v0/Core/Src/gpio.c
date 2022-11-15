@@ -67,7 +67,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, FIRE6_Pin|FIRE5_Pin|FIRE4_Pin|FIRE3_Pin
-                          |FIRE2_Pin|FIRE1_Pin, GPIO_PIN_RESET);
+                          |FIRE2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(BARO1_CS_GPIO_Port, BARO1_CS_Pin, GPIO_PIN_SET);
@@ -111,11 +111,9 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(RAD433_RST_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin
-                           PDPin PDPin PDPin PDPin
-                           PDPin */
+                           PDPin PDPin PDPin PDPin */
   GPIO_InitStruct.Pin = FIRE6_Pin|FIRE5_Pin|FIRE4_Pin|FIRE3_Pin
-                          |FIRE2_Pin|FIRE1_Pin|IMU1_M_CS_Pin|IMU1_AG_CS_Pin
-                          |HIGH_G_CS_Pin;
+                          |FIRE2_Pin|IMU1_M_CS_Pin|IMU1_AG_CS_Pin|HIGH_G_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

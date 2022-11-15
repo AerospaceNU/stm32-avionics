@@ -111,8 +111,6 @@ void Error_Handler(void);
 #define FIRE3_GPIO_Port GPIOD
 #define FIRE2_Pin GPIO_PIN_14
 #define FIRE2_GPIO_Port GPIOD
-#define FIRE1_Pin GPIO_PIN_15
-#define FIRE1_GPIO_Port GPIOD
 #define SERVO1_Pin GPIO_PIN_6
 #define SERVO1_GPIO_Port GPIOC
 #define SERVO2_Pin GPIO_PIN_7

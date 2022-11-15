@@ -47,6 +47,10 @@
 #include "pyro_digital.h"
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
+#if HAS_DEV(PYRO_PWM)
+#include "pyro_pwm.h"
+#endif  // HAS_DEV(PYRO_PWM)
+
 #if HAS_DEV(LED_DIGITAL)
 #include "led.h"
 #endif  // HAS_DEV(LED_DIGITAL)
@@ -115,6 +119,9 @@ bool hardwareStatusLineCutter[NUM_LINE_CUTTER];
 #endif  // HAS_DEV(LINE_CUTTER)
 #if HAS_DEV(PYRO)
 bool hardwareStatusPyro[NUM_PYRO];
+#endif  // HAS_DEV(PYRO)
+#if HAS_DEV(PYRO_PWM)
+bool hardwareStatusPyroPwm[NUM_PYRO_PWM];
 #endif  // HAS_DEV(PYRO)
 #if HAS_DEV(PYRO_CONT)
 bool hardwareStatusPyroCont[NUM_PYRO_CONT];
@@ -188,6 +195,11 @@ static LineCutterBleCtrl_t lineCutterBle[NUM_LINE_CUTTER_BLE];
 #if HAS_DEV(PYRO_DIGITAL)
 static PyroDigitalCtrl_s pyroDigital[NUM_PYRO_DIGITAL];
 #endif  // HAS_DEV(PYRO_DIGITAL)
+
+/* Pyro PWMs */
+#if HAS_DEV(PYRO_PWM)
+static PyroPwmCtrl_s pyroPWM[NUM_PYRO_PWM];
+#endif  // HAS_DEV(PYRO_PWM)
 
 /* Leds */
 #if HAS_DEV(LED_DIGITAL)
@@ -345,6 +357,15 @@ void hm_hardwareInit() {
     pyroDigital[i].pin = pyroDigitalPin[i];
     pyroDigital_init(&pyroDigital[i]);
     hardwareStatusPyro[FIRST_ID_PYRO_DIGITAL + i] = true;
+  }
+#endif  // HAS_DEV(PYRO_DIGITAL)
+
+  /* Pyro PWMs */
+#if HAS_DEV(PYRO_PWM)
+  for (int i = 0; i < NUM_PYRO_PWM; i++) {
+    pyroPwm_init(&pyroPWM[i], pyroPwmHtim[i], pyroPwmChannel[i], 500);
+    hardwareStatusPyroPwm[FIRST_ID_PYRO_PWM + i] = true;
+    pyroPwm_setFrequency(&pyroPWM[i], 1000);
   }
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
@@ -872,6 +893,11 @@ void hm_pyroFire(int pyroId, uint32_t duration) {
     pyroDigital_start(&pyroDigital[pyroId - FIRST_ID_PYRO_DIGITAL], duration);
   }
 #endif  // HAS_DEV(PYRO_DIGITAL)
+#if HAS_DEV(PYRO_PWM)
+  if (IS_DEVICE(pyroId, PYRO_PWM)) {
+    pyroPwm_start(&pyroPWM[pyroId - FIRST_ID_PYRO_PWM], 6000);
+  }
+#endif  // HAS_DEV(PYRO_PWM)
 }
 
 void hm_pyroSet(int pyroId, bool enable) {
@@ -888,6 +914,11 @@ void hm_pyroUpdate() {
     pyroDigital_tick(&pyroDigital[i]);
   }
 #endif  // HAS_DEV(PYRO_DIGITAL)
+#if HAS_DEV(PYRO_PWM)
+  for (int i = 0; i < NUM_PYRO_PWM; i++) {
+    pyroPWM_tick(&pyroPWM[i]);
+  }
+#endif  // HAS_DEV(PYRO_PWM)
 }
 
 void hm_dcMotorSetPercent(int dcMotorId, double percent) {
