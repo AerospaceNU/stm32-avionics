@@ -289,6 +289,11 @@ extern uint8_t lineCutterBleAddress[NUM_LINE_CUTTER_BLE];
 
 #if HAS_DEV(PYRO_DIGITAL)
 extern GPIO_TypeDef* pyroDigitalGpioPort[NUM_PYRO_DIGITAL];
+// I know this is terrible, but I didn't want to add this
+// to the CLI configs because that would involve changing
+// Python code and testing all of that
+extern uint32_t pyroPwmPulseWidth;
+extern TIM_HandleTypeDef* pyroDigitalTickTim;
 extern uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL];
 #endif  // HAS_DEV(PYRO_DIGITAL)
 

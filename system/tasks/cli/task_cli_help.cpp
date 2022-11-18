@@ -33,6 +33,7 @@ void CliTasks::help() {
   generateDoc("", "             ", "Type 2 = line cutter");
   generateDoc("", "             ", "Type 3 = digital on (on pyro)");
   generateDoc("", "             ", "Type 4 = digital off (on pyro)");
+  generateDoc("", "             ", "Type 5 = pwm (on pyro)");
   generateDoc("", "     -p int*1", "Pyro num or cut channel (required)");
   generateDoc("", "     -L", "Deploy on launch");
   generateDoc("", "     -A", "Deploy at apogee");

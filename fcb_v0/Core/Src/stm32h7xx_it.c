@@ -66,6 +66,7 @@ extern DMA_HandleTypeDef hdma_spi3_tx;
 extern DMA_HandleTypeDef hdma_spi3_rx;
 extern SPI_HandleTypeDef hspi1;
 extern SPI_HandleTypeDef hspi3;
+extern TIM_HandleTypeDef htim2;
 extern DMA_HandleTypeDef hdma_uart5_rx;
 extern UART_HandleTypeDef huart5;
 /* USER CODE BEGIN EV */
@@ -307,6 +308,20 @@ void DMA1_Stream6_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles TIM2 global interrupt.
+  */
+void TIM2_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM2_IRQn 0 */
+
+  /* USER CODE END TIM2_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim2);
+  /* USER CODE BEGIN TIM2_IRQn 1 */
+
+  /* USER CODE END TIM2_IRQn 1 */
+}
+
+/**
   * @brief This function handles SPI1 global interrupt.
   */
 void SPI1_IRQHandler(void)
@@ -374,20 +389,6 @@ void OTG_FS_IRQHandler(void)
   /* USER CODE BEGIN OTG_FS_IRQn 1 */
 
   /* USER CODE END OTG_FS_IRQn 1 */
-}
-
-/**
-  * @brief This function handles DMAMUX1 overrun interrupt.
-  */
-void DMAMUX1_OVR_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMAMUX1_OVR_IRQn 0 */
-
-  /* USER CODE END DMAMUX1_OVR_IRQn 0 */
-
-  /* USER CODE BEGIN DMAMUX1_OVR_IRQn 1 */
-
-  /* USER CODE END DMAMUX1_OVR_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

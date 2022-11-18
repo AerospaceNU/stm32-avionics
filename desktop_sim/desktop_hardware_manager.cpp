@@ -293,6 +293,16 @@ void hm_pyroSet(int pyroId, bool enable) {
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
 
+void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth,
+                   uint32_t duration) {
+#if HAS_DEV(PYRO_DESKTOP_PRINT)
+  if (IS_DEVICE(pyroId, PYRO_DESKTOP_PRINT)) {
+    printPyro_pwmStart(&printPyro[pyroId - FIRST_ID_PYRO_DESKTOP_PRINT],
+                       duration, frequency, pulseWidth);
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+}
+
 void hm_pyroUpdate() {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   for (int i = 0; i < NUM_PYRO_DESKTOP_PRINT; i++) {

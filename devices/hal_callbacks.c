@@ -9,6 +9,7 @@
 #define MAX_SPI_HANDLES 6   // SPI 1-6
 #define MAX_ADC_HANDLES 3   // ADC 1-3
 #define MAX_UART_HANDLES 5  // UART 1-5
+#define MAX_TIM_HANDLES 8   // TIM 1-8
 
 #ifdef HAL_SPI_MODULE_ENABLED
 typedef struct {
@@ -233,3 +234,48 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 }
 
 #endif  // HAL_ADC_MODULE_ENABLED
+
+#ifdef HAL_TIM_MODULE_ENABLED
+
+typedef struct {
+  TIM_HandleTypeDef *htim;
+  void (*irqCallback)(void *);
+  void *irqCallbackUserData;
+} TimPeriodElapsedCallbackProperty_s;
+
+static TimPeriodElapsedCallbackProperty_s
+    timPeriodElapsedCallbacks[MAX_TIM_HANDLES];
+static int numTimPeriodElapsedCallbacksRegistered = 0;
+
+void halCallbacks_registerTimPeriodElapsedCallback(TIM_HandleTypeDef *htim,
+                                                   void (*callback)(void *),
+                                                   void *userData) {
+  for (int i = 0; i < numTimPeriodElapsedCallbacksRegistered; i++) {
+    if (timPeriodElapsedCallbacks[i].htim == htim) {
+      timPeriodElapsedCallbacks[i].irqCallback = callback;
+      timPeriodElapsedCallbacks[i].irqCallbackUserData = userData;
+      return;  // No need to keep going if handle already found to be registered
+    }
+  }
+  // If reached, handle hasn't been registered, so create a new association
+  timPeriodElapsedCallbacks[numTimPeriodElapsedCallbacksRegistered].htim = htim;
+  timPeriodElapsedCallbacks[numTimPeriodElapsedCallbacksRegistered]
+      .irqCallback = callback;
+  timPeriodElapsedCallbacks[numTimPeriodElapsedCallbacksRegistered]
+      .irqCallbackUserData = userData;
+  numTimPeriodElapsedCallbacksRegistered++;
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+  for (int i = 0; i < numTimPeriodElapsedCallbacksRegistered; i++) {
+    if (timPeriodElapsedCallbacks[i].htim == htim) {
+      if (timPeriodElapsedCallbacks[i].irqCallback != NULL) {
+        timPeriodElapsedCallbacks[i].irqCallback(
+            timPeriodElapsedCallbacks[i].irqCallbackUserData);
+      }
+      return;  // No need to keep searching if callback was found
+    }
+  }
+}
+
+#endif  // HAL_TIM_MODULE_ENABLED

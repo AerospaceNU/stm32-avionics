@@ -55,6 +55,7 @@ void CliTasks::config() {
       case TRIGGER_TYPE_PYRO:
       case TRIGGER_TYPE_DIGITAL_ON_PYRO:
       case TRIGGER_TYPE_DIGITAL_OFF_PYRO:
+      case TRIGGER_TYPE_PWM_PYRO:
         maxPort = NUM_PYRO;
         break;
       case TRIGGER_TYPE_LINE_CUTTER:
@@ -184,6 +185,9 @@ void CliTasks::config() {
           break;
         case TRIGGER_TYPE_DIGITAL_OFF_PYRO:
           deviceText = "Disable digital pin";
+          break;
+        case TRIGGER_TYPE_PWM_PYRO:
+          deviceText = "PWM on pyro";
           break;
         default:
           deviceText = "";

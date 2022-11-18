@@ -54,9 +54,6 @@ void triggerManager_setTriggerFireStatus(uint8_t status) {
 
 void triggerManager_update(FilterData_s* filterData, bool hasPassedLaunch,
                            bool hasPassedApogee, bool hasPassedTouchdown) {
-  // Turns off expired pyros (this is only a pyro thing, the line cutters
-  // shut themselves off
-  hm_pyroUpdate();
   // Check marman cut event
   if (!passedMarmanCut && hasPassedLaunch && filterData->world_vel_z < 18.3 &&
       filterData->world_acc_z < 10) {
@@ -116,7 +113,9 @@ void triggerManager_triggerFire(uint8_t triggerNum, bool logFire) {
   } else if (triggerConfig->mode == TRIGGER_TYPE_DIGITAL_OFF_PYRO) {
     if (!(triggerConfig->port >= 0 && triggerConfig->port < NUM_PYRO)) return;
     hm_pyroSet(triggerConfig->port, false);
-
+  } else if (triggerConfig->mode == TRIGGER_TYPE_PWM_PYRO) {
+    if (!(triggerConfig->port >= 0 && triggerConfig->port < NUM_PYRO)) return;
+    hm_pyroSetPwm(triggerConfig->port, 6000, 100, 80);
     // Line cutter type
   } else if (triggerConfig->mode == TRIGGER_TYPE_LINE_CUTTER) {
     hm_lineCuttersSendCut(triggerConfig->port);

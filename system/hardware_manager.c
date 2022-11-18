@@ -1,5 +1,6 @@
 #include "hardware_manager.h"
 
+#include "hal_callbacks.h"
 #include "radio_packet_types.h"
 
 /* Device includes */
@@ -346,6 +347,9 @@ void hm_hardwareInit() {
     pyroDigital_init(&pyroDigital[i]);
     hardwareStatusPyro[FIRST_ID_PYRO_DIGITAL + i] = true;
   }
+  halCallbacks_registerTimPeriodElapsedCallback(pyroDigitalTickTim,
+                                                hm_pyroUpdate, NULL);
+  HAL_TIM_Base_Start_IT(pyroDigitalTickTim);
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
   /* Line Cutters */
@@ -878,6 +882,16 @@ void hm_pyroSet(int pyroId, bool enable) {
 #if HAS_DEV(PYRO_DIGITAL)
   if (IS_DEVICE(pyroId, PYRO_DIGITAL)) {
     pyroDigital_set(&pyroDigital[pyroId - FIRST_ID_PYRO_DIGITAL], enable);
+  }
+#endif  // HAS_DEV(PYRO_DIGITAL)
+}
+
+void hm_pyroSetPwm(int pyroId, uint32_t duration, uint32_t frequency,
+                   uint32_t pulseWidth) {
+#if HAS_DEV(PYRO_DIGITAL)
+  if (IS_DEVICE(pyroId, PYRO_DIGITAL)) {
+    pyroDigital_pwmStart(&pyroDigital[pyroId - FIRST_ID_PYRO_DIGITAL], duration,
+                         frequency, pyroPwmPulseWidth);
   }
 #endif  // HAS_DEV(PYRO_DIGITAL)
 }

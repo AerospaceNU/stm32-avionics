@@ -34,4 +34,11 @@ void halCallbacks_registerUartRxIdleCallback(UART_HandleTypeDef *huart,
                                              void *userData);
 #endif  // HAL_UART_MODULE_ENABLED
 
+#ifdef HAL_TIM_MODULE_ENABLED
+
+void halCallbacks_registerTimPeriodElapsedCallback(TIM_HandleTypeDef *htim,
+                                                   void (*callback)(void *),
+                                                   void *userData);
+#endif  // HAL_TIM_MODULE_ENABLED
+
 #endif  // DEVICES_HAL_CALLBACKS_H_

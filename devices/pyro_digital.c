@@ -15,6 +15,7 @@ void pyroDigital_init(PyroDigitalCtrl_s *pyro) {
     HAL_GPIO_WritePin(pyro->port, pyro->pin, GPIO_PIN_RESET);
   }
   pyro->stayEnabled = false;
+  pyro->pwm = false;
 }
 
 void pyroDigital_start(PyroDigitalCtrl_s *pyro, uint32_t duration) {
@@ -36,6 +37,29 @@ void pyroDigital_tick(PyroDigitalCtrl_s *pyro) {
       pyro->port != NULL && !pyro->stayEnabled) {
     HAL_GPIO_WritePin(pyro->port, pyro->pin, GPIO_PIN_RESET);
     pyro->expireTime = 0;
+    pyro->pwm = false;
+  }
+  if (pyro->pwm) {
+    // Tick PWM counters
+    pyro->counter += 1;
+    if (pyro->counter > pyro->counterMax) {
+      pyro->counter = 0;
+      HAL_GPIO_WritePin(pyro->port, pyro->pin, GPIO_PIN_SET);
+    }
+    if (pyro->counter >= pyro->counterThreshold) {
+      HAL_GPIO_WritePin(pyro->port, pyro->pin, GPIO_PIN_RESET);
+    }
+  }
+}
+
+void pyroDigital_pwmStart(PyroDigitalCtrl_s *pyro, uint32_t duration,
+                          uint32_t frequency, uint32_t pulseWidth) {
+  if (pyro->port) {
+    pyro->pwm = true;
+    pyro->expireTime = HAL_GetTick() + duration;
+    pyro->counterMax = ((float)CLOCK_FREQUENCY_HZ / (float)frequency);
+    pyro->counterThreshold = (((float)pulseWidth / 100.0) * pyro->counterMax);
+    HAL_GPIO_WritePin(pyro->port, pyro->pin, GPIO_PIN_SET);
   }
 }
 
