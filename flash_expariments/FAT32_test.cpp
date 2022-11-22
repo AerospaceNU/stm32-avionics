@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdio.h>
 #include <cstring>
 
 // Looks like two copies of the boot sector?? interesting
@@ -255,7 +256,7 @@ typedef struct __attribute__((packed)) {
   unsigned int hours : 5;            // 0-23
 } FATtime_t;
 
-enum class FileAttributes {
+enum class FileAttributes : uint8_t {
   READ_ONLY = 1,
   HIDDEN = 2,
   SYSTEM_FILE = 4,
@@ -286,7 +287,72 @@ typedef struct __attribute__((packed)) {
   uint32_t fileSizeBytes;
 } FileEntry_t;
 
-#include <stdio.h>
+struct FlightInFlash {
+  // We expect the entries to have correct date/time
+  FileEntry_t metadataFile;
+  FileEntry_t actualDataFile;
+
+  // If the rocket launched
+  bool launched;
+
+  // Total flight duration, in seconds
+  uint32_t flightDurationSeconds;
+
+  // More misc metadata that might be helpful to know
+  float maxAltitude;
+  float maxVelocity;
+  float maxAccel;
+};
+
+uint32_t addr_from(FileEntry_t file) {
+  int cluster =
+      (file.startingClusterHighBytes << 16) | file.startingClusterLowBytes;
+  cluster -= 3;
+  return 0x7f000 + 0x1000 * cluster;
+}
+
+void write_metadata_text(FILE *pFile, FlightInFlash *pFlight) {
+  fseek(pFile, addr_from(pFlight->metadataFile), SEEK_SET);
+
+  char str[512];
+  int offset = 0;
+  offset +=
+      snprintf(str, sizeof(str), "Flight starts: %2d/%2d/%2d %2d:%2d%2d\n",
+               pFlight->actualDataFile.createDate.months,
+               pFlight->actualDataFile.createDate.days,
+               pFlight->actualDataFile.createDate.years,
+               pFlight->actualDataFile.createTime.hours,
+               pFlight->actualDataFile.createTime.minutes,
+               pFlight->actualDataFile.createTime.seconds_periods / 2);
+  fwrite(str + offset, strlen(str) - offset, 1, pFile);
+
+  offset += snprintf(str, sizeof(str), "Flight ends: %2d/%2d/%2d %2d:%2d%2d\n",
+                     pFlight->actualDataFile.createDate.months,
+                     pFlight->actualDataFile.createDate.days,
+                     pFlight->actualDataFile.createDate.years,
+                     pFlight->actualDataFile.createTime.hours,
+                     pFlight->actualDataFile.createTime.minutes,
+                     pFlight->actualDataFile.createTime.seconds_periods / 2);
+  fwrite(str + offset, strlen(str) - offset, 1, pFile);
+
+  offset += snprintf(str, sizeof(str), "Duration: %u seconds\n",
+                     pFlight->flightDurationSeconds);
+  fwrite(str + offset, strlen(str) - offset, 1, pFile);
+  offset += snprintf(str, sizeof(str), "Launched? %s\n", pFlight->launched ? "YES" : "NO");
+  fwrite(str + offset, strlen(str) - offset, 1, pFile);
+
+  offset += snprintf(str, sizeof(str), "Max altitude:     %f\n",
+                     pFlight->maxAltitude);
+  fwrite(str + offset, strlen(str) - offset, 1, pFile);
+  offset += snprintf(str, sizeof(str), "Max velocity:     %f\n",
+                     pFlight->maxVelocity);
+  fwrite(str + offset, strlen(str) - offset, 1, pFile);
+  offset +=
+      snprintf(str, sizeof(str), "Max acceleration: %f\n", pFlight->maxAccel);
+  fwrite(str + offset, strlen(str) - offset, 1, pFile);
+
+  pFlight->metadataFile.fileSizeBytes = offset;
+}
 
 int main() {
   FILE *pFile;
