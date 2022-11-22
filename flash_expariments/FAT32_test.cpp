@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <cstring>
 
 // Looks like two copies of the boot sector?? interesting
 uint8_t bootsector[] = {
@@ -289,11 +290,12 @@ typedef struct __attribute__((packed)) {
 
 int main() {
   FILE *pFile;
-  pFile = fopen("test.img", "wb");  // w for write, b for binary
+  pFile = fopen("fat32_test.img", "wb");  // w for write, b for binary
 
   // Need to write a bunch of 0s for the rest of the file
+  static uint8_t zeros[512 * 64] = {0};
+  std::memset(zeros, 0, sizeof(zeros));
   for (int i = 0; i < 0x1e848000; i += 512 * 64) {
-    static const uint8_t zeros[512 * 64] = {0};
     fwrite(zeros, sizeof(zeros), 1, pFile);
   }
 
