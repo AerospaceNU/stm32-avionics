@@ -457,7 +457,7 @@ int main() {
                    .hours = 14,  // gmt, I think -- set to 14 to make 10am ET
                },
            .modifyDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-           .startingClusterLowBytes = 5,
+           .startingClusterLowBytes = 4,
            .fileSizeBytes = 32};
   fwrite(&entry, sizeof(entry), 1, pFile);
 
