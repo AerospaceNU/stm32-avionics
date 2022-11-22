@@ -316,7 +316,7 @@ void write_metadata_text(FILE *pFile, FlightInFlash *pFlight) {
 
   char str[512];
   int offset = 0;
-  offset +=
+  int string_len =
       snprintf(str, sizeof(str), "Flight starts: %2d/%2d/%2d %2d:%2d%2d\n",
                pFlight->actualDataFile.createDate.months,
                pFlight->actualDataFile.createDate.days,
@@ -324,32 +324,42 @@ void write_metadata_text(FILE *pFile, FlightInFlash *pFlight) {
                pFlight->actualDataFile.createTime.hours,
                pFlight->actualDataFile.createTime.minutes,
                pFlight->actualDataFile.createTime.seconds_periods / 2);
-  fwrite(str + offset, strlen(str) - offset, 1, pFile);
+  fwrite(str, strlen(str), 1, pFile);
+  offset += string_len;
 
-  offset += snprintf(str, sizeof(str), "Flight ends: %2d/%2d/%2d %2d:%2d%2d\n",
+  string_len = snprintf(str, sizeof(str), "Flight ends:   %2d/%2d/%2d %2d:%2d%2d\n",
                      pFlight->actualDataFile.createDate.months,
                      pFlight->actualDataFile.createDate.days,
                      pFlight->actualDataFile.createDate.years,
                      pFlight->actualDataFile.createTime.hours,
                      pFlight->actualDataFile.createTime.minutes,
                      pFlight->actualDataFile.createTime.seconds_periods / 2);
-  fwrite(str + offset, strlen(str) - offset, 1, pFile);
+  fwrite(str, strlen(str), 1, pFile);
+  offset += string_len;
 
-  offset += snprintf(str, sizeof(str), "Duration: %u seconds\n",
+  string_len = snprintf(str, sizeof(str), "Duration:      %u seconds\n",
                      pFlight->flightDurationSeconds);
-  fwrite(str + offset, strlen(str) - offset, 1, pFile);
-  offset += snprintf(str, sizeof(str), "Launched? %s\n", pFlight->launched ? "YES" : "NO");
-  fwrite(str + offset, strlen(str) - offset, 1, pFile);
+  fwrite(str, strlen(str), 1, pFile);
+  offset += string_len;
 
-  offset += snprintf(str, sizeof(str), "Max altitude:     %f\n",
+  string_len = snprintf(str, sizeof(str), "Launched?      %s\n", pFlight->launched ? "YES" : "NO");
+  fwrite(str, strlen(str), 1, pFile);
+  offset += string_len;
+
+  string_len = snprintf(str, sizeof(str), "Max altitude:  %f\n",
                      pFlight->maxAltitude);
-  fwrite(str + offset, strlen(str) - offset, 1, pFile);
-  offset += snprintf(str, sizeof(str), "Max velocity:     %f\n",
+  fwrite(str, strlen(str), 1, pFile);
+  offset += string_len;
+
+  string_len = snprintf(str, sizeof(str), "Max velocity:  %f\n",
                      pFlight->maxVelocity);
-  fwrite(str + offset, strlen(str) - offset, 1, pFile);
-  offset +=
-      snprintf(str, sizeof(str), "Max acceleration: %f\n", pFlight->maxAccel);
-  fwrite(str + offset, strlen(str) - offset, 1, pFile);
+  fwrite(str, strlen(str), 1, pFile);
+  offset += string_len;
+
+  string_len =
+      snprintf(str, sizeof(str), "Max accel:     %f\n", pFlight->maxAccel);
+  fwrite(str, strlen(str), 1, pFile);
+  offset += string_len;
 
   pFlight->metadataFile.fileSizeBytes = offset;
 }
@@ -401,7 +411,7 @@ int main() {
       .fileSizeBytes = 0};
   fwrite(&entry, sizeof(entry), 1, pFile);
 
-  entry = {.filename = {'t', 'e', 's', 't', '2', ' ', ' ', ' '},
+  FileEntry_t data = {.filename = {'0', '1', '_', 'd', 'a', 't', 'a', ' '},
            .extension =
                {
                    't',
@@ -429,9 +439,8 @@ int main() {
            .modifyDate = {.days = 22, .months = 10, .years = 2022 - 1980},
            .startingClusterLowBytes = 3,
            .fileSizeBytes = 32};
-  fwrite(&entry, sizeof(entry), 1, pFile);
 
-  entry = {.filename = {'a', 'n', 'o', 't', 'h', 'e', 'r', ' '},
+  FileEntry_t meta = {.filename = {'0', '1', '_', 'm', 'e', 't', 'a', ' '},
            .extension =
                {
                    't',
@@ -447,8 +456,8 @@ int main() {
                    .minutes = 0,
                    .hours = 0,
                },
-           .createDate = {.days = 13, .months = 9, .years = 2021 - 1980},
-           .accessDate = {.days = 13, .months = 9, .years = 2021 - 1980},
+           .createDate = {.days = 22, .months = 10, .years = 2022 - 1980},
+           .accessDate = {.days = 22, .months = 10, .years = 2022 - 1980},
            .startingClusterHighBytes = 0,
            .modifyTime =
                {
@@ -459,15 +468,27 @@ int main() {
            .modifyDate = {.days = 22, .months = 10, .years = 2022 - 1980},
            .startingClusterLowBytes = 4,
            .fileSizeBytes = 32};
-  fwrite(&entry, sizeof(entry), 1, pFile);
 
-  // Write the first file
-  fseek(pFile, 0x7f000, SEEK_SET);
-  char file1[32] = "helloooooooasdf";
-  fwrite(&file1, sizeof(file1), 1, pFile);
+  FlightInFlash flash_flight = {
+    .metadataFile = meta,
+    .actualDataFile = data,
+    .launched = true,
+    .flightDurationSeconds = 69,
+    .maxAltitude = 420,
+    .maxVelocity = 1234,
+    .maxAccel = 666
+  };
 
-  // Write the second file
-  fseek(pFile, 0x7f000 + 0x1000, SEEK_SET);
-  char file2[32] = "This is another file, or smth\n";
-  fwrite(&file2, sizeof(file2), 1, pFile);
+  // This changes the size of the metadata file poitner within flash_flight
+  write_metadata_text(pFile, &flash_flight);
+
+  // Seek back to the right spot in the FAT
+  fseek(pFile, 0x7e000 + sizeof(entry), SEEK_SET);
+  fwrite(&flash_flight.metadataFile, sizeof(flash_flight.metadataFile), 1, pFile);
+  // fwrite(&data, sizeof(data), 1, pFile);
+
+  // Write the first fake actual flight file file
+  // fseek(pFile, addr_from(data), SEEK_SET);
+  // char file1[32] = "helloooooooasdf";
+  // fwrite(&file1, sizeof(file1), 1, pFile);
 }
