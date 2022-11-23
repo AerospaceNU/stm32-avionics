@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
+
 #include <cstring>
 
 // Looks like two copies of the boot sector?? interesting
@@ -317,7 +318,7 @@ void write_metadata_text(FILE *pFile, FlightInFlash *pFlight) {
   char str[512];
   int offset = 0;
   int string_len =
-      snprintf(str, sizeof(str), "Flight starts: %2d/%2d/%2d %2d:%2d%2d\n",
+      snprintf(str, sizeof(str), "Flight starts: %2d/%2d/%2d %2d:%2d:%2d\n",
                pFlight->actualDataFile.createDate.months,
                pFlight->actualDataFile.createDate.days,
                pFlight->actualDataFile.createDate.years,
@@ -327,32 +328,34 @@ void write_metadata_text(FILE *pFile, FlightInFlash *pFlight) {
   fwrite(str, strlen(str), 1, pFile);
   offset += string_len;
 
-  string_len = snprintf(str, sizeof(str), "Flight ends:   %2d/%2d/%2d %2d:%2d%2d\n",
-                     pFlight->actualDataFile.createDate.months,
-                     pFlight->actualDataFile.createDate.days,
-                     pFlight->actualDataFile.createDate.years,
-                     pFlight->actualDataFile.createTime.hours,
-                     pFlight->actualDataFile.createTime.minutes,
-                     pFlight->actualDataFile.createTime.seconds_periods / 2);
+  string_len =
+      snprintf(str, sizeof(str), "Flight ends:   %2d/%2d/%2d %2d:%2d:%2d\n",
+               pFlight->actualDataFile.createDate.months,
+               pFlight->actualDataFile.createDate.days,
+               pFlight->actualDataFile.createDate.years,
+               pFlight->actualDataFile.createTime.hours,
+               pFlight->actualDataFile.createTime.minutes,
+               pFlight->actualDataFile.createTime.seconds_periods / 2);
   fwrite(str, strlen(str), 1, pFile);
   offset += string_len;
 
   string_len = snprintf(str, sizeof(str), "Duration:      %u seconds\n",
-                     pFlight->flightDurationSeconds);
+                        pFlight->flightDurationSeconds);
   fwrite(str, strlen(str), 1, pFile);
   offset += string_len;
 
-  string_len = snprintf(str, sizeof(str), "Launched?      %s\n", pFlight->launched ? "YES" : "NO");
+  string_len = snprintf(str, sizeof(str), "Launched?      %s\n",
+                        pFlight->launched ? "YES" : "NO");
   fwrite(str, strlen(str), 1, pFile);
   offset += string_len;
 
-  string_len = snprintf(str, sizeof(str), "Max altitude:  %f\n",
-                     pFlight->maxAltitude);
+  string_len =
+      snprintf(str, sizeof(str), "Max altitude:  %f\n", pFlight->maxAltitude);
   fwrite(str, strlen(str), 1, pFile);
   offset += string_len;
 
-  string_len = snprintf(str, sizeof(str), "Max velocity:  %f\n",
-                     pFlight->maxVelocity);
+  string_len =
+      snprintf(str, sizeof(str), "Max velocity:  %f\n", pFlight->maxVelocity);
   fwrite(str, strlen(str), 1, pFile);
   offset += string_len;
 
@@ -411,81 +414,102 @@ int main() {
       .fileSizeBytes = 0};
   fwrite(&entry, sizeof(entry), 1, pFile);
 
-  FileEntry_t data = {.filename = {'0', '1', '_', 'd', 'a', 't', 'a', ' '},
-           .extension =
-               {
-                   't',
-                   'x',
-                   't',
-               },
-           .attributes = 0,
-           .reserved = {0},
-           .creationTimeTenths = 0,
-           .createTime =
-               {
-                   .seconds_periods = 0,
-                   .minutes = 0,
-                   .hours = 0,
-               },
-           .createDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-           .accessDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-           .startingClusterHighBytes = 0,
-           .modifyTime =
-               {
-                   .seconds_periods = 0,
-                   .minutes = 36,
-                   .hours = 14,  // gmt, I think -- set to 14 to make 10am ET
-               },
-           .modifyDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-           .startingClusterLowBytes = 3,
-           .fileSizeBytes = 32};
-
-  FileEntry_t meta = {.filename = {'0', '1', '_', 'm', 'e', 't', 'a', ' '},
-           .extension =
-               {
-                   't',
-                   'x',
-                   't',
-               },
-           .attributes = 0,
-           .reserved = {0},
-           .creationTimeTenths = 0,
-           .createTime =
-               {
-                   .seconds_periods = 0,
-                   .minutes = 0,
-                   .hours = 0,
-               },
-           .createDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-           .accessDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-           .startingClusterHighBytes = 0,
-           .modifyTime =
-               {
-                   .seconds_periods = 0,
-                   .minutes = 36,
-                   .hours = 14,  // gmt, I think -- set to 14 to make 10am ET
-               },
-           .modifyDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-           .startingClusterLowBytes = 4,
-           .fileSizeBytes = 32};
-
-  FlightInFlash flash_flight = {
-    .metadataFile = meta,
-    .actualDataFile = data,
-    .launched = true,
-    .flightDurationSeconds = 69,
-    .maxAltitude = 420,
-    .maxVelocity = 1234,
-    .maxAccel = 666
+  FileEntry_t data = {0};
+  data.createTime = {
+      .seconds_periods = 10,
+      .minutes = 1,
+      .hours = 3,
   };
+  data.createDate = {.days = 22, .months = 10, .years = 2022 - 1980};
+
+  FileEntry_t meta2 = {
+      .filename = {'0', '2', '_', 'm', 'e', 't', 'a', ' '},
+      .extension =
+          {
+              't',
+              'x',
+              't',
+          },
+      .attributes = 0,
+      .reserved = {0},
+      .creationTimeTenths = 0,
+      .createTime =
+          {
+              .seconds_periods = 0,
+              .minutes = 0,
+              .hours = 0,
+          },
+      .createDate = {.days = 22, .months = 10, .years = 2022 - 1980},
+      .accessDate = {.days = 22, .months = 10, .years = 2022 - 1980},
+      .startingClusterHighBytes = 0,
+      .modifyTime =
+          {
+              .seconds_periods = 0,
+              .minutes = 36,
+              .hours = 14,  // gmt, I think -- set to 14 to make 10am ET
+          },
+      .modifyDate = {.days = 22, .months = 10, .years = 2022 - 1980},
+      .startingClusterLowBytes = 3,
+      .fileSizeBytes = 32};
+
+  FileEntry_t meta = {
+      .filename = {'0', '1', '_', 'm', 'e', 't', 'a', ' '},
+      .extension =
+          {
+              't',
+              'x',
+              't',
+          },
+      .attributes = 0,
+      .reserved = {0},
+      .creationTimeTenths = 0,
+      .createTime =
+          {
+              .seconds_periods = 0,
+              .minutes = 0,
+              .hours = 0,
+          },
+      .createDate = {.days = 22, .months = 10, .years = 2022 - 1980},
+      .accessDate = {.days = 22, .months = 10, .years = 2022 - 1980},
+      .startingClusterHighBytes = 0,
+      .modifyTime =
+          {
+              .seconds_periods = 0,
+              .minutes = 36,
+              .hours = 14,  // gmt, I think -- set to 14 to make 10am ET
+          },
+      .modifyDate = {.days = 22, .months = 10, .years = 2022 - 1980},
+      .startingClusterLowBytes = 4,
+      .fileSizeBytes = 32};
+
+  FlightInFlash flash_flight = {.metadataFile = meta,
+                                .actualDataFile = data,
+                                .launched = true,
+                                .flightDurationSeconds = 69,
+                                .maxAltitude = 420,
+                                .maxVelocity = 1234,
+                                .maxAccel = 666};
+  FlightInFlash flash_flight2 = {.metadataFile = meta2,
+                                 .actualDataFile = data,
+                                 .launched = false,
+                                 .flightDurationSeconds = 12,
+                                 .maxAltitude = 111,
+                                 .maxVelocity = 321,
+                                 .maxAccel = 123};
 
   // This changes the size of the metadata file poitner within flash_flight
   write_metadata_text(pFile, &flash_flight);
+  write_metadata_text(pFile, &flash_flight2);
 
-  // Seek back to the right spot in the FAT
+  // Seek back to the right spot in the FAT to write our metadata entry
   fseek(pFile, 0x7e000 + sizeof(entry), SEEK_SET);
-  fwrite(&flash_flight.metadataFile, sizeof(flash_flight.metadataFile), 1, pFile);
-  // fwrite(&data, sizeof(data), 1, pFile);
+  fwrite(&flash_flight.metadataFile, sizeof(flash_flight.metadataFile), 1,
+         pFile);
+
+  // same for second metadata entry
+  fseek(pFile, 0x7e000 + sizeof(entry) * 2, SEEK_SET);
+  fwrite(&flash_flight2.metadataFile, sizeof(flash_flight2.metadataFile), 1,
+         pFile);
 
   // Write the first fake actual flight file file
   // fseek(pFile, addr_from(data), SEEK_SET);
