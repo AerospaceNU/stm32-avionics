@@ -67,6 +67,15 @@ void dataLog_loadLastStoredFlightMetadata();
 FlightMetadata_s *dataLog_getFlightMetadata();
 
 /**
+ * @brief Get the first and last sectors (end inclusive) of a given flight #. That is, all flight data will
+ * lie on [firstSector, lastSector]
+ */
+void dataLog_getFlightSectors(uint32_t flightNum, uint32_t *firstSector,
+                                     uint32_t *lastSector);
+
+void dataLog_flashRead(uint32_t startLoc, uint32_t numBytes, uint8_t *pData);
+
+/**
  * @brief Load metadata from a flight load into the current packet
  */
 void dataLog_readFlightNumMetadata(uint8_t flightNum);

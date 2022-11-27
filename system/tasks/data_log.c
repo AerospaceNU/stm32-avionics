@@ -98,7 +98,7 @@ static void addressToFlashId(uint32_t startLoc, int *flashId,
   }
 }
 
-static void flashRead(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
+void dataLog_flashRead(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
   int flashId = -1;
   uint32_t flashOffset = 0;
   addressToFlashId(startLoc, &flashId, &flashOffset);
@@ -175,7 +175,7 @@ static uint32_t dataLog_getLastFlightNumType(bool launched) {
                                               // metadata
   uint32_t metadataReadAddress;
   while (!flightNumFound) {
-    flashRead(searchSectorNum * 2, 2, sectorRxBuff);
+    dataLog_flashRead(searchSectorNum * 2, 2, sectorRxBuff);
     uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
     if (tempFlightNum == 0xFFFF) {
       flightNumFound = true;
@@ -184,7 +184,7 @@ static uint32_t dataLog_getLastFlightNumType(bool launched) {
                        tempFlightNum)) {  // Need to check for launched to mark
                                           // as last flight
         metadataReadAddress = searchSectorNum * FLASH_MAX_SECTOR_BYTES;
-        flashRead(metadataReadAddress, kFlightMetadataSize,
+        dataLog_flashRead(metadataReadAddress, kFlightMetadataSize,
                   metadataBuff);  // Read the metadata
         FlightMetadata_s tempFlightMetadataPacket =
             *(FlightMetadata_s *)metadataBuff;
@@ -211,7 +211,7 @@ uint32_t dataLog_getLastLaunchedFlightNum() {
   return dataLog_getLastFlightNumType(true);
 }
 
-static void dataLog_getFlightSectors(uint32_t flightNum, uint32_t *firstSector,
+void dataLog_getFlightSectors(uint32_t flightNum, uint32_t *firstSector,
                                      uint32_t *lastSector) {
   *firstSector = 0;
   *lastSector = 0;
@@ -220,7 +220,7 @@ static void dataLog_getFlightSectors(uint32_t flightNum, uint32_t *firstSector,
 
   while (*firstSector == 0 &&
          tempCurSectorNum < logSizeBytes / FLASH_MAX_SECTOR_BYTES) {
-    flashRead(tempCurSectorNum * 2, 2, sectorRxBuff);
+    dataLog_flashRead(tempCurSectorNum * 2, 2, sectorRxBuff);
     uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
     if (tempFlightNum == flightNum) {
       *firstSector = tempCurSectorNum;
@@ -237,7 +237,7 @@ static void dataLog_getFlightSectors(uint32_t flightNum, uint32_t *firstSector,
   // Find last sector of flight num using metadata.
   while (*lastSector == 0 &&
          tempCurSectorNum < logSizeBytes / FLASH_MAX_SECTOR_BYTES) {
-    flashRead(tempCurSectorNum * 2, 2, sectorRxBuff);
+    dataLog_flashRead(tempCurSectorNum * 2, 2, sectorRxBuff);
 
     uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
     if (tempFlightNum != flightNum) {
@@ -301,7 +301,7 @@ void dataLog_readFlightNumMetadata(uint8_t flightNum) {
   uint8_t metadataBuff[kFlightMetadataSize];
   uint32_t metadataReadAddress = firstSector * FLASH_MAX_SECTOR_BYTES;
   // Read the metadata
-  flashRead(metadataReadAddress, kFlightMetadataSize, metadataBuff);
+  dataLog_flashRead(metadataReadAddress, kFlightMetadataSize, metadataBuff);
   flightMetadataPacket = *(FlightMetadata_s *)metadataBuff;
 }
 
@@ -452,7 +452,7 @@ uint32_t dataLog_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata,
   uint32_t readAddress = firstSector * FLASH_MAX_SECTOR_BYTES +
                          FLIGHT_METADATA_PAGES * FLASH_MIN_PAGE_SIZE_BYTES +
                          readOffset;
-  flashRead(readAddress, maxBytes, pdata);
+  dataLog_flashRead(readAddress, maxBytes, pdata);
   // If the last sector has been passed, return only the bytes that count
   if ((readAddress + maxBytes) > FLASH_MAX_SECTOR_BYTES * (lastSector + 1)) {
     uint32_t bytesRead =
@@ -494,7 +494,7 @@ static uint32_t dataLog_getLastPacketType(uint32_t firstAddress,
 
   while (low < mid) {
     pReadAddress = firstAddress + mid * packetSize;
-    flashRead(pReadAddress, packetSize, tempPacketBuffer);
+    dataLog_flashRead(pReadAddress, packetSize, tempPacketBuffer);
     // All FFs = too high
     if (packetIsEmpty(tempPacketBuffer, packetSize)) {
       high = mid;
@@ -505,7 +505,7 @@ static uint32_t dataLog_getLastPacketType(uint32_t firstAddress,
     }
   }
   pReadAddress = firstAddress + mid * packetSize;
-  flashRead(pReadAddress, packetSize, tempPacketBuffer);
+  dataLog_flashRead(pReadAddress, packetSize, tempPacketBuffer);
   return pReadAddress;
 }
 
@@ -572,7 +572,7 @@ void dataLog_writeCliConfigs() {
   }
   currentConfigAddress += kCliConfigSize;
   if (currentConfigAddress > FLASH_MAX_SECTOR_BYTES - kCliConfigSize) {
-    flashRead(0, CONFIG_START_ADDRESS, tempPacketBuffer);
+    dataLog_flashRead(0, CONFIG_START_ADDRESS, tempPacketBuffer);
     flashEraseSector(0);
     flashWrite(0, CONFIG_START_ADDRESS, tempPacketBuffer);
     currentConfigAddress = CONFIG_START_ADDRESS;

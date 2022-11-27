@@ -15,6 +15,8 @@ set(SYSTEM_FILES_LIST
         tasks/cli/task_cli_sense.cpp
         tasks/cli/task_cli_linecutter.cpp
         tasks/cli/task_cli_version.cpp
+        
+        tasks/fat_msc/FAT32_test.cpp
 
         states/flight_state.cpp
         states/states_interface.cpp
