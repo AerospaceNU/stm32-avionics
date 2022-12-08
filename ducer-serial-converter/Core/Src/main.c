@@ -41,6 +41,12 @@
 #define PRESSURE_MIN 0        // min is 0 for sensors that give absolute values
 #define PRESSURE_MAX 6.8046   // 100psi, in bar
 
+typedef struct __attribute__((packed)) {
+	uint8_t status;
+	float temp;
+	float pressure;
+} PressureSensorData_t;
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -123,6 +129,13 @@ int main(void) {
 		float pressure = (((float) pressReading - OUTPUT_MIN)
 				* (PRESSURE_MAX - PRESSURE_MIN))
 				/ (OUTPUT_MAX - OUTPUT_MIN)+ PRESSURE_MIN;
+
+		static PressureSensorData_t outputData;
+		outputData.status = status;
+		outputData.pressure = pressure;
+		outputData.temp= temp;
+
+		HAL_UART_Transmit(&huart2, (uint8_t*) &outputData, sizeof(outputData), HAL_MAX_DELAY);
 
 		// Read at 200hz? IDK
 		HAL_Delay(5);
