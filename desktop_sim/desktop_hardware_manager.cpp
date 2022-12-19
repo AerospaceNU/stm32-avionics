@@ -87,6 +87,9 @@ bool hardwareStatusVbat[NUM_VBAT];
 /* Hardware objects */
 
 FileBackedFlash *internalFlash;
+bool do_networking;
+CircularBuffer_s bleBuffer;
+uint8_t bleArray[1024] = {0};
 
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
@@ -121,6 +124,18 @@ void hm_hardwareInit() {
 
   internalFlash = new FileBackedFlash(int_flash_path, kFlashSizeBytes[0]);
 
+  // TODO this resets the state log, but we start at the
+  // beginning of the CSV anyways, so we shouldn't ever
+  // try to resad from it regardless
+  internalFlash->Reinit(true);
+
+  // TODO stick in ifdef
+  cb_init(&bleBuffer, bleArray, sizeof(bleArray), 1);
+  const char *testString = "--linecutter -i 1 -c \"!arm\"\n";
+  for (int i = 0; i < strlen(testString); i++) {
+    cb_enqueue(&bleBuffer, &testString[i]);
+  }
+
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
@@ -142,9 +157,11 @@ void hm_hardwareInit() {
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 
 #if HAS_DEV(RADIO_DESKTOP_SOCKET)
-  for (int i = 0; i < NUM_RADIO_DESKTOP_SOCKET; i++) {
-    radioSocket[i] = new TcpSocket{radioDesktopSocketPort[i]};
-    hardwareStatusRadio[FIRST_ID_RADIO_DESKTOP_SOCKET + i] = true;
+  if (do_networking) {
+    for (int i = 0; i < NUM_RADIO_DESKTOP_SOCKET; i++) {
+      radioSocket[i] = new TcpSocket{radioDesktopSocketPort[i]};
+      hardwareStatusRadio[FIRST_ID_RADIO_DESKTOP_SOCKET + i] = true;
+    }
   }
 #endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
 
@@ -175,7 +192,7 @@ bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
   if (IS_DEVICE(flashId, FLASH_DESKTOP_FILE_BACKED)) {
     return externalFlash[flashId - FIRST_ID_FLASH_DESKTOP_FILE_BACKED]
-        ->readStart(startLoc, numBytes, pData);
+        ->ReadStart(startLoc, numBytes, pData);
   }
 #endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
 
@@ -187,7 +204,7 @@ bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
   if (IS_DEVICE(flashId, FLASH_DESKTOP_FILE_BACKED)) {
     return externalFlash[flashId - FIRST_ID_FLASH_DESKTOP_FILE_BACKED]
-        ->writeStart(startLoc, numBytes, data);
+        ->WriteStart(startLoc, numBytes, data);
   }
 #endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
 
@@ -204,7 +221,7 @@ void hm_buzzerSetFrequency(int buzzerId, float fHz) {}
 void hm_buzzerStart(int buzzerId) {}
 void hm_buzzerStop(int buzzerId) {}
 
-void hm_servoSetAngle(int servoId, float degrees) {}
+void hm_ServoSetAngle(int servoId, float degrees) {}
 
 void hm_ledSet(int ledId, bool set) {}
 void hm_ledToggle(int ledId) {}
@@ -219,9 +236,7 @@ bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
 #if HAS_DEV(RADIO_DESKTOP_SOCKET)
   if (IS_DEVICE(radioNum, RADIO_DESKTOP_SOCKET)) {
     packet.radioId = radioNum;
-    if (radioSocket[radioNum]) {
-      radioSocket[radioNum]->writeData((uint8_t *)&packet, sizeof(packet));
-    }
+    radioSocket[radioNum]->writeData((uint8_t *)&packet, sizeof(packet));
     return true;
   }
 #endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
@@ -244,31 +259,18 @@ bool hm_bleClientConnected(int bleClientId) { return false; }
 bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
   return false;
 }
-CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) { return nullptr; }
+
+CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) {
+  return &bleBuffer;
+}
 void hm_bleTick() {}
 
-LineCutterData_s dummyData[2] = {{
-                                     .lineCutterNumber = 1,
-                                 },
-                                 {
-                                     .lineCutterNumber = 2,
-                                 }};
-LineCutterFlightVars_s dummyVars[2] = {{
-                                           .lineCutterNumber = 1,
-                                       },
-                                       {
-                                           .lineCutterNumber = 2,
-                                       }};
-
-LineCutterData_s *hm_getLineCutterData(int lineCutterId) {
-  return dummyData + lineCutterId;
-}
-
+LineCutterData_s *hm_getLineCutterData(int lineCutterId) { return nullptr; }
 LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
-  return dummyVars + lineCutterId;
+  return nullptr;
 }
-
 bool hm_lineCutterSendString(int lineCutterNumber, char *string) {
+  printf("[Sent to LC %i] %s\n", lineCutterNumber, string);
   return true;
 }
 bool hm_lineCuttersSendCut(int chan) {
@@ -277,6 +279,9 @@ bool hm_lineCuttersSendCut(int chan) {
 }
 
 void hm_watchdogRefresh() {}
+
+void hm_pyroSetPwm(int pyroId, uint32_t duration, uint32_t frequency,
+                   uint32_t pulseWidth) { }
 
 void hm_pyroFire(int pyroId, uint32_t duration) {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
@@ -294,16 +299,6 @@ void hm_pyroSet(int pyroId, bool enable) {
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
 
-void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth,
-                   uint32_t duration) {
-#if HAS_DEV(PYRO_DESKTOP_PRINT)
-  if (IS_DEVICE(pyroId, PYRO_DESKTOP_PRINT)) {
-    printPyro_pwmStart(&printPyro[pyroId - FIRST_ID_PYRO_DESKTOP_PRINT],
-                       duration, frequency, pulseWidth);
-  }
-#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
-}
-
 void hm_pyroUpdate() {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   for (int i = 0; i < NUM_PYRO_DESKTOP_PRINT; i++) {
@@ -312,9 +307,9 @@ void hm_pyroUpdate() {
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
 
-void hm_dcMotorSetPercent(int dcMotorId, double percent) {}
+void hm_DCMotorSetPercent(int dcMotorId, double percent) {}
 
-void hm_readSensorData() { flightReplay->getNext(&sensorData); }
+void hm_readSensorData() { flightReplay->GetNext(&sensorData); }
 
 SensorData_s *hm_getSensorData() { return &sensorData; }
 

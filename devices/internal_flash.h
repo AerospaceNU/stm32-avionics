@@ -25,11 +25,11 @@ extern "C" {
 
 #define MAX_FLASH_ADDRESS INTERNAL_FLASH_END - INTERNAL_FLASH_START
 
-bool internalFlash_write(uint32_t RelFlashAddress, uint8_t *data,
-                         uint32_t numBytes);
+bool internal_flash_write(uint32_t RelFlashAddress, uint8_t *data,
+                          uint32_t numBytes);
 
-bool internalFlash_read(uint32_t RelFlashAddress, uint8_t *pData,
-                        uint32_t numBytes);
+bool internal_flash_read(uint32_t RelFlashAddress, uint8_t *pData,
+                         uint32_t numBytes);
 
 #ifdef __cplusplus
 }
