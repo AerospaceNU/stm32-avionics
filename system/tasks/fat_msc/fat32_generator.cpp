@@ -351,8 +351,8 @@ int maxFlightNum;
 void updateFileTimestamp(FileEntry_t *entry, int64_t gpsTimeStart,
                          int64_t gpsTimeEnd) {
   tm *dt = gmtime(&gpsTimeStart);
-  if (dt && dt->tm_year > 20 && dt->tm_year < 120) {
-    entry->createDate.years = dt->tm_year - 1980;
+  if (dt && dt->tm_year > 20 && dt->tm_year < 300) {
+    entry->createDate.years = dt->tm_year + 1900 - 1980;
     entry->createDate.months = dt->tm_mon;
     entry->createDate.days = dt->tm_mday;
     entry->createTime.hours = dt->tm_hour;
@@ -362,8 +362,8 @@ void updateFileTimestamp(FileEntry_t *entry, int64_t gpsTimeStart,
   }
 
   dt = gmtime(&gpsTimeEnd);
-  if (dt && dt->tm_year > 20 && dt->tm_year < 120) {
-    entry->modifyDate.years = dt->tm_year - 1980;
+  if (dt && dt->tm_year > 20 && dt->tm_year < 300) {
+    entry->modifyDate.years = dt->tm_year + 1900 - 1980;
     entry->modifyDate.months = dt->tm_mon;
     entry->modifyDate.days = dt->tm_mday;
     entry->modifyTime.hours = dt->tm_hour;
@@ -386,38 +386,40 @@ void write_metadata_text(FlightInFlash *pFlight, char *pSectorStart) {
   int string_len = 0;
   string_len +=
       snprintf(pSectorStart, sector_size - string_len,
-               "Flight starts: %2d/%2d/%2d %2d:%2d:%2d\n",
+               "Flight starts: %2d/%2d/%2d %2d:%2d:%2f\n",
                pFlight->actualDataFile.createDate.months,
                pFlight->actualDataFile.createDate.days,
-               pFlight->actualDataFile.createDate.years,
+               pFlight->actualDataFile.createDate.years + 1980,
                pFlight->actualDataFile.createTime.hours,
                pFlight->actualDataFile.createTime.minutes,
-               pFlight->actualDataFile.createTime.seconds_periods / 2);
-
-  string_len += snprintf(
-      pSectorStart + string_len, sector_size - string_len, "Flight ends:   %2d/%2d/%2d %2d:%2d:%2d\n",
-      pFlight->actualDataFile.createDate.months,
-      pFlight->actualDataFile.createDate.days,
-      pFlight->actualDataFile.createDate.years,
-      pFlight->actualDataFile.createTime.hours,
-      pFlight->actualDataFile.createTime.minutes,
-      pFlight->actualDataFile.createTime.seconds_periods / 2);
+               pFlight->actualDataFile.createTime.seconds_periods / 2.0);
 
   string_len +=
-      snprintf(pSectorStart + string_len, sector_size - string_len, "Duration:      %u seconds\n",
-               pFlight->flightDurationSeconds);
+      snprintf(pSectorStart + string_len, sector_size - string_len,
+               "Flight ends:   %2d/%2d/%2d %2d:%2d:%2f\n",
+               pFlight->actualDataFile.createDate.months,
+               pFlight->actualDataFile.createDate.days,
+               pFlight->actualDataFile.createDate.years + 1980,
+               pFlight->actualDataFile.createTime.hours,
+               pFlight->actualDataFile.createTime.minutes,
+               pFlight->actualDataFile.createTime.seconds_periods / 2.0);
 
-  string_len += snprintf(pSectorStart + string_len, sector_size - string_len, "Launched?      %s\n",
-                         pFlight->launched ? "YES" : "NO");
+  string_len +=
+      snprintf(pSectorStart + string_len, sector_size - string_len,
+               "Duration:      %u seconds\n", pFlight->flightDurationSeconds);
 
-  string_len += snprintf(pSectorStart + string_len, sector_size - string_len, "Max altitude:  %f\n",
-                         pFlight->maxAltitude);
+  string_len +=
+      snprintf(pSectorStart + string_len, sector_size - string_len,
+               "Launched?      %s\n", pFlight->launched ? "YES" : "NO");
 
-  string_len += snprintf(pSectorStart + string_len, sector_size - string_len, "Max velocity:  %f\n",
-                         pFlight->maxVelocity);
+  string_len += snprintf(pSectorStart + string_len, sector_size - string_len,
+                         "Max altitude:  %f\n", pFlight->maxAltitude);
 
-  string_len += snprintf(pSectorStart + string_len, sector_size - string_len, "Max accel:     %f\n",
-                         pFlight->maxAccel);
+  string_len += snprintf(pSectorStart + string_len, sector_size - string_len,
+                         "Max velocity:  %f\n", pFlight->maxVelocity);
+
+  string_len += snprintf(pSectorStart + string_len, sector_size - string_len,
+                         "Max accel:     %f\n", pFlight->maxAccel);
 
   // Pad rest of file with a bunch of spaces
   memset(pSectorStart + string_len, ' ', sector_size - string_len);
@@ -425,7 +427,7 @@ void write_metadata_text(FlightInFlash *pFlight, char *pSectorStart) {
 
 // Update the list of flights in the flightArray based on internal flash state
 void mapFlashToClusters() {
-  int bound = dataLog_getLastFlightNum();
+  int bound = dataLog_getLastFlightNum() - 1;
   printf("Found %i flights\n", bound);
 
   // The first flight will have metadata at cluster 3, and
@@ -442,11 +444,13 @@ void mapFlashToClusters() {
     flight.internalFlashOnePastEndAddress =
         (lastSector * FLASH_MAX_SECTOR_BYTES + 1) + 1;
 
-    dataLog_readFlightNumMetadata(i);
+    const int datalog_flight_idx = i + 1;
+    dataLog_readFlightNumMetadata(datalog_flight_idx);
     FlightMetadata_s *meta = dataLog_getFlightMetadata();
 
     uint64_t startTime = meta->gpsTimestamp;  // seconds
-    uint64_t endTime = startTime + dataLog_getLastFlightTimestamp(i) / 1000;
+    uint64_t duration = dataLog_getLastFlightTimestamp(datalog_flight_idx) / 1000;
+    uint64_t endTime = startTime + duration;
     updateFileTimestamp(&flight.actualDataFile, startTime, endTime);
     updateFileTimestamp(&flight.metadataFile, startTime, endTime);
 
@@ -468,7 +472,8 @@ void mapFlashToClusters() {
     uint64_t flightSizeBytes =
         (lastSector - firstSector + 1) * FLASH_MAX_SECTOR_BYTES;
     // Need to round _up_ to get # of sectors in MSC land
-    const uint64_t numClusters = (int)ceil(flightSizeBytes / CLUSTER_SIZE_BYTES);
+    const uint64_t numClusters =
+        (int)ceil(flightSizeBytes / CLUSTER_SIZE_BYTES);
     flight.lastFlightCluster = flight.firstFlightCluster + numClusters;
 
     // Update the actual FileEntry as well
@@ -489,11 +494,10 @@ void mapFlashToClusters() {
     firstFreeCluster += numClusters;
 
     flight.launched = meta->launched;
-    flight.flightDurationSeconds = endTime - startTime;
+    flight.flightDurationSeconds = duration;
   }
   maxFlightNum = bound;
 }
-
 
 // Get the flight # in flash from a given address in mass-storage-land
 FlightInFlash *getFlightFromMSCaddress(uint32_t mscAddress) {
@@ -555,7 +559,7 @@ void copyFlighDataToCluster(uint32_t mscAddress, uint8_t *pCluster) {
 // appropriate fake data based on cluster requested by host
 // pCluster had better be >= 512 (one physical cluster)
 void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
-                     uint8_t *pSector) {
+                    uint8_t *pSector) {
   memset(pSector, 0xff, 512);
 
   // First blob of data: the boot sector. Never changes
@@ -653,8 +657,7 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
         FlightInFlash *it = &(flightArray[flight_num]);
 
         // Write metadata file and flight data file
-        memcpy(pSector + clusterOffset, &it->metadataFile,
-               sizeof(FileEntry_t));
+        memcpy(pSector + clusterOffset, &it->metadataFile, sizeof(FileEntry_t));
         memcpy(pSector + clusterOffset + sizeof(FileEntry_t),
                &it->actualDataFile, sizeof(FileEntry_t));
       }
@@ -662,25 +665,24 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
 
     return;
   } else if (mscAddress >= FIRST_FILE_ADDRESS) {
-
     // Search through all flights
     for (int i = 0; i < maxFlightNum; i++) {
       FlightInFlash &flight = flightArray[i];
-      
-      
+
       // Check if this cluster should contain the metadata file
       uint64_t metadataAddress = getFileDataAddress(flight.metadataFile);
       if ((metadataAddress == mscAddress)) {
-        // Contains the metadata file! We only have one sector with metadata data in it, anyways
-        write_metadata_text(&flight, (char*)pSector);
+        // Contains the metadata file! We only have one sector with metadata
+        // data in it, anyways
+        write_metadata_text(&flight, (char *)pSector);
       }
 
       uint64_t flightStartAddress = getFileDataAddress(flight.actualDataFile);
       // TODO flight sizes make my brain hurt
-      if ((mscAddress >= flightStartAddress) && (mscAddress < (flightStartAddress + 1))) {
+      if ((mscAddress >= flightStartAddress) &&
+          (mscAddress < (flightStartAddress + 1))) {
         // TODO memcpy from right spot
       }
     }
   }
-
 }
