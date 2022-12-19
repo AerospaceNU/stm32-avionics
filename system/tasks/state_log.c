@@ -45,7 +45,7 @@ void stateLog_write(int currentState) {
                              // written to flash
   uint8_t stateReadBuffer;
   while (1) {
-    internalFlash_read(writeAddress, &stateReadBuffer, 1);
+    internal_flash_read(writeAddress, &stateReadBuffer, 1);
     curRead = stateReadBuffer;  // Read from the address
     if (curRead == 255) {       // Find the first empty address
       break;
@@ -66,7 +66,7 @@ void stateLog_write(int currentState) {
     stateWriteBuffer = (uint8_t)(currentState);  // Otherwise write the state
   }
 
-  internalFlash_write(writeAddress, &stateWriteBuffer, 1);
+  internal_flash_write(writeAddress, &stateWriteBuffer, 1);
 }
 
 void stateLog_writeComplete() {
@@ -77,7 +77,7 @@ void stateLog_writeComplete() {
 int stateLog_read() {
   uint8_t stateReadBuffer;
   readAddress = STATE_START_ADDRESS;
-  internalFlash_read(readAddress, &stateReadBuffer, 1);
+  internal_flash_read(readAddress, &stateReadBuffer, 1);
   prevRead = stateReadBuffer;
 
   if (prevRead == 255) {  // If we immediately read 255, the state log is empty,
@@ -86,7 +86,7 @@ int stateLog_read() {
   }
 
   while (1) {
-    internalFlash_read(readAddress, &stateReadBuffer, 1);
+    internal_flash_read(readAddress, &stateReadBuffer, 1);
     curRead = stateReadBuffer;
     readAddress += 32;
 

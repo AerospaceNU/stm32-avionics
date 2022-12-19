@@ -5,14 +5,14 @@
 #include "hardware_manager.h"
 
 TEST(CliParse, ParseLineCutter) {
-  HM_HardwareInit();
-  auto opt = cliParse(CLI_PHONE);
+  hm_hardwareInit();
+  auto opt = cli_parse(CLI_PHONE);
   ASSERT_EQ(LINECUTTER, opt);
 }
 
 TEST(CliParse, CliTick) {
-  HM_HardwareInit();
-  cli_tasks::ConfigureForGround();
-  auto opt = cli_tasks::cliTick();
+  hm_hardwareInit();
+  CliTasks::configureForGround();
+  auto opt = CliTasks::tick();
   ASSERT_EQ(NoChange, opt);
 }
