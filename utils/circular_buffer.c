@@ -51,6 +51,9 @@ size_t cb_count(CircularBuffer_s *cb) {
   } else {
     ret_bytes = cb->head - cb->tail;
   }
+
+  size_t size = cb->size;
+  if (size == 0) return 0;
   return ret_bytes / cb->size;
 }
 

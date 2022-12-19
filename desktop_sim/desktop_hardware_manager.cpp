@@ -260,6 +260,11 @@ bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
   return false;
 }
 
+CircularBuffer_s *HM_bleClientGetRxBuffer(int bleClientId) {
+  return &bleBuffer;
+}
+void HM_BleTick() {}
+
 CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) {
   return &bleBuffer;
 }

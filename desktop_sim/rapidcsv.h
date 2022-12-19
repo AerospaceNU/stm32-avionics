@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <limits>
 #ifdef HAS_CODECVT
 #include <codecvt>
 #include <locale>
@@ -24,6 +25,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <sstream>
 #include <string>
