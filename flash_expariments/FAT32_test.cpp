@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <stdio.h>
-
 #include <cstring>
 
 // Looks like two copies of the boot sector?? interesting

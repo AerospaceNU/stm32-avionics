@@ -6,6 +6,7 @@
 
 #include <chrono>  // NOLINT
 #include <fstream>
+#include <cstring>
 
 #include "circular_buffer.h"
 #include "hardware_manager.h"

@@ -459,31 +459,36 @@ void retrieveCluster(uint32_t mscAddress, uint32_t lengthBytes,
            mscAddress < ROOT_DIRECTORY_ADDR) {
     // Generate the FAT
 
-    // TODO
+    // 
     const uint8_t endOfChain[4] = {0xf8, 0xff, 0xff, 0x0f};
   }
 
   // Third blob of data: the root directory
+  // Need to generate a 512-byte chunk of the root directory
   else if ((mscAddress >= ROOT_DIRECTORY_ADDR) &&
            mscAddress < FIRST_FILE_ADDRESS) {
     
-    // Need to generate a 512-byte chunk of the root directory
+    // How far, in bytes, into the root directory we are
     const uint32_t offset = mscAddress - ROOT_DIRECTORY_ADDR;
+
+    // We assume each dir entry takes up exactly 32 bits (no long file name extension stupidity)
+    // the entry idx
     const uint32_t firstEntryIdx = offset / sizeof(FileEntry_t);
-    const uint32_t lastEntryIdx = firstFlightIdx + (512 / sizeof(FileEntry_t));
+    const uint32_t lastEntryIdx = firstEntryIdx + (512 / sizeof(FileEntry_t));
 
     // Luckily, everything's divisible by 2 so no need to worry about
     // only having space for metadata but not actual flight data within
     // a logical cluster
-    for (int i = firstEntryIdx; i < lastEntryIdx; i++) {
-      // Need to generate a metadata file and a data file, so
-      // 2 files/flight
-      const uin32_t flight_num = i / 2;
-      FlightInFlash *it = flightArray[flight_num];
+
+    // We iterate forward 2 files each time, as we write a meta and actual file for each flight
+    for (int i = firstEntryIdx; i < lastEntryIdx; i += 2) {
+      size_t clusterOffset = i * sizeof(FileEntry_t); 
+      const uint32_t flight_num = i / 2;
+      FlightInFlash *it = &(flightArray[flight_num]);
 
       // Write metadata file and flight data file
-      memcpy(pCluster, it->metadataFile, sizeof(FileEntry_t));
-      memcpy(pCluster, it->actualDataFile, sizeof(FileEntry_t));
+      memcpy(pCluster + clusterOffset, &it->metadataFile, sizeof(FileEntry_t));
+      memcpy(pCluster + clusterOffset + sizeof(FileEntry_t), &it->actualDataFile, sizeof(FileEntry_t));
     }
 
     return;
@@ -491,7 +496,8 @@ void retrieveCluster(uint32_t mscAddress, uint32_t lengthBytes,
 
   // Rest of the drive is for flight data
   else {
-
+    // TODO, just write zeros
+    memset(pCluster, 0, 512);
   }
 }
 
@@ -557,7 +563,7 @@ void write_metadata_text(FILE *pFile, FlightInFlash *pFlight) {
   pFlight->metadataFile.fileSizeBytes = offset;
 }
 
-int main() {
+int old_main() {
   FILE *pFile;
   pFile = fopen("fat32_test.img", "wb");  // w for write, b for binary
 
