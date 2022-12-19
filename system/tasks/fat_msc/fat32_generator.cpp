@@ -335,6 +335,14 @@ struct FlightInFlash {
 FlightInFlash flightArray[MAX_FLIGHTS] = {0};
 int maxFlightNum;
 
+#define CLUSTER_SIZE_BYTES 0x1000
+
+#define FAT_START_ADDRESS 0x4000
+
+#define ROOT_DIRECTORY_ADDR 0x7e000
+#define FIRST_FILE_ADDRESS 0x7f000
+#define FIRST_FLIGHT_CLUSTER_NUM 3
+
 /**
  * @param entry The entry to assign date/times to
  * @param gpsTimeStart Seconds since unix epoch of first packet of the flight
@@ -373,7 +381,7 @@ void updateFileTimestamp(FileEntry_t *entry, int64_t gpsTimeStart,
  * @param pFile
  * @param pFlight
  */
-void write_metadata_text(FlightInFlash flight, uint8_t *pSectorStart) {
+void write_metadata_text(FlightInFlash *pFlight, char *pSectorStart) {
   const unsigned int sector_size = 512;
   int string_len = 0;
   string_len +=
@@ -387,7 +395,7 @@ void write_metadata_text(FlightInFlash flight, uint8_t *pSectorStart) {
                pFlight->actualDataFile.createTime.seconds_periods / 2);
 
   string_len += snprintf(
-      str + string_len, sector_size - string_len, "Flight ends:   %2d/%2d/%2d %2d:%2d:%2d\n",
+      pSectorStart + string_len, sector_size - string_len, "Flight ends:   %2d/%2d/%2d %2d:%2d:%2d\n",
       pFlight->actualDataFile.createDate.months,
       pFlight->actualDataFile.createDate.days,
       pFlight->actualDataFile.createDate.years,
@@ -396,23 +404,23 @@ void write_metadata_text(FlightInFlash flight, uint8_t *pSectorStart) {
       pFlight->actualDataFile.createTime.seconds_periods / 2);
 
   string_len +=
-      snprintf(str + string_len, sector_size - string_len, "Duration:      %u seconds\n",
+      snprintf(pSectorStart + string_len, sector_size - string_len, "Duration:      %u seconds\n",
                pFlight->flightDurationSeconds);
 
-  string_len += snprintf(str + string_len, sector_size - string_len, "Launched?      %s\n",
+  string_len += snprintf(pSectorStart + string_len, sector_size - string_len, "Launched?      %s\n",
                          pFlight->launched ? "YES" : "NO");
 
-  string_len += snprintf(str + string_len, sector_size - string_len, "Max altitude:  %f\n",
+  string_len += snprintf(pSectorStart + string_len, sector_size - string_len, "Max altitude:  %f\n",
                          pFlight->maxAltitude);
 
-  string_len += snprintf(str + string_len, sector_size - string_len, "Max velocity:  %f\n",
+  string_len += snprintf(pSectorStart + string_len, sector_size - string_len, "Max velocity:  %f\n",
                          pFlight->maxVelocity);
 
-  string_len += snprintf(str + string_len, sector_size - string_len, "Max accel:     %f\n",
+  string_len += snprintf(pSectorStart + string_len, sector_size - string_len, "Max accel:     %f\n",
                          pFlight->maxAccel);
 
   // Pad rest of file with a bunch of spaces
-  memset(str + string_len, ' ', sector_size - string_len);
+  memset(pSectorStart + string_len, ' ', sector_size - string_len);
 }
 
 // Update the list of flights in the flightArray based on internal flash state
@@ -471,6 +479,9 @@ void mapFlashToClusters() {
     flight.metadataFile.startingClusterLowBytes = flight.metadataCluster;
     flight.actualDataFile.startingClusterLowBytes = flight.firstFlightCluster;
 
+    // Hard coded, coz it's padded with spaces at the end, lol
+    flight.metadataFile.fileSizeBytes = 512;
+
     printf("Meta cluster: %i data cluster %i\n",
            flight.metadataFile.startingClusterLowBytes,
            flight.actualDataFile.startingClusterLowBytes);
@@ -483,13 +494,6 @@ void mapFlashToClusters() {
   maxFlightNum = bound;
 }
 
-#define CLUSTER_SIZE_BYTES 0x1000
-
-#define FAT_START_ADDRESS 0x4000
-
-#define ROOT_DIRECTORY_ADDR 0x7e000
-#define FIRST_FILE_ADDRESS 0x7f000
-#define FIRST_FLIGHT_CLUSTER_NUM 3
 
 // Get the flight # in flash from a given address in mass-storage-land
 FlightInFlash *getFlightFromMSCaddress(uint32_t mscAddress) {
@@ -513,6 +517,16 @@ FlightInFlash *getFlightFromMSCaddress(uint32_t mscAddress) {
 uint32_t clusterToMSCglobalAddress(uint32_t cluster) {
   return (cluster - FIRST_FLIGHT_CLUSTER_NUM) * CLUSTER_SIZE_BYTES +
          FIRST_FILE_ADDRESS;
+}
+
+/**
+ * @brief Get the location of the first byte of a file, in MSC address space
+ */
+uint32_t getFileDataAddress(FileEntry_t file) {
+  int cluster =
+      (file.startingClusterHighBytes << 16) | file.startingClusterLowBytes;
+  cluster -= 3;
+  return FIRST_FILE_ADDRESS + CLUSTER_SIZE_BYTES * cluster;
 }
 
 /**
@@ -540,9 +554,9 @@ void copyFlighDataToCluster(uint32_t mscAddress, uint8_t *pCluster) {
 // This is the main function of the fake SD card. It handles creating the
 // appropriate fake data based on cluster requested by host
 // pCluster had better be >= 512 (one physical cluster)
-void retrieveCluster(uint32_t mscAddress, uint32_t lengthBytes,
-                     uint8_t *pCluster) {
-  memset(pCluster, 0xff, 512);
+void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
+                     uint8_t *pSector) {
+  memset(pSector, 0xff, 512);
 
   // First blob of data: the boot sector. Never changes
   if (mscAddress < sizeof(bootsector)) {
@@ -551,7 +565,7 @@ void retrieveCluster(uint32_t mscAddress, uint32_t lengthBytes,
     uint8_t *pBootsectorEnd = bootsector + sizeof(bootsector);
 
     // TODO do I need the -1
-    memcpy(pCluster, bootsector + mscAddress,
+    memcpy(pSector, bootsector + mscAddress,
            (size_t)MIN(512, (unsigned long)(pBootsectorEnd - mscAddress - 1)));
     return;
   }
@@ -574,7 +588,7 @@ void retrieveCluster(uint32_t mscAddress, uint32_t lengthBytes,
           0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f,
       };
 
-      memcpy(pCluster, fat, sizeof(fat));
+      memcpy(pSector, fat, sizeof(fat));
     }
   }
 
@@ -609,10 +623,10 @@ void retrieveCluster(uint32_t mscAddress, uint32_t lengthBytes,
           .startingClusterLowBytes = 0,
           .fileSizeBytes = 0};
 
-      memcpy(pCluster + 0, &entry, sizeof(entry));
+      memcpy(pSector + 0, &entry, sizeof(entry));
 
       uint32_t zeros[sizeof(entry)] = {0};
-      memcpy(pCluster + 32, zeros, sizeof(zeros));
+      memcpy(pSector + 32, zeros, sizeof(zeros));
     }
 
     // How far, in bytes, into the root directory we are
@@ -639,9 +653,9 @@ void retrieveCluster(uint32_t mscAddress, uint32_t lengthBytes,
         FlightInFlash *it = &(flightArray[flight_num]);
 
         // Write metadata file and flight data file
-        memcpy(pCluster + clusterOffset, &it->metadataFile,
+        memcpy(pSector + clusterOffset, &it->metadataFile,
                sizeof(FileEntry_t));
-        memcpy(pCluster + clusterOffset + sizeof(FileEntry_t),
+        memcpy(pSector + clusterOffset + sizeof(FileEntry_t),
                &it->actualDataFile, sizeof(FileEntry_t));
       }
     }
@@ -656,18 +670,17 @@ void retrieveCluster(uint32_t mscAddress, uint32_t lengthBytes,
       
       // Check if this cluster should contain the metadata file
       uint64_t metadataAddress = getFileDataAddress(flight.metadataFile);
-      // if ()
+      if ((metadataAddress == mscAddress)) {
+        // Contains the metadata file! We only have one sector with metadata data in it, anyways
+        write_metadata_text(&flight, (char*)pSector);
+      }
+
+      uint64_t flightStartAddress = getFileDataAddress(flight.actualDataFile);
+      // TODO flight sizes make my brain hurt
+      if ((mscAddress >= flightStartAddress) && (mscAddress < (flightStartAddress + 1))) {
+        // TODO memcpy from right spot
+      }
     }
   }
 
-}
-
-/**
- * @brief Get the location of the first byte of a file, in MSC address space
- */
-uint32_t getFileDataAddress(FileEntry_t file) {
-  int cluster =
-      (file.startingClusterHighBytes << 16) | file.startingClusterLowBytes;
-  cluster -= 3;
-  return FIRST_FILE_ADDRESS + CLUSTER_SIZE_BYTES * cluster;
 }

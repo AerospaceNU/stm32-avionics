@@ -4,7 +4,7 @@
 #include <desktop_hardware_manager.h>
 #include <data_log.h>
 
-void retrieveCluster(uint32_t mscAddress, uint32_t lengthBytes,
+void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
                      uint8_t *pCluster);
 void mapFlashToClusters();
 
@@ -46,7 +46,7 @@ int main() {
   // Retrieve every cluster
   uint8_t buf[512];
   for (size_t i = 0; i < FILE_LEN; i += 512) {
-    retrieveCluster(i, sizeof(buf), buf);
+    retrieveSector(i, sizeof(buf), buf);
 
     // printf("Writing cluster %i...", i / 512);
     fwrite(buf, sizeof(buf), 1, pFile);
