@@ -364,6 +364,8 @@ void write_metadata_text(FILE *pFile, FlightInFlash *pFlight) {
   offset += string_len;
 
   pFlight->metadataFile.fileSizeBytes = offset;
+  
+  printf("Offset = %i\n", offset);
 }
 
 int main() {

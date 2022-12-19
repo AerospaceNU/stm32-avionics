@@ -145,6 +145,7 @@ void hm_hardwareInit() {
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
   for (int i = 0; i < NUM_FLASH_DESKTOP_FILE_BACKED; i++) {
     externalFlash[i] = new FileBackedFlash(ext_flash_path, kFlashSizeBytes[i]);
+    externalFlash[i]->Reinit(true);
     hardwareStatusFlash[FIRST_ID_FLASH_DESKTOP_FILE_BACKED + i] = true;
   }
 #endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)

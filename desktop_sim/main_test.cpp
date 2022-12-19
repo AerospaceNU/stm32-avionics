@@ -48,6 +48,11 @@ int main() {
   for (size_t i = 0; i < FILE_LEN; i += 512) {
     retrieveCluster(i, sizeof(buf), buf);
 
+    // printf("Writing cluster %i...", i / 512);
     fwrite(buf, sizeof(buf), 1, pFile);
+    // printf("done\n");
   }
+
+  printf("All done!\n");
+  fclose(pFile);
 }

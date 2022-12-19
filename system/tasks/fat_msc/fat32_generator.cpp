@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <ctime>
 
@@ -299,16 +300,20 @@ struct FlightInFlash {
   uint32_t internalFlashOnePastEndAddress;
 
   uint32_t
-      firstFATcluster;  // The first FAT cluster this flight "occupies". The FAT
-                        // entry here should point to first + 1, and that to
-                        // first + 2... up to the last. Note that the first file
-                        // will occupy sector #2, technically
+      metadataCluster;  // The cluster in MSC address land occupied by metadata
   uint32_t
-      lastFATcluster;  // The last FAT cluster this flight "occupies". FAT entry
-                       // for this cluster should be the end of cluster marker.
+      firstFlightCluster;  // The first FAT cluster this flight "occupies". The
+                           // FAT entry here should point to first + 1, and that
+                           // to first + 2... up to the last. Note that the
+                           // first file will occupy sector #2, technically
+  uint32_t lastFlightCluster;  // The last FAT cluster this flight "occupies".
+                               // FAT entry for this cluster should be the end
+                               // of cluster marker.
 
-  uint32_t metadataFatEntryIdx; // Index in the FAT of the metadata file
-  uint32_t flightDataFirstFatEntryIdx; // Index in the FAT of the first flight data entry. The flight has (lastFATcluster - firstFATcluster) + 1 many entries in the
+  uint32_t
+      flightDataFirstFatEntryIdx;  // Index in the FAT of the first flight data
+                                   // entry. The flight has (lastFATcluster -
+                                   // firstFATcluster) + 1 many entries in the
 
   // We expect the entries to have correct date/time
   FileEntry_t metadataFile;
@@ -328,8 +333,7 @@ struct FlightInFlash {
 
 #define MAX_FLIGHTS 256
 FlightInFlash flightArray[MAX_FLIGHTS] = {0};
-
-void generateFat(uint8_t *pFat) {}
+int maxFlightNum;
 
 /**
  * @param entry The entry to assign date/times to
@@ -360,9 +364,66 @@ void updateFileTimestamp(FileEntry_t *entry, int64_t gpsTimeStart,
   }
 }
 
+/**
+ * So what's really annoying about this is we don't have a way of knowing the
+ * file size before we try writing it. We could run this function while caching
+ * all the flights, or (lmao lol rofl) we could just create a file 512 bytes
+ * long, padded with blank ASCII braile characters. I'm lazy, so let's do that
+ *
+ * @param pFile
+ * @param pFlight
+ */
+void write_metadata_text(FlightInFlash flight, uint8_t *pSectorStart) {
+  const unsigned int sector_size = 512;
+  int string_len = 0;
+  string_len +=
+      snprintf(pSectorStart, sector_size - string_len,
+               "Flight starts: %2d/%2d/%2d %2d:%2d:%2d\n",
+               pFlight->actualDataFile.createDate.months,
+               pFlight->actualDataFile.createDate.days,
+               pFlight->actualDataFile.createDate.years,
+               pFlight->actualDataFile.createTime.hours,
+               pFlight->actualDataFile.createTime.minutes,
+               pFlight->actualDataFile.createTime.seconds_periods / 2);
+
+  string_len += snprintf(
+      str + string_len, sector_size - string_len, "Flight ends:   %2d/%2d/%2d %2d:%2d:%2d\n",
+      pFlight->actualDataFile.createDate.months,
+      pFlight->actualDataFile.createDate.days,
+      pFlight->actualDataFile.createDate.years,
+      pFlight->actualDataFile.createTime.hours,
+      pFlight->actualDataFile.createTime.minutes,
+      pFlight->actualDataFile.createTime.seconds_periods / 2);
+
+  string_len +=
+      snprintf(str + string_len, sector_size - string_len, "Duration:      %u seconds\n",
+               pFlight->flightDurationSeconds);
+
+  string_len += snprintf(str + string_len, sector_size - string_len, "Launched?      %s\n",
+                         pFlight->launched ? "YES" : "NO");
+
+  string_len += snprintf(str + string_len, sector_size - string_len, "Max altitude:  %f\n",
+                         pFlight->maxAltitude);
+
+  string_len += snprintf(str + string_len, sector_size - string_len, "Max velocity:  %f\n",
+                         pFlight->maxVelocity);
+
+  string_len += snprintf(str + string_len, sector_size - string_len, "Max accel:     %f\n",
+                         pFlight->maxAccel);
+
+  // Pad rest of file with a bunch of spaces
+  memset(str + string_len, ' ', sector_size - string_len);
+}
+
 // Update the list of flights in the flightArray based on internal flash state
 void mapFlashToClusters() {
   int bound = dataLog_getLastFlightNum();
+  printf("Found %i flights\n", bound);
+
+  // The first flight will have metadata at cluster 3, and
+  // flight at 4-???
+  int firstFreeCluster = 3;
+
   for (int i = 0; i < bound; i++) {
     uint32_t firstSector, lastSector;
     dataLog_getFlightSectors(i, &firstSector, &lastSector);
@@ -371,7 +432,7 @@ void mapFlashToClusters() {
     flight.flightNumber = i;
     flight.internalFlashStartAddress = firstSector * FLASH_MAX_SECTOR_BYTES;
     flight.internalFlashOnePastEndAddress =
-        (lastSector * FLASH_MAX_SECTOR_BYTES) + 1;
+        (lastSector * FLASH_MAX_SECTOR_BYTES + 1) + 1;
 
     dataLog_readFlightNumMetadata(i);
     FlightMetadata_s *meta = dataLog_getFlightMetadata();
@@ -381,9 +442,45 @@ void mapFlashToClusters() {
     updateFileTimestamp(&flight.actualDataFile, startTime, endTime);
     updateFileTimestamp(&flight.metadataFile, startTime, endTime);
 
+    // Also set filename and jazz
+    char buff[8] = {0};
+    snprintf(buff, sizeof(buff), "%i_meta", i);
+    memcpy(flight.metadataFile.filename, buff, sizeof(buff));
+    snprintf(buff, sizeof(buff), "%i_data", i);
+    memcpy(flight.actualDataFile.filename, buff, sizeof(buff));
+    char txt_ext[3] = {'t', 'x', 't'};
+    char hex_ext[3] = {'h', 'e', 'x'};
+    memcpy(flight.metadataFile.extension, txt_ext, sizeof(txt_ext));
+    memcpy(flight.actualDataFile.extension, hex_ext, sizeof(hex_ext));
+
+    // Figure out what clusters to allocate to which part of the flight
+    flight.metadataCluster = firstFreeCluster;
+    flight.firstFlightCluster = firstFreeCluster + 1;
+
+    uint64_t flightSizeBytes =
+        (lastSector - firstSector + 1) * FLASH_MAX_SECTOR_BYTES;
+    // Need to round _up_ to get # of sectors in MSC land
+    const uint64_t numClusters = (int)ceil(flightSizeBytes / CLUSTER_SIZE_BYTES);
+    flight.lastFlightCluster = flight.firstFlightCluster + numClusters;
+
+    // Update the actual FileEntry as well
+    // TODO this assumes 32-bit size, b/c am lazy. should be sufficient,
+    // technically
+    flight.metadataFile.startingClusterHighBytes = 0;
+    flight.actualDataFile.startingClusterHighBytes = 0;
+    flight.metadataFile.startingClusterLowBytes = flight.metadataCluster;
+    flight.actualDataFile.startingClusterLowBytes = flight.firstFlightCluster;
+
+    printf("Meta cluster: %i data cluster %i\n",
+           flight.metadataFile.startingClusterLowBytes,
+           flight.actualDataFile.startingClusterLowBytes);
+
+    firstFreeCluster += numClusters;
+
     flight.launched = meta->launched;
     flight.flightDurationSeconds = endTime - startTime;
   }
+  maxFlightNum = bound;
 }
 
 #define CLUSTER_SIZE_BYTES 0x1000
@@ -404,8 +501,8 @@ FlightInFlash *getFlightFromMSCaddress(uint32_t mscAddress) {
 
   for (int i = 0; i < MAX_FLIGHTS; i++) {
     FlightInFlash *it = flightArray + i;
-    if (clusterNumber >= it->firstFATcluster &&
-        clusterNumber <= it->lastFATcluster) {
+    if (clusterNumber >= it->firstFlightCluster &&
+        clusterNumber <= it->lastFlightCluster) {
       return it;
     }
   }
@@ -414,7 +511,8 @@ FlightInFlash *getFlightFromMSCaddress(uint32_t mscAddress) {
 }
 
 uint32_t clusterToMSCglobalAddress(uint32_t cluster) {
-  return (cluster - FIRST_FLIGHT_CLUSTER_NUM) * CLUSTER_SIZE_BYTES + FIRST_FILE_ADDRESS;
+  return (cluster - FIRST_FLIGHT_CLUSTER_NUM) * CLUSTER_SIZE_BYTES +
+         FIRST_FILE_ADDRESS;
 }
 
 /**
@@ -424,16 +522,20 @@ uint32_t clusterToMSCglobalAddress(uint32_t cluster) {
 void copyFlighDataToCluster(uint32_t mscAddress, uint8_t *pCluster) {
   FlightInFlash *flight = getFlightFromMSCaddress(mscAddress);
   if (!flight) return;
-  
-  // The offset of the cluster, in bytes, relative to the start of the flight in msc address space
-  uint32_t mscClusterStartAddress_offsetFromStartOfFlight = mscAddress - clusterToMSCglobalAddress(flight->firstFATcluster);
+
+  // The offset of the cluster, in bytes, relative to the start of the flight in
+  // msc address space
+  uint32_t mscClusterStartAddress_offsetFromStartOfFlight =
+      mscAddress - clusterToMSCglobalAddress(flight->firstFlightCluster);
 
   // Fill pCluster with flash data
-  dataLog_flashRead(flight->internalFlashStartAddress + mscClusterStartAddress_offsetFromStartOfFlight, 512, pCluster);
+  dataLog_flashRead(flight->internalFlashStartAddress +
+                        mscClusterStartAddress_offsetFromStartOfFlight,
+                    512, pCluster);
 }
 
 #define MIN(a, b) a < b ? a : b
-#define FAT_ENTRY_BYTES 4 // fat32
+#define FAT_ENTRY_BYTES 4  // fat32
 
 // This is the main function of the fake SD card. It handles creating the
 // appropriate fake data based on cluster requested by host
@@ -459,256 +561,113 @@ void retrieveCluster(uint32_t mscAddress, uint32_t lengthBytes,
            mscAddress < ROOT_DIRECTORY_ADDR) {
     // Generate the FAT
 
-    // 
-    const uint8_t endOfChain[4] = {0xf8, 0xff, 0xff, 0x0f};
+    if (mscAddress == FAT_START_ADDRESS) {
+      printf("Writing fat\n");
+      uint8_t fat[] = {
+          0xf8, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff,
+          0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff, 0xff,
+          0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff,
+          0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f,
+          0xff, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff,
+          0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff, 0xff,
+          0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff,
+          0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f,
+      };
+
+      memcpy(pCluster, fat, sizeof(fat));
+    }
   }
 
   // Third blob of data: the root directory
   // Need to generate a 512-byte chunk of the root directory
   else if ((mscAddress >= ROOT_DIRECTORY_ADDR) &&
            mscAddress < FIRST_FILE_ADDRESS) {
-    
+    const bool add_root_dir = (mscAddress == ROOT_DIRECTORY_ADDR);
+    if (add_root_dir) {
+      FileEntry_t entry{
+          .filename = {'E', 'M', 'B', 'E', 'D', 'D', 'E', 'D'},
+          .extension =
+              {
+                  ' ',
+                  'F',
+                  'S',
+              },
+          .attributes = (char)FileAttributes::VOLUME_LABEL,
+          .reserved = {0},
+          .creationTimeTenths = 0,
+          .createTime = {},
+          .createDate = {},
+          .accessDate = {},
+          .startingClusterHighBytes = {0},
+          .modifyTime =
+              {
+                  .seconds_periods = 0,
+                  .minutes = 59,
+                  .hours = 9,
+              },
+          .modifyDate = {.days = 22, .months = 10, .years = 2022 - 1980},
+          .startingClusterLowBytes = 0,
+          .fileSizeBytes = 0};
+
+      memcpy(pCluster + 0, &entry, sizeof(entry));
+
+      uint32_t zeros[sizeof(entry)] = {0};
+      memcpy(pCluster + 32, zeros, sizeof(zeros));
+    }
+
     // How far, in bytes, into the root directory we are
     const uint32_t offset = mscAddress - ROOT_DIRECTORY_ADDR;
 
-    // We assume each dir entry takes up exactly 32 bits (no long file name extension stupidity)
-    // the entry idx
-    const uint32_t firstEntryIdx = offset / sizeof(FileEntry_t);
-    const uint32_t lastEntryIdx = firstEntryIdx + (512 / sizeof(FileEntry_t));
+    // We assume each dir entry takes up exactly 32 bits (no long file name
+    // extension stupidity) the entry idx
+    uint32_t firstEntryIdx = offset / sizeof(FileEntry_t) / 2;
+    uint32_t lastEntryIdx = firstEntryIdx + (512 / sizeof(FileEntry_t) / 2);
 
-    // Luckily, everything's divisible by 2 so no need to worry about
-    // only having space for metadata but not actual flight data within
-    // a logical cluster
+    // Need to take out root dir entry we add above. This offsets everything
+    // following by 2
+    if (!add_root_dir) {
+      firstEntryIdx -= 2;
+    }
+    lastEntryIdx -= 2;
 
-    // We iterate forward 2 files each time, as we write a meta and actual file for each flight
-    for (int i = firstEntryIdx; i < lastEntryIdx; i += 2) {
-      size_t clusterOffset = i * sizeof(FileEntry_t); 
-      const uint32_t flight_num = i / 2;
-      FlightInFlash *it = &(flightArray[flight_num]);
+    // We iterate forward 2 files each time, as we write a meta and actual file
+    // for each flight
+    for (int i = firstEntryIdx; i < lastEntryIdx; i++) {
+      size_t clusterOffset = i * sizeof(FileEntry_t) + 64;
+      const uint32_t flight_num = i;
+      if (flight_num < maxFlightNum) {
+        FlightInFlash *it = &(flightArray[flight_num]);
 
-      // Write metadata file and flight data file
-      memcpy(pCluster + clusterOffset, &it->metadataFile, sizeof(FileEntry_t));
-      memcpy(pCluster + clusterOffset + sizeof(FileEntry_t), &it->actualDataFile, sizeof(FileEntry_t));
+        // Write metadata file and flight data file
+        memcpy(pCluster + clusterOffset, &it->metadataFile,
+               sizeof(FileEntry_t));
+        memcpy(pCluster + clusterOffset + sizeof(FileEntry_t),
+               &it->actualDataFile, sizeof(FileEntry_t));
+      }
     }
 
     return;
+  } else if (mscAddress >= FIRST_FILE_ADDRESS) {
+
+    // Search through all flights
+    for (int i = 0; i < maxFlightNum; i++) {
+      FlightInFlash &flight = flightArray[i];
+      
+      
+      // Check if this cluster should contain the metadata file
+      uint64_t metadataAddress = getFileDataAddress(flight.metadataFile);
+      // if ()
+    }
   }
 
-  // Rest of the drive is for flight data
-  else {
-    // TODO, just write zeros
-    memset(pCluster, 0, 512);
-  }
 }
 
-uint32_t addr_from(FileEntry_t file) {
+/**
+ * @brief Get the location of the first byte of a file, in MSC address space
+ */
+uint32_t getFileDataAddress(FileEntry_t file) {
   int cluster =
       (file.startingClusterHighBytes << 16) | file.startingClusterLowBytes;
   cluster -= 3;
   return FIRST_FILE_ADDRESS + CLUSTER_SIZE_BYTES * cluster;
-}
-
-void write_metadata_text(FILE *pFile, FlightInFlash *pFlight) {
-  fseek(pFile, addr_from(pFlight->metadataFile), SEEK_SET);
-
-  char str[512];
-  int offset = 0;
-  int string_len =
-      snprintf(str, sizeof(str), "Flight starts: %2d/%2d/%2d %2d:%2d:%2d\n",
-               pFlight->actualDataFile.createDate.months,
-               pFlight->actualDataFile.createDate.days,
-               pFlight->actualDataFile.createDate.years,
-               pFlight->actualDataFile.createTime.hours,
-               pFlight->actualDataFile.createTime.minutes,
-               pFlight->actualDataFile.createTime.seconds_periods / 2);
-  fwrite(str, strlen(str), 1, pFile);
-  offset += string_len;
-
-  string_len =
-      snprintf(str, sizeof(str), "Flight ends:   %2d/%2d/%2d %2d:%2d:%2d\n",
-               pFlight->actualDataFile.createDate.months,
-               pFlight->actualDataFile.createDate.days,
-               pFlight->actualDataFile.createDate.years,
-               pFlight->actualDataFile.createTime.hours,
-               pFlight->actualDataFile.createTime.minutes,
-               pFlight->actualDataFile.createTime.seconds_periods / 2);
-  fwrite(str, strlen(str), 1, pFile);
-  offset += string_len;
-
-  string_len = snprintf(str, sizeof(str), "Duration:      %u seconds\n",
-                        pFlight->flightDurationSeconds);
-  fwrite(str, strlen(str), 1, pFile);
-  offset += string_len;
-
-  string_len = snprintf(str, sizeof(str), "Launched?      %s\n",
-                        pFlight->launched ? "YES" : "NO");
-  fwrite(str, strlen(str), 1, pFile);
-  offset += string_len;
-
-  string_len =
-      snprintf(str, sizeof(str), "Max altitude:  %f\n", pFlight->maxAltitude);
-  fwrite(str, strlen(str), 1, pFile);
-  offset += string_len;
-
-  string_len =
-      snprintf(str, sizeof(str), "Max velocity:  %f\n", pFlight->maxVelocity);
-  fwrite(str, strlen(str), 1, pFile);
-  offset += string_len;
-
-  string_len =
-      snprintf(str, sizeof(str), "Max accel:     %f\n", pFlight->maxAccel);
-  fwrite(str, strlen(str), 1, pFile);
-  offset += string_len;
-
-  pFlight->metadataFile.fileSizeBytes = offset;
-}
-
-int old_main() {
-  FILE *pFile;
-  pFile = fopen("fat32_test.img", "wb");  // w for write, b for binary
-
-  // Need to write a bunch of 0s for the rest of the file
-  static uint8_t zeros[512 * 64] = {0};
-  std::memset(zeros, 0, sizeof(zeros));
-  for (int i = 0; i < 0x1e848000; i += 512 * 64) {
-    fwrite(zeros, sizeof(zeros), 1, pFile);
-  }
-
-  fseek(pFile, 0, SEEK_SET);
-  fwrite(bootsector, sizeof(bootsector), 1, pFile);
-
-  fseek(pFile, 0x4000, SEEK_SET);
-  uint8_t fat[] = {0xf8, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f,
-                   0xf8, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f};
-  fwrite(fat, sizeof(fat), 1, pFile);
-
-  // Write root directory
-  fseek(pFile, 0x7e000, SEEK_SET);
-  FileEntry_t entry{
-      .filename = {'E', 'M', 'B', 'E', 'D', 'D', 'E', 'D'},
-      .extension =
-          {
-              ' ',
-              'F',
-              'S',
-          },
-      .attributes = (char)FileAttributes::VOLUME_LABEL,
-      .reserved = {0},
-      .creationTimeTenths = 0,
-      .createTime = {},
-      .createDate = {},
-      .accessDate = {},
-      .startingClusterHighBytes = {0},
-      .modifyTime =
-          {
-              .seconds_periods = 0,
-              .minutes = 59,
-              .hours = 9,
-          },
-      .modifyDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-      .startingClusterLowBytes = 0,
-      .fileSizeBytes = 0};
-  fwrite(&entry, sizeof(entry), 1, pFile);
-
-  FileEntry_t data = {0};
-  data.createTime = {
-      .seconds_periods = 10,
-      .minutes = 1,
-      .hours = 3,
-  };
-  data.createDate = {.days = 22, .months = 10, .years = 2022 - 1980};
-
-  FileEntry_t meta2 = {
-      .filename = {'0', '2', '_', 'm', 'e', 't', 'a', ' '},
-      .extension =
-          {
-              't',
-              'x',
-              't',
-          },
-      .attributes = 0,
-      .reserved = {0},
-      .creationTimeTenths = 0,
-      .createTime =
-          {
-              .seconds_periods = 0,
-              .minutes = 0,
-              .hours = 0,
-          },
-      .createDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-      .accessDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-      .startingClusterHighBytes = 0,
-      .modifyTime =
-          {
-              .seconds_periods = 0,
-              .minutes = 36,
-              .hours = 14,  // gmt, I think -- set to 14 to make 10am ET
-          },
-      .modifyDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-      .startingClusterLowBytes = 3,
-      .fileSizeBytes = 32};
-
-  FileEntry_t meta = {
-      .filename = {'0', '1', '_', 'm', 'e', 't', 'a', ' '},
-      .extension =
-          {
-              't',
-              'x',
-              't',
-          },
-      .attributes = 0,
-      .reserved = {0},
-      .creationTimeTenths = 0,
-      .createTime =
-          {
-              .seconds_periods = 0,
-              .minutes = 0,
-              .hours = 0,
-          },
-      .createDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-      .accessDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-      .startingClusterHighBytes = 0,
-      .modifyTime =
-          {
-              .seconds_periods = 0,
-              .minutes = 36,
-              .hours = 14,  // gmt, I think -- set to 14 to make 10am ET
-          },
-      .modifyDate = {.days = 22, .months = 10, .years = 2022 - 1980},
-      .startingClusterLowBytes = 4,
-      .fileSizeBytes = 32};
-
-  FlightInFlash flash_flight = {.metadataFile = meta,
-                                .actualDataFile = data,
-                                .launched = true,
-                                .flightDurationSeconds = 69,
-                                .maxAltitude = 420,
-                                .maxVelocity = 1234,
-                                .maxAccel = 666};
-  FlightInFlash flash_flight2 = {.metadataFile = meta2,
-                                 .actualDataFile = data,
-                                 .launched = false,
-                                 .flightDurationSeconds = 12,
-                                 .maxAltitude = 111,
-                                 .maxVelocity = 321,
-                                 .maxAccel = 123};
-
-  // This changes the size of the metadata file poitner within flash_flight
-  write_metadata_text(pFile, &flash_flight);
-  write_metadata_text(pFile, &flash_flight2);
-
-  // Seek back to the right spot in the FAT to write our metadata entry
-  fseek(pFile, 0x7e000 + sizeof(entry), SEEK_SET);
-  fwrite(&flash_flight.metadataFile, sizeof(flash_flight.metadataFile), 1,
-         pFile);
-
-  // same for second metadata entry
-  fseek(pFile, 0x7e000 + sizeof(entry) * 2, SEEK_SET);
-  fwrite(&flash_flight2.metadataFile, sizeof(flash_flight2.metadataFile), 1,
-         pFile);
-
-  // Write the first fake actual flight file file
-  // fseek(pFile, addr_from(data), SEEK_SET);
-  // char file1[32] = "helloooooooasdf";
-  // fwrite(&file1, sizeof(file1), 1, pFile);
 }
