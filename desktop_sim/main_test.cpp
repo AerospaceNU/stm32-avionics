@@ -12,7 +12,7 @@ void mapFlashToClusters();
 
 #define FILE_LEN 0x1e848000
 
-int main() {
+int main_1() {
   output_file = "";
   ext_flash_path = "ext_flash_test.hex";
   int_flash_path = "int_flash_test.hex";
@@ -73,4 +73,30 @@ int main() {
 
   printf("All done!\n");
   fclose(pFile);
+}
+
+int main_2() {
+  FILE *pFile;
+  pFile = fopen("/media/matt/EMBEDDED FS/0_data.hex", "rb");  // r for read, b for binary
+  // seek to the start of the file (to be sure)
+  fseek(pFile, 0, SEEK_SET);
+
+  FlightMetadata_s meta;
+  fread(&meta, sizeof(meta), 1, pFile);
+
+  uint32_t startAddr = 2 * FLASH_MIN_PAGE_SIZE_BYTES;
+  LogData_s dequeuedData;
+
+  fseek(pFile, startAddr, SEEK_SET);
+  for (int i = 0; i < 100; i++) {
+    fread(&dequeuedData, sizeof(dequeuedData), 1, pFile);
+    printf("Got data from timestamp %i pos %f\n", dequeuedData.timestampMs, dequeuedData.dataPacket.fcbData.pos_z);
+  }
+
+  printf("All done!\n");
+  fclose(pFile);
+}
+
+int main() {
+  return main_2();
 }

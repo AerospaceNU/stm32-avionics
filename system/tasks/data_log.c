@@ -33,46 +33,8 @@ static uint8_t tempPacketBuffer[PACKET_BUFFER_SIZE];
 
 #define LOG_ID_FCB 0
 
-typedef struct __attribute__((__packed__)) {
-#if HAS_DEV(IMU)
-  ImuDataRaw_s imuData[NUM_IMU];
-#endif  // HAS_DEV(IMU)
-#if HAS_DEV(ACCEL)
-  Axis3dRaw_s accelData[NUM_ACCEL];
-#endif  // HAS_DEV(ACCEL)
-#if HAS_DEV(BAROMETER)
-  BarometerData_s barometerData[NUM_BAROMETER];
-#endif  // HAS_DEV(BAROMETER)
-#if HAS_DEV(GPS)
-  GpsGeneralData_s gpsData[NUM_GPS];
-#endif  // HAS_DEV(GPS)
-#if HAS_DEV(VBAT)
-  double vbatData[NUM_VBAT];
-#endif  // HAS_DEV(VBAT)
-#if HAS_DEV(PYRO_CONT)
-  uint8_t pyroContinuity;
-#endif  // HAS_DEV(PYRO_CONT)
-  uint8_t triggerStatus;
-  double heading, vtg;
-  double pos_x, pos_y, pos_z;
-  double vel_x, vel_y, vel_z;
-  double acc_x, acc_y, acc_z;
-  double qx, qy, qz, qw;
-  uint8_t state;
-} FcbLogData_s;
 
 #define LOG_ID_LINE_CUTTER 1
-
-typedef union {
-  FcbLogData_s fcbData;
-  LineCutterData_s lineCutterData;
-} LogDataPacket_s;
-
-typedef struct __attribute__((__packed__)) {
-  uint8_t packetType;
-  uint32_t timestampMs;
-  LogDataPacket_s dataPacket;
-} LogData_s;
 
 static LogData_s logPackets[MAX_LOG_PACKETS];
 static CircularBuffer_s logPacketBuffer;

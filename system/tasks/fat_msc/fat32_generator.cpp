@@ -602,7 +602,7 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
     static uint8_t boot[] = {0xf8, 0xff, 0xff, 0x0f};
 
     // write boot and root dir entries
-    offset = 0;
+    uint32_t offset = 0;
     if (mscAddress == FAT_START_ADDRESS) {
       // start with boot and root dir clusters
       memcpy(pSector, boot, sizeof(boot));
@@ -636,10 +636,10 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
       if (flight.metadataCluster == clusterNum) {
         memcpy(pSector + offset, eoc, sizeof(eoc));
         offset += sizeof(eoc);
-      } else if (cluster >= flight.firstFlightCluster) {
+      } else if (clusterNum >= flight.firstFlightCluster) {
         // Check if it's time to write end-of-chain yet
-        if (cluster < flight.lastFlightCluster) {
-          uint32_t next_cluster = cluster + 1;
+        if (clusterNum < flight.lastFlightCluster) {
+          uint32_t next_cluster = clusterNum + 1;
           uint8_t entry[4] = {
             next_cluster & 0xff,
             (next_cluster >> 8) & 0xff,
@@ -648,8 +648,18 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
           };
           memcpy(pSector + offset, entry, sizeof(eoc));
           offset += sizeof(entry);
+        } else {
+          memcpy(pSector + offset, eoc, sizeof(eoc));
+          offset += sizeof(eoc);
+          flightIdx ++;
         }
+      } else {
+          // Unknown, just write 0xff
+          // memcpy(pSector + offset, eoc, sizeof(eoc));
+          memset(pSector + offset, 0xff, 4);
+          offset += sizeof(eoc);
       }
+
     }
 
   }
