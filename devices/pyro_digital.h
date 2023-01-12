@@ -10,6 +10,8 @@
 
 #include "board_config_common.h"
 
+#ifdef HAL_TIM_MODULE_ENABLED
+
 #define CLOCK_FREQUENCY_HZ 1000
 
 typedef struct {
@@ -30,5 +32,7 @@ void pyroDigital_set(PyroDigitalCtrl_s *pyro, bool enable);
 void pyroDigital_tick(PyroDigitalCtrl_s *pyro);
 void pyroDigital_pwmStart(PyroDigitalCtrl_s *pyro, uint32_t duration,
                           uint32_t frequency, uint32_t pulseWidth);
+
+#endif  // HAL_TIM_MODULE_ENABLED
 
 #endif  // DEVICES_PYRO_DIGITAL_H_

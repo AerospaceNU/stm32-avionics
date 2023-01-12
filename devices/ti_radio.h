@@ -16,9 +16,14 @@ extern "C" {
 #include <stdint.h>
 
 #include "board_config_common.h"
+
+#if (HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915))
+
 #include "circular_buffer.h"
 #include "data_structures.h"
 #include "smartrf_registersettings.h"
+
+#include HAL_HEADER
 
 #define TI_RADIO_STATUS_MASK 0xF0
 
@@ -136,6 +141,8 @@ void tiRadio_setOutputPower(TiRadioCtrl_s *radio, uint8_t powerDbM);
 void tiRadio_configGpio(TiRadioCtrl_s *radio, uint16_t gpio_register,
                         uint8_t gpio_config, bool outputInverted);
 bool tiRadio_calibrate(TiRadioCtrl_s *radio);
+
+#endif
 
 #ifdef __cplusplus
 }

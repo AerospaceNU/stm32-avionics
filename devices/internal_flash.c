@@ -15,8 +15,6 @@
 /**
  * @brief  Duplicate of HAL_FLASH_Program but without checking for a valid flash
  * address
- * @param  TypeProgram Indicate the way to program at a specified address.
- *         This parameter can be a value of @ref FLASH_Type_Program
  * @param  FlashAddress specifies the address to be programmed.
  *         This parameter shall be aligned to the Flash word:
  *          - 256 bits for STM32H74x/5X devices (8x 32bits words)
@@ -27,11 +25,11 @@
  *
  * @retval HAL_StatusTypeDef HAL Status
  */
-HAL_StatusTypeDef Internal_Flash_Program(uint32_t TypeProgram,
-                                         uint32_t FlashAddress,
+HAL_StatusTypeDef Internal_Flash_Program(uint32_t FlashAddress,
                                          uint32_t DataAddress) {
 #ifdef STM32H743xx
-  return HAL_FLASH_Program(TypeProgram, FlashAddress, DataAddress);
+  return HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, FlashAddress,
+                           DataAddress);
 #endif  // STM32H743XX
 #ifdef STM32H750xx
   HAL_StatusTypeDef status;
@@ -39,9 +37,8 @@ HAL_StatusTypeDef Internal_Flash_Program(uint32_t TypeProgram,
   __IO uint32_t *src_addr = (__IO uint32_t *)DataAddress;
   uint32_t bank;
   uint8_t row_index = FLASH_NB_32BITWORD_IN_FLASHWORD;
-
   /* Check the parameters */
-  assert_param(IS_FLASH_TYPEPROGRAM(TypeProgram));
+  assert_param(IS_FLASH_TYPEPROGRAM(FLASH_TYPEPROGRAM_FLASHWORD));
   // assert_param(IS_FLASH_PROGRAM_ADDRESS(FlashAddress));
 
   /* Process Locked */
@@ -122,7 +119,7 @@ bool internalFlash_write(uint32_t RelFlashAddress, uint8_t *data,
 
     sofar += copyBytes;
 
-    Internal_Flash_Program(FLASH_TYPEPROGRAM_FLASHWORD, writeAddress,
+    Internal_Flash_Program(writeAddress,
                            (uint32_t)&flashWriteBuffer);  // Write to the flash
     writeAddress += FLASH_BYTE_INCREMENT;
   }

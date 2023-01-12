@@ -9,7 +9,8 @@
 #define MAX_SPI_HANDLES 6   // SPI 1-6
 #define MAX_ADC_HANDLES 3   // ADC 1-3
 #define MAX_UART_HANDLES 5  // UART 1-5
-#define MAX_TIM_HANDLES 8   // TIM 1-8
+#define MAX_EXTI_HANDLES 6
+#define MAX_TIM_HANDLES 8  // TIM 1-8
 
 #ifdef HAL_SPI_MODULE_ENABLED
 typedef struct {
@@ -234,6 +235,51 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 }
 
 #endif  // HAL_ADC_MODULE_ENABLED
+
+#ifdef HAL_EXTI_MODULE_ENABLED
+typedef struct {
+  uint16_t extInterruptGpioPin;
+  void (*extInterruptCallback)(void *);
+  void *extInterruptCallbackUserData;
+} ExtInterruptCallbackProperty_s;
+
+static ExtInterruptCallbackProperty_s extInterruptCallbacks[MAX_EXTI_HANDLES];
+static int numExtInterruptCallbacksRegistered = 0;
+
+void halCallbacks_registerExtInterruptCallback(uint16_t gpioPin,
+                                               void (*callback)(void *),
+                                               void *userData) {
+  // See if handle already has callback registered to it
+  for (int i = 0; i < numExtInterruptCallbacksRegistered; i++) {
+    if (extInterruptCallbacks[i].extInterruptGpioPin == gpioPin) {
+      extInterruptCallbacks[i].extInterruptCallback = callback;
+      extInterruptCallbacks[i].extInterruptCallbackUserData = userData;
+      return;  // No need to keep going if handle already found to be registered
+    }
+  }
+
+  // If reached, handle hasn't been registered, so create a new association
+  extInterruptCallbacks[numExtInterruptCallbacksRegistered]
+      .extInterruptGpioPin = gpioPin;
+  extInterruptCallbacks[numExtInterruptCallbacksRegistered]
+      .extInterruptCallback = callback;
+  extInterruptCallbacks[numExtInterruptCallbacksRegistered]
+      .extInterruptCallbackUserData = userData;
+  numExtInterruptCallbacksRegistered++;
+}
+
+// The actual callback function
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+  for (int i = 0; i < numExtInterruptCallbacksRegistered; i++) {
+    if (extInterruptCallbacks[i].extInterruptGpioPin == GPIO_Pin) {
+      if (extInterruptCallbacks[i].extInterruptCallback != NULL) {
+        extInterruptCallbacks[i].extInterruptCallback(
+            extInterruptCallbacks[i].extInterruptCallbackUserData);
+      }
+    }
+  }
+}
+#endif  // HAL_EXTI_MODULE_ENABLED
 
 #ifdef HAL_TIM_MODULE_ENABLED
 

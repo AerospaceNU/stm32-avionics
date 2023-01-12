@@ -7,6 +7,8 @@ extern "C" {
 
 #include "board_config_common.h"
 
+#if HAS_DEV(DC_MOTOR_PWM)
+
 /* Definition of DC motor control struct */
 /* user needs to config timer */
 typedef struct {
@@ -20,6 +22,8 @@ void dcMotorPwm_init(DcMotorPwmCtrl_s *dev, TIM_HandleTypeDef *htim,
 
 /* start a specified DC motor with a given speed percentage -100-100 */
 void dcMotorPwm_setPercent(DcMotorPwmCtrl_s *dev, double speed_percent);
+
+#endif
 
 #ifdef __cplusplus
 }
