@@ -55,7 +55,7 @@ void triggerManager_setTriggerFireStatus(uint8_t status) {
 void triggerManager_update(FilterData_s* filterData, bool hasPassedLaunch,
                            bool hasPassedApogee, bool hasPassedTouchdown) {
   // Check marman cut event
-  if (!passedMarmanCut && hasPassedLaunch && filterData->world_vel_z < 18.3 &&
+  if (!passedMarmanCut && hasPassedLaunch && filterData->world_vel_z < 19.0 &&
       filterData->world_acc_z < 10) {
     passedMarmanCut = true;
     marmanCutTimestamp = hm_millis();

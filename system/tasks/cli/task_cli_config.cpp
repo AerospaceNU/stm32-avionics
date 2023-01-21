@@ -220,7 +220,7 @@ void CliTasks::config() {
                    triggerConfig->port);
           break;
         case FLAG_CUSTOM_MARMAN_CLAMP:
-          snprintf(val, sizeof(val), "%s %i under 20 m/s before apogee",
+          snprintf(val, sizeof(val), "%s %i under 19 m/s before apogee",
                    deviceText, triggerConfig->port);
           break;
         case FLAG_CUSTOM_MARMAN_DELAY:
