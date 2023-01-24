@@ -15,19 +15,27 @@
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
+
 #include "flight_replay.h"
+
 #endif  // HAS_DEV(XXX_DESKTOP_FILE)
 
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
+
 #include "file_backed_flash.h"
+
 #endif  // HAS_DEV(NUM_FLASH_DESKTOP_FILE_BACKED)
 
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
+
 #include "print_pyro.h"
+
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 
 #if HAS_DEV(RADIO_DESKTOP_SOCKET)
+
 #include "tcp_socket.h"
+
 #endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
 
 /* Hardware statuses */
@@ -228,8 +236,22 @@ bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
   return false;
 }
 
-void hm_radioUpdate() {}
-void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {}
+void hm_radioUpdate() {
+  // Read TCP data
+  for (int i = 0; i < NUM_RADIO_DESKTOP_SOCKET; i++) {
+    radioSocket[i]->readData();
+  }
+}
+
+void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {
+  // Need to put code here to pass the rxBuffer onto the TCP socket
+  // TCP socket then needs to add new data to rxBuffer
+
+#if IS_DEVICE(radioNum, RADIO_DESKTOP_SOCKET)
+  radioSocket[radioNum - FIRST_ID_RADIO_DESKTOP_SOCKET]->setRXBuffer(rxBuffer);
+#endif  // IS_DEV(radioNum, RADIO_DESKTOP_SOCKET)
+}
+
 void hm_radioSetChannel(int radioNum, int channel) {}
 
 bool hm_usbIsConnected(int usbId) { return false; }
