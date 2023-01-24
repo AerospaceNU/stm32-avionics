@@ -460,10 +460,11 @@ uint32_t dataLog_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata,
     readOffset += bytesRead;
     return bytesRead;
   }
-  // If all bytes are 0xFF, return that none count since that part of the log
-  // wasn't written to Only apply this if the max read bytes is large enough.
-  // Otherwise, the 0xFF could be caused by the data
-  if (maxBytes > 20) {
+  // If all bytes are 0xFF and we're in the last sector, return that none count
+  // since that part of the log wasn't written to Only apply this if the max
+  // read bytes is large enough. Otherwise, the 0xFF could be caused by the data
+  if (maxBytes > 20 &&
+      (readAddress + maxBytes) > FLASH_MAX_SECTOR_BYTES * lastSector) {
     for (int i = 0; i < maxBytes; i++) {
       if (*(pdata + i) != 0xFF) break;
       if (i == maxBytes - 1) {
