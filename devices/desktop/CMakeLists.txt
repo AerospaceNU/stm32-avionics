@@ -4,6 +4,8 @@ set(DEVICES_FILES_LIST
         ${CMAKE_CURRENT_SOURCE_DIR}/tcp_socket.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/print_pyro.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/nt_pyro.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/krpc_pyro.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/krpc_flight.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/file_backed_flash.cpp
         CACHE INTERNAL "")
 

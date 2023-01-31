@@ -7,10 +7,39 @@
 
 #include "hardware_manager.h"
 #include "rapidcsv.h"
+#include <krpc.hpp>
+#include <krpc/services/space_center.hpp>
+#include <krpc/services/ui.hpp>
+#include <krpc/services/drawing.hpp>
 
 class FlightReplay {
  public:
   virtual void getNext(SensorData_s *data) {}
+};
+
+class KRPCFlightReplay {
+ public:
+  explicit KRPCFlightReplay();
+
+  void getNext(SensorData_s *data);
+
+  void writeActionGroup(int group, bool state);
+
+ private:
+  krpc::Client conn;
+  krpc::services::SpaceCenter spaceCenter;
+  krpc::services::SpaceCenter::Vessel vessel;
+  krpc::services::SpaceCenter::Control control;
+  krpc::services::SpaceCenter::Flight flight;
+  krpc::Stream<double> utcTime;
+  krpc::Stream<float> staticPress;
+  krpc::Stream<float> airTemp;
+  krpc::Stream<double> latitude;
+  krpc::Stream<double> longitude;
+  krpc::Stream<double> gpsAlt;
+
+  krpc::services::SpaceCenter::ReferenceFrame vesselRef;
+  krpc::Stream<std::tuple<double, double, double>> angularVel;
 };
 
 class CsvReplay : FlightReplay {

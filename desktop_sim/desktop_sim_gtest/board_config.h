@@ -21,9 +21,8 @@
 
 #define NUM_IMU_DESKTOP_FILE 2
 
-// TODO add fake bluetooth
-
-#define NUM_PYRO_DESKTOP_PRINT 6
+// #define NUM_PYRO_DESKTOP_PRINT 6
+#define NUM_PYRO_SIM_KRPC 6
 
 #define NUM_PYRO_CONT_DESKTOP_FILE 6
 
