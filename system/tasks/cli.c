@@ -99,8 +99,8 @@ void cli_setDefaultConfig() {
   cliConfigs.triggerConfiguration[0].port = 0;  // Pyro # 1
   cliConfigs.triggerConfiguration[0].flags = FLAG_APOGEE;
 #if NUM_PYRO > 1
-  cliConfigs.triggerConfiguration[0].mode = TRIGGER_TYPE_PYRO;
-  cliConfigs.triggerConfiguration[0].port = 1;  // Pyro # 2
+  cliConfigs.triggerConfiguration[1].mode = TRIGGER_TYPE_PYRO;
+  cliConfigs.triggerConfiguration[1].port = 1;  // Pyro # 2
   cliConfigs.triggerConfiguration[1].flags = FLAG_ALT_DURING_DESCENT;
   cliConfigs.triggerConfiguration[1].configValue = 230;  // 230 m deploy
 
