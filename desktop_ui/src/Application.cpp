@@ -1,4 +1,5 @@
 #include "Application.h"	
+#include "FrameUpdate.h"
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -9,10 +10,10 @@ void Application::tickApplication() {
 	// std::vector<nlohmann::json> data_frame = socket->dump_messages();
 
 	// timestamp maybe
-	// FrameUpdate frame_update(std::move(data_frame));
+	FrameUpdate frame_update;
 
 	for (auto& w: widgets) {
-		w->update_widget();
+		w->update_widget(frame_update);
 		w->display();
 	}
 }
@@ -68,16 +69,15 @@ void Application::runGUI() {
 
 	ImPlot::CreateContext();
 
+	// // font sizing
+	// // https://github.com/ocornut/imgui/blob/master/docs/FONTS.md see this link to change the font
+	// ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-	// font sizing
-	// https://github.com/ocornut/imgui/blob/master/docs/FONTS.md see this link to change the font
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-	float font_scale = 1.3;
-	ImFontConfig cfg;
-	cfg.SizePixels = 13 * font_scale;
-	cfg.GlyphOffset.y = font_scale;
-	ImGui::GetIO().Fonts->AddFontDefault(&cfg);
+	// float font_scale = 1.3;
+	// ImFontConfig cfg;
+	// cfg.SizePixels = 13 * font_scale;
+	// cfg.GlyphOffset.y = font_scale;
+	// ImGui::GetIO().Fonts->AddFontDefault(&cfg);
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();

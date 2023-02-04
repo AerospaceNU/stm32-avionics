@@ -27,7 +27,7 @@
 #include "implot.h"
 #include "implot_internal.h"
 
-#include "Widget.h"
+#include "widgets/Widget.h"
 #include <vector>
 
 

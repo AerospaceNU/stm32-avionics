@@ -67,6 +67,8 @@ endif()
 file(GLOB imgui_sources ${imgui_SOURCE_DIR}/*.cpp ${imgui_SOURCE_DIR}/misc/cpp/*.cpp)
 file(GLOB implot_sources ${implot_SOURCE_DIR}/*.cpp)
 file(GLOB fonts_sources ${fonts_SOURCE_DIR}/src/*.cpp)
+file(GLOB fmtlib_native_src src/fmtlib/src/*.cpp)
+message( ${fmtlib_native_src})
 add_library(imgui STATIC
     ${imgui_sources}
     ${implot_sources}
@@ -74,10 +76,11 @@ add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
     ${gl3w_BINARY_DIR}/src/gl3w.c
     ${fonts_sources}
+    ${fmtlib_native_src}
     src/stb_image.cpp
     src/Application.cpp
+    src/widgets/SensorDataBox.cpp
     src/Application.h
-    src/Widget.h
 )
 target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GL3W)
 if (MSVC)
@@ -103,7 +106,10 @@ target_include_directories(imgui
     "$<BUILD_INTERFACE:${stb_SOURCE_DIR}>"
     PRIVATE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/fmtlib/include>"
 )
 
 set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_features(imgui PUBLIC cxx_std_17)
+
+target_link_libraries(imgui PRIVATE system)

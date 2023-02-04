@@ -12,17 +12,15 @@
 #include "imgui.h"
 #include "implot.h"
 #include "implot_internal.h"
-
+#include "../FrameUpdate.h"
 
 class Widget {
 public:
 	Widget(std::string n) : widget_name(n) {};
 	virtual ~Widget() = default;
 
-	// display()
 	virtual void display() const = 0; 
-	// update_widget(data updates)
-	virtual void update_widget() = 0;
+	virtual void update_widget(const FrameUpdate&) = 0;
 protected:
 	std::string widget_name;
 };
