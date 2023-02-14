@@ -951,10 +951,18 @@ void hm_readSensorData() {
 
     // Barometer data
 #if HAS_DEV(BAROMETER_MS5607)
-    for (int i = 0; i < NUM_BAROMETER_MS5607; i++) {
-      barometerMs5607_getData(&barometerMs5607[i]);
-      sensorData.barometerData[i + FIRST_ID_BAROMETER_MS5607] =
-          barometerMs5607[i].data;
+    bool allBaroComplete = false;
+    bool baroComplete[NUM_BAROMETER_MS5607] = {false};
+    while (!allBaroComplete) {
+      allBaroComplete = true;
+      for (int i = 0; i < NUM_BAROMETER_MS5607; i++) {
+        if (!baroComplete[i]) {
+          allBaroComplete = false;
+          baroComplete[i] = barometerMs5607_getData(&barometerMs5607[i]);
+          sensorData.barometerData[i + FIRST_ID_BAROMETER_MS5607] =
+              barometerMs5607[i].data;
+        }
+      }
     }
 #endif  // HAS_DEV(BAROMETER_MS5607)
 
@@ -1005,7 +1013,6 @@ void hm_readSensorData() {
     // Timestamp data
     // TODO: Make sensor data timestamp get time from PPS-updated timer
     sensorData.timestampMs = hm_millis();
-
   } else {
     // Simming
     hm_simReadSensorData();
