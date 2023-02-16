@@ -52,7 +52,7 @@ typedef struct __attribute__((__packed__)) {
 #if HAS_DEV(PYRO_CONT)
   uint8_t pyroContinuity;
 #endif  // HAS_DEV(PYRO_CONT)
-  uint8_t triggerStatus;
+  uint16_t triggerStatus;
   double heading, vtg;
   double pos_x, pos_y, pos_z;
   double vel_x, vel_y, vel_z;

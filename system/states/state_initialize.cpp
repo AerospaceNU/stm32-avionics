@@ -7,6 +7,7 @@
 #include "filters.h"
 #include "hardware_manager.h"
 #include "radio_manager.h"
+#include "event_manager.h"
 
 #if HAS_DEV(LINE_CUTTER_BLE)
 #include "line_cutter_ble.h"
@@ -26,6 +27,8 @@ void InitializeState::init() {
 
   // Start CLI, which will run in the background in other states
   cli_init();
+
+  eventManager_init();
 
   // Set up line cutters to forward strings to radio
 #if HAS_DEV(LINE_CUTTER_BLE)

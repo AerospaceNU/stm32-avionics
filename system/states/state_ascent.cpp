@@ -7,6 +7,7 @@
 #include "hardware_manager.h"
 #include "state_log.h"
 #include "trigger_manager.h"
+#include "event_manager.h"
 
 void AscentState::init() {
   // Write launched status
@@ -14,6 +15,7 @@ void AscentState::init() {
   dataLog_getFlightMetadata()->gravityRef = filter_getGravityRef();
   dataLog_getFlightMetadata()->launchedCliConfigs = *cli_getConfigs();
   dataLog_getFlightMetadata()->launched = 1;
+  eventManager_setEventComplete(Event_e::launch);
   dataLog_writeFlightMetadata();
   maxPosZ = 0;
   stateLog_write(this->getID());

@@ -68,7 +68,7 @@ AltInfoPacket_s;
 #define TELEMETRY_ID_HARDWARE_STATUS 7
 PACKED_STRUCT {
   uint8_t pyroContinuity;
-  uint8_t triggerFireStatus;
+  uint16_t triggerFireStatus;
   uint8_t flashUsage;
 }
 HardwareStatusPacket_s;
