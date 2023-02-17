@@ -18,7 +18,9 @@ OrientationEstimator::OrientationEstimator(double dt) : m_dt(dt) {}
 
 OrientationEstimator::~OrientationEstimator() {}
 
-void OrientationEstimator::reset() { this->q = Matrix<4, 1>({1.0, 0, 0, 0}); }
+void OrientationEstimator::reset() { 
+  // this->q = Matrix<4, 1>({1.0, 0, 0, 0});
+}
 
 void OrientationEstimator::setDt(double dt) { this->m_dt = dt; }
 
@@ -44,17 +46,17 @@ void OrientationEstimator::setAccelVector(float rocket_acc_x,
 void OrientationEstimator::update(float rocket_ang_vel_x,
                                   float rocket_ang_vel_y,
                                   float rocket_ang_vel_z) {
-  Matrix<4, 4> omega(
-      {0.0, -rocket_ang_vel_x, -rocket_ang_vel_y, -rocket_ang_vel_z,
-       rocket_ang_vel_x, 0.0, rocket_ang_vel_z, -rocket_ang_vel_y,
-       rocket_ang_vel_y, -rocket_ang_vel_z, 0.0, rocket_ang_vel_x,
-       rocket_ang_vel_z, rocket_ang_vel_y, -rocket_ang_vel_x, 0.0});
-  Matrix<3, 1> gyro({rocket_ang_vel_x, rocket_ang_vel_y, rocket_ang_vel_z});
+  // Matrix<4, 4> omega(
+  //     {0.0, -rocket_ang_vel_x, -rocket_ang_vel_y, -rocket_ang_vel_z,
+  //      rocket_ang_vel_x, 0.0, rocket_ang_vel_z, -rocket_ang_vel_y,
+  //      rocket_ang_vel_y, -rocket_ang_vel_z, 0.0, rocket_ang_vel_x,
+  //      rocket_ang_vel_z, rocket_ang_vel_y, -rocket_ang_vel_x, 0.0});
+  // Matrix<3, 1> gyro({rocket_ang_vel_x, rocket_ang_vel_y, rocket_ang_vel_z});
 
-  volatile float w = gyro.norm();
-  Matrix<4, 4> ident = (Matrix<4, 4>::identity() * cos(w * m_dt / 2.0));
-  float omgmult = sin(w * m_dt / 2.0) / w;
-  Matrix<4, 4> A = ident + omega * omgmult;
-  this->q = A * q;
-  this->q = q / q.norm();
+  // volatile float w = gyro.norm();
+  // Matrix<4, 4> ident = (Matrix<4, 4>::identity() * cos(w * m_dt / 2.0));
+  // float omgmult = sin(w * m_dt / 2.0) / w;
+  // Matrix<4, 4> A = ident + omega * omgmult;
+  // this->q = A * q;
+  // this->q = q / q.norm();
 }
