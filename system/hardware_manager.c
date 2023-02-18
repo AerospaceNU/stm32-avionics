@@ -993,3 +993,15 @@ void HM_EnableSimMode(CircularBuffer_s *rxBuffer) {
 void HM_DisableSimMode(CircularBuffer_s *rxBuffer) { inSim = false; }
 
 bool HM_InSimMode() { return inSim; }
+
+void HM_Yield() {
+  // no-op on real hardware
+}
+
+void HM_Delay(int ms) {
+  HAL_Delay(ms);
+}
+
+bool HM_IsProgramRunning() {
+  return true;
+}

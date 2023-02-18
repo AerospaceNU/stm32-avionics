@@ -2,49 +2,33 @@
 
 #include "cli_tasks.h"
 #include "hardware_manager.h"
-#include "state_ascent.h"
-#include "state_cli_erase_flash.h"
-#include "state_cli_offload.h"
-#include "state_cli_temp.h"
-#include "state_descent.h"
-#include "state_initialize.h"
-#include "state_log.h"
-#include "state_post_flight.h"
-#include "state_pre_flight.h"
 
-void Scheduler::run(void) {
-  /* Create all necessary states initially and store in list */
-  uint32_t defaultPeriod = 15;
-  CliEraseFlashState cliEraseFlash =
-      CliEraseFlashState(StateId_e::CliEraseFlash, defaultPeriod);
-  CliOffloadState cliOffload =
-      CliOffloadState(StateId_e::CliOffload, defaultPeriod);
-  AscentState ascent = AscentState(StateId_e::Ascent, defaultPeriod);
-  InitializeState initialize =
-      InitializeState(StateId_e::Initialize, defaultPeriod);
-  DescentState descent = DescentState(StateId_e::Descent, defaultPeriod);
-  PostFlightState postFlight =
-      PostFlightState(StateId_e::PostFlight, defaultPeriod);
-  PreFlightState preFlight =
-      PreFlightState(StateId_e::PreFlight, defaultPeriod);
-  CliTempState tempState = CliTempState(StateId_e::SimTempState, defaultPeriod);
+#include <cstdio>
 
-  State* states[] = {&cliEraseFlash, &cliOffload, &ascent,    &descent,
-                     &initialize,    &postFlight, &preFlight, &tempState};
+namespace {
+}
 
-  // Initialize the current and next states
+Scheduler::Scheduler()
+{
   pCurrentState_ = nullptr;
-  State* pNextState = &initialize;
+  pNextState = &initialize;
+
+  lastTime_ = HM_Millis();
+}
+
+void Scheduler::tick(void) {
+  /* Create all necessary states initially and store in list */
 
   // Helper functions throughout infinite loop
-  uint32_t lastTime_ = HM_Millis();
   EndCondition_e endCondition = NoChange;
 
   // Keep running scheduler forever
-  while (1) {
+  uint64_t i = 0;
+  while (HM_IsProgramRunning()) {
     // Limit rate scheduler runs at
     if (pCurrentState_) {
-      while ((HM_Millis() - lastTime_) < pCurrentState_->getPeriodMS()) {
+      while ((HM_Millis() - lastTime_) < pCurrentState_->getPeriodMS() && HM_IsProgramRunning()) {
+        HM_Yield();
       }
     }
 
@@ -70,6 +54,9 @@ void Scheduler::run(void) {
         break;
       }
     }
+
+    ++i;
+    HM_ObserveTickComplete(i);
   }
 }
 

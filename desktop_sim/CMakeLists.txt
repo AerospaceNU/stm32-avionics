@@ -4,7 +4,7 @@ execute_process(
 )
 
 set(SIMULATOR_FILES_LIST
-        main.cpp desktop_hardware_manager.cpp board_config.c)
+        main.cpp desktop_hardware_manager.cpp board_config.c sim_timing.cpp)
 
 add_executable(desktop_sim ${SIMULATOR_FILES_LIST})
 
@@ -29,7 +29,7 @@ set(TEST_FILES
         tests/test_file_flash.cpp
         tests/test_flight.cpp
         tests/test_cli_parse.cpp
-        desktop_hardware_manager.cpp board_config.c
+        desktop_hardware_manager.cpp board_config.c sim_timing.cpp
         )
 
 add_executable(

@@ -11,4 +11,12 @@ extern std::string output_file;
 
 extern bool do_networking;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+void HM_Sim_Exit();
+#ifdef __cplusplus
+}
+#endif
+
 #endif  // DESKTOP_SIM_DESKTOP_HARDWARE_MANAGER_H_

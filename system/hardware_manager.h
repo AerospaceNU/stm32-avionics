@@ -209,6 +209,22 @@ void HM_DisableSimMode();
  */
 bool HM_InSimMode();
 
+/**
+ * @brief Yield the current thread. Currently no-op on real hardware
+ */
+void HM_Yield();
+
+/**
+ * @brief Block the current thread's execution for some time.
+ * 
+ * @param ms Number of milliseconds to delay
+ */
+void HM_Delay(int ms);
+
+bool HM_IsProgramRunning();
+
+void HM_ObserveTickComplete(uint64_t);
+
 #ifdef __cplusplus
 }
 #endif

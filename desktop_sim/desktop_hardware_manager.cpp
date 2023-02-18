@@ -9,6 +9,8 @@
 
 #include "circular_buffer.h"
 #include "hardware_manager.h"
+#include "sim_timing.h"
+#include <atomic>
 
 /* Device includes */
 
@@ -115,11 +117,15 @@ std::string int_flash_path;  // NOLINT
 std::string ext_flash_path;  // NOLINT
 std::string output_file;     // NOLINT
 
+std::atomic<bool> shouldRun(true);
+
 extern "C" {
 
 void HM_HardwareInit() {
   printf("STARTING: output %s, ext flash %s, int flash %s\n",
          output_file.c_str(), ext_flash_path.c_str(), int_flash_path.c_str());
+
+  shouldRun.store(true);
 
   internalFlash = new FileBackedFlash(int_flash_path, kFlashSizeBytes[0]);
 
@@ -130,10 +136,6 @@ void HM_HardwareInit() {
 
   // TODO stick in ifdef
   cbInit(&bleBuffer, bleArray, sizeof(bleArray), 1);
-  const char *testString = "--linecutter -i 1 -c \"!arm\"\n";
-  for (int i = 0; i < strlen(testString); i++) {
-    cbEnqueue(&bleBuffer, &testString[i]);
-  }
 
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
@@ -180,10 +182,7 @@ void HM_HardwareInit() {
 }
 
 uint32_t HM_Millis() {
-  std::chrono::milliseconds ms =
-      std::chrono::duration_cast<std::chrono::milliseconds>(
-          std::chrono::system_clock::now().time_since_epoch());
-  return ms.count();
+  return timing::GetProgramTimeMillis(); 
 }
 
 bool HM_FlashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
@@ -316,4 +315,29 @@ void HM_EnableSimMode(CircularBuffer_s *rxBuffer) {}
 void HM_DisableSimMode() {}
 
 bool HM_InSimMode() { return false; }
+
+void HM_Yield() {
+  std::this_thread::yield();
+}
+
+void HM_Delay(int ms) {
+  uint64_t end = timing::GetProgramTimeMillis() + ms;
+  while (timing::GetProgramTimeMillis() < end) {
+    HM_Yield();
+  }
+}
+
+bool HM_IsProgramRunning() {
+  return shouldRun.load();
+}
+
+void HM_Sim_Exit() {
+  printf("Running set FALSE\n");
+  shouldRun.store(false);
+}
+
+void HM_ObserveTickComplete(uint64_t tickNum) {
+  timing::SetTickCompleted(tickNum);
+}
+
 }  // extern "C"

@@ -7,6 +7,8 @@
 
 #include "board_config_types.h"
 
+#define IS_DESKTOP_SIM 1
+
 #define HAL_HEADER "fake_stm_hal.h"
 
 #define NUM_ACCEL_DESKTOP_FILE 1
