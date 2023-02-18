@@ -543,9 +543,11 @@ void dataLog_loadCliConfigs() {
   uint32_t firstAddress = CONFIG_START_ADDRESS;
   uint32_t maxCount =
       (FLASH_MAX_SECTOR_BYTES - CONFIG_START_ADDRESS) / kCliConfigSize;
+  volatile uint32_t lastPacketAddress =CONFIG_START_ADDRESS;
+		  // dataLog_getLastPacketType(firstAddress, maxCount, kCliConfigSize);
   currentConfigAddress =
-      kCliConfigSize +
-      dataLog_getLastPacketType(firstAddress, maxCount, kCliConfigSize);
+      kCliConfigSize + lastPacketAddress;
+  flashRead(lastPacketAddress, kCliConfigSize, tempPacketBuffer);
   *cliConfig = *(CliConfigs_s *)tempPacketBuffer;
   if (packetIsEmpty((uint8_t *)cliConfig, kCliConfigSize)) {
     currentConfigAddress -= kCliConfigSize;

@@ -40,7 +40,7 @@ constexpr auto variant_cast = [](auto &var) -> T {
 ExpressionStore::ExpressionStore() {
     // Generate a list of pointers
     for (int i = 0; i < MAX_EXPRESSION; ++i) {
-    	volatile SerializedExpression_s *serialized = &(cli_getConfigs()->serializedExprs)[i];
+    	SerializedExpression_s *serialized = cli_getConfigs()->serializedExprs + i;
     	switch (serialized->type) {
 			case event:
 				expressions[i] = EventExpression(serialized->triggerNum, serialized->contents.event.event);
@@ -120,7 +120,7 @@ void ExpressionStore::writeNewConfigs() {
     for (int i = 0; i < MAX_EXPRESSION; ++i) {
         expressions[i] = expressionBuffer[i];
         this->expressionPtrs[i] = variant_cast<Expression *>(expressions[i]);
-        this->expressionPtrs[i]->serializeInto(&(cli_getConfigs()->serializedExprs)[i]);
+        this->expressionPtrs[i]->serializeInto(cli_getConfigs()->serializedExprs + i);
     }
 }
 

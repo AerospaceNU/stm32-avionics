@@ -138,7 +138,6 @@ uint8_t lineCutterBleAddress[NUM_LINE_CUTTER_BLE];
 GPIO_TypeDef* pyroDigitalGpioPort[NUM_PYRO_DIGITAL] = {
     FIRE1_GPIO_Port, FIRE2_GPIO_Port, FIRE3_GPIO_Port,
     FIRE4_GPIO_Port, FIRE5_GPIO_Port, FIRE6_GPIO_Port};
-uint32_t pyroPwmPulseWidth = 40;
 TIM_HandleTypeDef* pyroDigitalTickTim = &htim2;
 uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL] = {FIRE1_Pin, FIRE2_Pin, FIRE3_Pin,
                                              FIRE4_Pin, FIRE5_Pin, FIRE6_Pin};

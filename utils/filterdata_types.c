@@ -77,6 +77,18 @@ FilterData_e getVariableEnumFromString(char* input) {
   if (strncmp(input, "qw", 2) == 0) {
     return qw;
   }
+  if (strncmp(input, "roll", 4) == 0) {
+    return roll;
+  }
+  if (strncmp(input, "pitch", 5) == 0) {
+    return pitch;
+  }
+  if (strncmp(input, "yaw", 3) == 0) {
+    return yaw;
+  }
+  if (strncmp(input, "angle_vertical", 14) == 0) {
+    return angle_vertical;
+  }
   // Matched no other valid value
   return invalid;
 }
@@ -132,6 +144,14 @@ float getVariableValue(FilterData_s *filterData, FilterData_e valueType) {
       return filterData->qz;
     case qw:
       return filterData->qw;
+    case roll:
+      return filterData->roll;
+    case pitch:
+      return filterData->pitch;
+    case yaw:
+      return filterData->yaw;
+    case angle_vertical:
+      return filterData->angle_vertical;
     default:
       return 0;
   }
@@ -212,6 +232,18 @@ void fillVariableName(char *buffer, int n, FilterData_e valueType) {
       return;
     case qw:
       strncpy(buffer,  "qw", n);
+      return;
+    case roll:
+      strncpy(buffer,  "roll", n);
+      return;
+    case pitch:
+      strncpy(buffer,  "pitch", n);
+      return;
+    case yaw:
+      strncpy(buffer,  "yaw", n);
+      return;
+    case angle_vertical:
+      strncpy(buffer,  "angle_vertical", n);
       return;
   }
 }

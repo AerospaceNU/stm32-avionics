@@ -16,6 +16,7 @@ void AscentState::init() {
   dataLog_getFlightMetadata()->launchedCliConfigs = *cli_getConfigs();
   dataLog_getFlightMetadata()->launched = 1;
   eventManager_setEventComplete(Event_e::launch);
+  transitionResetTimer = hm_millis();
   dataLog_writeFlightMetadata();
   maxPosZ = 0;
   stateLog_write(this->getID());
@@ -31,6 +32,15 @@ EndCondition_e AscentState::run() {
   // Detect if new maximum Z position has been reached and record the time
   if (filterData->pos_z_agl > maxPosZ) {
     maxPosZ = filterData->pos_z_agl;
+  }
+
+  // Detect burnout of acc_z drops
+  if (filterData->world_acc_z < kBurnoutAccThreshold) {
+    if (hm_millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
+  	  eventManager_setEventComplete(Event_e::burnout);
+    }
+  } else {
+    transitionResetTimer = hm_millis();
   }
 
   // Detect apogee if under max z position and negative velocity

@@ -44,7 +44,7 @@ void triggerManager_update(FilterData_s* filterData) {
   expressionStore.tick(filterData);
 
   for (int i = 0; i < MAX_TRIGGER; i++) {
-	if (expressionStore.getStatusFor(i)) {
+	if (expressionStore.getStatusFor(i) && !triggerFireStatus[i]) {
 	  triggerManager_triggerFire(i, true);
 	}
   }

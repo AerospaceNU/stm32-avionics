@@ -35,6 +35,10 @@ typedef struct {
   double qy;
   double qz;
   double qw;
+  double roll;
+  double pitch;
+  double yaw;
+  double angle_vertical;
 } FilterData_s;
 
 typedef enum {
@@ -63,6 +67,10 @@ typedef enum {
   qy,
   qz,
   qw,
+  roll,
+  pitch,
+  yaw,
+  angle_vertical,
 } FilterData_e;
 
 FilterData_e getVariableEnumFromString(char* input);

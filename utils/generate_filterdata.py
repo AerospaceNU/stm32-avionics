@@ -26,7 +26,11 @@ STRUCT_ENTRIES = [
     ("double", "qx"),
     ("double", "qy"),
     ("double", "qz"),
-    ("double", "qw")
+    ("double", "qw"),
+    ("double", "roll"),
+    ("double", "pitch"),
+    ("double", "yaw"),
+    ("double", "angle_vertical")
 ]
 
 with open("filterdata_types.h", "w") as data_file:

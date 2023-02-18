@@ -73,14 +73,14 @@ static auto eqFunc = BINARY_FUNCTION_HEADER {
 
 static auto afterFunc = BINARY_FUNCTION_HEADER {
     float conditionalTime = op1->getNumberValue();
-    uint32_t firstTrue = op2->firstTrue;
-    expr->setBooleanValue(op2->getBooleanValue() && (int)hm_millis() - (int)firstTrue > conditionalTime);
+    int firstTrue = op2->firstTrue;
+    expr->setBooleanValue(firstTrue != -1 && (int)((int)hm_millis() - (int)firstTrue) > conditionalTime);
 };
 
 static auto forFunc = BINARY_FUNCTION_HEADER {
-    uint32_t trueSince = op1->trueSince;
+    int trueSince = op1->trueSince;
     float conditionalTime = op2->getNumberValue();
-    expr->setBooleanValue(op1->getBooleanValue() && (int)hm_millis() - (int)trueSince > conditionalTime);
+    expr->setBooleanValue(trueSince != -1 && op1->getBooleanValue() && (int)((int)hm_millis() - (int)trueSince) > conditionalTime);
 };
 
 static auto addFunc = BINARY_FUNCTION_HEADER {
