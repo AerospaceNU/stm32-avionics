@@ -5,7 +5,7 @@
 Expression::Expression() {
     this->trueSince = -1;
     this->firstTrue = -1;
-    this->setBooleanValue(false);
+    this->setBooleanValue(getDefaultValue());
 
 }
 
@@ -48,4 +48,8 @@ void Expression::setBooleanValue(bool bl) {
 
 void Expression::setTriggerNum(int triggerNum) {
     this->triggerNum = triggerNum;
+}
+
+bool Expression::getDefaultValue() {
+	return false;
 }

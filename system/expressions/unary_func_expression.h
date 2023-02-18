@@ -28,6 +28,7 @@ class UnaryFunctionWrapper {
     UnaryFunction *function;
     ExpressionValueType_e opType;
     uint16_t stringLen;
+    bool defaultValue;
 public:
     char stringRep[10];
     ExpressionValueType_e valueType;
@@ -38,11 +39,13 @@ public:
      * @param function The lambda function.
      * @param opType Type of operand.
      * @param valueType The type of result this function returns.
+     * @param defaultValue Default boolean value to set.
      */
     UnaryFunctionWrapper(const char *stringRep,
                          UnaryFunction *function,
                          ExpressionValueType_e opType,
-                         ExpressionValueType_e valueType);
+                         ExpressionValueType_e valueType,
+						 bool defaultValue);
 
     /**
      * Evaluate this wrapper's function.
@@ -67,6 +70,11 @@ public:
      * @return bool of match or not.
      */
     bool acceptsArgumentType(ExpressionValueType_e type);
+    /**
+     * Get the default value of this function.
+     * @return bool of the default value.
+     */
+    bool getDefaultBoolean();
 };
 
 extern UnaryFunctionWrapper unaryFunctionWrappers[NUM_UNARY_FUNCTION];
@@ -95,6 +103,8 @@ public:
     int toString(char *buffer, int n, Expression *expressions[]);
 
     void serializeInto(SerializedExpression_s *serialized);
+
+    bool getDefaultValue();
 };
 
 

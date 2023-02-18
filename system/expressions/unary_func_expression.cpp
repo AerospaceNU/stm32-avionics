@@ -8,12 +8,14 @@
 UnaryFunctionWrapper::UnaryFunctionWrapper(const char *stringRep,
                                            UnaryFunction *function,
                                            ExpressionValueType_e opType,
-                                           ExpressionValueType_e valueType) {
+                                           ExpressionValueType_e valueType,
+										   bool defaultValue) {
     strncpy(this->stringRep, stringRep, 10);
     this->stringLen = strlen(stringRep);
     this->opType = opType;
     this->function = function;
     this->valueType = valueType;
+    this->defaultValue = defaultValue;
 }
 
 void UnaryFunctionWrapper::evaluate(Expression *expr,
@@ -28,6 +30,10 @@ bool UnaryFunctionWrapper::matchesSlice(StringSlice &slice) {
 
 bool UnaryFunctionWrapper::acceptsArgumentType(ExpressionValueType_e type) {
     return this->opType == type;
+}
+
+bool UnaryFunctionWrapper::getDefaultBoolean() {
+	return this->defaultValue;
 }
 
 
@@ -60,12 +66,12 @@ static auto tanFunc = UNARY_FUNCTION_HEADER {
 };
 
 UnaryFunctionWrapper unaryFunctionWrappers[NUM_UNARY_FUNCTION] = {
-        UnaryFunctionWrapper("not", notFunc, boolean, boolean),
-        UnaryFunctionWrapper("always", alwaysFunc, boolean, boolean),
-        UnaryFunctionWrapper("ever", everFunc, boolean, boolean),
-        UnaryFunctionWrapper("sin", sinFunc, number, number),
-        UnaryFunctionWrapper("cos", cosFunc, number, number),
-        UnaryFunctionWrapper("tan", tanFunc, number, number),
+        UnaryFunctionWrapper("not", notFunc, boolean, boolean, false),
+        UnaryFunctionWrapper("always", alwaysFunc, boolean, boolean, true),
+        UnaryFunctionWrapper("ever", everFunc, boolean, boolean, false),
+        UnaryFunctionWrapper("sin", sinFunc, number, number, false),
+        UnaryFunctionWrapper("cos", cosFunc, number, number, false),
+        UnaryFunctionWrapper("tan", tanFunc, number, number, false),
 };
 
 int UnaryFuncExpression::toString(char *buffer, int n, Expression *expressions[]) {
@@ -92,4 +98,8 @@ void UnaryFuncExpression::serializeInto(SerializedExpression_s *serialized) {
 	serialized->type = unaryFunc;
 	serialized->contents.unary.opcode = this->opcode;
 	serialized->contents.unary.operandID = this->operandID;
+}
+
+bool UnaryFuncExpression::getDefaultValue() {
+	return unaryFunctionWrappers[this->opcode].getDefaultBoolean();
 }

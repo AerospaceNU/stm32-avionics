@@ -93,6 +93,12 @@ public:
       * @param serialized Struct to serialize into.
       */
      virtual void serializeInto(SerializedExpression_s *serialized) = 0;
+
+     /**
+      * Get the default value of the expression.
+      * @return bool of default value
+      */
+     virtual bool getDefaultValue();
 };
 
 
