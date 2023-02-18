@@ -39,7 +39,7 @@ bool IsTimingPaused();
  *
  * @param deltaMiros the timestep in uS
  */
-void StepTimingAsync(uint64_t delta);
+void StepTimingAsync(uint64_t uS);
 
 /**
  * @brief Advance time and await loop completion

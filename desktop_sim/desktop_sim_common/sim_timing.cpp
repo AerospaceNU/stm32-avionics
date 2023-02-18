@@ -42,14 +42,6 @@ void timing::StepTimingAsync(uint64_t delta) {
     programStepTime += delta; 
 }
 
-void timing::StepTiming(uint64_t delta) { 
-    auto tick = timing::GetTickNumber();
-    timing::StepTimingAsync(delta);
-    while (timing::GetTickNumber() == tick) {
-        // busywait
-    }
-}
-
 // offset in microseconds
 static uint64_t time_since_epoch() noexcept {
 #ifdef _WIN32

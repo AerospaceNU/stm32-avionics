@@ -1,12 +1,9 @@
 set(DEVICES_FILES_LIST
-        fake_internal_flash.cpp
-        flight_replay.cpp tcp_socket.cpp print_pyro.cpp
-        file_backed_flash.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/fake_internal_flash.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/flight_replay.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/tcp_socket.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/print_pyro.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/file_backed_flash.cpp
+        CACHE INTERNAL "")
 
-add_library(devices ${DEVICES_FILES_LIST})
-
-target_include_directories(devices PUBLIC ../../desktop_sim/)
-target_include_directories(devices PUBLIC .)
-target_include_directories(devices PUBLIC ..)
-
-target_link_libraries(devices PUBLIC utils)
+set(DEVICES_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../ ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "")

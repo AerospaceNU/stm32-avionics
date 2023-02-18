@@ -1,47 +1,39 @@
 set(SYSTEM_FILES_LIST
-        cli.c
-        radio_manager.c
-        scheduler.cpp
-        state_log.c
-        data_log.c
-        trigger_manager.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/cli.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/radio_manager.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/scheduler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/state_log.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/data_log.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/trigger_manager.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/buzzer_heartbeat.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/data_offload.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_config.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_help.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_trigger.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_sense.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_linecutter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_version.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/states/flight_state.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/states/states_interface.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/states/state_ascent.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/states/state_descent.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/states/state_initialize.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/states/state_post_flight.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/states/state_pre_flight.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/states/cli/state_cli_erase_flash.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/states/cli/state_cli_offload.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/states/cli/state_cli_temp.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/filtering/altitude_kalman.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/filtering/filters.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/filtering/orientation_estimator.cpp
+        CACHE INTERNAL "")
 
-        tasks/buzzer_heartbeat.c
-        tasks/data_offload.c
-        tasks/cli/task_cli_config.cpp
-        tasks/cli/task_cli_help.cpp
-        tasks/cli/task_cli_main.cpp
-        tasks/cli/task_cli_trigger.cpp
-        tasks/cli/task_cli_sense.cpp
-        tasks/cli/task_cli_linecutter.cpp
-        tasks/cli/task_cli_version.cpp
-
-        states/flight_state.cpp
-        states/states_interface.cpp
-        states/state_ascent.cpp
-        states/state_descent.cpp
-        states/state_initialize.cpp
-        states/state_post_flight.cpp
-        states/state_pre_flight.cpp
-
-        states/cli/state_cli_erase_flash.cpp
-        states/cli/state_cli_offload.cpp
-        states/cli/state_cli_temp.cpp
-
-        filtering/altitude_kalman.cpp
-        filtering/filters.cpp
-        filtering/orientation_estimator.cpp
-        )
-
-add_library(system ${SYSTEM_FILES_LIST})
-
-target_include_directories(system PRIVATE ../desktop_sim/)
-target_include_directories(system PUBLIC filtering)
-target_include_directories(system PUBLIC states)
-target_include_directories(system PUBLIC states/cli)
-target_include_directories(system PUBLIC tasks)
-target_include_directories(system PUBLIC tasks/cli)
-target_include_directories(utils PUBLIC .)
-
-target_link_libraries(system PUBLIC utils)
-target_link_libraries(system PUBLIC devices)
+set(SYSTEM_INCLUDE_DIRS filtering
+        ${CMAKE_CURRENT_SOURCE_DIR}/states
+        ${CMAKE_CURRENT_SOURCE_DIR}/states/cli
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks
+        ${CMAKE_CURRENT_SOURCE_DIR}/filtering
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        CACHE INTERNAL "")

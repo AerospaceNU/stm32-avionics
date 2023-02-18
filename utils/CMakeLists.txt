@@ -1,9 +1,7 @@
 set(UTILS_FILES_LIST
-    circular_buffer.c
-    dtoa.c
-    small_strtod.c
-)
+    ${CMAKE_CURRENT_SOURCE_DIR}/circular_buffer.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dtoa.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/small_strtod.c
+    CACHE INTERNAL "")
 
-add_library(utils ${UTILS_FILES_LIST})
-
-target_include_directories(utils PUBLIC .)
+set(UTILS_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "")

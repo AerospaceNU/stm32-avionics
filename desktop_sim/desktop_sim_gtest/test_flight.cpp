@@ -3,7 +3,7 @@
 #include "desktop_hardware_manager.h"
 #include "scheduler.h"
 #include <thread>
-#include "../sim_timing.h"
+#include "sim_timing.h"
 
 TEST(FullFlight, TestFlightLands) {
   // It's tempermental about the working directory
@@ -17,13 +17,15 @@ TEST(FullFlight, TestFlightLands) {
 
   Scheduler s = Scheduler();
 
-  uint32_t nextExpireTime = HM_Millis();
-  for (int i = 0; i < 100000; i++) {
+  uint32_t lastExpireTime = HM_Millis();
+  for (int i = 0; i < 50; i++) {
     // This should guarantee that we wait the correct quantity of time
-    uint32_t delta = s.getNextExpirationTimeMillis() - nextExpireTime;
-    timing::StepTimingAsync(delta);
+    uint32_t nextExpireTime = s.getNextExpirationTimeMillis();
+    uint32_t delta = nextExpireTime - lastExpireTime;
+    timing::StepTimingAsync(delta * 1000);
 
-    s.tick();
+    if (s.hasTimerExpired())
+      s.tick();
   } 
 
   printf("Done stepping ticks %lu\n", timing::GetTickNumber());

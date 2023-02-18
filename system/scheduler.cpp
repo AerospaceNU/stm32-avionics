@@ -26,7 +26,7 @@ bool Scheduler::hasTimerExpired() {
   // TODO what should we do if current state is null here somehow?
   if (!pCurrentState_) return true;
 
-  return ((HM_Millis() - lastTime_) < pCurrentState_->getPeriodMS());
+  return ((HM_Millis() - lastTime_) > pCurrentState_->getPeriodMS());
 }
 
 void Scheduler::tick(void) {
