@@ -110,29 +110,28 @@ static void flashRead(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
 }
 
 static void flashWrite(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
-  int flashId = -1;
-  uint32_t flashOffset = 0;
-  addressToFlashId(startLoc, &flashId, &flashOffset);
-  if (flashId == -1) return;
+  uint32_t dataOffset = 0;
+  // Continue writing page by page
+  while (dataOffset < numBytes) {
+    // Check how many bytes to write
+    uint32_t bytesToNextPage =
+        FLASH_MIN_PAGE_SIZE_BYTES -
+        ((startLoc + dataOffset) % FLASH_MIN_PAGE_SIZE_BYTES);
+    uint32_t pageBytes = numBytes - dataOffset > bytesToNextPage
+                             ? bytesToNextPage
+                             : numBytes - dataOffset;
 
-  uint32_t second_page_bytes =
-      (startLoc + numBytes) % FLASH_MIN_PAGE_SIZE_BYTES;
-  if (second_page_bytes >= numBytes) second_page_bytes = 0;
-  uint32_t first_page_bytes = numBytes - second_page_bytes;
-  hm_flashWriteStart(flashId, flashOffset, first_page_bytes, pData);
-  uint32_t waitStartMS = hm_millis();
-  while (!hm_flashIsWriteComplete(flashId) &&
-         hm_millis() - waitStartMS < FLASH_TIMEOUT_MS) {
-  }
-  if (second_page_bytes > 0) {
-    addressToFlashId(startLoc + first_page_bytes, &flashId, &flashOffset);
+    // Check which flash to write to and write there
+    int flashId = -1;
+    uint32_t flashOffset = 0;
+    addressToFlashId(startLoc + dataOffset, &flashId, &flashOffset);
     if (flashId == -1) return;
-    hm_flashWriteStart(flashId, flashOffset, second_page_bytes,
-                       pData + first_page_bytes);
-    waitStartMS = hm_millis();
+    uint32_t waitStartMS = hm_millis();
+    hm_flashWriteStart(flashId, flashOffset, pageBytes, &pData[dataOffset]);
     while (!hm_flashIsWriteComplete(flashId) &&
            hm_millis() - waitStartMS < FLASH_TIMEOUT_MS) {
     }
+    dataOffset += pageBytes;
   }
 }
 
@@ -543,11 +542,9 @@ void dataLog_loadCliConfigs() {
   uint32_t firstAddress = CONFIG_START_ADDRESS;
   uint32_t maxCount =
       (FLASH_MAX_SECTOR_BYTES - CONFIG_START_ADDRESS) / kCliConfigSize;
-  volatile uint32_t lastPacketAddress =CONFIG_START_ADDRESS;
-		  // dataLog_getLastPacketType(firstAddress, maxCount, kCliConfigSize);
-  currentConfigAddress =
-      kCliConfigSize + lastPacketAddress;
-  flashRead(lastPacketAddress, kCliConfigSize, tempPacketBuffer);
+  uint32_t lastPacketAddress =
+      dataLog_getLastPacketType(firstAddress, maxCount, kCliConfigSize);
+  currentConfigAddress = kCliConfigSize + lastPacketAddress;
   *cliConfig = *(CliConfigs_s *)tempPacketBuffer;
   if (packetIsEmpty((uint8_t *)cliConfig, kCliConfigSize)) {
     currentConfigAddress -= kCliConfigSize;
