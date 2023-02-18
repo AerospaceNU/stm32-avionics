@@ -1,19 +1,32 @@
 #include "scheduler.h"
 
+#include <cstdio>
+
 #include "cli_tasks.h"
 #include "hardware_manager.h"
 
-#include <cstdio>
+namespace {}
 
-namespace {
-}
-
-Scheduler::Scheduler()
-{
+Scheduler::Scheduler() {
   pCurrentState_ = nullptr;
   pNextState = &initialize;
 
   lastTime_ = HM_Millis();
+  tickIdx = 0;
+}
+
+uint32_t Scheduler::getNextExpirationTimeMillis() {
+  // TODO what should we do if current state is null here somehow?
+  if (!pCurrentState_) return 0;
+
+  return lastTime_ + pCurrentState_->getPeriodMS();
+}
+
+bool Scheduler::hasTimerExpired() {
+  // TODO what should we do if current state is null here somehow?
+  if (!pCurrentState_) return true;
+
+  return ((HM_Millis() - lastTime_) < pCurrentState_->getPeriodMS());
 }
 
 void Scheduler::tick(void) {
@@ -22,42 +35,30 @@ void Scheduler::tick(void) {
   // Helper functions throughout infinite loop
   EndCondition_e endCondition = NoChange;
 
-  // Keep running scheduler forever
-  uint64_t i = 0;
-  while (HM_IsProgramRunning()) {
-    // Limit rate scheduler runs at
-    if (pCurrentState_) {
-      while ((HM_Millis() - lastTime_) < pCurrentState_->getPeriodMS() && HM_IsProgramRunning()) {
-        HM_Yield();
-      }
-    }
+  lastTime_ = HM_Millis();
+  // Visually show how fast scheduler is running using LED
+  HM_LedToggle(1);
 
-    lastTime_ = HM_Millis();
-    // Visually show how fast scheduler is running using LED
-    HM_LedToggle(1);
-
-    // Cleanup current state and initialize next state if changing states
-    if (pNextState != pCurrentState_) {
-      if (pCurrentState_) pCurrentState_->cleanup();
-      if (pNextState) pNextState->init();
-      pCurrentState_ = pNextState;
-    }
-
-    // Run the current state
-    if (pCurrentState_) endCondition = pCurrentState_->run_state();
-
-    // Find and set the next state
-    StateId_e nextState = getNextState(endCondition);
-    for (State* state : states) {
-      if (state->getID() == nextState) {
-        pNextState = state;
-        break;
-      }
-    }
-
-    ++i;
-    HM_ObserveTickComplete(i);
+  // Cleanup current state and initialize next state if changing states
+  if (pNextState != pCurrentState_) {
+    if (pCurrentState_) pCurrentState_->cleanup();
+    if (pNextState) pNextState->init();
+    pCurrentState_ = pNextState;
   }
+
+  // Run the current state
+  if (pCurrentState_) endCondition = pCurrentState_->run_state();
+
+  // Find and set the next state
+  StateId_e nextState = getNextState(endCondition);
+  for (State* state : states) {
+    if (state->getID() == nextState) {
+      pNextState = state;
+      break;
+    }
+  }
+
+  HM_ObserveTickComplete(++tickIdx);
 }
 
 Scheduler::StateId_e Scheduler::getNextState(EndCondition_e endCondition) {

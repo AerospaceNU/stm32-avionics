@@ -29,7 +29,14 @@ class Scheduler {
   bool hasTimerExpired(void);
 
   /**
-   * @brief Run one iteration of the Scheduler
+   * @brief Get the time the next iteration should be run at, in the same timebase as HM_Millis.
+   * 
+   * @return uint32_t 
+   */
+  uint32_t getNextExpirationTimeMillis();
+
+  /**
+   * @brief Run one iteration of the Scheduler. Does NOT block
    * 
    */
   void tick(void);
@@ -74,6 +81,8 @@ class Scheduler {
 
   // Start time of the last loop
   uint32_t lastTime_;
+
+  uint64_t tickIdx;
 };
 
 #endif  // SYSTEM_SCHEDULER_H_

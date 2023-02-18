@@ -16,21 +16,17 @@ TEST(FullFlight, TestFlightLands) {
   timing::PauseTiming();
 
   Scheduler s = Scheduler();
-  std::thread flightThread([&](){
-    s.run();
-  });
 
-  auto start = std::chrono::duration_cast<std::chrono::milliseconds>(
-          std::chrono::system_clock::now().time_since_epoch());
-  for (int i = 0; i < 1; i++) {
-    timing::StepTiming(14 * 1e3);
+  uint32_t nextExpireTime = HM_Millis();
+  for (int i = 0; i < 100000; i++) {
+    // This should guarantee that we wait the correct quantity of time
+    uint32_t delta = s.getNextExpirationTimeMillis() - nextExpireTime;
+    timing::StepTimingAsync(delta);
+
+    s.tick();
   } 
-  auto delta = (std::chrono::duration_cast<std::chrono::milliseconds>(
-          std::chrono::system_clock::now().time_since_epoch()) - start).count();
 
-  printf("Done stepping in %lu ticks %lu\n", delta, timing::GetTickNumber());
+  printf("Done stepping ticks %lu\n", timing::GetTickNumber());
   HM_Sim_Exit();
-
-  flightThread.join();
 
 }

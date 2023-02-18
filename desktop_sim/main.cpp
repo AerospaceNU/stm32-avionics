@@ -16,8 +16,13 @@ int main(int argC, char** argv) {
     return 1;
   }
 
-  Scheduler s = Scheduler();
-  s.run();
+  Scheduler s {};
+  while (true) {
+    s.tick();
+    while (!s.hasTimerExpired()) {
+      // busywait
+    }
+  }
 
   return 0;
 }
