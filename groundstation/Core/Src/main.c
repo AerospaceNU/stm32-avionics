@@ -96,7 +96,7 @@ static void GroundstationParseCommand(GroundstationUsbCommand_s *command) {
     uint8_t radioHw = command->data[1];
     int8_t channel = command->data[2];
 
-    HM_RadioSetChannel((int)radioHw, channel);
+    hm_radioSetChannel((int)radioHw, channel);
   }
 
   //  if (command->data[0] == CHANNEL_COMMAND_ID) {
@@ -108,7 +108,7 @@ static void GroundstationParseCommand(GroundstationUsbCommand_s *command) {
 }
 
 static void OnDataRx(RadioRecievedPacket_s *packet) {
-  HM_UsbTransmit(FIRST_ID_USB_STD, (uint8_t *)packet, sizeof(*packet));
+  hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)packet, sizeof(*packet));
 }
 
 #define min(a, b) (a < b) ? a : b
@@ -164,25 +164,25 @@ int main(void) {
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  HM_HardwareInit();
+  hm_hardwareInit();
 
-  RadioManager_init();
+  radioManager_init();
   for (int i = 0; i < NUM_RADIO; i++) {
-    RadioManager_addMessageCallback(i, OnDataRx);
+    radioManager_addMessageCallback(i, OnDataRx);
   }
 
-  CircularBuffer_s *buffer = HM_UsbGetRxBuffer(FIRST_ID_USB_STD);
+  CircularBuffer_s *buffer = hm_usbGetRxBuffer(FIRST_ID_USB_STD);
 
   uint32_t start = HAL_GetTick();
 
   while (1) {
     // Update sensors
-    HM_WatchdogRefresh();
-    HM_ReadSensorData();
-    HM_RadioUpdate();
+    hm_watchdogRefresh();
+    hm_readSensorData();
+    hm_radioUpdate();
 
     // Process incoming data
-    RadioManager_tick();
+    radioManager_tick();
 
     // Send barometer ~1x/5sec
     if ((HAL_GetTick() - start) >= 2000) {
@@ -190,27 +190,27 @@ int main(void) {
 
       static HeartbeatData_s heartbeat;
       heartbeat.packetType = 200;
-      heartbeat.latitude = HM_GetSensorData()->gpsData->latitude;
-      heartbeat.longitude = HM_GetSensorData()->gpsData->longitude;
-      heartbeat.gps_alt = HM_GetSensorData()->gpsData->altitude;
+      heartbeat.latitude = hm_getSensorData()->gpsData->generalData.latitude;
+      heartbeat.longitude = hm_getSensorData()->gpsData->generalData.longitude;
+      heartbeat.gps_alt = hm_getSensorData()->gpsData->generalData.altitude;
       heartbeat.groundPressure =
-          HM_GetSensorData()->barometerData[0].pressureAtm;
-      heartbeat.groundTemp = HM_GetSensorData()->barometerData[0].temperatureC;
+          hm_getSensorData()->barometerData[0].pressureAtm;
+      heartbeat.groundTemp = hm_getSensorData()->barometerData[0].temperatureC;
 
       // Hack to make all packets the same length when sent over USB
       static uint8_t heartbeatArr[sizeof(RadioRecievedPacket_s)] = {0};
       memset(heartbeatArr, 0, sizeof(heartbeatArr));
       memcpy(heartbeatArr, &heartbeat, sizeof(heartbeat));
-      HM_UsbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr,
+      hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr,
                      sizeof(heartbeatArr));
     }
 
     // A packet must mave at least a destination [1 byte] and a len [2 bytes],
     // and a non-zero quantity of data
-    if (cbCount(buffer) > 3) {
+    if (cb_count(buffer) > 3) {
       static GroundstationUsbCommand_s command;
-      size_t count = min(cbCount(buffer), sizeof(command));
-      cbPeek(buffer, (uint8_t *)&command, &count);
+      size_t count = min(cb_count(buffer), sizeof(command));
+      cb_peek(buffer, (uint8_t *)&command, &count);
 
       // If we got at least enough bytes for one message to be done
       if (count >= command.len + 3) {
@@ -219,17 +219,18 @@ int main(void) {
         } else {
           int dest = command.destination == RAD_433 ? FIRST_ID_RADIO_TI_433
                                                     : FIRST_ID_RADIO_TI_915;
-          RadioManager_transmitString(dest, command.data, command.len);
+
+          radioManager_transmitString(dest, command.data, command.len);
         }
-        cbDequeue(buffer, count);
+        cb_dequeue(buffer, count);
       } else if (command.destination != GROUNDSTATION ||
                  command.destination != RAD_433 ||
                  command.destination != RAD_915) {
-        cbFlush(buffer);
+        cb_flush(buffer);
       }
     }
 
-    HAL_Delay(10);
+    HAL_Delay(1);
 
     /* USER CODE END WHILE */
 

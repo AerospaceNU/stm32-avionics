@@ -27,32 +27,32 @@
 #define PAGE_SIZE_BYTES 512
 #define SECTOR_SIZE_BYTES 262144
 
-static void cs_pull(const FlashS25flxCtrl_s *s25flx, GPIO_PinState direction) {
+static void csPull(const FlashS25flxCtrl_s *s25flx, GPIO_PinState direction) {
   HAL_GPIO_WritePin(s25flx->csPort, s25flx->csPin, direction);
 }
 
-static bool write_disable(FlashS25flxCtrl_s *s25flx) {
-  cs_pull(s25flx, GPIO_PIN_RESET);
+static bool writeDisable(FlashS25flxCtrl_s *s25flx) {
+  csPull(s25flx, GPIO_PIN_RESET);
   uint8_t tx = WRITE_DISABLE_CMD;
   // Write-disable command is too short to require DMA
   bool bSuccess =
       HAL_SPI_Transmit(s25flx->hspi, &tx, 1, SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
-  cs_pull(s25flx, GPIO_PIN_SET);
+  csPull(s25flx, GPIO_PIN_SET);
   return bSuccess;
 }
 
-static bool write_enable(FlashS25flxCtrl_s *s25flx) {
-  cs_pull(s25flx, GPIO_PIN_RESET);
+static bool writeEnable(FlashS25flxCtrl_s *s25flx) {
+  csPull(s25flx, GPIO_PIN_RESET);
   uint8_t tx = WRITE_ENABLE_CMD;
   // Write-enable command is too short to require DMA
   bool bSuccess =
       HAL_SPI_Transmit(s25flx->hspi, &tx, 1, SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
-  cs_pull(s25flx, GPIO_PIN_SET);
+  csPull(s25flx, GPIO_PIN_SET);
   return bSuccess;
 }
 
-static void check_write_in_progress(FlashS25flxCtrl_s *s25flx) {
-  cs_pull(s25flx, GPIO_PIN_RESET);
+static void checkWriteInProgress(FlashS25flxCtrl_s *s25flx) {
+  csPull(s25flx, GPIO_PIN_RESET);
   uint8_t tx[] = {READ_STAT_REG_CMD, 0};
   uint8_t rx[] = {0, 0};
   // Read status register once
@@ -65,11 +65,11 @@ static void check_write_in_progress(FlashS25flxCtrl_s *s25flx) {
   else
     s25flx->bWIP = true;  // If status register can't be read, assume the
                           // worst-case scenario: flash is busy
-  cs_pull(s25flx, GPIO_PIN_SET);
+  csPull(s25flx, GPIO_PIN_SET);
 }
 
 #ifdef USE_S25FLx_DMA
-static void spi_TxCpltCallback(void *s25flx) {
+static void spiTxCpltCallback(void *s25flx) {
   // Input must be void to use this function as a callback, but this is assumed
   // to be a S25FLXCtrl_t type
   FlashS25flxCtrl_t *ps25flx = (FlashS25flxCtrl_s *)s25flx;
@@ -78,10 +78,10 @@ static void spi_TxCpltCallback(void *s25flx) {
   // a CS pull high to end a command. Therefore, it makes sense to do that here
   // instead of making higher-level code responsible to call some cleanup
   // function
-  cs_pull(s25flx, GPIO_PIN_SET);
+  csPull(s25flx, GPIO_PIN_SET);
 }
 
-static void spi_RxCpltCallback(void *s25flx) {
+static void spiRxCpltCallback(void *s25flx) {
   // Input must be void to use this function as a callback, but this is assumed
   // to be a S25FLXCtrl_t type
   FlashS25flxCtrl_t *ps25flx = (FlashS25flxCtrl_s *)s25flx;
@@ -90,13 +90,13 @@ static void spi_RxCpltCallback(void *s25flx) {
   // pull high to end a command. Therefore, it makes sense to do that here
   // instead of making higher-level code responsible to call some cleanup
   // function.
-  cs_pull(s25flx, GPIO_PIN_SET);
+  csPull(s25flx, GPIO_PIN_SET);
 }
 #endif
 
-void S25FLX_init(FlashS25flxCtrl_s *s25flx, SPI_HandleTypeDef *hspi,
-                 GPIO_TypeDef *csPort, uint16_t csPin,
-                 uint32_t flashSizeBytes) {
+void flashS25flx_init(FlashS25flxCtrl_s *s25flx, SPI_HandleTypeDef *hspi,
+                      GPIO_TypeDef *csPort, uint16_t csPin,
+                      uint32_t flashSizeBytes) {
   // Set struct properties
   s25flx->hspi = hspi;
   s25flx->csPort = csPort;
@@ -108,16 +108,18 @@ void S25FLX_init(FlashS25flxCtrl_s *s25flx, SPI_HandleTypeDef *hspi,
   s25flx->bTxComplete = true;
 
   // Register callbacks for HAL SPI transmit-receive completions
-  register_HAL_SPI_TxCpltCallback(s25flx->hspi, spi_TxCpltCallback, s25flx);
-  register_HAL_SPI_TxRxCpltCallback(s25flx->hspi, spi_RxCpltCallback, s25flx);
+  halCallbacks_registerSpiTxCpltCallback(s25flx->hspi, spiTxCpltCallback,
+                                         s25flx);
+  halCallbacks_registerSpiTxRxCpltCallback(s25flx->hspi, spiRxCpltCallback,
+                                           s25flx);
 #endif
 
   // Ensure CS is pulled high
   HAL_GPIO_WritePin(s25flx->csPort, s25flx->csPin, GPIO_PIN_SET);
 }
 
-bool S25FLX_read_start(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
-                       uint32_t numBytes, uint8_t *pData) {
+bool flashS25flx_readStart(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
+                           uint32_t numBytes, uint8_t *pData) {
   // Check for valid parameters
   if (startLoc + numBytes > s25flx->flashSizeBytes || pData == NULL ||
       s25flx->bWIP
@@ -128,14 +130,14 @@ bool S25FLX_read_start(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
     return false;
 
   // Transmit read command and location
-  cs_pull(s25flx, GPIO_PIN_RESET);
+  csPull(s25flx, GPIO_PIN_RESET);
   uint8_t txBuf1[5] = {READ_DATA_CMD, startLoc >> 24, startLoc >> 16,
                        startLoc >> 8, startLoc & 0xFF};
   // No need to transmit 5-byte read command with DMA since it should occur in
   // very short period of time
   if (HAL_SPI_Transmit(s25flx->hspi, txBuf1, 5, SPI_TX_RX_TIMEOUT_MS) !=
       HAL_OK) {
-    cs_pull(s25flx, GPIO_PIN_SET);
+    csPull(s25flx, GPIO_PIN_SET);
     return false;
   }
 
@@ -151,13 +153,13 @@ bool S25FLX_read_start(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
   if (HAL_SPI_TransmitReceive(s25flx->hspi, txBuf2, pData, numBytes,
                               SPI_TX_RX_TIMEOUT_MS) != HAL_OK) {
 #endif
-    cs_pull(s25flx, GPIO_PIN_SET);
+    csPull(s25flx, GPIO_PIN_SET);
     return false;
   }
 
 #ifndef USE_S25FLx_DMA
   // Pull CS high if not using DMA because read is complete
-  cs_pull(s25flx, GPIO_PIN_SET);
+  csPull(s25flx, GPIO_PIN_SET);
 #endif
   // If using DMA, don't pull CS high because transmit-receive still needs to
   // occur on hardware communication end CS should be pulled high when receive
@@ -166,8 +168,8 @@ bool S25FLX_read_start(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
   return true;
 }
 
-bool S25FLX_write_start(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
-                        uint32_t numBytes, uint8_t *data) {
+bool flashS25flx_writeStart(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
+                            uint32_t numBytes, uint8_t *data) {
   // Only allows writing to 1 page at a time
 
   // Check for valid parameters
@@ -186,7 +188,7 @@ bool S25FLX_write_start(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
   // won't cause an error.
 
   // Enable writing to flash
-  if (!write_enable(s25flx)) return false;
+  if (!writeEnable(s25flx)) return false;
 
   // Set up data transfer
   s25flx->bWIP = true;  // Assume write is in progress for flash until status
@@ -195,7 +197,7 @@ bool S25FLX_write_start(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
   s25flx->bTxComplete = false;  // Assume DMA transmission hasn't been completed
                                 // until callback has been called
 #endif
-  cs_pull(s25flx, GPIO_PIN_RESET);
+  csPull(s25flx, GPIO_PIN_RESET);
 
   // Fill in TX buffer for page program command and send
   uint8_t txBuf[5];
@@ -218,14 +220,14 @@ bool S25FLX_write_start(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
       !success) {
 #endif
     s25flx->bWIP = false;
-    cs_pull(s25flx, GPIO_PIN_SET);
-    write_disable(s25flx);
+    csPull(s25flx, GPIO_PIN_SET);
+    writeDisable(s25flx);
     return false;
   }
 
 #ifndef USE_S25FLx_DMA
   // Pull CS high if not using DMA because write transmission is complete
-  cs_pull(s25flx, GPIO_PIN_SET);
+  csPull(s25flx, GPIO_PIN_SET);
 #endif
   // If using DMA, don't pull CS high since transmit of data still needs to
   // occur on hardware end CS should be pulled high when transmit is complete
@@ -234,17 +236,18 @@ bool S25FLX_write_start(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
   return true;
 }
 
-bool S25FLX_erase_sector_start(FlashS25flxCtrl_s *s25flx, uint32_t sectorNum) {
+bool flashS25flx_eraseSectorStart(FlashS25flxCtrl_s *s25flx,
+                                  uint32_t sectorNum) {
   // Check for valid parameters
   if (sectorNum * SECTOR_SIZE_BYTES >= s25flx->flashSizeBytes) return false;
 
   // Enable writing to flash (also necessary for erasing)
-  if (!write_enable(s25flx)) return false;
+  if (!writeEnable(s25flx)) return false;
 
   // Prep erase command
   s25flx->bWIP = true;  // Assume write (erase counts, too) is in progress for
                         // flash until status reg reads otherwise
-  cs_pull(s25flx, GPIO_PIN_RESET);
+  csPull(s25flx, GPIO_PIN_RESET);
 
   // Fill in TX buffer
   uint8_t txBuf[5];
@@ -257,49 +260,49 @@ bool S25FLX_erase_sector_start(FlashS25flxCtrl_s *s25flx, uint32_t sectorNum) {
   // up
   if (HAL_SPI_Transmit(s25flx->hspi, txBuf, 5, SPI_TX_RX_TIMEOUT_MS) !=
       HAL_OK) {
-    cs_pull(s25flx, GPIO_PIN_SET);
-    write_disable(s25flx);
+    csPull(s25flx, GPIO_PIN_SET);
+    writeDisable(s25flx);
     s25flx->bWIP = false;
     return false;
   }
 
   // Latch the erase command so it starts
-  cs_pull(s25flx, GPIO_PIN_SET);
+  csPull(s25flx, GPIO_PIN_SET);
 
   return true;
 }
 
-bool S25FLX_erase_chip_start(FlashS25flxCtrl_s *s25flx) {
+bool flashS25flx_eraseChipStart(FlashS25flxCtrl_s *s25flx) {
   // Enable writing to flash (also necessary for erasing)
-  if (!write_enable(s25flx)) return false;
+  if (!writeEnable(s25flx)) return false;
 
   // Perform full erase command. Short enough to avoid DMA
   s25flx->bWIP = true;  // Assume write (erase counts, too) is in progress for
                         // flash until status reg reads otherwise
-  cs_pull(s25flx, GPIO_PIN_RESET);
+  csPull(s25flx, GPIO_PIN_RESET);
   uint8_t txByte = CHIP_ERASE_CMD;
   if (HAL_SPI_Transmit(s25flx->hspi, &txByte, 1, SPI_TX_RX_TIMEOUT_MS) !=
       HAL_OK) {
-    cs_pull(s25flx, GPIO_PIN_SET);
-    write_disable(s25flx);
+    csPull(s25flx, GPIO_PIN_SET);
+    writeDisable(s25flx);
     s25flx->bWIP = false;
     return false;
   }
 
   // Latch the full erase command so it starts
-  cs_pull(s25flx, GPIO_PIN_SET);
+  csPull(s25flx, GPIO_PIN_SET);
 
   return true;
 }
 
 #ifdef USE_S25FLx_DMA
-bool S25FLX_is_read_complete(const FlashS25flxCtrl_s *s25flx) {
+bool flashS25flx_isReadComplete(const FlashS25flxCtrl_s *s25flx) {
   return s25flx->bRxComplete;
 }
 #endif
 
-bool S25FLX_is_write_complete(FlashS25flxCtrl_s *s25flx) {
-  check_write_in_progress(s25flx);
+bool flashS25flx_isWriteComplete(FlashS25flxCtrl_s *s25flx) {
+  checkWriteInProgress(s25flx);
   if (s25flx->bWIP) {
     HAL_Delay(1);
   }
@@ -309,10 +312,10 @@ bool S25FLX_is_write_complete(FlashS25flxCtrl_s *s25flx) {
   return !s25flx->bWIP;
 }
 
-bool S25FLX_is_erase_complete(FlashS25flxCtrl_s *s25flx) {
+bool flashS25flx_isEraseComplete(FlashS25flxCtrl_s *s25flx) {
   // Same functionality as write, but different public function name is clearer
   // for programmers at higher levels
-  return S25FLX_is_write_complete(s25flx);
+  return flashS25flx_isWriteComplete(s25flx);
 }
 
 #endif  // HAS_DEV(FLASH_S25FLX)

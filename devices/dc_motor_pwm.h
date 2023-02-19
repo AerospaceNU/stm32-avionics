@@ -7,14 +7,7 @@ extern "C" {
 
 #include "board_config_common.h"
 
-/*
- This is how one runs a motor
- pwm_control_t pwm_test;
- pwm_test.timer = &htim3;
- pwm_test.channel = TIM_CHANNEL_3;
- DC_motor_init(&pwm_test);
- DC_motor_run(&pwm_test, 25);
- */
+#if HAS_DEV(DC_MOTOR_PWM)
 
 /* Definition of DC motor control struct */
 /* user needs to config timer */
@@ -23,14 +16,14 @@ typedef struct {
   uint32_t channel;
 } DcMotorPwmCtrl_s;
 
-/* function declarations */
-
 /* creates a new DC motor that can be started and stopped */
-void dcMotorPwmInit(DcMotorPwmCtrl_s *dev, TIM_HandleTypeDef *htim,
-                    uint32_t channel);
+void dcMotorPwm_init(DcMotorPwmCtrl_s *dev, TIM_HandleTypeDef *htim,
+                     uint32_t channel);
 
 /* start a specified DC motor with a given speed percentage -100-100 */
-void dcMotorPwmSetPercent(DcMotorPwmCtrl_s *dev, double speed_percent);
+void dcMotorPwm_setPercent(DcMotorPwmCtrl_s *dev, double speed_percent);
+
+#endif
 
 #ifdef __cplusplus
 }

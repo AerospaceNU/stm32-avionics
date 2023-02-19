@@ -4,26 +4,26 @@
 #include "cli.h"
 #include "cli_tasks.h"
 
-void cli_tasks::cliTriggerFire() {
-  CliOptionVals_s options = cliGetOptions();
+void CliTasks::triggerFire() {
+  CliOptionVals_s options = cli_getOptions();
   if (options.t) {
     char* endPtr;
     int triggerNum = strtol(options.t, &endPtr, 10);
     if (*endPtr != '\0' || triggerNum < 0 || triggerNum >= MAX_TRIGGER) {
-      cliSendAck(false, "Invalid trigger number");
+      cli_sendAck(false, "Invalid trigger number");
       return;
     }
 
     char msg[70 + 4] = {0};
     snprintf(msg, sizeof(msg), "Initializing trigger %i\r\n", triggerNum);
-    cliSend(msg);
-    HM_RadioUpdate();
+    cli_send(msg);
+    hm_radioUpdate();
 
-    TriggerManager_TriggerFire(triggerNum, false);
+    triggerManager_triggerFire(triggerNum, false);
 
     // Send success ack to CLI
-    cliSendAck(true, nullptr);
+    cli_sendAck(true, nullptr);
     return;
   }
-  cliSendAck(false, "You must specify a trigger number to fire with -t");
+  cli_sendAck(false, "You must specify a trigger number to fire with -t");
 }

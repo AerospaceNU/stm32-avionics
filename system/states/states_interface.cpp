@@ -7,11 +7,11 @@
 
 #include "states_interface.h"
 
-EndCondition_e State::run_state() {
+EndCondition_e State::runState() {
   EndCondition_e result = run();
 
   // Refresh watchdog
-  HM_WatchdogRefresh();
+  hm_watchdogRefresh();
 
   run_counter_++;
   return result;

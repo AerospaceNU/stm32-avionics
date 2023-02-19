@@ -18,36 +18,36 @@
 
 EndCondition_e FlightState::m_lastCliEndConn;
 
-EndCondition_e FlightState::run_state() {
+EndCondition_e FlightState::runState() {
   // We also should run periodic updates
-  HM_RadioUpdate();
-  RadioManager_tick();
-  HM_BleTick();
+  hm_radioUpdate();
+  radioManager_tick();
+  hm_bleTick();
 
   // Collect, filter, and log all sensor data
-  HM_ReadSensorData();
-  SensorData_s* sensorData = HM_GetSensorData();
-  filterApplyData(sensorData, HM_GetSensorProperties(), m_hasPassedApogee);
-  FilterData_s* filterData = filterGetData();
+  hm_readSensorData();
+  SensorData_s* sensorData = hm_getSensorData();
+  filter_applyData(sensorData, hm_getSensorProperties(), m_hasPassedApogee);
+  FilterData_s* filterData = filter_getData();
 
   // For now, transmit data to all attached radios
   for (int i = 0; i < NUM_RADIO; i++) {
-    RadioManager_transmitData(i, sensorData, filterData, this->getID());
+    radioManager_transmitData(i, sensorData, filterData, this->getID());
   }
 
   // Update pyros
-  TriggerManager_Update(filterData, m_hasPassedLaunch, m_hasPassedApogee,
+  triggerManager_update(filterData, m_hasPassedLaunch, m_hasPassedApogee,
                         m_hasPassedTouchdown);
 
   // Run buzzer heartbeat
-  buzzerHeartbeat();
+  buzzerHeartbeat_tick();
 
   // Run the state
-  EndCondition_e normalEndCondition = State::run_state();
+  EndCondition_e normalEndCondition = State::runState();
 
   // CLI tick checks if we've gotten a new CLI command, and if we have, return
   // it
-  auto cliEndCondition = cli_tasks::cliTick();
+  auto cliEndCondition = CliTasks::tick();
   if (cliEndCondition != NoChange) {
     // We'll get a cli end condition for things like Sim, Calibrate, Erase
     // But we only want to create a "new flight" if we exit with Erase

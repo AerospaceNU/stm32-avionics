@@ -39,7 +39,7 @@ class State {
   /**
    * @brief Runs this state and increments the counter
    */
-  virtual EndCondition_e run_state();
+  virtual EndCondition_e runState();
 
   /**
    * @brief Actions that occur on initialization of state

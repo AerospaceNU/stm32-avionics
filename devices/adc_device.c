@@ -14,12 +14,12 @@
 #define MAX_RAW_VAL_10B 2 << 10
 #define MAX_RAW_VAL_8B 2 << 8
 
-static void adcConversionCpltCallback(void *adc) {
+static void adcDev_conversionCpltCallback(void *adc) {
   ((AdcDevCtrl_s *)adc)->bConvCplt = true;
 }
 
-void adcInit(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
-             float minVal, float maxVal, bool bSingleEnded) {
+void adcDev_init(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
+                 float minVal, float maxVal, bool bSingleEnded) {
   // Set struct values
   adc->hadc = hadc;
   adc->bConvCplt = false;  // No conversion has occurred, so the value in the
@@ -32,7 +32,6 @@ void adcInit(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
     case ADC_RESOLUTION_16B:
       maxRawVal = MAX_RAW_VAL_16B;
       break;
-
     case ADC_RESOLUTION_14B:
       maxRawVal = MAX_RAW_VAL_14B;
       break;
@@ -62,10 +61,11 @@ void adcInit(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
   HAL_ADCEx_Calibration_Start(hadc, ADC_CALIB_OFFSET, singleDiff);
 }
 
-void adcStartSingleRead(AdcDevCtrl_s *adc) {
+void adcDev_startSingleRead(AdcDevCtrl_s *adc) {
   // Register callback for completed adc conversion (will overwrite any existing
   // callback/data for existing ADC handle)
-  register_HAL_ADC_ConvCpltCallback(adc->hadc, adcConversionCpltCallback, adc);
+  halCallbacks_registerAdcConvCpltCallback(adc->hadc,
+                                           adcDev_conversionCpltCallback, adc);
 
   adc->bConvCplt = false;
 
@@ -75,7 +75,7 @@ void adcStartSingleRead(AdcDevCtrl_s *adc) {
   HAL_ADC_Start_DMA(adc->hadc, adc->rawVals, adc->hadc->Init.NbrOfConversion);
 }
 
-bool adcGetValue(AdcDevCtrl_s *adc, float *pval, uint32_t timeoutMS) {
+bool adcDev_getValue(AdcDevCtrl_s *adc, float *pval, uint32_t timeoutMS) {
   // Wait for something to happen
   uint32_t startTime = HAL_GetTick();
   while (!adc->bConvCplt && HAL_GetTick() - startTime < timeoutMS) {

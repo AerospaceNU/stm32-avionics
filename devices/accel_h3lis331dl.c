@@ -31,45 +31,28 @@
 #define X_AXIS_ENABLE (1 << 0)
 
 static uint8_t whoAmI(AccelH3lis331dlCtrl_s *sensor) {
-  return SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_WHO_AM_I);
+  return spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_WHO_AM_I);
 }
 
 static void accelH3lis331dl_getDataRaw(AccelH3lis331dlCtrl_s *sensor) {
   // Takes x, y, and z axis readings
   uint8_t x_l =
-      SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_X_L);
+      spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_X_L);
   uint8_t x_h =
-      SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_X_H);
+      spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_X_H);
   uint8_t y_l =
-      SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Y_L);
+      spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Y_L);
   uint8_t y_h =
-      SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Y_H);
+      spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Y_H);
   uint8_t z_l =
-      SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Z_L);
+      spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Z_L);
   uint8_t z_h =
-      SPI_ReadRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Z_H);
+      spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Z_H);
 
   // Writes combined h and l byte to struct
   sensor->val.raw.x = ((int16_t)x_h << 8) | (x_l);
   sensor->val.raw.y = ((int16_t)y_h << 8) | (y_l);
   sensor->val.raw.z = ((int16_t)z_h << 8) | (z_l);
-}
-
-static void accelH3lis331dl_getAdj(AccelH3lis331dlCtrl_s *sensor) {
-  int sampleCount = 100;
-  int adjx = 0;
-  int adjy = 0;
-  int adjz = 0;
-  for (int i = 0; i < sampleCount; i++) {
-    accelH3lis331dl_getDataRaw(sensor);
-    adjx += sensor->val.raw.x;
-    adjy += sensor->val.raw.y;
-    adjz += sensor->val.raw.z;
-    HAL_Delay(5);
-  }
-  sensor->adjVal.x = (adjx / sampleCount) * sensor->gain;
-  sensor->adjVal.y = (adjy / sampleCount) * sensor->gain;
-  sensor->adjVal.z = (adjz / sampleCount) * sensor->gain - 9.80665;
 }
 
 static void accelH3lis331dl_getGain(AccelH3lis331dlCtrl_s *sensor) {
@@ -84,22 +67,19 @@ bool accelH3lis331dl_init(AccelH3lis331dlCtrl_s *sensor, SpiCtrl_t spi) {
   if (me == 0x00 || me == 0xFF) {
     return false;
   }
-  SPI_WriteRegister(&sensor->spi, REG_CTRL1,
+  spi_writeRegister(&sensor->spi, REG_CTRL1,
                     PWR_MODE_ON | DATA_RATE_100HZ | Z_AXIS_ENABLE |
                         Y_AXIS_ENABLE | X_AXIS_ENABLE);
   accelH3lis331dl_getGain(sensor);
-  accelH3lis331dl_getAdj(sensor);
+
   return true;
 }
 
 void accelH3lis331dl_getData(AccelH3lis331dlCtrl_s *sensor) {
   accelH3lis331dl_getDataRaw(sensor);
-  sensor->val.realMps2.x =
-      (sensor->gain * sensor->val.raw.x) - sensor->adjVal.x;
-  sensor->val.realMps2.y =
-      (sensor->gain * sensor->val.raw.y) - sensor->adjVal.y;
-  sensor->val.realMps2.z =
-      (sensor->gain * sensor->val.raw.z) - sensor->adjVal.z;
+  sensor->val.realMps2.x = sensor->gain * sensor->val.raw.x;
+  sensor->val.realMps2.y = sensor->gain * sensor->val.raw.y;
+  sensor->val.realMps2.z = sensor->gain * sensor->val.raw.z;
 }
 
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)

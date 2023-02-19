@@ -56,20 +56,20 @@ static double medianArray[kPrevPresMedianCount + kPrevPresCount];
 static AltitudeKalman kalman{0.015};
 static OrientationEstimator orientationEstimator(0.015);
 
-void filterInit(double dt) {
-  kalman.Reset();
-  kalman.SetDt(dt);
+void filter_init(double dt) {
+  kalman.reset();
+  kalman.setDt(dt);
   orientationEstimator.reset();
   orientationEstimator.setDt(dt);
   // Initialize circular buffers for running medians/running pressure values
-  cbInit(&runningPresMediansBuffer, runningPresMedians,
-         kPrevPresMedianCount + 1, sizeof(double));
-  cbInit(&runningPresBuffer, runningPres, kPrevPresCount + 1, sizeof(double));
-  cbInit(&runningGravityRefBuffer, runningGravityRef, kGravityRefCount + 1,
-         sizeof(double));
-  cbInit(&gyroXRefBuffer, gyroXRefBack, kGyroRefCount + 1, sizeof(float));
-  cbInit(&gyroYRefBuffer, gyroYRefBack, kGyroRefCount + 1, sizeof(float));
-  cbInit(&gyroZRefBuffer, gyroZRefBack, kGyroRefCount + 1, sizeof(float));
+  cb_init(&runningPresMediansBuffer, runningPresMedians,
+          kPrevPresMedianCount + 1, sizeof(double));
+  cb_init(&runningPresBuffer, runningPres, kPrevPresCount + 1, sizeof(double));
+  cb_init(&runningGravityRefBuffer, runningGravityRef, kGravityRefCount + 1,
+          sizeof(double));
+  cb_init(&gyroXRefBuffer, gyroXRefBack, kGyroRefCount + 1, sizeof(float));
+  cb_init(&gyroYRefBuffer, gyroYRefBack, kGyroRefCount + 1, sizeof(float));
+  cb_init(&gyroZRefBuffer, gyroZRefBack, kGyroRefCount + 1, sizeof(float));
   gyroXOffset = 0;
   gyroYOffset = 0;
   gyroZOffset = 0;
@@ -204,7 +204,7 @@ static void filterAccels(SensorData_s* curSensorVals,
       accelReadings[AXIS_Z], imuReadings[AXIS_Z], sensorProperties);
 }
 
-double filterGetAveragePressure(SensorData_s* curSensorVals) {
+double filter_getAveragePressure(SensorData_s* curSensorVals) {
   double presAvg = 0;
 #if HAS_DEV(BAROMETER)
   for (int i = 0; i < NUM_BAROMETER; i++) {
@@ -259,20 +259,20 @@ void updateGyroOffsetOneAxis(CircularBuffer_s* refBuffer, const float& newValue,
   uint8_t i;
   float gyroSum = 0;
   static float referenceBuffer[kGyroRefCount];
-  if (cbFull(refBuffer)) {
-    cbDequeue(refBuffer, 1);
+  if (cb_full(refBuffer)) {
+    cb_dequeue(refBuffer, 1);
   }
-  cbEnqueue(refBuffer, &newValue);
-  cbPeek(refBuffer, referenceBuffer, nullptr);
+  cb_enqueue(refBuffer, &newValue);
+  cb_peek(refBuffer, referenceBuffer, nullptr);
 
-  for (i = 0; i < cbCount(refBuffer); ++i) {
+  for (i = 0; i < cb_count(refBuffer); ++i) {
     gyroSum += referenceBuffer[i];
   }
 
-  *offset = gyroSum / (float)cbCount(refBuffer);
+  *offset = gyroSum / (float)cb_count(refBuffer);
 }
 
-void filterAddGyroRef() {
+void filter_addGyroRef() {
   static float noOffset;
   noOffset = filterData.rocket_ang_vel_x + gyroXOffset;
   updateGyroOffsetOneAxis(&gyroXRefBuffer, noOffset, &gyroXOffset);
@@ -289,17 +289,16 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
 #if HAS_DEV(BAROMETER)
   double lapseRate = -0.0065;  // valid below 11000m, use lookup table for
                                // lapse rate when altitude is higher
-  double tempRef = cliGetConfigs()->groundTemperatureC + 273.15;  // C to K
-  double elevRef = cliGetConfigs()->groundElevationM;
+  double tempRef = cli_getConfigs()->groundTemperatureC + 273.15;  // C to K
 
-  double presAvg = filterGetAveragePressure(curSensorVals);
-  double baroAlt =
-      fabs(presAvg) < 0.001
-          ? 0
-          : (tempRef / lapseRate) *
-                    (1 - pow(presAvg / presRef,
-                             R_DRY_AIR * lapseRate / G_ACCEL_EARTH)) +
-                elevRef;
+  double presAvg = filter_getAveragePressure(curSensorVals);
+
+  double baroAltAgl = 0;
+  if (fabs(presAvg) > 0.001) {
+    baroAltAgl =
+        (tempRef / lapseRate) *
+        (pow(presAvg / presRef, -R_DRY_AIR * lapseRate / G_ACCEL_EARTH) - 1);
+  }
 #endif  // HAS_DEV(BAROMETER)
 
   // Kalman filtering, assuming Z is always up
@@ -307,26 +306,26 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
 
   // If we're descending, we can't trust the acceleration from our
   // accelerometer
-  // -- the rocket's flapping around on a parachute! Otherwise, our "global
-  // acceleration" is the measured acceleration minus 9.81 (since earth pulls
-  // us down). Under parachute it's about zero, since we're about-ish in
-  // equilibrium
+  // -- the rocket's flapping around on a parachute! Otherwise, our
+  // "global acceleration" is the measured acceleration minus 9.81
+  // (since earth pulls us down). Under parachute it's about zero, since
+  // we're about-ish in equilibrium
   double accz = hasPassedApogee ? 0 : filterData.world_acc_z - 9.81;
 
   // TODO check what order these "should" run in. Worst case we're off by one
   // iteration We don't update accelerations till after this, so the z
   // acceleration should still be from the last timestep
-  kalman.Predict(accz);
+  kalman.predict(accz);
 
 #if HAS_DEV(BAROMETER)
   // Only correct if below max speed (above, baro readings untrustworthy)
-  if (fabs(kalman.GetXhat().estimatedVelocity) < BARO_MAX_SPEED) {
-    kalman.Correct(baroAlt, kalman.DEFAULT_KALMAN_GAIN);
+  if (fabs(kalman.getXhat().estimatedVelocity) < BARO_MAX_SPEED) {
+    kalman.correct(baroAltAgl, kalman.DEFAULT_KALMAN_GAIN);
   }
 #endif  // HAS_DEV(BAROMETER)
 
-  auto kalmanOutput = kalman.GetXhat();
-  filterData.pos_z = kalmanOutput.estimatedAltitude;
+  auto kalmanOutput = kalman.getXhat();
+  filterData.pos_z_agl = kalmanOutput.estimatedAltitude;
   filterData.rocket_vel_x = kalmanOutput.estimatedVelocity;
 }
 
@@ -351,15 +350,15 @@ static double median(double* input, uint8_t count) {
   }
 }
 
-void filterAddGravityRef() {
-  if (cbFull(&runningGravityRefBuffer)) {
-    cbDequeue(&runningGravityRefBuffer, 1);
+void filter_addGravityRef() {
+  if (cb_full(&runningGravityRefBuffer)) {
+    cb_dequeue(&runningGravityRefBuffer, 1);
   }
-  cbEnqueue(&runningGravityRefBuffer, &(filterData.rocket_acc_x));
+  cb_enqueue(&runningGravityRefBuffer, &(filterData.rocket_acc_x));
 
-  cbPeek(&runningGravityRefBuffer, gravityRefBuffer, nullptr);
+  cb_peek(&runningGravityRefBuffer, gravityRefBuffer, nullptr);
 
-  uint8_t gravCount = cbCount(&runningGravityRefBuffer);
+  uint8_t gravCount = cb_count(&runningGravityRefBuffer);
 
   double accelSum = 0;
   for (uint8_t i = 0; i < gravCount; ++i) {
@@ -381,13 +380,13 @@ void filterAddGravityRef() {
   // buffer
   if (accelSum < 0) {
     gravityRef *= -1;
-    cbFlush(&runningGravityRefBuffer);
+    cb_flush(&runningGravityRefBuffer);
   }
 }
 
-void filterAddPressureRef(SensorData_s* curSensorVals) {
+void filter_addPressureRef(SensorData_s* curSensorVals) {
   // Average current pressures
-  double currentPres = filterGetAveragePressure(curSensorVals);
+  double currentPres = filter_getAveragePressure(curSensorVals);
 
   // For the first 10 seconds (before we have any current medians
   // just set the current pressure ref so we don't depend on
@@ -396,12 +395,12 @@ void filterAddPressureRef(SensorData_s* curSensorVals) {
     presRef = currentPres;
   }
   // Make room for new value, discarding oldest pressure stored if full
-  if (cbFull(&runningPresBuffer)) {
-    cbDequeue(&runningPresBuffer, 1);
+  if (cb_full(&runningPresBuffer)) {
+    cb_dequeue(&runningPresBuffer, 1);
   }
 
   // Add current pressure
-  cbEnqueue(&runningPresBuffer, &currentPres);
+  cb_enqueue(&runningPresBuffer, &currentPres);
 
   ++runningPresCount;
 
@@ -410,22 +409,22 @@ void filterAddPressureRef(SensorData_s* curSensorVals) {
     runningPresCount = 0;
     if (runningPresMedianCount < kPrevPresMedianCount) ++runningPresMedianCount;
     // Make room for new value, discarding oldest median stored if full
-    if (cbFull(&runningPresMediansBuffer)) {
-      cbDequeue(&runningPresMediansBuffer, 1);
+    if (cb_full(&runningPresMediansBuffer)) {
+      cb_dequeue(&runningPresMediansBuffer, 1);
     }
 
     // Add median of most recent values
     size_t numElements = kPrevPresCount;
-    cbPeek(&runningPresBuffer, medianArray, &numElements);
+    cb_peek(&runningPresBuffer, medianArray, &numElements);
     double currentMedian = median(medianArray, kPrevPresCount);
-    cbEnqueue(&runningPresMediansBuffer, &currentMedian);
+    cb_enqueue(&runningPresMediansBuffer, &currentMedian);
 
     // Only set pressure ref if we have enough values recorded
     if (runningPresMedianCount == kPrevPresMedianCount) {
       // Now, find median of the last 100 seconds of data and set that to be
       // current ref
       size_t numMedElements = kPrevPresMedianCount;
-      cbPeek(&runningPresMediansBuffer, medianArray, &numMedElements);
+      cb_peek(&runningPresMediansBuffer, medianArray, &numMedElements);
       presRef = median(medianArray, kPrevPresMedianCount);
     } else {
       // Otherwise (for the first 100 seconds) set current pressure ref to the
@@ -436,11 +435,15 @@ void filterAddPressureRef(SensorData_s* curSensorVals) {
   }
 }
 
-void filterSetPressureRef(double pres) { presRef = pres; }
+void filter_setPressureRef(double pres) { presRef = pres; }
 
-double filterGetPressureRef() { return presRef; }
+double filter_getPressureRef() { return presRef; }
 
-static void filterSetWorldReference() {
+void filter_setGravityRef(int8_t reference) { gravityRef = reference; }
+
+int8_t filter_getGravityRef() { return gravityRef; }
+
+static void filter_setWorldReference() {
   /*
    * Data comes in through sensors relative to the board. Other filter functions
    * convert sensor measurements into the board reference frame. We then also
@@ -457,9 +460,9 @@ static void filterSetWorldReference() {
   filterData.world_vel_z = filterData.rocket_vel_x;
 }
 
-void filterApplyData(SensorData_s* curSensorVals,
-                     SensorProperties_s* sensorProperties,
-                     bool hasPassedApogee) {
+void filter_applyData(SensorData_s* curSensorVals,
+                      SensorProperties_s* sensorProperties,
+                      bool hasPassedApogee) {
   // Filter z pos first so we still have the old accelerations
   // This lets us project our state estimate forward from the last
   // timestep to the current one
@@ -467,9 +470,9 @@ void filterApplyData(SensorData_s* curSensorVals,
 
   filterAccels(curSensorVals, sensorProperties);
 
-  filterSetWorldReference();
+  filter_setWorldReference();
 
   filterGyros(curSensorVals);
 }
 
-FilterData_s* filterGetData() { return &filterData; }
+FilterData_s* filter_getData() { return &filterData; }

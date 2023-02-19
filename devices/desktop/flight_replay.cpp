@@ -11,11 +11,11 @@
 
 CsvReplay::CsvReplay(std::string path) : doc{path} {}
 
-void CsvReplay::GetNext(SensorData_s* data) {
+void CsvReplay::getNext(SensorData_s* data) {
   try {
     char rowName[30];
 
-    data->timestampS = doc.GetCell<double>("timestamp_s", m_row);
+    data->timestampMs = doc.GetCell<double>("timestamp_s", m_row);
 
 #if HAS_DEV(IMU_DESKTOP_FILE)
     for (int i = 0; i < NUM_IMU_DESKTOP_FILE; i++) {
@@ -75,9 +75,12 @@ void CsvReplay::GetNext(SensorData_s* data) {
 
 #if HAS_DEV(GPS_DESKTOP_FILE)
     for (int i = 0; i < NUM_GPS_DESKTOP_FILE; i++) {
-      data->gpsData[i].latitude = doc.GetCell<double>("gps_lat", m_row);
-      data->gpsData[i].longitude = doc.GetCell<double>("gps_long", m_row);
-      data->gpsData[i].altitude = doc.GetCell<double>("gps_alt", m_row);
+      data->gpsData[i].generalData.latitude =
+          doc.GetCell<double>("gps_lat", m_row);
+      data->gpsData[i].generalData.longitude =
+          doc.GetCell<double>("gps_long", m_row);
+      data->gpsData[i].generalData.altitude =
+          doc.GetCell<double>("gps_alt", m_row);
     }
 #endif  // HAS_DEV(GPS_DESKTOP_FILE)
 

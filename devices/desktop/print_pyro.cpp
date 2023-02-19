@@ -22,6 +22,12 @@ void printPyro_set(PrintPyroCtrl_s *pyro, bool enable) {
   printf("Setting pyro %i to %s\n", pyro->id, enable ? "ON" : "OFF");
 }
 
+void printPyro_pwmStart(PrintPyroCtrl_s *pyro, uint32_t duration,
+                        uint32_t frequency, uint32_t pulseWidth) {
+  printf("Initializing PWM on pyro %i with %i duty cycle \n", pyro->id,
+         pulseWidth);
+}
+
 void printPyro_tick(PrintPyroCtrl_s *pyro) {
   if (pyro->expireTime != 0 &&
       std::chrono::duration_cast<std::chrono::milliseconds>(

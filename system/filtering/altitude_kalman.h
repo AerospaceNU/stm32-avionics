@@ -152,18 +152,18 @@ class AltitudeKalman {
 
   // Project our state estimate x forward in time by one timestep
   // See above, but this does x_new = Ax_old + Bu
-  void Predict(const double az);
+  void predict(const double az);
 
   // Correct our estimate by sorta "nudging it a bit" towards where
   // we measured ourselves to actually be
-  void Correct(const double baroAltitude, const double kalman_gain[2]);
+  void correct(const double baroAltitude, const double kalman_gain[2]);
 
   // Get the current estimated position/velocity
-  const AltitudeKalmanOutput_s GetXhat() const;
+  const AltitudeKalmanOutput_s getXhat() const;
 
-  void SetDt(const double dt);
+  void setDt(const double dt);
 
-  void Reset();
+  void reset();
 
   // All these are from Python
   // and are fixed per-DT

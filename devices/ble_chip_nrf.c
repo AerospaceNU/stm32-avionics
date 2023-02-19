@@ -70,7 +70,7 @@ static void bleChipNrf_rxEventCallback(void *userData, size_t Size) {
       ctrl->circular_buffers[address] != NULL) {
     for (uint16_t i = 1; i < Size;
          i++) {  // Byte 1 is address, so just enqueue [1..end]
-      cbEnqueue(ctrl->circular_buffers[address], ctrl->dma_buff_begin + i);
+      cb_enqueue(ctrl->circular_buffers[address], ctrl->dma_buff_begin + i);
     }
   }
 
@@ -126,27 +126,27 @@ static bool bleChipNrf_sendRequest(void *ctrl, uint8_t address,
 static uint16_t bleChipNrf_dequeuePacket(CircularBuffer_s *buffer,
                                          uint8_t *pdata) {
   // We should have at least 2 bytes (the len bytes) in our array
-  if (cbCount(buffer) < 2) return 0;
+  if (cb_count(buffer) < 2) return 0;
 
   // Buffer should have two bytes length, then a bunch of bytes data
   uint16_t len;
   size_t two = 2;
-  cbPeek(buffer, &len, &two);
+  cb_peek(buffer, &len, &two);
 
   // If we have enough bytes to copy out a whole packet, do so
-  if (len + 2 <= cbCount(buffer)) {
-    cbDequeue(buffer, 2);  // Dequeue length first
+  if (len + 2 <= cb_count(buffer)) {
+    cb_dequeue(buffer, 2);  // Dequeue length first
 
     // Then pop out len-many bytes
     size_t len_ = len;
-    cbPeek(buffer, pdata, &len_);
+    cb_peek(buffer, pdata, &len_);
 
-    cbDequeue(buffer, len_);
+    cb_dequeue(buffer, len_);
 
     return len_;
   } else {
     // If we don't, all we can do is flush the buffer
-    cbFlush(buffer);
+    cb_flush(buffer);
     return 0;
   }
 }
@@ -184,10 +184,10 @@ void bleChipNrf_init(BleChipNrfCtrl_t *ctrl, UART_HandleTypeDef *ble_uart) {
   ctrl->connectedClients = 0;
 
   // Set up our "Event" callback, which should only happen when idle happens
-  register_HAL_UART_RxIdleCallback(ctrl->ble_uart, bleChipNrf_rxEventCallback,
-                                   ctrl);
-  register_HAL_UART_RxCpltCallback(ctrl->ble_uart, bleChipNrf_rxCpltCallback,
-                                   ctrl);
+  halCallbacks_registerUartRxIdleCallback(ctrl->ble_uart,
+                                          bleChipNrf_rxEventCallback, ctrl);
+  halCallbacks_registerUartRxCpltCallback(ctrl->ble_uart,
+                                          bleChipNrf_rxCpltCallback, ctrl);
 
   // This will trigger DMA stuff to happen until either the line goes idle
   START_DMA;

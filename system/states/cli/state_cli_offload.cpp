@@ -11,7 +11,7 @@
 #include "data_log.h"  // This include is only needed to pass a flightID to userSetFlightID before command line implementation
 #include "data_offload.h"
 
-static void format_time_seconds(char *result, int resultLen, uint32_t seconds) {
+static void formatTimeSeconds(char *result, int resultLen, uint32_t seconds) {
   uint32_t minutes = seconds / 60;
   seconds %= 60;
 
@@ -23,7 +23,7 @@ static void format_time_seconds(char *result, int resultLen, uint32_t seconds) {
 }
 
 void CliOffloadState::init() {
-  CliOptionVals_s cliOptions = cliGetOptions();
+  CliOptionVals_s cliOptions = cli_getOptions();
 
   // If specific flight number is provided, try offloading that
   if (cliOptions.f) {
@@ -31,27 +31,27 @@ void CliOffloadState::init() {
     // Flight number 0 explicitly doesn't exist, so 0 means atoi failed
     if (flightNum == 0) {
       initSuccess_ = false;
-      cliSendAck(false, "Flight number invalid integer or 0");
+      cli_sendAck(false, "Flight number invalid integer or 0");
       return;
     }
-    if (flightNum > data_log_get_last_flight_num()) {
+    if (flightNum > dataLog_getLastFlightNum()) {
       initSuccess_ = false;
-      cliSendAck(false, "Flight number doesn't exist");
+      cli_sendAck(false, "Flight number doesn't exist");
       return;
     }
-    dataOffloadSetFlightId(flightNum);
+    dataOffload_setFlightId(flightNum);
   } else {
     // Otherwise, offload most recent launched flight
-    uint32_t lastLaunched = data_log_get_last_launched_flight_num();
+    uint32_t lastLaunched = dataLog_getLastLaunchedFlightNum();
     // Offload the last launched flight if it exists, or else the last flight if
     // none are launched
-    dataOffloadSetFlightId(lastLaunched > 0 ? lastLaunched
-                                            : data_log_get_last_flight_num());
+    dataOffload_setFlightId(lastLaunched > 0 ? lastLaunched
+                                             : dataLog_getLastFlightNum());
   }
 
   // Send ack to command line if reached
   initSuccess_ = true;
-  cliSendAck(true, nullptr);
+  cli_sendAck(true, nullptr);
 }
 
 EndCondition_e CliOffloadState::run() {
@@ -61,34 +61,33 @@ EndCondition_e CliOffloadState::run() {
   }
 
   // Run buzzer heartbeat
-  buzzerHeartbeat();
+  buzzerHeartbeat_tick();
 
   // If help command, send help and stop
-  if (cliGetOptions().h) {
+  if (cli_getOptions().h) {
     char sendString[80];
-    uint32_t lastFlightNum = data_log_get_last_flight_num();
+    uint32_t lastFlightNum = dataLog_getLastFlightNum();
     if (lastFlightNum == 0) {
       snprintf(sendString, sizeof(sendString),
                "\r\nNo flights exist to offload\r\n");
-      cliSend(sendString);
+      cli_send(sendString);
     } else {
       time_t flight_timestamp;
       char timeString[25];
       snprintf(sendString, sizeof(sendString),
                "Available flights to offload: \r\n");
-      cliSend(sendString);
+      cli_send(sendString);
       snprintf(sendString, sizeof(sendString),
                "Last: %" PRIu32 "      Last Launched: %" PRIu32 "\r\n",
-               data_log_get_last_flight_num(),
-               data_log_get_last_launched_flight_num());
-      cliSend(sendString);
+               dataLog_getLastFlightNum(), dataLog_getLastLaunchedFlightNum());
+      cli_send(sendString);
       snprintf(sendString, sizeof(sendString),
                "| %8s | %8s | %-25s | %-15s |\r\n", "Flight #", "Launched",
                "Timestamp", "Flight Duration");
-      cliSend(sendString);
+      cli_send(sendString);
       for (uint8_t num = 1; num <= lastFlightNum; ++num) {
-        data_log_read_flight_num_metadata(num);
-        FlightMetadata_s *metadataPacket = data_log_get_flight_metadata();
+        dataLog_readFlightNumMetadata(num);
+        FlightMetadata_s *metadataPacket = dataLog_getFlightMetadata();
         flight_timestamp = (time_t)metadataPacket->gpsTimestamp;
         // Check timestamp between 2000 and 2100
         if (flight_timestamp > 946702800 && flight_timestamp < 4102462800) {
@@ -102,19 +101,19 @@ EndCondition_e CliOffloadState::run() {
         snprintf(launchedString, sizeof(launchedString),
                  metadataPacket->launched == 1 ? "true" : "false");
         char durationString[9];
-        format_time_seconds(durationString, sizeof(durationString),
-                            data_log_get_last_flight_timestamp(num) / 1000);
+        formatTimeSeconds(durationString, sizeof(durationString),
+                          dataLog_getLastFlightTimestamp(num) / 1000);
         snprintf(sendString, sizeof(sendString),
                  "| %8d | %8s | %-25s | %-15s |\r\n", num, launchedString,
                  timeString, durationString);
-        cliSend(sendString);
+        cli_send(sendString);
       }
     }
     return EndCondition_e::CliCommandComplete;
   }
 
   // Offload one chunk of data
-  if (dataOffload()) {
+  if (dataOffload_tick()) {
     return EndCondition_e::CliCommandComplete;
   }
 
@@ -124,6 +123,6 @@ EndCondition_e CliOffloadState::run() {
 void CliOffloadState::cleanup() {
   // Only send complete message if initialization was successful
   if (initSuccess_) {
-    cliSendComplete(true, nullptr);
+    cli_sendComplete(true, nullptr);
   }
 }

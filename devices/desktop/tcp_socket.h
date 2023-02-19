@@ -11,11 +11,17 @@
 #include <thread>  // NOLINT
 #include <vector>
 
+#include "circular_buffer.h"
+
 class TcpSocket {
  public:
   explicit TcpSocket(int port);
 
   bool writeData(uint8_t *data, size_t len);
+
+  bool readData();
+
+  void setRXBuffer(CircularBuffer_s *rx_buffer);
 
  private:
   struct sockaddr_in address {};
@@ -23,6 +29,8 @@ class TcpSocket {
 
   int server_fd;
   volatile int client_fd;
+
+  CircularBuffer_s *rxBuffer;
 
   std::thread acceptThread;
 };

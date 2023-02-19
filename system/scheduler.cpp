@@ -11,7 +11,7 @@ Scheduler::Scheduler() {
   pCurrentState_ = nullptr;
   pNextState = &initialize;
 
-  lastTime_ = HM_Millis();
+  lastTime_ = hm_millis();
   tickIdx = 0;
 }
 
@@ -26,7 +26,7 @@ bool Scheduler::hasTimerExpired() {
   // TODO what should we do if current state is null here somehow?
   if (!pCurrentState_) return true;
 
-  return ((HM_Millis() - lastTime_) > pCurrentState_->getPeriodMS());
+  return ((hm_millis() - lastTime_) > pCurrentState_->getPeriodMS());
 }
 
 void Scheduler::tick(void) {
@@ -35,7 +35,7 @@ void Scheduler::tick(void) {
   // Helper functions throughout infinite loop
   EndCondition_e endCondition = NoChange;
 
-  lastTime_ = HM_Millis();
+  lastTime_ = hm_millis();
   // Visually show how fast scheduler is running using LED
   HM_LedToggle(1);
 
@@ -58,7 +58,7 @@ void Scheduler::tick(void) {
     }
   }
 
-  HM_ObserveTickComplete(++tickIdx);
+  hm_observeTickComplete(++tickIdx);
 }
 
 Scheduler::StateId_e Scheduler::getNextState(EndCondition_e endCondition) {
@@ -94,7 +94,7 @@ Scheduler::StateId_e Scheduler::getNextState(EndCondition_e endCondition) {
       }
       break;
     case StateId_e::Initialize: {
-      int storedStateInt = state_log_read();
+      int storedStateInt = stateLog_read();
       // Resumes a flight from the state log if there is a state to resume
       if (storedStateInt >= 0) {
         StateId_e storedStateId_e =
@@ -104,8 +104,8 @@ Scheduler::StateId_e Scheduler::getNextState(EndCondition_e endCondition) {
         // regardless)
         if (storedStateId_e == StateId_e::Ascent ||
             storedStateId_e == StateId_e::Descent) {
-          state_log_reload_flight();
-          cli_tasks::ConfigureForFlight();
+          stateLog_reloadFlight();
+          CliTasks::configureForFlight();
           return storedStateId_e;
         }
       }

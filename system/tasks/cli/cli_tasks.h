@@ -3,20 +3,20 @@
 
 #include "states_interface.h"
 
-namespace cli_tasks {
-EndCondition_e cliTick();
+namespace CliTasks {
+EndCondition_e tick();
 
 // Change allowed transitions based on flight state
-void ConfigureForFlight();
-void ConfigureForGround();
+void configureForFlight();
+void configureForGround();
 
-void cliConfig();
-void cliSense();
-void cliHelp();
-void cliTriggerFire();
-void cliSendLineCutterstring();  // Send a string to a line cutter
-void cliVersion();
+void config();
+void sense();
+void help();
+void triggerFire();
+void sendLineCutterString();  // Send a string to a line cutter
+void version();
 
-}  // namespace cli_tasks
+}  // namespace CliTasks
 
 #endif  // SYSTEM_TASKS_CLI_CLI_TASKS_H_

@@ -21,7 +21,7 @@ class FlightState : public State {
 
   ~FlightState() = default;
 
-  EndCondition_e run_state() override;
+  EndCondition_e runState() override;
 
  protected:
   bool m_hasPassedLaunch;

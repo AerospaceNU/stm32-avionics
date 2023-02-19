@@ -114,6 +114,7 @@ int main(void) {
   MX_UART5_Init();
   MX_USB_DEVICE_Init();
   MX_IWDG1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
   /* Initialize scheduler */

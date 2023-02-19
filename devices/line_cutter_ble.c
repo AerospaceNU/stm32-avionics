@@ -126,8 +126,8 @@ void lineCutterBle_init(LineCutterBleCtrl_t *lineCutter, BleChip_s *bleChip,
   lineCutter->bleChip = bleChip;
   lineCutter->address = address;
 
-  cbInit(&lineCutter->buffer, lineCutter->packetArray, LINE_CUTTER_CB_SIZE,
-         sizeof(uint8_t));
+  cb_init(&lineCutter->buffer, lineCutter->packetArray, LINE_CUTTER_CB_SIZE,
+          sizeof(uint8_t));
   lineCutter->bleChip->registerAddress(lineCutter->bleChip, lineCutter->address,
                                        &lineCutter->buffer);
 }

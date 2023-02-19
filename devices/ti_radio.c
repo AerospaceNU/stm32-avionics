@@ -17,21 +17,21 @@
 #include "cc1120_cc1200_defs.h"
 
 // Forward declarations for all internal register read/writes
-static uint8_t cc1120SpiReadReg(TiRadioCtrl_s *radio, uint16_t addr,
-                                uint8_t *data, uint8_t len);
-static uint8_t cc1120SpiWriteReg(TiRadioCtrl_s *radio, uint16_t addr,
-                                 uint8_t *data, uint8_t len);
-static uint8_t cc1120SpiWriteTxFifo(TiRadioCtrl_s *radio, uint8_t *pWriteData,
-                                    uint8_t len);
-static uint8_t cc1120SpiReadRxFifo(TiRadioCtrl_s *radio, uint8_t *pReadData,
-                                   uint8_t len);
-static uint8_t cc1120TrxSpiCmdStrobe(TiRadioCtrl_s *radio, uint8_t cmd);
-static void cc1120TrxReadWriteBurstSingle(TiRadioCtrl_s *radio, uint8_t addr,
-                                          uint8_t *pData, uint16_t len);
+static uint8_t tiRadio_spiReadReg(TiRadioCtrl_s *radio, uint16_t addr,
+                                  uint8_t *data, uint8_t len);
+static uint8_t tiRadio_spiWriteReg(TiRadioCtrl_s *radio, uint16_t addr,
+                                   uint8_t *data, uint8_t len);
+static uint8_t tiRadio_spiWriteTxFifo(TiRadioCtrl_s *radio, uint8_t *pWriteData,
+                                      uint8_t len);
+static uint8_t tiRadio_spiReadRxFifo(TiRadioCtrl_s *radio, uint8_t *pReadData,
+                                     uint8_t len);
+static uint8_t tiRadio_txRxSpiCmdStrobe(TiRadioCtrl_s *radio, uint8_t cmd);
+static void tiRadio_txRxReadWriteBurstSingle(TiRadioCtrl_s *radio, uint8_t addr,
+                                             uint8_t *pData, uint16_t len);
 //! Try to transmit a packet. Returns true if we were able to add the packet to
 //! TX FIFO
-static bool cc1120TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
-                                 uint8_t payloadLength);
+static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
+                                   uint8_t payloadLength);
 
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
 static bool manualCalibration(TiRadioCtrl_s *radio);
@@ -40,7 +40,7 @@ static bool manualCalibration(TiRadioCtrl_s *radio);
 #define TIRADIO_MAX_DELAY 10  // ms
 
 // Initially configure radio, apply settings provided
-bool tiRadio_Init(TiRadioCtrl_s *radio) {
+bool tiRadio_init(TiRadioCtrl_s *radio) {
   // Set SPI pins into a known good state. Lots of waiting to make sure it
   // actually happens
   HAL_GPIO_WritePin(radio->RST_port, radio->RST_pin, SET);
@@ -53,23 +53,23 @@ bool tiRadio_Init(TiRadioCtrl_s *radio) {
   HAL_Delay(50);
 
   // Reset everything
-  cc1120TrxSpiCmdStrobe(radio, TIRADIO_SRES);
+  tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SRES);
 
   // Write provided default register settings
   uint8_t writeByte;
   for (uint16_t i = 0; i < (radio->settingsSize / sizeof(RegisterSetting_s));
        i++) {
     writeByte = radio->settingsPtr[i].data;
-    cc1120SpiWriteReg(radio, radio->settingsPtr[i].addr, &writeByte, 1);
+    tiRadio_spiWriteReg(radio, radio->settingsPtr[i].addr, &writeByte, 1);
   }
 
   // Put radio back into RX after receiving a good packet
   uint8_t rfend1 = 0b00110000 | (0x07 << 1) | 0x01;
-  cc1120SpiWriteReg(radio, TIRADIO_RFEND_CFG1, &rfend1, 1);
+  tiRadio_spiWriteReg(radio, TIRADIO_RFEND_CFG1, &rfend1, 1);
 
   // Put radio back into RX after sending a packet (TXOFF_MODE)
   uint8_t rfend0 = 0b00110000;
-  cc1120SpiWriteReg(radio, TIRADIO_RFEND_CFG0, &rfend0, 1);
+  tiRadio_spiWriteReg(radio, TIRADIO_RFEND_CFG0, &rfend0, 1);
 
   // Figure out what packet length/config we need to send to the radio
   uint8_t pkt_len = 0xFF;
@@ -83,10 +83,10 @@ bool tiRadio_Init(TiRadioCtrl_s *radio) {
   }
 
   // The size for fixed length should be known on init
-  cc1120SpiWriteReg(radio, TIRADIO_PKT_LEN, &pkt_len, 0x01);
-  cc1120SpiWriteReg(radio, TIRADIO_PKT_CFG0, &pkt_cfg0, 0x01);
+  tiRadio_spiWriteReg(radio, TIRADIO_PKT_LEN, &pkt_len, 0x01);
+  tiRadio_spiWriteReg(radio, TIRADIO_PKT_CFG0, &pkt_cfg0, 0x01);
 
-  cc1120SpiWriteReg(radio, TIRADIO_FIFO_CFG, &radio->payloadSize, 0x01);
+  tiRadio_spiWriteReg(radio, TIRADIO_FIFO_CFG, &radio->payloadSize, 0x01);
 
   // SetFrequency is broken, for now the prefered settings do this for us
   // tiRadio_setFrequency(radio);
@@ -95,18 +95,18 @@ bool tiRadio_Init(TiRadioCtrl_s *radio) {
   // calibrate the radio per errata
   if (!manualCalibration(radio)) return false;
 #else
-  cc1120TrxSpiCmdStrobe(radio, TIRADIO_SCAL);
+  tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SCAL);
 #endif
 
   // We need GPIO3 to find when packets come in
   // We look for when full above thresh or packet end reached
-  tiRadio_ConfigGPIO(radio, TIRADIO_IOCFG3, TIRADIO_RXFIFO_THR_PKT, false);
+  tiRadio_configGpio(radio, TIRADIO_IOCFG3, TIRADIO_RXFIFO_THR_PKT, false);
 
-  tiRadio_ForceIdle(radio);
+  tiRadio_forceIdle(radio);
 
   radio->initialized = true;
 
-  cbInit(&radio->txBuffer, radio->txArray, PACKET_TX_SIZE, 1);
+  cb_init(&radio->txBuffer, radio->txArray, PACKET_TX_SIZE, 1);
   radio->currentConsumerCount = 0;
 
   // TODO we should be smart about not killing our LNA by accident, that's why I
@@ -117,41 +117,81 @@ bool tiRadio_Init(TiRadioCtrl_s *radio) {
 
 // The main tick function. Checks for new packets and transmits the waiting one,
 // if non-zero
-void tiRadio_Update(TiRadioCtrl_s *radio) {
+void tiRadio_update(TiRadioCtrl_s *radio) {
   // Don't let anything happen if radio isn't initialized
   if (!radio->initialized) return;
+
+  // The MARC_STATUS1 register "tells us what caused MCU_WAKEUP to be asserted"
+  // We don't actually check if it's been asserted here, though -- that's
+  // probably not ideal instead, we just use it to figure out of the TX or RX
+  // FIFO queues inside the radio chip have overflowed.
+
+  // Due (probably) to another bug with how we enqueue packets to send to the
+  // radio, spamming CLI commands from ground station up to the rocket can make
+  // the TX FIFO overflow, causing the radio to become stuck in the TX state
+  // forever. This makes everything hang. When this happens, MARC_STATUS1 will
+  // read 7 (TX FIFO overflow) and the radio state will be stuck in TX.
+
+  // To get out of this state, we can't use SFTX or SFRX directly (states that
+  // flush the FIFOs), as we're still in the TX state, not the TX FIFO error
+  // state. So first, we have to force the radio chip to IDLE (See the state
+  // machine on page 6 of the CC1200 programming manual)
+
+  // But this alone isn't sufficient, since there's there can still be some
+  // residual data left in the TX FIFOs. Essentially, this means all future
+  // packets will be offset by some number of bytes lmao. Page 13 says that
+  // sending SFTX is allowed in IDLE, so we should be good
+
+  // TODO 1) we should be checking that the TX FIFO is _empty_ before adding a
+  // packet to it in the TX function, and figuring out if we need to flush there
+  // to ensure the FIFO is actually empty before we stuff our packet in
+  // TODO 2) we should probably attach the MCU_WAKEUP interrupt to something,
+  // and replace the FIFO_THRESH GPIO I think? It's unclear if it's undefined
+  // behavior to try to read MARC_STATUS1 at some random time, not just when
+  // MCU_WAKEUP happens
+
+  uint8_t marcstate;
+  tiRadio_spiReadReg(radio, TIRADIO_MARC_STATUS1, &marcstate, 1);
+  // TX over-/underflow 7-8, RX over-/underflow 9-10 -- want to flush in any of
+  // these cases
+  if (marcstate >= 0x07 &&
+      marcstate <= 0x0A) {  // TX overflow 7-8, RX overflow 9-10
+    tiRadio_forceIdle(radio);
+    tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SFTX);
+    tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SFRX);
+  }
 
   // Check for new packets until the GPIO goes low
   // realistically, we'll only ever get like 2, but
   // it doesn't hurt since the cost for each check
   // is a GPIO read
   int i = 0;
-  while (tiRadio_CheckNewPacket(radio) && (i++ < 10)) {
+  while (tiRadio_checkNewPacket(radio) && (i++ < 10)) {
   }
 
   // Attempt to transmit one packet, since we don't want to
   // overflow the TX FIFO. Alternately, we could write bytes
   // until the TX FIFO is full. But right now at least, a packet
   // takes 10ms or so to transmit anyways
-  if (cbCount(&radio->txBuffer) >= radio->payloadSize) {
+  if (cb_count(&radio->txBuffer) >= radio->payloadSize) {
     // Try to dequeue radio->payloadSize many bytes
     static uint8_t tempBuffer[128] = {0};
     size_t size = radio->payloadSize;
-    cbPeek(&radio->txBuffer, tempBuffer, &size);
+    cb_peek(&radio->txBuffer, tempBuffer, &size);
 
     // If we managed to dequeue bytes we're good
     if (size == radio->payloadSize) {
-      bool added = cc1120TransmitPacket(radio, tempBuffer, size);
-      if (added) cbDequeue(&radio->txBuffer, size);
+      bool added = tiRadio_TransmitPacket(radio, tempBuffer, size);
+      if (added) cb_dequeue(&radio->txBuffer, size);
     }
   }
 
-  uint8_t status = cc1120TrxSpiCmdStrobe(radio, TIRADIO_SNOP);
+  uint8_t status = tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SNOP);
   status = (status & TI_RADIO_STATUS_MASK);
 
   switch (status) {
     case TIRADIO_STATE_IDLE:
-      tiRadio_StartRX(radio);
+      tiRadio_startRx(radio);
       break;
     case TIRADIO_STATE_RX:
 
@@ -167,13 +207,13 @@ void tiRadio_Update(TiRadioCtrl_s *radio) {
     case TIRADIO_STATE_SETTLING:
       break;
     case TIRADIO_STATE_RXFIFO_ERROR:
-      cc1120TrxSpiCmdStrobe(radio, TIRADIO_SFRX);
+      tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SFRX);
       break;
     case TIRADIO_STATE_TXFIFO_ERROR:
-      cc1120TrxSpiCmdStrobe(radio, TIRADIO_SFTX);
+      tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SFTX);
       break;
     default:
-      cc1120TrxSpiCmdStrobe(radio, TIRADIO_SIDLE);
+      tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SIDLE);
       break;
   }
 }
@@ -183,12 +223,12 @@ static bool cc1120InTx(uint8_t status) {
          status == TIRADIO_STATE_SETTLING;
 }
 
-static bool cc1120TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
-                                 uint8_t payloadLength) {
+static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
+                                   uint8_t payloadLength) {
   static bool added = false;
 
   uint8_t status;
-  status = cc1120TrxSpiCmdStrobe(radio, TIRADIO_SNOP);
+  status = tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SNOP);
   status = (status & TI_RADIO_STATUS_MASK);
   if (cc1120InTx(status)) {
     // If we're currently in TX, we should wait a tick to add our packet,
@@ -203,8 +243,8 @@ static bool cc1120TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
   // At the same time, page 42 says that in LBT mode we'll keep trying to enter
   // TX mode
 
-  static uint8_t marcstat;
-  cc1120SpiReadReg(radio, TIRADIO_MARC_STATUS1, &marcstat, 1);
+  uint8_t marcstat;
+  tiRadio_spiReadReg(radio, TIRADIO_MARC_STATUS1, &marcstat, 1);
   if (marcstat == TIRADIO_CCA_FAILED) {
     // We shouldn't add another packet, but should try sending it again
     added = false;
@@ -220,23 +260,23 @@ static bool cc1120TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
       }
 
       // If in variable length mode, length needs to be the first bit in fifo
-      cc1120SpiWriteTxFifo(radio, &payloadLength, 1);
+      tiRadio_spiWriteTxFifo(radio, &payloadLength, 1);
     }
 
     // Write packet contents to TX FIFO
-    cc1120SpiWriteTxFifo(radio, payload, payloadLength);
+    tiRadio_spiWriteTxFifo(radio, payload, payloadLength);
 
     added = true;
   }
 
   // Check state again
-  status = cc1120TrxSpiCmdStrobe(radio, TIRADIO_SNOP);
+  status = tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SNOP);
   status = (status & TI_RADIO_STATUS_MASK);
 
   if (status == TIRADIO_STATE_TXFIFO_ERROR) {
     // FIFO overflow. Flush TX FIFO and try
     // to send the packet next tick
-    cc1120TrxSpiCmdStrobe(radio, TIRADIO_SFTX);
+    tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SFTX);
 
     added = false;
   }
@@ -246,14 +286,14 @@ static bool cc1120TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
     // The only way I've found to prevent this is to force
     // it idle before sending STX. This will interrupt any TX's in
     // progress though!!
-    cc1120TrxSpiCmdStrobe(radio, TIRADIO_SIDLE);
+    tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SIDLE);
   }
 #endif
 
   // Actually put radio into TX mode
   // If CCA is enabled, FSTXON is only entered if CCA is met
   // Otherwise we will stay in TX mode
-  cc1120TrxSpiCmdStrobe(radio, TIRADIO_STX);
+  tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_STX);
 
   return added;
 }
@@ -274,11 +314,11 @@ static void cc1120EnqueuePacket(TiRadioCtrl_s *radio, uint8_t *buff,
     CircularBuffer_s *consumer = radio->messageConsumers[i];
     if (consumer == NULL) continue;
 
-    cbEnqueue(consumer, &packet);
+    cb_enqueue(consumer, &packet);
   }
 }
 
-bool tiRadio_AddTxPacket(TiRadioCtrl_s *radio, uint8_t *packet, uint8_t len) {
+bool tiRadio_addTxPacket(TiRadioCtrl_s *radio, uint8_t *packet, uint8_t len) {
   // Need to transmit in distinct packets, and we assume in fixed that there's
   // no delimination between packets This will require some refactoring to
   // support variable packet length
@@ -288,11 +328,11 @@ bool tiRadio_AddTxPacket(TiRadioCtrl_s *radio, uint8_t *packet, uint8_t len) {
   }
 
   // Check if adding payloadSinze many bytes won't overflow
-  if (radio->payloadSize + cbCount(&radio->txBuffer) <=
-      cbCapacity(&radio->txBuffer)) {
+  if (radio->payloadSize + cb_count(&radio->txBuffer) <=
+      cb_capacity(&radio->txBuffer)) {
     // Add our whole packet to the queue
     for (int j = 0; j < radio->payloadSize; j++) {
-      cbEnqueue(&radio->txBuffer, packet + j);
+      cb_enqueue(&radio->txBuffer, packet + j);
     }
   } else {
     // Buffer full, all we can do is return
@@ -302,30 +342,30 @@ bool tiRadio_AddTxPacket(TiRadioCtrl_s *radio, uint8_t *packet, uint8_t len) {
   return true;
 }
 
-void tiRadio_RegisterConsumer(TiRadioCtrl_s *radio,
+void tiRadio_registerConsumer(TiRadioCtrl_s *radio,
                               CircularBuffer_s *rxBuffer) {
   radio->messageConsumers[radio->currentConsumerCount] = rxBuffer;
   radio->currentConsumerCount++;
 }
 
-bool tiRadio_CheckNewPacket(TiRadioCtrl_s *radio) {
+bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
   static uint8_t rxbytes = 0x00;
   static uint8_t rxBuffer[128] = {0};
 
   // Read GPIO, should be high until the RX FIFO is empty
   if (HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_SET) {
     // Read number of bytes in RX FIFO
-    cc1120SpiReadReg(radio, TIRADIO_NUM_RXBYTES, &rxbytes, 1);
+    tiRadio_spiReadReg(radio, TIRADIO_NUM_RXBYTES, &rxbytes, 1);
     if (rxbytes < 1) {
       return false;
     }
 
     // Double check RX FIFO has not yet overflowed
-    uint8_t status = cc1120TrxSpiCmdStrobe(radio, TIRADIO_SNOP);
+    uint8_t status = tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SNOP);
     status = (status & TI_RADIO_STATUS_MASK);
     if (status == TIRADIO_STATE_RXFIFO_ERROR) {
       // Flush RX FIFO
-      cc1120TrxSpiCmdStrobe(radio, TIRADIO_SFRX);
+      tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SFRX);
       return false;
     }
 
@@ -333,7 +373,7 @@ bool tiRadio_CheckNewPacket(TiRadioCtrl_s *radio) {
     if ((radio->packetCfg & CC1120_LENGTH_CONFIG_MASK) ==
         TIRADIO_PKTLEN_VARIABLE) {
       /*
-      cc1120SpiReadRxFifo(radio, rxBuffer, rxbytes);
+      tiRadio_spiReadRxFifo(radio, rxBuffer, rxbytes);
       memcpy(radio->packetRX, rxBuffer, rxbytes - 2);
       radio->RSSI = rxBuffer[rxbytes - 2];
       radio->CRC_LQI = rxBuffer[rxbytes - 1];
@@ -341,10 +381,10 @@ bool tiRadio_CheckNewPacket(TiRadioCtrl_s *radio) {
     } else {
       // Fixed means we have payloadSize many data bytes, then RSSI and CRC_LQI
       // appended
-      cc1120SpiReadRxFifo(radio, rxBuffer, radio->payloadSize);
-      cc1120SpiReadRxFifo(radio, (uint8_t *)&radio->RSSI, 1);
+      tiRadio_spiReadRxFifo(radio, rxBuffer, radio->payloadSize);
+      tiRadio_spiReadRxFifo(radio, (uint8_t *)&radio->RSSI, 1);
       uint8_t crc_lqi;
-      cc1120SpiReadRxFifo(radio, &crc_lqi, 1);
+      tiRadio_spiReadRxFifo(radio, &crc_lqi, 1);
 
       radio->LQI = crc_lqi & TIRADIO_LQI_EST_BM;
 
@@ -358,10 +398,10 @@ bool tiRadio_CheckNewPacket(TiRadioCtrl_s *radio) {
   return false;
 }
 
-bool tiRadio_ForceIdle(TiRadioCtrl_s *radio) {
+bool tiRadio_forceIdle(TiRadioCtrl_s *radio) {
   // return the radio to idle somehow
   uint8_t status;
-  status = cc1120TrxSpiCmdStrobe(radio, TIRADIO_SNOP);
+  status = tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SNOP);
   status = (status & TI_RADIO_STATUS_MASK);
 
   switch (status) {
@@ -369,15 +409,15 @@ bool tiRadio_ForceIdle(TiRadioCtrl_s *radio) {
       return true;
       break;
     case TIRADIO_STATE_RX:
-      cc1120TrxSpiCmdStrobe(radio, TIRADIO_SIDLE);
+      tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SIDLE);
       return true;
       break;
     case TIRADIO_STATE_TX:
-      cc1120TrxSpiCmdStrobe(radio, TIRADIO_SIDLE);
+      tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SIDLE);
       return true;
       break;
     case TIRADIO_STATE_FSTXON:
-      cc1120TrxSpiCmdStrobe(radio, TIRADIO_SIDLE);
+      tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SIDLE);
       return true;
       break;
     case TIRADIO_STATE_CALIBRATE:
@@ -387,30 +427,30 @@ bool tiRadio_ForceIdle(TiRadioCtrl_s *radio) {
       return false;
       break;
     case TIRADIO_STATE_RXFIFO_ERROR:
-      cc1120TrxSpiCmdStrobe(radio, TIRADIO_SFRX);
+      tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SFRX);
       return true;
       break;
     case TIRADIO_STATE_TXFIFO_ERROR:
-      cc1120TrxSpiCmdStrobe(radio, TIRADIO_SFTX);
+      tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SFTX);
       return true;
       break;
 
     default:
-      cc1120TrxSpiCmdStrobe(radio, TIRADIO_SIDLE);
+      tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SIDLE);
       return true;
   }
 
   return false;
 }
 
-bool tiRadio_StartRX(TiRadioCtrl_s *radio) {
+bool tiRadio_startRx(TiRadioCtrl_s *radio) {
   uint8_t readByte;
-  cc1120TrxSpiCmdStrobe(radio, TIRADIO_SRX);
+  tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SRX);
 
   // make sure we actually switch into rx by waiting till marcstate is right
   uint32_t startMS = HAL_GetTick();
   do {
-    cc1120SpiReadReg(radio, TIRADIO_MARCSTATE, &readByte, 1);
+    tiRadio_spiReadReg(radio, TIRADIO_MARCSTATE, &readByte, 1);
   } while (readByte != TIRADIO_MARCSTATE_RX &&
            HAL_GetTick() - startMS < TIRADIO_MAX_DELAY);
 
@@ -427,7 +467,7 @@ static const size_t maxValue24Bits = 16777216 - 1;
 #define RADIO_OSC_FREQ CC1200_OSC_FREQ
 #endif
 
-void tiRadio_SetRadioFrequency(TiRadioCtrl_s *radio, enum TIRADIO_Band band,
+void tiRadio_setRadioFrequency(TiRadioCtrl_s *radio, TiRadioBand_e band,
                                float frequencyHz) {
   // LO divider and stuff should already be set for us, as we assume we must
   // be on the correct band already
@@ -446,7 +486,7 @@ void tiRadio_SetRadioFrequency(TiRadioCtrl_s *radio, enum TIRADIO_Band band,
   // testing)
   uint8_t fsCfg =
       (1 << FS_CFG_FS_LOCK_EN) | ((uint8_t)(band) << FS_CFG_FSD_BANDSELECT);
-  cc1120SpiWriteReg(radio, TIRADIO_FS_CFG, &fsCfg, 1);
+  tiRadio_spiWriteReg(radio, TIRADIO_FS_CFG, &fsCfg, 1);
 
   // equation derived from user guide section 9.12
   // f_RF = FREQ / 2^16 * f_XOSC / LO
@@ -461,7 +501,7 @@ void tiRadio_SetRadioFrequency(TiRadioCtrl_s *radio, enum TIRADIO_Band band,
                              (uint8_t)((actualFreqRegValue >> 8) & 0xFF),
                              (uint8_t)((actualFreqRegValue & 0xFF))};
 
-  cc1120SpiWriteReg(radio, TIRADIO_FREQ2, freqRegisters, 3);
+  tiRadio_spiWriteReg(radio, TIRADIO_FREQ2, freqRegisters, 3);
 
 #ifdef CC1200_DEBUG
   // sanity check: calculate actual frequency
@@ -475,15 +515,15 @@ void tiRadio_SetRadioFrequency(TiRadioCtrl_s *radio, enum TIRADIO_Band band,
 #endif
 
   // We need to recalibrate our radio after changing the frequency
-  tiRadio_Calibrate(radio);
+  tiRadio_calibrate(radio);
 }
 
-bool tiRadio_Calibrate(TiRadioCtrl_s *radio) {
+bool tiRadio_calibrate(TiRadioCtrl_s *radio) {
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
   // calibrate the radio per errata
   return manualCalibration(radio);
 #else
-  cc1120TrxSpiCmdStrobe(radio, TIRADIO_SCAL);
+  tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SCAL);
   return true;  // TODO how can we tell we've calibrated?
 #endif
 }
@@ -501,80 +541,80 @@ static bool manualCalibration(TiRadioCtrl_s *radio) {
   uint8_t marcstate;
   uint8_t writeByte;
 
-  cc1120SpiReadReg(radio, TIRADIO_MARCSTATE, &marcstate, 1);
+  tiRadio_spiReadReg(radio, TIRADIO_MARCSTATE, &marcstate, 1);
 
   // 1) Set VCO cap-array to 0 (FS_VCO2 = 0x00)
   writeByte = 0x00;
-  cc1120SpiWriteReg(radio, TIRADIO_FS_VCO2, &writeByte, 1);
+  tiRadio_spiWriteReg(radio, TIRADIO_FS_VCO2, &writeByte, 1);
 
   // 2) Start with high VCDAC (original VCDAC_START + 2):
-  cc1120SpiReadReg(radio, TIRADIO_FS_CAL2, &original_fs_cal2, 1);
+  tiRadio_spiReadReg(radio, TIRADIO_FS_CAL2, &original_fs_cal2, 1);
   writeByte = original_fs_cal2 + VCDAC_START_OFFSET;
-  cc1120SpiWriteReg(radio, TIRADIO_FS_CAL2, &writeByte, 1);
+  tiRadio_spiWriteReg(radio, TIRADIO_FS_CAL2, &writeByte, 1);
 
   // 3) Calibrate and wait for calibration to be done
   //   (radio back in IDLE state)
-  cc1120TrxSpiCmdStrobe(radio, TIRADIO_SCAL);
+  tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SCAL);
 
   uint32_t startMS = HAL_GetTick();
   do {
-    cc1120SpiReadReg(radio, TIRADIO_MARCSTATE, &marcstate, 1);
+    tiRadio_spiReadReg(radio, TIRADIO_MARCSTATE, &marcstate, 1);
   } while (marcstate != 0x41 && HAL_GetTick() - startMS < 5000);
   if (marcstate != 0x41) return false;
 
   // 4) Read FS_VCO2, FS_VCO4 and FS_CHP register obtained with
   //    high VCDAC_START value
-  cc1120SpiReadReg(radio, TIRADIO_FS_VCO2,
-                   &calResults_for_vcdac_start_high[FS_VCO2_INDEX], 1);
-  cc1120SpiReadReg(radio, TIRADIO_FS_VCO4,
-                   &calResults_for_vcdac_start_high[FS_VCO4_INDEX], 1);
-  cc1120SpiReadReg(radio, TIRADIO_FS_CHP,
-                   &calResults_for_vcdac_start_high[FS_CHP_INDEX], 1);
+  tiRadio_spiReadReg(radio, TIRADIO_FS_VCO2,
+                     &calResults_for_vcdac_start_high[FS_VCO2_INDEX], 1);
+  tiRadio_spiReadReg(radio, TIRADIO_FS_VCO4,
+                     &calResults_for_vcdac_start_high[FS_VCO4_INDEX], 1);
+  tiRadio_spiReadReg(radio, TIRADIO_FS_CHP,
+                     &calResults_for_vcdac_start_high[FS_CHP_INDEX], 1);
 
   // 5) Set VCO cap-array to 0 (FS_VCO2 = 0x00)
   writeByte = 0x00;
-  cc1120SpiWriteReg(radio, TIRADIO_FS_VCO2, &writeByte, 1);
+  tiRadio_spiWriteReg(radio, TIRADIO_FS_VCO2, &writeByte, 1);
 
   // 6) Continue with mid VCDAC (original VCDAC_START):
   writeByte = original_fs_cal2;
-  cc1120SpiWriteReg(radio, TIRADIO_FS_CAL2, &writeByte, 1);
+  tiRadio_spiWriteReg(radio, TIRADIO_FS_CAL2, &writeByte, 1);
 
   // 7) Calibrate and wait for calibration to be done
   //   (radio back in IDLE state)
-  cc1120TrxSpiCmdStrobe(radio, TIRADIO_SCAL);
+  tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SCAL);
 
   startMS = HAL_GetTick();
   do {
-    cc1120SpiReadReg(radio, TIRADIO_MARCSTATE, &marcstate, 1);
+    tiRadio_spiReadReg(radio, TIRADIO_MARCSTATE, &marcstate, 1);
   } while (marcstate != 0x41 && HAL_GetTick() - startMS < 5000);
   if (marcstate != 0x41) return false;
 
   // 8) Read FS_VCO2, FS_VCO4 and FS_CHP register obtained
   //    with mid VCDAC_START value
-  cc1120SpiReadReg(radio, TIRADIO_FS_VCO2,
-                   &calResults_for_vcdac_start_mid[FS_VCO2_INDEX], 1);
-  cc1120SpiReadReg(radio, TIRADIO_FS_VCO4,
-                   &calResults_for_vcdac_start_mid[FS_VCO4_INDEX], 1);
-  cc1120SpiReadReg(radio, TIRADIO_FS_CHP,
-                   &calResults_for_vcdac_start_mid[FS_CHP_INDEX], 1);
+  tiRadio_spiReadReg(radio, TIRADIO_FS_VCO2,
+                     &calResults_for_vcdac_start_mid[FS_VCO2_INDEX], 1);
+  tiRadio_spiReadReg(radio, TIRADIO_FS_VCO4,
+                     &calResults_for_vcdac_start_mid[FS_VCO4_INDEX], 1);
+  tiRadio_spiReadReg(radio, TIRADIO_FS_CHP,
+                     &calResults_for_vcdac_start_mid[FS_CHP_INDEX], 1);
 
   // 9) Write back highest FS_VCO2 and corresponding FS_VCO
   //    and FS_CHP result
   if (calResults_for_vcdac_start_high[FS_VCO2_INDEX] >
       calResults_for_vcdac_start_mid[FS_VCO2_INDEX]) {
     writeByte = calResults_for_vcdac_start_high[FS_VCO2_INDEX];
-    cc1120SpiWriteReg(radio, TIRADIO_FS_VCO2, &writeByte, 1);
+    tiRadio_spiWriteReg(radio, TIRADIO_FS_VCO2, &writeByte, 1);
     writeByte = calResults_for_vcdac_start_high[FS_VCO4_INDEX];
-    cc1120SpiWriteReg(radio, TIRADIO_FS_VCO4, &writeByte, 1);
+    tiRadio_spiWriteReg(radio, TIRADIO_FS_VCO4, &writeByte, 1);
     writeByte = calResults_for_vcdac_start_high[FS_CHP_INDEX];
-    cc1120SpiWriteReg(radio, TIRADIO_FS_CHP, &writeByte, 1);
+    tiRadio_spiWriteReg(radio, TIRADIO_FS_CHP, &writeByte, 1);
   } else {
     writeByte = calResults_for_vcdac_start_mid[FS_VCO2_INDEX];
-    cc1120SpiWriteReg(radio, TIRADIO_FS_VCO2, &writeByte, 1);
+    tiRadio_spiWriteReg(radio, TIRADIO_FS_VCO2, &writeByte, 1);
     writeByte = calResults_for_vcdac_start_mid[FS_VCO4_INDEX];
-    cc1120SpiWriteReg(radio, TIRADIO_FS_VCO4, &writeByte, 1);
+    tiRadio_spiWriteReg(radio, TIRADIO_FS_VCO4, &writeByte, 1);
     writeByte = calResults_for_vcdac_start_mid[FS_CHP_INDEX];
-    cc1120SpiWriteReg(radio, TIRADIO_FS_CHP, &writeByte, 1);
+    tiRadio_spiWriteReg(radio, TIRADIO_FS_CHP, &writeByte, 1);
   }
 
   return true;
@@ -582,7 +622,7 @@ static bool manualCalibration(TiRadioCtrl_s *radio) {
 #endif
 
 //! Set power in db. Make sure to respect your PA maximum!
-void tiRadio_SetOutputPower(TiRadioCtrl_s *radio, uint8_t powerDbM) {
+void tiRadio_setOutputPower(TiRadioCtrl_s *radio, uint8_t powerDbM) {
   if (radio->has_cc1190 && powerDbM > 10) powerDbM = 10;
 
   // output = (ramp + 1)/2-18
@@ -604,22 +644,22 @@ void tiRadio_SetOutputPower(TiRadioCtrl_s *radio, uint8_t powerDbM) {
   return;
 #endif
 
-  cc1120SpiReadReg(radio, pa_reg_addr, &pa_cfg_val, 1);
+  tiRadio_spiReadReg(radio, pa_reg_addr, &pa_cfg_val, 1);
   uint8_t reg = 0b01000000;  // bit 7 set to enable ramping
   reg |= power;              // Lower 6 bits are power
-  cc1120SpiWriteReg(radio, pa_reg_addr, &pa_cfg_val, 1);
+  tiRadio_spiWriteReg(radio, pa_reg_addr, &pa_cfg_val, 1);
 }
 
 //! Configure a GPIO pin. register should be TIRADIO_IOCFG3 or TIRADIO_IOCFG2 or
 //! TIRADIO_IOCFG1 or TIRADIO_IOCFG0 gpio_config from tiRadio_GPIO_CFG, and
 //! outputInverted flips the logic of the pin
-void tiRadio_ConfigGPIO(TiRadioCtrl_s *radio, uint16_t gpio_register,
+void tiRadio_configGpio(TiRadioCtrl_s *radio, uint16_t gpio_register,
                         uint8_t gpio_config, bool outputInverted) {
   uint8_t invert = (outputInverted ? 1 : 0);
   // invert is bit 6, 7th from bottom
   // lower 6 are output selection
   uint8_t reg = (invert << 6) | gpio_config;
-  cc1120SpiWriteReg(radio, gpio_register, &reg, 1);
+  tiRadio_spiWriteReg(radio, gpio_register, &reg, 1);
 }
 
 uint8_t trx8BitRegAccess(TiRadioCtrl_s *radio, uint8_t accessType,
@@ -638,8 +678,8 @@ uint8_t trx8BitRegAccess(TiRadioCtrl_s *radio, uint8_t accessType,
 
   HAL_SPI_TransmitReceive(radio->radhspi, &txBuf, &readValue, 0x01,
                           TIRADIO_MAX_DELAY);
-  cc1120TrxReadWriteBurstSingle(radio, (accessType | addrByte), pData,
-                                len);                     // write the data
+  tiRadio_txRxReadWriteBurstSingle(radio, (accessType | addrByte), pData,
+                                   len);                  // write the data
   HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, SET);  // Pull CS High
 
   return (readValue);
@@ -668,14 +708,14 @@ uint8_t trx16BitRegAccess(TiRadioCtrl_s *radio, uint8_t accessType,
   HAL_SPI_Transmit(radio->radhspi, &regAddr, 1, TIRADIO_MAX_DELAY);
 
   // write the data
-  cc1120TrxReadWriteBurstSingle(radio, accessType | extAddr, pData, len);
+  tiRadio_txRxReadWriteBurstSingle(radio, accessType | extAddr, pData, len);
 
   HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, SET);
 
   return (readValue);
 }
 
-uint8_t cc1120TrxSpiCmdStrobe(TiRadioCtrl_s *radio, uint8_t cmd) {
+uint8_t tiRadio_txRxSpiCmdStrobe(TiRadioCtrl_s *radio, uint8_t cmd) {
   uint8_t rc;
 
   HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, RESET);
@@ -692,8 +732,8 @@ uint8_t cc1120TrxSpiCmdStrobe(TiRadioCtrl_s *radio, uint8_t cmd) {
   return (rc);
 }
 
-void cc1120TrxReadWriteBurstSingle(TiRadioCtrl_s *radio, uint8_t addr,
-                                   uint8_t *pData, uint16_t len) {
+void tiRadio_txRxReadWriteBurstSingle(TiRadioCtrl_s *radio, uint8_t addr,
+                                      uint8_t *pData, uint16_t len) {
   uint16_t i;
   uint8_t pushByte = 0x00;
   uint8_t rxdump;
@@ -726,8 +766,8 @@ void cc1120TrxReadWriteBurstSingle(TiRadioCtrl_s *radio, uint8_t addr,
   return;
 }
 
-uint8_t cc1120SpiReadReg(TiRadioCtrl_s *radio, uint16_t addr, uint8_t *pData,
-                         uint8_t len) {
+uint8_t tiRadio_spiReadReg(TiRadioCtrl_s *radio, uint16_t addr, uint8_t *pData,
+                           uint8_t len) {
   uint8_t tempExt = (uint8_t)(addr >> 8);
   uint8_t tempAddr = (uint8_t)(addr & 0x00FF);
   uint8_t rc = 0;
@@ -749,8 +789,8 @@ uint8_t cc1120SpiReadReg(TiRadioCtrl_s *radio, uint16_t addr, uint8_t *pData,
   return (rc);
 }
 
-uint8_t cc1120SpiWriteReg(TiRadioCtrl_s *radio, uint16_t addr, uint8_t *pData,
-                          uint8_t len) {
+uint8_t tiRadio_spiWriteReg(TiRadioCtrl_s *radio, uint16_t addr, uint8_t *pData,
+                            uint8_t len) {
   uint8_t tempExt = (uint8_t)(addr >> 8);
   uint8_t tempAddr = (uint8_t)(addr & 0x00FF);
   uint8_t rc = 0;
@@ -763,7 +803,7 @@ uint8_t cc1120SpiWriteReg(TiRadioCtrl_s *radio, uint16_t addr, uint8_t *pData,
     /*
     uint8_t readByte = 0;
     uint8_t writeByte = *pData;
-    cc1120SpiReadReg(radio, addr, &readByte, 0x01);
+    tiRadio_spiReadReg(radio, addr, &readByte, 0x01);
     testread = readByte;
     if (readByte != writeByte) {
       readByte = 0;
@@ -777,14 +817,15 @@ uint8_t cc1120SpiWriteReg(TiRadioCtrl_s *radio, uint16_t addr, uint8_t *pData,
   return (rc);
 }
 
-uint8_t cc1120SpiWriteTxFifo(TiRadioCtrl_s *radio, uint8_t *pData,
-                             uint8_t len) {
+uint8_t tiRadio_spiWriteTxFifo(TiRadioCtrl_s *radio, uint8_t *pData,
+                               uint8_t len) {
   uint8_t rc;
   rc = trx8BitRegAccess(radio, (RADIO_BURST_ACCESS | RADIO_WRITE_ACCESS),
                         TIRADIO_BURST_TXFIFO, pData, len);
   return (rc);
 }
-uint8_t cc1120SpiReadRxFifo(TiRadioCtrl_s *radio, uint8_t *pData, uint8_t len) {
+uint8_t tiRadio_spiReadRxFifo(TiRadioCtrl_s *radio, uint8_t *pData,
+                              uint8_t len) {
   uint8_t rc;
   rc = trx8BitRegAccess(radio, 0x00, TIRADIO_BURST_RXFIFO, pData, len);
   return (rc);

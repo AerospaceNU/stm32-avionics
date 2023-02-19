@@ -17,15 +17,15 @@ static void generateDoc(const char* primaryCommand, const char* args,
                         const char* desc) {
   snprintf(doc, sizeof(doc), "%-15s %-15s %-150s\r\n", primaryCommand, args,
            desc);
-  cliSend(doc);
+  cli_send(doc);
 }
 
-void cli_tasks::cliHelp() {
+void CliTasks::help() {
   // Send initial ACK to CLI
-  cliSendAck(true, nullptr);
+  cli_sendAck(true, nullptr);
 
   // Send help docs to user
-  cliSend("\r\n");
+  cli_send("\r\n");
   generateDoc("--config", "-t int*1",
               "Configure a trigger with additional flag: ");
   generateDoc("", "     -m int*1", "Trigger type (required)");
@@ -33,12 +33,14 @@ void cli_tasks::cliHelp() {
   generateDoc("", "             ", "Type 2 = line cutter");
   generateDoc("", "             ", "Type 3 = digital on (on pyro)");
   generateDoc("", "             ", "Type 4 = digital off (on pyro)");
+  generateDoc("", "             ", "Type 5 = pwm (on pyro)");
   generateDoc("", "     -p int*1", "Pyro num or cut channel (required)");
   generateDoc("", "     -L", "Deploy on launch");
   generateDoc("", "     -A", "Deploy at apogee");
-  generateDoc("", "     -T", "Deploy on touchdown");
+  generateDoc("", "     -T", "Deploy 60s after touchdown");
   generateDoc("", "     -M", "Deploy manually only");
-  generateDoc("", "     -C", "Custom marmon clamp deploy");
+  generateDoc("", "     -C", "Custom marman clamp deploy");
+  generateDoc("", "     -U", "Custom marman clamp deploy delay 1.5s");
   generateDoc("", "     -D float*1", "Deploy n seconds after apogee");
   generateDoc("", "     -H float*1", "Deploy at given descent altitude");
   generateDoc("", "-e float*1", "Configure ground elevation (in meters)");
@@ -63,5 +65,5 @@ void cli_tasks::cliHelp() {
   generateDoc("--sense", "", "Reads back most recent sensor data");
   generateDoc("--sim", "", "Simulate past flights in hardware");
   generateDoc("--version", "", "Send Git version and tag info");
-  cliSendComplete(true, nullptr);
+  cli_sendComplete(true, nullptr);
 }

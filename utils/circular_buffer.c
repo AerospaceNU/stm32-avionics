@@ -6,7 +6,7 @@
 
 #include <string.h>
 
-void cbInit(CircularBuffer_s *cb, void *buffer, size_t capacity, size_t size) {
+void cb_init(CircularBuffer_s *cb, void *buffer, size_t capacity, size_t size) {
   if (cb == NULL) {
     return;
   }
@@ -19,10 +19,10 @@ void cbInit(CircularBuffer_s *cb, void *buffer, size_t capacity, size_t size) {
   cb->tail = cb->buffer;
 }
 
-void cbPeek(CircularBuffer_s *cb, void *outputBuffer, size_t *numElements) {
+void cb_peek(CircularBuffer_s *cb, void *outputBuffer, size_t *numElements) {
   if (cb == NULL || outputBuffer == NULL) return;
 
-  size_t count = cbCount(cb);
+  size_t count = cb_count(cb);
   if (numElements == NULL)
     numElements = &(count);
   else if (*numElements > count)
@@ -40,7 +40,7 @@ void cbPeek(CircularBuffer_s *cb, void *outputBuffer, size_t *numElements) {
   }
 }
 
-size_t cbCount(CircularBuffer_s *cb) {
+size_t cb_count(CircularBuffer_s *cb) {
   if (!cb) {
     return 0;
   }
@@ -57,11 +57,11 @@ size_t cbCount(CircularBuffer_s *cb) {
   return ret_bytes / cb->size;
 }
 
-size_t cbCapacity(CircularBuffer_s *cb) {
+size_t cb_capacity(CircularBuffer_s *cb) {
   return ((cb->buffer_end - cb->buffer) / cb->size) - 1;
 }
 
-bool cbEnqueue(CircularBuffer_s *cb, const void *item) {
+bool cb_enqueue(CircularBuffer_s *cb, const void *item) {
   // Figure out what next spot to fill in buffer is
   void *next = cb->head + cb->size;
   if (next >= cb->buffer_end) {
@@ -79,8 +79,8 @@ bool cbEnqueue(CircularBuffer_s *cb, const void *item) {
   return true;
 }
 
-void cbDequeue(CircularBuffer_s *cb, size_t numElements) {
-  size_t count = cbCount(cb);
+void cb_dequeue(CircularBuffer_s *cb, size_t numElements) {
+  size_t count = cb_count(cb);
   if (numElements > count) {
     numElements = count;
   }
@@ -91,7 +91,7 @@ void cbDequeue(CircularBuffer_s *cb, size_t numElements) {
   }
 }
 
-bool cbFull(CircularBuffer_s *cb) {
+bool cb_full(CircularBuffer_s *cb) {
   void *next = cb->head + cb->size;
   if (next >= cb->buffer_end) {
     next = cb->buffer;
@@ -100,4 +100,4 @@ bool cbFull(CircularBuffer_s *cb) {
   return next == cb->tail;
 }
 
-void cbFlush(CircularBuffer_s *cb) { cb->tail = cb->head; }
+void cb_flush(CircularBuffer_s *cb) { cb->tail = cb->head; }

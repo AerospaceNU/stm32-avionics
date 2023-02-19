@@ -10,26 +10,29 @@
 
 void AscentState::init() {
   // Write launched status
-  data_log_get_flight_metadata()->launched = 1;
-  data_log_write_flight_metadata();
+  dataLog_getFlightMetadata()->pressureRef = filter_getPressureRef();
+  dataLog_getFlightMetadata()->gravityRef = filter_getGravityRef();
+  dataLog_getFlightMetadata()->launchedCliConfigs = *cli_getConfigs();
+  dataLog_getFlightMetadata()->launched = 1;
+  dataLog_writeFlightMetadata();
   maxPosZ = 0;
-  state_log_write(this->getID());
-  cli_tasks::ConfigureForFlight();
+  stateLog_write(this->getID());
+  CliTasks::configureForFlight();
 }
 
 EndCondition_e AscentState::run() {
   // Collect, filter, log, and log all data
-  SensorData_s* sensorData = HM_GetSensorData();
-  FilterData_s* filterData = filterGetData();
-  data_log_write(sensorData, filterData, this->getID());
+  SensorData_s* sensorData = hm_getSensorData();
+  FilterData_s* filterData = filter_getData();
+  dataLog_write(sensorData, filterData, this->getID());
 
   // Detect if new maximum Z position has been reached and record the time
-  if (filterData->pos_z > maxPosZ) {
-    maxPosZ = filterData->pos_z;
+  if (filterData->pos_z_agl > maxPosZ) {
+    maxPosZ = filterData->pos_z_agl;
   }
 
   // Detect apogee if under max z position and negative velocity
-  if (maxPosZ - filterData->pos_z > kPosDiffThreshold &&
+  if (maxPosZ - filterData->pos_z_agl > kPosDiffThreshold &&
       filterData->world_vel_z < 0) {
     return EndCondition_e::Apogee;
   }
@@ -37,4 +40,4 @@ EndCondition_e AscentState::run() {
   return EndCondition_e::NoChange;
 }
 
-void AscentState::cleanup() { TriggerManager_SetApogeeTime(HM_Millis()); }
+void AscentState::cleanup() {}
