@@ -31,5 +31,4 @@ TEST(FullFlight, TestFlightLands) {
   }
 
   printf("Done stepping ticks %lu\n", timing::GetTickNumber());
-  HM_Sim_Exit();
 }

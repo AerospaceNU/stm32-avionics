@@ -9,6 +9,8 @@ int main(int argC, char** argv) {
     int_flash_path = argv[3];
     printf("Running with output file %s, ext flash %s, int flash %s\n",
            output_file.c_str(), ext_flash_path.c_str(), int_flash_path.c_str());
+
+    do_networking = true;
   } else {
     printf(
         "Must have 3 args! Eg ./desktop_sim path/to/flight.csv "

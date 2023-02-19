@@ -117,15 +117,11 @@ std::string int_flash_path;  // NOLINT
 std::string ext_flash_path;  // NOLINT
 std::string output_file;     // NOLINT
 
-std::atomic<bool> shouldRun(true);
-
 extern "C" {
 
 void HM_HardwareInit() {
   printf("STARTING: output %s, ext flash %s, int flash %s\n",
          output_file.c_str(), ext_flash_path.c_str(), int_flash_path.c_str());
-
-  shouldRun.store(true);
 
   internalFlash = new FileBackedFlash(int_flash_path, kFlashSizeBytes[0]);
 
@@ -133,7 +129,7 @@ void HM_HardwareInit() {
   // beginning of the CSV anyways, so we shouldn't ever
   // try to resad from it regardless
   internalFlash->Reinit(true);
-
+  
   // TODO stick in ifdef
   cbInit(&bleBuffer, bleArray, sizeof(bleArray), 1);
 
@@ -147,6 +143,9 @@ void HM_HardwareInit() {
   for (int i = 0; i < NUM_FLASH_DESKTOP_FILE_BACKED; i++) {
     externalFlash[i] = new FileBackedFlash(ext_flash_path, kFlashSizeBytes[i]);
     hardwareStatusFlash[FIRST_ID_FLASH_DESKTOP_FILE_BACKED + i] = true;
+
+    // Nuke the ext flash, too
+    externalFlash[i]->Reinit(true);
   }
 #endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
 
@@ -177,6 +176,7 @@ void HM_HardwareInit() {
   // TODO we shouldn't do this, and should instead record this in metadata
   for (int i = 0; i < NUM_IMU; i++) {
     sensorProperties.imuAccelFs[i] = 156.96;  // 16 * 9.81
+    hardwareStatusImu[i] = true;
   }
 #endif  // HAS_DEV(IMU)
 }
@@ -319,11 +319,6 @@ void HM_Delay(int ms) {
   while (timing::GetProgramTimeMillis() < end) {
     std::this_thread::yield();
   }
-}
-
-void HM_Sim_Exit() {
-  printf("Running set FALSE\n");
-  shouldRun.store(false);
 }
 
 void HM_ObserveTickComplete(uint64_t tickNum) {
