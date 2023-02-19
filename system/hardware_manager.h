@@ -205,9 +205,9 @@ bool hm_inSimMode();
  *
  * @param ms Number of milliseconds to delay
  */
-void HM_Delay(int ms);
+void hm_delay(int ms);
 
-void HM_ObserveTickComplete(uint64_t);
+void hm_observeTickComplete(uint64_t);
 
 #ifdef __cplusplus
 }

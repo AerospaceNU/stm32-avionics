@@ -20,7 +20,7 @@ TEST(FullFlight, TestFlightLands) {
 
   Scheduler s = Scheduler();
 
-  uint32_t lastExpireTime = HM_Millis();
+  uint32_t lastExpireTime = hm_millis();
   for (int i = 0; i < 50; i++) {
     // This should guarantee that we wait the correct quantity of time
     uint32_t nextExpireTime = s.getNextExpirationTimeMillis();
