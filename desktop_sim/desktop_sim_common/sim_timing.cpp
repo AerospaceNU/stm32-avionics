@@ -38,9 +38,7 @@ void timing::ResumeTiming() {
 
 bool timing::IsTimingPaused() { return programPauseTime != 0; }
 
-void timing::StepTimingAsync(uint64_t delta) { 
-    programStepTime += delta; 
-}
+void timing::StepTimingAsync(uint64_t delta) { programStepTime += delta; }
 
 // offset in microseconds
 static uint64_t time_since_epoch() noexcept {
@@ -113,10 +111,6 @@ uint64_t timing::GetProgramTimeMillis() {
 
 std::atomic<uint64_t> tickNumber(0);
 
-uint64_t timing::GetTickNumber() {
-    return tickNumber.load();
-}
+uint64_t timing::GetTickNumber() { return tickNumber.load(); }
 
-void timing::SetTickCompleted(uint64_t tick) {
-    tickNumber.store(tick);
-}
+void timing::SetTickCompleted(uint64_t tick) { tickNumber.store(tick); }

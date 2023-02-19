@@ -1,13 +1,16 @@
 #include <gtest/gtest.h>
 
+#include <thread>
+
 #include "desktop_hardware_manager.h"
 #include "scheduler.h"
-#include <thread>
 #include "sim_timing.h"
 
 TEST(FullFlight, TestFlightLands) {
   // It's tempermental about the working directory
-  output_file = "/home/mmorley@na.jnj.com/Documents/github/stm32-avionics/resources/superguppy-fcb-output-post.csv";
+  output_file =
+      "/home/mmorley@na.jnj.com/Documents/github/stm32-avionics/resources/"
+      "superguppy-fcb-output-post.csv";
   ext_flash_path = "ext-flash-test.hex";
   int_flash_path = "int-flash-test.hex";
   do_networking = false;
@@ -24,11 +27,9 @@ TEST(FullFlight, TestFlightLands) {
     uint32_t delta = nextExpireTime - lastExpireTime;
     timing::StepTimingAsync(delta * 1000);
 
-    if (s.hasTimerExpired())
-      s.tick();
-  } 
+    if (s.hasTimerExpired()) s.tick();
+  }
 
   printf("Done stepping ticks %lu\n", timing::GetTickNumber());
   HM_Sim_Exit();
-
 }

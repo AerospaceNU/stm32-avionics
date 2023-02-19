@@ -2,8 +2,8 @@
 // Created by matth on 3/25/2022.
 //
 
-#ifndef DESKTOP_SIM_BOARD_CONFIG_H_
-#define DESKTOP_SIM_BOARD_CONFIG_H_
+#ifndef DESKTOP_SIM_DESKTOP_SIM_GTEST_BOARD_CONFIG_H_
+#define DESKTOP_SIM_DESKTOP_SIM_GTEST_BOARD_CONFIG_H_
 
 #include "board_config_types.h"
 
@@ -31,4 +31,4 @@
 
 #define NUM_VBAT_DESKTOP_FILE 1
 
-#endif  // DESKTOP_SIM_BOARD_CONFIG_H_
+#endif  // DESKTOP_SIM_DESKTOP_SIM_GTEST_BOARD_CONFIG_H_

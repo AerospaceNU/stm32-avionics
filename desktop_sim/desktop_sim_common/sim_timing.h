@@ -8,6 +8,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license in the root directory of this project.
 
+#pragma once
+
 #include <stdint.h>
 
 namespace timing {
@@ -43,11 +45,10 @@ void StepTimingAsync(uint64_t uS);
 
 /**
  * @brief Advance time and await loop completion
- * 
- * @param deltsMicros 
+ *
+ * @param deltsMicros
  */
 void StepTiming(uint64_t deltsMicros);
-
 
 void SetTickCompleted(uint64_t tick);
 uint64_t GetTickNumber();
@@ -55,4 +56,4 @@ uint64_t GetTickNumber();
 uint64_t GetProgramTimeMicros();
 uint64_t GetProgramTimeMillis();
 
-}
+}  // namespace timing

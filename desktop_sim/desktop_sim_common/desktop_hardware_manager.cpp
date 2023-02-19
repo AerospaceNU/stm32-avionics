@@ -4,13 +4,13 @@
 
 #include "desktop_hardware_manager.h"
 
+#include <atomic>
 #include <chrono>  // NOLINT
 #include <fstream>
 
 #include "circular_buffer.h"
 #include "hardware_manager.h"
 #include "sim_timing.h"
-#include <atomic>
 
 /* Device includes */
 
@@ -181,9 +181,7 @@ void HM_HardwareInit() {
 #endif  // HAS_DEV(IMU)
 }
 
-uint32_t HM_Millis() {
-  return timing::GetProgramTimeMillis(); 
-}
+uint32_t HM_Millis() { return timing::GetProgramTimeMillis(); }
 
 bool HM_FlashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
                        uint8_t *pData) {
@@ -316,19 +314,11 @@ void HM_DisableSimMode() {}
 
 bool HM_InSimMode() { return false; }
 
-void HM_Yield() {
-  std::this_thread::yield();
-}
-
 void HM_Delay(int ms) {
   uint64_t end = timing::GetProgramTimeMillis() + ms;
   while (timing::GetProgramTimeMillis() < end) {
-    HM_Yield();
+    std::this_thread::yield();
   }
-}
-
-bool HM_IsProgramRunning() {
-  return shouldRun.load();
 }
 
 void HM_Sim_Exit() {

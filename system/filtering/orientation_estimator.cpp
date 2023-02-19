@@ -18,7 +18,7 @@ OrientationEstimator::OrientationEstimator(double dt) : m_dt(dt) {}
 
 OrientationEstimator::~OrientationEstimator() {}
 
-void OrientationEstimator::reset() { 
+void OrientationEstimator::reset() {
   // this->q = Matrix<4, 1>({1.0, 0, 0, 0});
 }
 

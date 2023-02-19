@@ -16,7 +16,7 @@ int main(int argC, char** argv) {
     return 1;
   }
 
-  Scheduler s {};
+  Scheduler s{};
   while (true) {
     s.tick();
     while (!s.hasTimerExpired()) {

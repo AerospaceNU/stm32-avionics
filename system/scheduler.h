@@ -1,8 +1,6 @@
 #ifndef SYSTEM_SCHEDULER_H_
 #define SYSTEM_SCHEDULER_H_
 
-#include "states_interface.h"
-
 #include "state_ascent.h"
 #include "state_cli_erase_flash.h"
 #include "state_cli_offload.h"
@@ -12,32 +10,35 @@
 #include "state_log.h"
 #include "state_post_flight.h"
 #include "state_pre_flight.h"
+#include "states_interface.h"
 
 class Scheduler {
  public:
   /**
-   * @brief Construct a new Scheduler, including all the states and state transitions it manages
+   * @brief Construct a new Scheduler, including all the states and state
+   * transitions it manages
    */
   Scheduler();
 
   /**
    * @brief Determine if it's time to call tick() yet
-   * 
+   *
    * @return true if tick() should be called
    * @return false if not expired
    */
   bool hasTimerExpired(void);
 
   /**
-   * @brief Get the time the next iteration should be run at, in the same timebase as HM_Millis.
-   * 
-   * @return uint32_t 
+   * @brief Get the time the next iteration should be run at, in the same
+   * timebase as HM_Millis.
+   *
+   * @return uint32_t
    */
   uint32_t getNextExpirationTimeMillis();
 
   /**
    * @brief Run one iteration of the Scheduler. Does NOT block
-   * 
+   *
    */
   void tick(void);
 
@@ -72,8 +73,9 @@ class Scheduler {
       PreFlightState(StateId_e::PreFlight, defaultPeriod);
   CliTempState tempState = CliTempState(StateId_e::SimTempState, defaultPeriod);
 
-  State* states[NUM_STATES] = {&cliEraseFlash, &cliOffload, &ascent, &descent,
-                     &initialize, &postFlight, &preFlight, &tempState};
+  State* states[NUM_STATES] = {&cliEraseFlash, &cliOffload, &ascent,
+                               &descent,       &initialize, &postFlight,
+                               &preFlight,     &tempState};
 
   // Pointers for current and next states
   State* pCurrentState_ = nullptr;
