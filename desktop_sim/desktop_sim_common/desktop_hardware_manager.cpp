@@ -139,7 +139,7 @@ void hm_hardwareInit() {
   internalFlash->Reinit(true);
   
   // TODO stick in ifdef
-  cbInit(&bleBuffer, bleArray, sizeof(bleArray), 1);
+  cb_init(&bleBuffer, bleArray, sizeof(bleArray), 1);
 
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
@@ -201,7 +201,7 @@ bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
   if (IS_DEVICE(flashId, FLASH_DESKTOP_FILE_BACKED)) {
     return externalFlash[flashId - FIRST_ID_FLASH_DESKTOP_FILE_BACKED]
-        ->readStart(startLoc, numBytes, pData);
+        ->ReadStart(startLoc, numBytes, pData);
   }
 #endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
 
@@ -213,7 +213,7 @@ bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
   if (IS_DEVICE(flashId, FLASH_DESKTOP_FILE_BACKED)) {
     return externalFlash[flashId - FIRST_ID_FLASH_DESKTOP_FILE_BACKED]
-        ->writeStart(startLoc, numBytes, data);
+        ->WriteStart(startLoc, numBytes, data);
   }
 #endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
 

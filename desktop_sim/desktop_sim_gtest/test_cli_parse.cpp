@@ -11,8 +11,8 @@
 // }
 
 TEST(CliParse, CliTick) {
-  HM_HardwareInit();
-  cli_tasks::ConfigureForGround();
-  auto opt = cli_tasks::cliTick();
+  hm_hardwareInit();
+  CliTasks::configureForGround();
+  auto opt = CliTasks::tick();
   ASSERT_EQ(NoChange, opt);
 }

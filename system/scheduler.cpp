@@ -37,7 +37,7 @@ void Scheduler::tick(void) {
 
   lastTime_ = hm_millis();
   // Visually show how fast scheduler is running using LED
-  HM_LedToggle(1);
+  hm_ledToggle(1);
 
   // Cleanup current state and initialize next state if changing states
   if (pNextState != pCurrentState_) {
@@ -47,7 +47,7 @@ void Scheduler::tick(void) {
   }
 
   // Run the current state
-  if (pCurrentState_) endCondition = pCurrentState_->run_state();
+  if (pCurrentState_) endCondition = pCurrentState_->runState();
 
   // Find and set the next state
   StateId_e nextState = getNextState(endCondition);

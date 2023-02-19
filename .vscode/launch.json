@@ -9,7 +9,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/desktop_sim/desktop_sim_live/desktop_sim_live",
-      "args": ["/home/matt/Downloads/LDRS-beanboozler-l265-output-post.csv", "external_flash.dat", "internal_flash.dat"],
+      "args": ["/home/matt/Downloads/output-post.csv", "external_flash.dat", "internal_flash.dat"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],

@@ -13,7 +13,7 @@ class FileBackedFlash {
  public:
   explicit FileBackedFlash(std::string path, size_t len)
       : filepath(std::move(path)), m_len(len) {
-    reinit();
+    Reinit();
   }
 
   void Reinit(bool overwrite = false);

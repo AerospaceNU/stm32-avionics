@@ -12,10 +12,10 @@ extern FileBackedFlash *internalFlash;
 
 bool internalFlash_write(uint32_t RelFlashAddress, uint8_t *data,
                          uint32_t numBytes) {
-  return internalFlash->writeStart(RelFlashAddress, numBytes, data);
+  return internalFlash->WriteStart(RelFlashAddress, numBytes, data);
 }
 
 bool internalFlash_read(uint32_t RelFlashAddress, uint8_t *pData,
                         uint32_t numBytes) {
-  return internalFlash->readStart(RelFlashAddress, numBytes, pData);
+  return internalFlash->ReadStart(RelFlashAddress, numBytes, pData);
 }

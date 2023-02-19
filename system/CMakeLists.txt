@@ -1,10 +1,10 @@
 set(SYSTEM_FILES_LIST
-        ${CMAKE_CURRENT_SOURCE_DIR}/cli.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/radio_manager.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/radio_manager.c
         ${CMAKE_CURRENT_SOURCE_DIR}/scheduler.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/state_log.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/data_log.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/trigger_manager.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/state_log.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/data_log.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/trigger_manager.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/buzzer_heartbeat.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/data_offload.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_config.cpp

@@ -8,7 +8,7 @@
 
 #include <cstring>
 
-bool FileBackedFlash::writeStart(uint32_t startLoc, uint32_t numBytes,
+bool FileBackedFlash::WriteStart(uint32_t startLoc, uint32_t numBytes,
                                  uint8_t *pdata) {
   FILE *ptr;
   ptr = fopen(filepath.c_str(), "r+b");  // w for write, b for binary
@@ -25,7 +25,7 @@ bool FileBackedFlash::writeStart(uint32_t startLoc, uint32_t numBytes,
   return true;
 }
 
-bool FileBackedFlash::readStart(uint32_t startLoc, uint32_t numBytes,
+bool FileBackedFlash::ReadStart(uint32_t startLoc, uint32_t numBytes,
                                 uint8_t *pdata) {
   FILE *ptr;
   ptr = fopen(filepath.c_str(), "rb");  // r for read, b for binary
