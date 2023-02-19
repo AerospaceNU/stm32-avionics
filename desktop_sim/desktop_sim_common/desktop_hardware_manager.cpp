@@ -11,6 +11,10 @@
 #include "circular_buffer.h"
 #include "hardware_manager.h"
 #include "sim_timing.h"
+#if HAS_DEV(NT_INTERFACE)
+#include "nt_interface.h"
+#endif
+#include <thread>
 
 /* Device includes */
 
@@ -116,6 +120,11 @@ static PrintPyroCtrl_s printPyro[NUM_PYRO_DESKTOP_PRINT];
 
 #if HAS_DEV(RADIO_DESKTOP_SOCKET)
 static TcpSocket *radioSocket[NUM_RADIO_DESKTOP_SOCKET];
+#endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
+
+
+#if HAS_DEV(NT_INTERFACE)
+static RocketNTInterface ntInterface;
 #endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
 
 static SensorData_s sensorData = {0};
@@ -252,14 +261,23 @@ bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
   }
 #endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
 
+#if HAS_DEV(NT_INTERFACE)
+    packet.radioId = radioNum;
+    ntInterface.radioSend((uint8_t*)&packet, sizeof(packet));
+    return true;
+#endif
+
   return false;
 }
 
 void hm_radioUpdate() {
   // Read TCP data
-  for (int i = 0; i < NUM_RADIO_DESKTOP_SOCKET; i++) {
-    radioSocket[i]->readData();
-  }
+  // for (int i = 0; i < NUM_RADIO_DESKTOP_SOCKET; i++) {
+  //   radioSocket[i]->readData();
+  // }
+#if HAS_DEV(NT_INTERFACE)
+  ntInterface.update();
+#endif
 }
 
 void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {
@@ -269,6 +287,10 @@ void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {
 #if IS_DEVICE(radioNum, RADIO_DESKTOP_SOCKET)
   radioSocket[radioNum - FIRST_ID_RADIO_DESKTOP_SOCKET]->setRXBuffer(rxBuffer);
 #endif  // IS_DEV(radioNum, RADIO_DESKTOP_SOCKET)
+#if HAS_DEV(NT_INTERFACE)
+  ntInterface.setRadioRXBuffer(rxBuffer);
+#endif  // IS_DEV(radioNum, RADIO_DESKTOP_SOCKET)
+
 }
 
 void hm_radioSetChannel(int radioNum, int channel) {}

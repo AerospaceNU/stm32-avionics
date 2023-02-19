@@ -3,6 +3,7 @@ project(STM32-Avionics)
 
 set(CMAKE_CXX_STANDARD 14)
 
+add_subdirectory(allwpilib)
 add_subdirectory(utils)
 add_subdirectory(system)
 add_subdirectory(devices)

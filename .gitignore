@@ -26,3 +26,4 @@ build
 git_info.h
 *.hex
 *.dat
+networktables.json

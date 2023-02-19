@@ -3,10 +3,9 @@
         {
             "label": "build live sim",
             "type": "shell",
-            "command": "make",
+            "command": "ninja",
             "args": [
                 "desktop_sim_live",
-                "-j"
             ],
             "options": {
                 "cwd": "${workspaceFolder}/build"

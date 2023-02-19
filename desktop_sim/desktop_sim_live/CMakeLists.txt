@@ -24,4 +24,4 @@ target_include_directories(desktop_sim_live PRIVATE
   )
 
 find_package(Threads REQUIRED)
-target_link_libraries(desktop_sim_live PRIVATE Threads::Threads)
+target_link_libraries(desktop_sim_live PRIVATE Threads::Threads ntcore wpiutil)
