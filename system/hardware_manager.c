@@ -995,3 +995,7 @@ void HM_DisableSimMode(CircularBuffer_s *rxBuffer) { inSim = false; }
 bool HM_InSimMode() { return inSim; }
 
 void HM_Delay(int ms) { HAL_Delay(ms); }
+
+void HM_ObserveTickComplete(uint64_t idx) {
+	// todo
+}
