@@ -114,13 +114,17 @@ int main(void) {
   /* Initialize scheduler */
   Scheduler scheduler = Scheduler();
 
-  /* Scheduler will never return. NO CODE SHOULD COME AFTER THIS IN THIS FILE */
-  scheduler.run();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
+
+    // TODO should we block based on delta instead?
+    if (scheduler.hasTimerExpired()) {
+      scheduler.tick();
+    }
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

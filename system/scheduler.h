@@ -72,8 +72,8 @@ class Scheduler {
       PreFlightState(StateId_e::PreFlight, defaultPeriod);
   CliTempState tempState = CliTempState(StateId_e::SimTempState, defaultPeriod);
 
-  State* states[NUM_STATES] = {&cliEraseFlash, &cliOffload, &ascent,    &descent,
-                     &initialize,    &postFlight, &preFlight, &tempState};
+  State* states[NUM_STATES] = {&cliEraseFlash, &cliOffload, &ascent, &descent,
+                     &initialize, &postFlight, &preFlight, &tempState};
 
   // Pointers for current and next states
   State* pCurrentState_ = nullptr;
