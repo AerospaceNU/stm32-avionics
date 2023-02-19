@@ -35,14 +35,10 @@ void CliTasks::help() {
   generateDoc("", "             ", "Type 4 = digital off (on pyro)");
   generateDoc("", "             ", "Type 5 = pwm (on pyro)");
   generateDoc("", "     -p int*1", "Pyro num or cut channel (required)");
-  generateDoc("", "     -L", "Deploy on launch");
-  generateDoc("", "     -A", "Deploy at apogee");
-  generateDoc("", "     -T", "Deploy 60s after touchdown");
-  generateDoc("", "     -M", "Deploy manually only");
-  generateDoc("", "     -C", "Custom marman clamp deploy");
-  generateDoc("", "     -U", "Custom marman clamp deploy delay 1.5s");
-  generateDoc("", "     -D float*1", "Deploy n seconds after apogee");
-  generateDoc("", "     -H float*1", "Deploy at given descent altitude");
+  generateDoc("", "     -d float*1", "Duration (required for pyro and pwm)");
+  generateDoc("", "     -w float*1", "Pulse width (required for pwm)");
+  generateDoc("", "     -C string*1", "Configuration using expression notation, required");
+  generateDoc("", "     -D", "Delete this trigger");
   generateDoc("", "-e float*1", "Configure ground elevation (in meters)");
   generateDoc("", "-r float*1", "Configure ground temperature (in celsius)");
   generateDoc("", "-c int*1",

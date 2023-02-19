@@ -16,6 +16,8 @@ extern "C" {
 #include "circular_buffer.h"
 #include "data_structures.h"
 #include "trigger_manager.h"
+#include "event_manager.h"
+#include "expression_sharedtypes.h"
 
 /**
  * Ways the command line can receive information
@@ -48,14 +50,10 @@ typedef struct {
   char* t;      // trigger number
   char* m;      // trigger mode
   char* p;      // device port, e.g. pyro port or line cutter channel
-  char* H;      // trigger deploy altitude
-  char* D;      // trigger deploy apogee delay
-  bool A;       // trigger mode (apogee)
-  bool L;       // trigger mode (launch)
-  bool T;       // trigger mode (touchdown)
-  bool M;       // trigger mode (manual)
-  bool C;       // trigger mode (custom marman clamp)
-  bool U;       // trigger mode (custom marman delay)
+  char* d;      // trigger duration
+  char* w;      // trigger pulse width
+  char* C;      // trigger configuration
+  bool D;      // trigger delete
   char* e;      // ground elevation
   char* r;      // ground temperature
   bool h;       // help flag
@@ -64,11 +62,14 @@ typedef struct {
   char* lcId;   // Line cuttter id
 } CliOptionVals_s;
 
+
+
 /**
  * Configs that can be changed via CLI
  */
 typedef struct __attribute__((__packed__)) {
   TriggerConfig_s triggerConfiguration[MAX_TRIGGER];
+  SerializedExpression_s serializedExprs[MAX_EXPRESSION];
   double groundElevationM;
   double groundTemperatureC;
   int32_t radioChannel;

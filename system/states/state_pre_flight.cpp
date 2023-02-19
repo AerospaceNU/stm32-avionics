@@ -79,6 +79,7 @@ EndCondition_e PreFlightState::run() {
   } else {
     transitionResetTimer = hm_millis();
   }
+
   // Or a significantly large enough position change to override lack of
   // acceleration data
   if (filterData->pos_z_agl > kLaunchPosZDiffFailsafeThreshold) {

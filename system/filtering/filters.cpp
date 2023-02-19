@@ -252,6 +252,25 @@ static void filterGyros(SensorData_s* curSensorVals) {
   filterData.qx = orientationEstimator.q(1, 0);
   filterData.qy = orientationEstimator.q(2, 0);
   filterData.qz = orientationEstimator.q(3, 0);
+
+  double qw = filterData.qw;
+  double qx = filterData.qx;
+  double qy = filterData.qy;
+  double qz = filterData.qz;
+
+  double sinr_cosp = 2 * (qw * qx + qy * qz);
+  double cosr_cosp = 1 - 2 * (qx * qx + qy * qy);
+  filterData.roll = atan2(sinr_cosp, cosr_cosp) * 57.3;
+
+  double sinp = std::sqrt(1 + 2 * (qw * qy - qx * qz));
+  double cosp = std::sqrt(1 - 2 * (qw * qy - qx * qz));
+  filterData.pitch = (2 * atan2(sinp, cosp) - M_PI / 2) * 57.3;
+
+  filterData.angle_vertical = 90 + filterData.pitch;
+
+  double siny_cosp = 2 * (qw * qz + qx * qy);
+  double cosy_cosp = 1 - 2 * (qy * qy + qz * qz);
+  filterData.yaw = atan2(siny_cosp, cosy_cosp) * 57.3;
 }
 
 void updateGyroOffsetOneAxis(CircularBuffer_s* refBuffer, const float& newValue,

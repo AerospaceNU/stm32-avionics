@@ -17,6 +17,12 @@ class AscentState : public FlightState {
  private:
   double maxPosZ = 0;
   static constexpr double kPosDiffThreshold = 3;
+  static constexpr double kBurnoutAccThreshold = 10;
+
+  static constexpr uint32_t kTransitionResetTimeThreshold =
+      150;  // 150 ms transition timer
+
+  uint32_t transitionResetTimer = 0;
 };
 
 #endif  // SYSTEM_STATES_STATE_ASCENT_H_

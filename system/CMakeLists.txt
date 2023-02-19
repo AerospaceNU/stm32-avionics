@@ -4,7 +4,7 @@ set(SYSTEM_FILES_LIST
         ${CMAKE_CURRENT_SOURCE_DIR}/scheduler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/state_log.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/data_log.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/trigger_manager.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/trigger_manager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/buzzer_heartbeat.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/data_offload.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_config.cpp
@@ -27,6 +27,11 @@ set(SYSTEM_FILES_LIST
         ${CMAKE_CURRENT_SOURCE_DIR}/filtering/altitude_kalman.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/filtering/filters.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/filtering/orientation_estimator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/expressions/binary_func_expression.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/expressions/expression_store.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/expressions/expression.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/expressions/unary_func_expression.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/event_manager.cpp
         CACHE INTERNAL "")
 
 set(SYSTEM_INCLUDE_DIRS filtering
@@ -34,6 +39,7 @@ set(SYSTEM_INCLUDE_DIRS filtering
         ${CMAKE_CURRENT_SOURCE_DIR}/states/cli
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks
+        ${CMAKE_CURRENT_SOURCE_DIR}/expressions
         ${CMAKE_CURRENT_SOURCE_DIR}/filtering
         ${CMAKE_CURRENT_SOURCE_DIR}
         CACHE INTERNAL "")
