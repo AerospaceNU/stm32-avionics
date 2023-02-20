@@ -112,7 +112,14 @@ bool ExpressionStore::getStatusFor(int triggerNum) {
 
 void ExpressionStore::tick(FilterData_s *filterData) {
     for (int i = MAX_EXPRESSION - 1; i >= 0; --i) {
+#ifdef IS_DESKTOP_SIM
+        // At least on Matt's laptop, we need to re-cast this every loop
+        // (Or, specifically the second loop?)
+        // do it every time for safety
+        variant_cast<Expression *>(expressions[i])->evaluate(filterData, expressionPtrs);
+#else
         expressionPtrs[i]->evaluate(filterData, expressionPtrs);
+#endif // IS_DESKTOP_SIM
     }
 }
 
