@@ -19,6 +19,7 @@
 #define REG_OUT_Z_L 0x2C
 #define REG_OUT_Z_H 0x2D
 #define REG_CTRL1 0x20
+#define REG_CTRL4 0x23
 
 // CTRL_REG1 Values
 #define PWR_MODE_ON (1 << 5)
@@ -29,6 +30,9 @@
 #define Z_AXIS_ENABLE (1 << 2)
 #define Y_AXIS_ENABLE (1 << 1)
 #define X_AXIS_ENABLE (1 << 0)
+
+// CTRL_REG4 Values
+#define FS_SELECTION (3 << 4)
 
 static uint8_t whoAmI(AccelH3lis331dlCtrl_s *sensor) {
   return spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_WHO_AM_I);
@@ -56,7 +60,7 @@ static void accelH3lis331dl_getDataRaw(AccelH3lis331dlCtrl_s *sensor) {
 }
 
 static void accelH3lis331dl_getGain(AccelH3lis331dlCtrl_s *sensor) {
-  sensor->gain = 0.02942;
+  sensor->gain = 0.11971191;
 }
 
 bool accelH3lis331dl_init(AccelH3lis331dlCtrl_s *sensor, SpiCtrl_t spi) {
@@ -70,6 +74,7 @@ bool accelH3lis331dl_init(AccelH3lis331dlCtrl_s *sensor, SpiCtrl_t spi) {
   spi_writeRegister(&sensor->spi, REG_CTRL1,
                     PWR_MODE_ON | DATA_RATE_100HZ | Z_AXIS_ENABLE |
                         Y_AXIS_ENABLE | X_AXIS_ENABLE);
+  spi_writeRegister(&sensor->spi, REG_CTRL4, FS_SELECTION);
   accelH3lis331dl_getGain(sensor);
 
   return true;
