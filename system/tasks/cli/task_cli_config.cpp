@@ -37,12 +37,12 @@ void CliTasks::config() {
         cli_getConfigs()->triggerConfiguration + triggerNum;
 
     if (options.D) {
-    	triggerConfig->mode = TRIGGER_TYPE_EMPTY;
-    	triggerManager_removeTrigger(triggerNum);
-        // Write new cli configs to flash
-        dataLog_writeCliConfigs();
-    	cli_sendComplete(true, nullptr);
-    	return;
+      triggerConfig->mode = TRIGGER_TYPE_EMPTY;
+      triggerManager_removeTrigger(triggerNum);
+      // Write new cli configs to flash
+      dataLog_writeCliConfigs();
+      cli_sendComplete(true, nullptr);
+      return;
     }
 
     // Get trigger type
@@ -79,21 +79,21 @@ void CliTasks::config() {
     float duration = 0;
 
     if (mode == TRIGGER_TYPE_PYRO || mode == TRIGGER_TYPE_PWM_PYRO) {
-        duration = smallStrtod(options.d, &endPtr);
-        if (*endPtr != '\0') {
-          cli_sendAck(false, "Pyro/PWM must specify a duration");
-          return;
-        }
+      duration = smallStrtod(options.d, &endPtr) * 1000;  // Convert to ms
+      if (*endPtr != '\0') {
+        cli_sendAck(false, "Pyro/PWM must specify a duration");
+        return;
+      }
     }
 
     int pulseWidth = 0;
 
     if (mode == TRIGGER_TYPE_PWM_PYRO) {
-        pulseWidth = strtol(options.w, &endPtr, 10);
-        if (*endPtr != '\0') {
-          cli_sendAck(false, "PWM must specify a pulse width");
-          return;
-        }
+      pulseWidth = strtol(options.w, &endPtr, 10);
+      if (*endPtr != '\0') {
+        cli_sendAck(false, "PWM must specify a pulse width");
+        return;
+      }
     }
 
     triggerConfig->duration = duration;
@@ -109,10 +109,10 @@ void CliTasks::config() {
     triggerConfig->port = port;
 
     if (options.C) {
-      const char *configString = options.C;
+      const char* configString = options.C;
       if (!triggerManager_setTriggerConfig(triggerNum, &configString)) {
-          cli_sendAck(false, "Invalid config string");
-          return;
+        cli_sendAck(false, "Invalid config string");
+        return;
       }
     } else {
       cli_sendAck(false,
@@ -184,25 +184,32 @@ void CliTasks::config() {
       char deviceText[40];
       bool format = true;
       switch (triggerConfig->mode) {
-      	case TRIGGER_TYPE_EMPTY:
-      	  generateConfigHelp(name, "none");
-      	  format = false;
-      	  break;
+        case TRIGGER_TYPE_EMPTY:
+          generateConfigHelp(name, "none");
+          format = false;
+          break;
         case TRIGGER_TYPE_PYRO:
-          snprintf(deviceText, sizeof(deviceText), "Fire pyro %d for %ds on ", triggerConfig->port, (int)triggerConfig->duration);
+          snprintf(deviceText, sizeof(deviceText), "Fire pyro %d for %ds on ",
+                   triggerConfig->port, (int)triggerConfig->duration);
           break;
         case TRIGGER_TYPE_LINE_CUTTER:
-          snprintf(deviceText, sizeof(deviceText), "Cut line cutter %d on ", triggerConfig->port);
+          snprintf(deviceText, sizeof(deviceText), "Cut line cutter %d on ",
+                   triggerConfig->port);
           break;
         case TRIGGER_TYPE_DIGITAL_ON_PYRO:
-            snprintf(deviceText, sizeof(deviceText), "Enable digital pin %d on ", triggerConfig->port);
-            break;
+          snprintf(deviceText, sizeof(deviceText), "Enable digital pin %d on ",
+                   triggerConfig->port);
+          break;
         case TRIGGER_TYPE_DIGITAL_OFF_PYRO:
-            snprintf(deviceText, sizeof(deviceText), "Disable digital pin %d on ", triggerConfig->port);
-            break;
+          snprintf(deviceText, sizeof(deviceText), "Disable digital pin %d on ",
+                   triggerConfig->port);
+          break;
         case TRIGGER_TYPE_PWM_PYRO:
-            snprintf(deviceText, sizeof(deviceText), "PWM on pyro %d for %ds with %d width on", triggerConfig->port, (int)triggerConfig->duration, triggerConfig->pulseWidth);
-            break;
+          snprintf(deviceText, sizeof(deviceText),
+                   "PWM on pyro %d for %ds with %d width on",
+                   triggerConfig->port, (int)triggerConfig->duration,
+                   triggerConfig->pulseWidth);
+          break;
         default:
           snprintf(deviceText, sizeof(deviceText), "error");
           break;
@@ -210,9 +217,9 @@ void CliTasks::config() {
 
       char configText[200];
       if (format) {
-		  triggerManager_getConfigString(i, configText, 200);
-		  snprintf(val, sizeof(val), "%s%s", deviceText, configText);
-		  generateConfigHelp(name, val);
+        triggerManager_getConfigString(i, configText, 200);
+        snprintf(val, sizeof(val), "%s%s", deviceText, configText);
+        generateConfigHelp(name, val);
       }
     }
     // Ground elevation

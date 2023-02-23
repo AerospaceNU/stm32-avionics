@@ -1,7 +1,3 @@
-/*
- * cli.h
- */
-
 #ifndef SYSTEM_TASKS_CLI_H_
 #define SYSTEM_TASKS_CLI_H_
 
@@ -15,10 +11,9 @@ extern "C" {
 #include "board_config_common.h"
 #include "circular_buffer.h"
 #include "data_structures.h"
-#include "trigger_manager.h"
 #include "event_manager.h"
 #include "expression_sharedtypes.h"
-
+#include "trigger_manager.h"
 /**
  * Ways the command line can receive information
  */
@@ -53,7 +48,7 @@ typedef struct {
   char* d;      // trigger duration
   char* w;      // trigger pulse width
   char* C;      // trigger configuration
-  bool D;      // trigger delete
+  bool D;       // trigger delete
   char* e;      // ground elevation
   char* r;      // ground temperature
   bool h;       // help flag
@@ -61,8 +56,6 @@ typedef struct {
   char* lcCmd;  // Line cuttter command
   char* lcId;   // Line cuttter id
 } CliOptionVals_s;
-
-
 
 /**
  * Configs that can be changed via CLI

@@ -32,6 +32,7 @@ typedef struct __attribute__((__packed__)) {
   uint8_t port;
   float duration;
   int pulseWidth;
+  uint16_t rootExpressionID;
 } TriggerConfig_s;
 
 /**
@@ -57,7 +58,7 @@ void triggerManager_setTriggerFireStatus(uint16_t status);
  * @brief Update the TriggerManager with new data
  * @param filterData: Current filter data
  */
-void triggerManager_update(FilterData_s* filterData);
+void triggerManager_update(FilterData_s *filterData);
 
 /**
  * @brief Fire a given trigger
@@ -73,14 +74,14 @@ void triggerManager_triggerFire(uint8_t triggerNum, bool logFire);
  * @param triggerNum Trigger number to change
  * @param configString string to parse as config
  */
-bool triggerManager_setTriggerConfig(uint8_t triggerNum, const char **configString);
+bool triggerManager_setTriggerConfig(uint8_t triggerNum,
+                                     const char **configString);
 
 /**
  * Remove a trigger of a given index.
  * @param triggerNum Trigger number to remove.
  */
 void triggerManager_removeTrigger(uint8_t triggerNum);
-
 
 /**
  * Get a trigger number of a given index.

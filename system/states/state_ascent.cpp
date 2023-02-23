@@ -3,11 +3,11 @@
 
 #include "cli_tasks.h"
 #include "data_log.h"
+#include "event_manager.h"
 #include "filters.h"
 #include "hardware_manager.h"
 #include "state_log.h"
 #include "trigger_manager.h"
-#include "event_manager.h"
 
 void AscentState::init() {
   // Write launched status
@@ -37,7 +37,7 @@ EndCondition_e AscentState::run() {
   // Detect burnout of acc_z drops
   if (filterData->world_acc_z < kBurnoutAccThreshold) {
     if (hm_millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
-  	  eventManager_setEventComplete(Event_e::burnout);
+      eventManager_setEventComplete(Event_e::burnout);
     }
   } else {
     transitionResetTimer = hm_millis();

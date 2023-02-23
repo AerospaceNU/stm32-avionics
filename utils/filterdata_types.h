@@ -6,7 +6,7 @@
 #ifndef UTILS_FILTERDATA_TYPES_H_
 #define UTILS_FILTERDATA_TYPES_H_
 #ifdef __cplusplus
-extern "C" { 
+extern "C" {
 #endif
 #include <stdbool.h>
 #include <string.h>
@@ -73,10 +73,10 @@ typedef enum {
   angle_vertical,
 } FilterData_e;
 
-FilterData_e getVariableEnumFromString(char* input);
+FilterData_e getVariableEnumFromString(char *input);
 float getVariableValue(FilterData_s *filterData, FilterData_e valueType);
 void fillVariableName(char *buffer, int n, FilterData_e valueType);
 #ifdef __cplusplus
 }
 #endif
-#endif // UTILS_FILTERDATA_TYPES_H_
+#endif  // UTILS_FILTERDATA_TYPES_H_
