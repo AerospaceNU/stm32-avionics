@@ -104,6 +104,9 @@ bool do_networking;
 CircularBuffer_s bleBuffer;
 uint8_t bleArray[1024] = {0};
 
+CircularBuffer_s usbBuffer;
+uint8_t usbArray[1024] = {0};
+
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
@@ -149,6 +152,12 @@ void hm_hardwareInit() {
   
   // TODO stick in ifdef
   cb_init(&bleBuffer, bleArray, sizeof(bleArray), 1);
+  cb_init(&usbBuffer, usbArray, sizeof(usbArray), 1);
+
+#if HAS_DEV(NT_INTERFACE)
+  ntInterface.setRadioRXBuffer(&bleBuffer);
+  ntInterface.setUsbDownlinkBuffer(&usbBuffer);
+#endif  // HAS_DEV(NT_INTERFACE)
 
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
