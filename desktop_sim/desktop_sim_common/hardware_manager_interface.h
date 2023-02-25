@@ -7,8 +7,10 @@
 
 class HardwareManagerInterface {
 public:
-  virtual inline void hm_hardwareInit(){};
-  virtual inline uint32_t hm_millis() { return 0; }
+  HardwareManagerInterface() = default;
+
+  virtual inline void hm_hardwareInit() {};
+  virtual uint32_t hm_millis() { return 0; }
   virtual inline bool hm_flashReadStart(int flashId, uint32_t startLoc,
                                         uint32_t numBytes, uint8_t *pData) {
     return false;
@@ -51,7 +53,7 @@ public:
                                        uint16_t numBytes) {
     return false;
   }
-  virtual CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId);
+  virtual inline CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) { return 0; }
     
   virtual inline void hm_bleTick() {}
   virtual inline LineCutterData_s *hm_getLineCutterData(int lineCutterId) { return 0; }

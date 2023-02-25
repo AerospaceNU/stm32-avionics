@@ -4,7 +4,11 @@ execute_process(
 )
 
 set(SIMULATOR_FILES_LIST
-        main.cpp board_config.c board_config.h)
+        main.cpp
+        board_config.c
+        board_config.h 
+        nt_hardware_manager.cpp
+)
 
 add_executable(desktop_sim_live 
   ${SIMULATOR_FILES_LIST}

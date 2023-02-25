@@ -2,15 +2,25 @@
 #include "scheduler.h"
 #include "tcp_socket.h"
 
+#include "nt_hardware_manager.h"
+
 int main(int argC, char** argv) {
   if (argC > 3) {
-    output_file = argv[1];
-    ext_flash_path = argv[2];
-    int_flash_path = argv[3];
-    printf("Running with output file %s, ext flash %s, int flash %s\n",
-           output_file.c_str(), ext_flash_path.c_str(), int_flash_path.c_str());
+    // output_file = argv[1];
+    // ext_flash_path = argv[2];
+    // int_flash_path = argv[3];
+    // printf("Running with output file %s, ext flash %s, int flash %s\n",
+    //        output_file.c_str(), ext_flash_path.c_str(), int_flash_path.c_str());
 
-    do_networking = true;
+    // do_networking = true;
+    
+    hm_sim_setHM(std::make_unique<NtHardwareManager>(
+      argv[1],
+      argv[2],
+      argv[3],
+      argv[4]
+    ));
+
   } else {
     printf(
         "Must have 3 args! Eg ./desktop_sim path/to/flight.csv "

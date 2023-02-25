@@ -8,7 +8,66 @@
 
 #include "hardware_manager_interface.h"
 
-// std::unique_ptr<HardwareManagerInterface> m_hmInterface;
+/* Hardware statuses */
+#if HAS_DEV(ACCEL)
+bool hardwareStatusAccel[NUM_ACCEL];
+#endif  // HAS_DEV(ACCEL)
+#if HAS_DEV(BAROMETER)
+bool hardwareStatusBarometer[NUM_BAROMETER];
+#endif  // HAS_DEV(BAROMETER)
+#if HAS_DEV(BLE_CHIP)
+bool hardwareStatusBleChip[NUM_BLE_CHIP];
+#endif  // HAS_DEV(BLE)
+#if HAS_DEV(BLE_CLIENT)
+bool hardwareStatusBleClient[NUM_BLE_CLIENT];
+#endif  // HAS_DEV(BLE_CLIENT)
+#if HAS_DEV(BUZZER)
+bool hardwareStatusBuzzer[NUM_BUZZER];
+#endif  // HAS_DEV(BUZZER)
+#if HAS_DEV(DC_MOTOR)
+bool hardwareStatusDcMotor[NUM_DC_MOTOR];
+#endif  // HAS_DEV(DC_MOTOR)
+#if HAS_DEV(FLASH)
+bool hardwareStatusFlash[NUM_FLASH];
+#endif  // HAS_DEV(FLASH)
+#if HAS_DEV(GPS)
+bool hardwareStatusGps[NUM_GPS];
+#endif  // HAS_DEV(GPS)
+#if HAS_DEV(IMU)
+bool hardwareStatusImu[NUM_IMU];
+#endif  // HAS_DEV(IMU)
+#if HAS_DEV(LED)
+bool hardwareStatusLed[NUM_LED];
+#endif  // HAS_DEV(LED)
+#if HAS_DEV(LINE_CUTTER)
+bool hardwareStatusLineCutter[NUM_LINE_CUTTER];
+#endif  // HAS_DEV(LINE_CUTTER)
+#if HAS_DEV(PYRO)
+bool hardwareStatusPyro[NUM_PYRO];
+#endif  // HAS_DEV(PYRO)
+#if HAS_DEV(PYRO_CONT)
+bool hardwareStatusPyroCont[NUM_PYRO_CONT];
+#endif  // HAS_DEV(PYRO_CONT)
+#if HAS_DEV(RADIO)
+bool hardwareStatusRadio[NUM_RADIO];
+#endif  // HAS_DEV(RADIO)
+#if HAS_DEV(SERVO)
+bool hardwareStatusServo[NUM_SERVO];
+#endif  // HAS_DEV(SERVO)
+#if HAS_DEV(USB)
+bool hardwareStatusUsb[NUM_USB];
+#endif  // HAS_DEV(USB)
+#if HAS_DEV(VBAT)
+bool hardwareStatusVbat[NUM_VBAT];
+#endif  // HAS_DEV(VBAT)
+
+
+std::unique_ptr<HardwareManagerInterface> m_hmInterface;
+
+void hm_sim_setHM(std::unique_ptr<HardwareManagerInterface> hmInterface) {
+  m_hmInterface = std::move(hmInterface);
+}
+
 
 extern "C" {
 
