@@ -116,10 +116,11 @@ void NtHardwareManager::hm_hardwareInit() {
 }
 
 uint32_t NtHardwareManager::hm_millis() {
-  std::chrono::milliseconds ms =
-      std::chrono::duration_cast<std::chrono::milliseconds>(
-          std::chrono::system_clock::now().time_since_epoch());
-  return ms.count();
+  return timing::GetProgramTimeMillis();
+  // std::chrono::milliseconds ms =
+  //     std::chrono::duration_cast<std::chrono::milliseconds>(
+  //         std::chrono::system_clock::now().time_since_epoch());
+  // return ms.count();
 }
 
 bool NtHardwareManager::hm_flashReadStart(int flashId, uint32_t startLoc,
@@ -271,13 +272,6 @@ SensorData_s *NtHardwareManager::hm_getSensorData() { return &sensorData; }
 
 SensorProperties_s *NtHardwareManager::hm_getSensorProperties() {
   return &sensorProperties;
-}
-
-void NtHardwareManager::hm_delay(int ms) {
-  uint64_t end = timing::GetProgramTimeMillis() + ms;
-  while (timing::GetProgramTimeMillis() < end) {
-    std::this_thread::yield();
-  }
 }
 
 void NtHardwareManager::hm_observeTickComplete(uint64_t tickNum) {

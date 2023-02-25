@@ -7,6 +7,6 @@
 #include "hardware_manager_interface.h"
 #include <memory>
 
-void hm_sim_setHM(std::unique_ptr<HardwareManagerInterface> hmInterface);
+void hm_sim_setHM(std::shared_ptr<HardwareManagerInterface> hmInterface);
 
 #endif  // DESKTOP_SIM_DESKTOP_SIM_COMMON_DESKTOP_HARDWARE_MANAGER_H_

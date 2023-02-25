@@ -80,6 +80,5 @@ public:
   virtual inline void hm_enableSimMode(CircularBuffer_s *rxBuffer) {}
   virtual inline void hm_disableSimMode() {}
   virtual inline bool hm_inSimMode() { return false; }
-  virtual inline void hm_delay(int ms) {}
   virtual inline void hm_observeTickComplete(uint64_t tickNum) {}
 };

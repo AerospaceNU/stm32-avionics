@@ -62,10 +62,10 @@ bool hardwareStatusVbat[NUM_VBAT];
 #endif  // HAS_DEV(VBAT)
 
 
-std::unique_ptr<HardwareManagerInterface> m_hmInterface;
+std::shared_ptr<HardwareManagerInterface> m_hmInterface;
 
-void hm_sim_setHM(std::unique_ptr<HardwareManagerInterface> hmInterface) {
-  m_hmInterface = std::move(hmInterface);
+void hm_sim_setHM(std::shared_ptr<HardwareManagerInterface> hmInterface) {
+  m_hmInterface = hmInterface;
 }
 
 
@@ -130,6 +130,5 @@ SensorProperties_s *hm_getSensorProperties() { return 0; }
 void hm_enableSimMode(CircularBuffer_s *rxBuffer) {}
 void hm_disableSimMode() {}
 bool hm_inSimMode() { return false; }
-void hm_delay(int ms) {}
 void hm_observeTickComplete(uint64_t tickNum) {}
 }

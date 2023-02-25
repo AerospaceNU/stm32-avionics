@@ -1,5 +1,7 @@
 #pragma once
 
+#include "board_config.h"
+
 #include "data_structures.h"
 #include "hardware_manager_interface.h"
 
@@ -13,7 +15,6 @@
 #include "nt_interface.h"
 #endif // HAS_DEV(NT_INTERFACE)
 
-#include "board_config.h"
 
 class NtHardwareManager : public HardwareManagerInterface {
  public:
@@ -127,6 +128,5 @@ class NtHardwareManager : public HardwareManagerInterface {
   inline void hm_enableSimMode(CircularBuffer_s *rxBuffer) override {}
   inline void hm_disableSimMode() override {}
   inline bool hm_inSimMode() override { return false; }
-  void hm_delay(int ms) override;
   void hm_observeTickComplete(uint64_t tickNum) override;
 };

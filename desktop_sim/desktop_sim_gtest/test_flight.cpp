@@ -3,17 +3,20 @@
 #include <thread>
 
 #include "desktop_hardware_manager.h"
+#include "sim_hardware_manager.h"
 #include "scheduler.h"
 #include "sim_timing.h"
 
 TEST(FullFlight, TestFlightLands) {
   // It's tempermental about the working directory
-  // output_file =
-  //     "/home/mmorley@na.jnj.com/Documents/github/stm32-avionics/resources/"
-  //     "superguppy-fcb-output-post.csv";
-  // ext_flash_path = "ext-flash-test.hex";
-  // int_flash_path = "int-flash-test.hex";
-  // do_networking = false;
+  auto output_file =
+      "/home/mmorley@na.jnj.com/Documents/github/stm32-avionics/resources/"
+      "superguppy-fcb-output-post.csv";
+  auto ext_flash_path = "ext-flash-test.hex";
+  auto int_flash_path = "int-flash-test.hex";
+
+  auto hm = std::make_shared<SimHardwareManager>();
+  hm_sim_setHM(hm);
 
   timing::RestartTiming();
   timing::PauseTiming();

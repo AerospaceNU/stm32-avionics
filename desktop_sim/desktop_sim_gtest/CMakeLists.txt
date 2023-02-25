@@ -12,7 +12,9 @@ set(TEST_FILES
   test_file_flash.cpp
   test_flight.cpp
   test_cli_parse.cpp
-  board_config.c)
+  board_config.c
+  sim_hardware_manager.cpp  
+)
 
 add_executable(
   desktop_sim_test

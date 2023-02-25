@@ -1,3 +1,8 @@
+#include "board_config.h"
+#include "board_config_common.h"
+
+#if HAS_DEV(NT_INTERFACE)
+
 #include "nt_interface.h"
 
 #include <networktables/NetworkTableInstance.h>
@@ -87,3 +92,5 @@ void RocketNTInterface::update() {
     }
   }
 }
+
+#endif
