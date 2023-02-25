@@ -4,6 +4,7 @@ execute_process(
 )
 
 set(SIM_COMMON_FILES_LIST
+  ${CMAKE_CURRENT_SOURCE_DIR}/nt_hardware_manager.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/desktop_hardware_manager.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/sim_timing.cpp
   CACHE INTERNAL "")
