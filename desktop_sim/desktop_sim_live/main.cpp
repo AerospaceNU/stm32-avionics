@@ -39,10 +39,10 @@ int main(int argC, char** argv) {
   }
 
   // Hack in hard-coded pyro configs
-  const char* apogee = "apogee";
-  const char* main = "(apogee and (pos_z_agl < 200))";
-  triggerManager_setTriggerConfig(0, &apogee);
-  triggerManager_setTriggerConfig(1, &main);
+  // const char* apogee = "apogee";
+  // const char* main = "(apogee and (pos_z_agl < 200))";
+  // triggerManager_setTriggerConfig(0, &apogee);
+  // triggerManager_setTriggerConfig(1, &main);
 
   while (true) {
     s.tick();
