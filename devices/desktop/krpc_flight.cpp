@@ -56,6 +56,7 @@ void KRPCFlightReplay::getNext(SensorData_s* data) {
     }
 #endif  // HAS_DEV(GPS_DESKTOP_FILE)
 
+    // X up, Y north, Z east
     auto [wx, wy, wz] = vessel.angular_velocity(vessel.surface_reference_frame());
 
     // +x is to the right
@@ -72,6 +73,11 @@ void KRPCFlightReplay::getNext(SensorData_s* data) {
     auto ax = fx / mass;
     auto ay = fy / mass;
     auto az = fz / mass;
+    if (mass < 1e-4) {
+      ax = 0;
+      ay = 0;
+      az = 0;
+    }
 
 #if HAS_DEV(IMU_DESKTOP_FILE)
 
