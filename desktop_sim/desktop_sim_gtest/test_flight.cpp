@@ -1,10 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <thread>
-
 #include "desktop_hardware_manager.h"
-#include "sim_hardware_manager.h"
 #include "scheduler.h"
+#include "sim_hardware_manager.h"
 #include "sim_timing.h"
 
 TEST(FullFlight, TestFlightLands) {

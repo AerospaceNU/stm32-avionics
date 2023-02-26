@@ -18,9 +18,7 @@ OrientationEstimator::OrientationEstimator(double dt) : m_dt(dt) {}
 
 OrientationEstimator::~OrientationEstimator() {}
 
-void OrientationEstimator::reset() {
-  this->q = Matrix<4, 1>({1.0, 0, 0, 0});
-}
+void OrientationEstimator::reset() { this->q = Matrix<4, 1>({1.0, 0, 0, 0}); }
 
 void OrientationEstimator::setDt(double dt) { this->m_dt = dt; }
 
@@ -54,7 +52,7 @@ void OrientationEstimator::update(float rocket_ang_vel_x,
   Matrix<3, 1> gyro({rocket_ang_vel_x, rocket_ang_vel_y, rocket_ang_vel_z});
 
   float w = gyro.norm();
-  
+
   // special case -- w = 0, so omgmult becomes NaN and everything explodes
   // But w=0 means no rotation. So just return early
   if (fabs(w) < 1e-6) {

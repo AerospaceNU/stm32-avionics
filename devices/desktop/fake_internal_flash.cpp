@@ -2,15 +2,16 @@
 // Created by matth on 3/25/2022.
 //
 
+#include "fake_internal_flash.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "file_backed_flash.h"
 #include "internal_flash.h"
-#include "fake_internal_flash.h"
 
 namespace detail {
-  FileBackedFlash *internalFlash;
+FileBackedFlash *internalFlash;
 }
 
 void internalFlash_sim_setFilePointer(FileBackedFlash *ptr) {

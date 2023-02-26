@@ -2,20 +2,22 @@
 
 #if HAS_DEV(PYRO_DESKTOP_NT)
 
+#include <fmt/format.h>
 #include <stdint.h>
 #include <stdio.h>
 
 #include <chrono>  // NOLINT
-#include <fmt/format.h>
 
 void ntPyro_init(NtPyroCtrl_s *pyro, int id) {
   pyro->expireTime = 0;
   pyro->id = id;
   auto name = fmt::format("/rocket_sim/pyro_{}/state", id);
-  pyro->stateTopic = NT_GetTopic(NT_GetDefaultInstance(), name.c_str(), name.length());
-  NT_PubSubOptions opts {0};
+  pyro->stateTopic =
+      NT_GetTopic(NT_GetDefaultInstance(), name.c_str(), name.length());
+  NT_PubSubOptions opts{0};
   opts.structSize = sizeof(opts);
-  pyro->statePublisher = NT_Publish(pyro->stateTopic, NT_STRING, "string", &opts);
+  pyro->statePublisher =
+      NT_Publish(pyro->stateTopic, NT_STRING, "string", &opts);
 }
 
 void ntPyro_start(NtPyroCtrl_s *pyro, uint32_t duration) {
@@ -34,10 +36,10 @@ void ntPyro_set(NtPyroCtrl_s *pyro, bool enable) {
   NT_SetString(pyro->statePublisher, 0, name.c_str(), name.length());
 }
 
-void ntPyro_pwmStart(NtPyroCtrl_s *pyro, uint32_t duration,
-                        uint32_t frequency, uint32_t pulseWidth) {
+void ntPyro_pwmStart(NtPyroCtrl_s *pyro, uint32_t duration, uint32_t frequency,
+                     uint32_t pulseWidth) {
   // ntf("Initializing PWM on pyro %i with %i duty cycle \n", pyro->id,
-        //  pulseWidth);
+  //  pulseWidth);
   std::string name = fmt::format("PWM_{}_{}", frequency, pulseWidth);
   NT_SetString(pyro->statePublisher, 0, name.c_str(), name.length());
 }

@@ -117,22 +117,23 @@ void ExpressionStore::tick(FilterData_s *filterData) {
     expressionPtrs[i]->evaluate(filterData, expressionPtrs);
   }
 
-// <<<<<<< HEAD
-//     for (int i = MAX_EXPRESSION - 1; i >= 0; --i) {
-// #ifdef IS_DESKTOP_SIM
-//         // At least on Matt's laptop, we need to re-cast this every loop
-//         // (Or, specifically the second loop?)
-//         // do it every time for safety
-//         variant_cast<Expression *>(expressions[i])->evaluate(filterData, expressionPtrs);
-// #else
-//         expressionPtrs[i]->evaluate(filterData, expressionPtrs);
-// #endif // IS_DESKTOP_SIM
-//     }
-// =======
-//   for (int i = MAX_EXPRESSION - 1; i >= 0; --i) {
-//     expressionPtrs[i]->evaluate(filterData, expressionPtrs);
-//   }
-// >>>>>>> expression-config
+  // <<<<<<< HEAD
+  //     for (int i = MAX_EXPRESSION - 1; i >= 0; --i) {
+  // #ifdef IS_DESKTOP_SIM
+  //         // At least on Matt's laptop, we need to re-cast this every loop
+  //         // (Or, specifically the second loop?)
+  //         // do it every time for safety
+  //         variant_cast<Expression *>(expressions[i])->evaluate(filterData,
+  //         expressionPtrs);
+  // #else
+  //         expressionPtrs[i]->evaluate(filterData, expressionPtrs);
+  // #endif // IS_DESKTOP_SIM
+  //     }
+  // =======
+  //   for (int i = MAX_EXPRESSION - 1; i >= 0; --i) {
+  //     expressionPtrs[i]->evaluate(filterData, expressionPtrs);
+  //   }
+  // >>>>>>> expression-config
 }
 
 void ExpressionStore::writeNewConfigs() {

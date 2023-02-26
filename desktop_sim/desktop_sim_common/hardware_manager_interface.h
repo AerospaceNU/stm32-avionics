@@ -6,10 +6,10 @@
 #include "hardware_manager.h"
 
 class HardwareManagerInterface {
-public:
+ public:
   HardwareManagerInterface() = default;
 
-  virtual inline void hm_hardwareInit() {};
+  virtual inline void hm_hardwareInit() {}
   virtual uint32_t hm_millis() { return 0; }
   virtual inline bool hm_flashReadStart(int flashId, uint32_t startLoc,
                                         uint32_t numBytes, uint8_t *pData) {
@@ -40,7 +40,7 @@ public:
   }
   virtual inline void hm_radioUpdate() {}
   virtual inline void hm_radioRegisterConsumer(int radioNum,
-                                               CircularBuffer_s *rxBuffer){};
+                                               CircularBuffer_s *rxBuffer) {}
   virtual inline void hm_radioSetChannel(int radioNum, int channel) {}
   virtual inline bool hm_usbIsConnected(int usbId) { return false; }
   virtual inline bool hm_usbTransmit(int usbId, uint8_t *data,
@@ -53,10 +53,14 @@ public:
                                        uint16_t numBytes) {
     return false;
   }
-  virtual inline CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) { return 0; }
-    
+  virtual inline CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) {
+    return 0;
+  }
+
   virtual inline void hm_bleTick() {}
-  virtual inline LineCutterData_s *hm_getLineCutterData(int lineCutterId) { return 0; }
+  virtual inline LineCutterData_s *hm_getLineCutterData(int lineCutterId) {
+    return 0;
+  }
   virtual inline LineCutterFlightVars_s *hm_getLineCutterFlightVariables(
       int lineCutterId) {
     return 0;
@@ -65,9 +69,7 @@ public:
                                               char *string) {
     return true;
   }
-  virtual inline bool hm_lineCuttersSendCut(int chan) {
-    return true;
-  }
+  virtual inline bool hm_lineCuttersSendCut(int chan) { return true; }
   virtual inline void hm_watchdogRefresh() {}
   virtual inline void hm_pyroFire(int pyroId, uint32_t duration) {}
   virtual inline void hm_pyroSet(int pyroId, bool enable) {}

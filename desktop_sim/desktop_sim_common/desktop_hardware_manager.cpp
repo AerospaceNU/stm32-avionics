@@ -72,7 +72,7 @@ void hm_sim_setHM(std::shared_ptr<HardwareManagerInterface> hmInterface) {
 
 extern "C" {
 
-void hm_hardwareInit() { p->hm_hardwareInit(); };
+void hm_hardwareInit() { p->hm_hardwareInit(); }
 uint32_t hm_millis() { return p->hm_millis(); }
 bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
                        uint8_t *pData) {
@@ -167,5 +167,7 @@ void hm_enableSimMode(CircularBuffer_s *rxBuffer) {
 }
 void hm_disableSimMode() { p->hm_disableSimMode(); }
 bool hm_inSimMode() { return p->hm_inSimMode(); }
-void hm_observeTickComplete(uint64_t tickNum) { p->hm_observeTickComplete(tickNum); }
+void hm_observeTickComplete(uint64_t tickNum) {
+  p->hm_observeTickComplete(tickNum);
+}
 }

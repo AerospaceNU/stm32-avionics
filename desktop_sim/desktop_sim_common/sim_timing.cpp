@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include <atomic>
-#include <chrono>
+#include <chrono>  // NOLINT
 
 static std::atomic<uint64_t> programStartTime{0};
 static std::atomic<uint64_t> programPauseTime{0};

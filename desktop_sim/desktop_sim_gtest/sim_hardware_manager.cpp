@@ -1,5 +1,6 @@
 #include "sim_hardware_manager.h"
-#include <thread>
+
+#include <thread>  // NOLINT
 
 uint32_t SimHardwareManager::hm_millis() {
   return timing::GetProgramTimeMillis();

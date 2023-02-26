@@ -11,10 +11,9 @@
 #include "nt_interface.h"
 #endif
 
-#include <thread>
+#include <thread>  // NOLINT
 
 #include "fake_internal_flash.h"
-#include "hardware_manager.h"
 
 /* Device includes */
 
@@ -285,7 +284,8 @@ void NtHardwareManager::hm_pyroSetPwm(int pyroId, uint32_t frequency,
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 #if HAS_DEV(PYRO_DESKTOP_NT)
   if (IS_DEVICE(pyroId, PYRO_DESKTOP_NT)) {
-    ntPyro_pwmStart(&ntPyro[pyroId - FIRST_ID_PYRO_DESKTOP_NT], duration, frequency, pulseWidth);
+    ntPyro_pwmStart(&ntPyro[pyroId - FIRST_ID_PYRO_DESKTOP_NT], duration,
+                    frequency, pulseWidth);
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }

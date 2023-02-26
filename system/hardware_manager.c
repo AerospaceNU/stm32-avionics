@@ -1028,5 +1028,5 @@ bool hm_inSimMode() { return inSim; }
 void hm_delay(int ms) { HAL_Delay(ms); }
 
 void hm_observeTickComplete(uint64_t idx) {
-	// todo
+  // todo
 }
