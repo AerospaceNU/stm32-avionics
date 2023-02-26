@@ -23,7 +23,7 @@
 
 // TODO add fake bluetooth
 
-#define NUM_PYRO_DESKTOP_PRINT 6
+#define NUM_PYRO_DESKTOP_NT 6
 
 #define NUM_PYRO_CONT_DESKTOP_FILE 6
 

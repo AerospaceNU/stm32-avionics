@@ -1,4 +1,5 @@
 #include "nt_hardware_manager.h"
+
 #include <atomic>
 #include <chrono>  // NOLINT
 #include <fstream>
@@ -11,8 +12,9 @@
 #endif
 
 #include <thread>
-#include "hardware_manager.h"
+
 #include "fake_internal_flash.h"
+#include "hardware_manager.h"
 
 /* Device includes */
 
@@ -43,7 +45,6 @@
 #endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
 
 /* Hardware objects */
-
 
 void NtHardwareManager::hm_hardwareInit() {
   printf("STARTING: output %s, ext flash %s, int flash %s\n",
@@ -86,6 +87,12 @@ void NtHardwareManager::hm_hardwareInit() {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   for (int i = 0; i < NUM_PYRO_DESKTOP_PRINT; i++) {
     printPyro_init(&printPyro[i], i);
+    hardwareStatusPyro[FIRST_ID_PYRO_DESKTOP_PRINT + i] = true;
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+#if HAS_DEV(PYRO_DESKTOP_NT)
+  for (int i = 0; i < NUM_PYRO_DESKTOP_NT; i++) {
+    ntPyro_init(&ntPyro[i], i);
     hardwareStatusPyro[FIRST_ID_PYRO_DESKTOP_PRINT + i] = true;
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
@@ -207,7 +214,9 @@ bool NtHardwareManager::hm_usbTransmit(int usbId, uint8_t *data,
 #endif
   return true;
 }
-CircularBuffer_s *NtHardwareManager::hm_usbGetRxBuffer(int usbId) { return &usbBuffer; }
+CircularBuffer_s *NtHardwareManager::hm_usbGetRxBuffer(int usbId) {
+  return &usbBuffer;
+}
 
 bool NtHardwareManager::hm_bleClientConnected(int bleClientId) { return false; }
 bool NtHardwareManager::hm_bleClientSend(int bleClientId, const uint8_t *data,
@@ -230,10 +239,25 @@ bool NtHardwareManager::hm_lineCuttersSendCut(int chan) {
   return true;
 }
 
+LineCutterData_s *NtHardwareManager::hm_getLineCutterData(int lineCutterId) {
+  static LineCutterData_s empty = {0};
+  return &empty;
+}
+LineCutterFlightVars_s *NtHardwareManager::hm_getLineCutterFlightVariables(
+    int lineCutterId) {
+  static LineCutterFlightVars_s empty = {0};
+  return &empty;
+}
+
 void NtHardwareManager::hm_pyroFire(int pyroId, uint32_t duration) {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   if (IS_DEVICE(pyroId, PYRO_DESKTOP_PRINT)) {
     printPyro_start(&printPyro[pyroId - FIRST_ID_PYRO_DESKTOP_PRINT], duration);
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+#if HAS_DEV(PYRO_DESKTOP_NT)
+  if (IS_DEVICE(pyroId, PYRO_DESKTOP_NT)) {
+    ntPyro_start(&ntPyro[pyroId - FIRST_ID_PYRO_DESKTOP_NT], duration);
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
@@ -242,6 +266,11 @@ void NtHardwareManager::hm_pyroSet(int pyroId, bool enable) {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   if (IS_DEVICE(pyroId, PYRO_DESKTOP_PRINT)) {
     printPyro_set(&printPyro[pyroId - FIRST_ID_PYRO_DESKTOP_PRINT], enable);
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+#if HAS_DEV(PYRO_DESKTOP_NT)
+  if (IS_DEVICE(pyroId, PYRO_DESKTOP_NT)) {
+    ntPyro_set(&ntPyro[pyroId - FIRST_ID_PYRO_DESKTOP_NT], enable);
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
@@ -254,12 +283,22 @@ void NtHardwareManager::hm_pyroSetPwm(int pyroId, uint32_t frequency,
                        duration, frequency, pulseWidth);
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+#if HAS_DEV(PYRO_DESKTOP_NT)
+  if (IS_DEVICE(pyroId, PYRO_DESKTOP_NT)) {
+    ntPyro_pwmStart(&ntPyro[pyroId - FIRST_ID_PYRO_DESKTOP_NT], duration, frequency, pulseWidth);
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
 
 void NtHardwareManager::hm_pyroUpdate() {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   for (int i = 0; i < NUM_PYRO_DESKTOP_PRINT; i++) {
     printPyro_tick(&printPyro[i]);
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+#if HAS_DEV(PYRO_DESKTOP_NT)
+  for (int i = 0; i < NUM_PYRO_DESKTOP_PRINT; i++) {
+    ntPyro_tick(&ntPyro[i]);
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
