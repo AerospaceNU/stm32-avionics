@@ -5,8 +5,8 @@
  *      Author: Ben
  */
 
-#ifndef DEVICES_DESKTOP_PRINT_PYRO_H_
-#define DEVICES_DESKTOP_PRINT_PYRO_H_
+#ifndef DEVICES_DESKTOP_KRPC_PYRO_H_
+#define DEVICES_DESKTOP_KRPC_PYRO_H_
 
 #ifdef __cplusplus
 extern "C" {

@@ -14,6 +14,8 @@
 #include "nt_interface.h"
 #endif  // HAS_DEV(NT_INTERFACE)
 
+#include "krpc_pyro.h"
+
 class NtHardwareManager : public HardwareManagerInterface {
  public:
   inline NtHardwareManager(std::string_view flightCsv, std::string_view metaCSV,
@@ -40,7 +42,7 @@ class NtHardwareManager : public HardwareManagerInterface {
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
-  CsvReplay *flightReplay;
+  std::unique_ptr<FlightReplay> flightReplay;
 #endif  // HAS_DEV(XXX_DESKTOP_FILE)
 
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
@@ -50,6 +52,10 @@ class NtHardwareManager : public HardwareManagerInterface {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   PrintPyroCtrl_s printPyro[NUM_PYRO_DESKTOP_PRINT];
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+
+#if HAS_DEV(PYRO_SIM_KRPC)
+  KRPCPyroCtrl_s pyroKRPC[NUM_PYRO_SIM_KRPC];
+#endif  // HAS_DEV(PYRO_SIM_KRPC)
 
 #if HAS_DEV(PYRO_DESKTOP_NT)
   NtPyroCtrl_s ntPyro[NUM_PYRO_DESKTOP_NT];

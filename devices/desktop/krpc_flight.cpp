@@ -2,6 +2,11 @@
 // Created by matth on 3/26/2022.
 //
 
+#include "board_config.h"
+#include "board_config_common.h"
+
+#if HAS_DEV(PYRO_SIM_KRPC)
+
 #include "flight_replay.h"
 
 #include <algorithm>  // std::min
@@ -109,3 +114,5 @@ void KRPCFlightReplay::getNext(SensorData_s* data) {
     }
 #endif  // HAS_DEV(ACCEL_DESKTOP_FILE)
 }
+
+#endif // HAS_DEV(PYRO_SIM_KRPC)

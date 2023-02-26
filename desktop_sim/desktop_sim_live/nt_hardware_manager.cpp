@@ -7,9 +7,10 @@
 #include "circular_buffer.h"
 #include "hardware_manager.h"
 #include "sim_timing.h"
+
 #if HAS_DEV(NT_INTERFACE)
 #include "nt_interface.h"
-#endif
+#endif // Has nt interface
 
 #include <thread>  // NOLINT
 
@@ -70,7 +71,20 @@ void NtHardwareManager::hm_hardwareInit() {
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
-  flightReplay = new CsvReplay(output_file);
+
+  // flightReplay = new CsvReplay(output_file);
+  // TODO
+#if HAS_DEV(PYRO_SIM_KRPC)
+  flightReplay = std::make_unique<KRPCFlightReplay>();
+#endif
+
+  // Tell filter code our baros and imus actually work
+  for (int i = 0; i < NUM_BAROMETER; i++) {
+    hardwareStatusBarometer[i] = true;
+  }
+  for (int i = 0; i < NUM_IMU; i++) {
+    hardwareStatusImu[i] = true;
+  }
 #endif  // HAS_DEV(XXX_DESKTOP_FILE)
 
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
@@ -95,6 +109,13 @@ void NtHardwareManager::hm_hardwareInit() {
     hardwareStatusPyro[FIRST_ID_PYRO_DESKTOP_PRINT + i] = true;
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_NT)
+
+#if HAS_DEV(PYRO_SIM_KRPC)
+  for (int i = 0; i < NUM_PYRO_SIM_KRPC; i++) {
+    krpcPyro_init(&pyroKRPC[i], i, callbackMisdirectionFun);
+    hardwareStatusPyro[FIRST_ID_PYRO_SIM_KRPC + i] = true;
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 
 #if HAS_DEV(RADIO_DESKTOP_SOCKET)
   if (do_networking) {
@@ -258,7 +279,13 @@ void NtHardwareManager::hm_pyroFire(int pyroId, uint32_t duration) {
   if (IS_DEVICE(pyroId, PYRO_DESKTOP_NT)) {
     ntPyro_start(&ntPyro[pyroId - FIRST_ID_PYRO_DESKTOP_NT], duration);
   }
-#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+#endif  // HAS_DEV(PYRO_DESKTOP_NT)
+
+#if HAS_DEV(PYRO_SIM_KRPC)
+  if (IS_DEVICE(pyroId, PYRO_SIM_KRPC)) {
+    krpcPyro_start(&pyroKRPC[pyroId - FIRST_ID_PYRO_SIM_KRPC], duration);
+  }
+#endif // HAS_DEV(PYRO_SIM_KRPC)
 }
 
 void NtHardwareManager::hm_pyroSet(int pyroId, bool enable) {
@@ -270,6 +297,12 @@ void NtHardwareManager::hm_pyroSet(int pyroId, bool enable) {
 #if HAS_DEV(PYRO_DESKTOP_NT)
   if (IS_DEVICE(pyroId, PYRO_DESKTOP_NT)) {
     ntPyro_set(&ntPyro[pyroId - FIRST_ID_PYRO_DESKTOP_NT], enable);
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+
+#if HAS_DEV(PYRO_SIM_KRPC)
+  if (IS_DEVICE(pyroId, PYRO_SIM_KRPC)) {
+    krpcPyro_set(&pyroKRPC[pyroId - FIRST_ID_PYRO_SIM_KRPC], enable);
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
@@ -288,6 +321,11 @@ void NtHardwareManager::hm_pyroSetPwm(int pyroId, uint32_t frequency,
                     frequency, pulseWidth);
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+#if HAS_DEV(PYRO_SIM_KRPC)
+  if (IS_DEVICE(pyroId, PYRO_SIM_KRPC)) {
+    krpcPyro_pwmStart(&pyroKRPC[pyroId - FIRST_ID_PYRO_SIM_KRPC], duration, frequency, pulseWidth);
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
 
 void NtHardwareManager::hm_pyroUpdate() {
@@ -301,10 +339,15 @@ void NtHardwareManager::hm_pyroUpdate() {
     ntPyro_tick(&ntPyro[i]);
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+#if HAS_DEV(PYRO_SIM_KRPC)
+  for (int i = 0; i < NUM_PYRO_SIM_KRPC; i++) {
+    krpcPyro_tick(&pyroKRPC[i]);
+  }
+#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
 
 void NtHardwareManager::hm_readSensorData() {
-  flightReplay->getNext(&sensorData);
+  if (flightReplay) flightReplay->getNext(&sensorData);
 
   // TODO SHITTY HACK -- call pyro update from here
   this->hm_pyroUpdate();

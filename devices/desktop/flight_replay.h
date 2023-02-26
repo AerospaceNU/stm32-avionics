@@ -5,23 +5,26 @@
 #ifndef DEVICES_DESKTOP_FLIGHT_REPLAY_H_
 #define DEVICES_DESKTOP_FLIGHT_REPLAY_H_
 
+#include "board_config.h"
+#include "board_config_common.h"
 #include "hardware_manager.h"
 #include "rapidcsv.h"
-#include <krpc.hpp>
-#include <krpc/services/space_center.hpp>
-#include <krpc/services/ui.hpp>
-#include <krpc/services/drawing.hpp>
 
 class FlightReplay {
  public:
   virtual void getNext(SensorData_s *data) {}
 };
 
-class KRPCFlightReplay {
+#include <krpc.hpp>
+#include <krpc/services/space_center.hpp>
+#include <krpc/services/ui.hpp>
+#include <krpc/services/drawing.hpp>
+
+class KRPCFlightReplay : public FlightReplay {
  public:
   explicit KRPCFlightReplay();
 
-  void getNext(SensorData_s *data);
+  void getNext(SensorData_s *data) override;
 
   void writeActionGroup(int group, bool state);
 
@@ -52,5 +55,6 @@ class CsvReplay : FlightReplay {
   rapidcsv::Document doc;
   size_t m_row = 0;
 };
+
 
 #endif  // DEVICES_DESKTOP_FLIGHT_REPLAY_H_
