@@ -1,6 +1,7 @@
 #include "desktop_hardware_manager.h"
 #include "scheduler.h"
 #include "tcp_socket.h"
+#include "trigger_manager.h"
 
 #include "nt_hardware_manager.h"
 
@@ -29,6 +30,20 @@ int main(int argC, char** argv) {
   }
 
   Scheduler s{};
+  // HACK -- step forward 1/2 sec
+  for(int i = 0; i < 30; i++) {
+    s.tick();
+    while (!s.hasTimerExpired()) {
+      // busywait
+    }
+  }
+
+  // Hack in hard-coded pyro configs
+  const char* apogee = "apogee";
+  const char* main = "(apogee and (pos_z_agl < 200))";
+  triggerManager_setTriggerConfig(0, &apogee);
+  triggerManager_setTriggerConfig(1, &main);
+
   while (true) {
     s.tick();
     while (!s.hasTimerExpired()) {

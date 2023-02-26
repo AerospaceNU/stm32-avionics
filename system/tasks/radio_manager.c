@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "board_config_common.h"
+#include "board_config.h"
 #include "cli.h"
 #include "data_log.h"
 #include "data_structures.h"
@@ -253,12 +254,17 @@ void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
     transmitPacket[radioId].payload.cliString.len = txLen;
     transmitPacket[radioId].payload.cliString.id = lastTxId++;
 
+    #if DO_RADIO_HACK == 1
     for (int i = 0; i < 3; i++) {
+    #else 
+    {
+    #endif // DO_RADIO_HACK
+
+    #if DO_RADIO_HACK == 1
       // This is intended to be called twice to hopefully successfully send at
       // least once
       radioManager_sendInternal(radioId);
       radioManager_sendInternal(radioId);
-
       // The radio seems to not actually send the packet unless we actually call
       // RadioUpdate a bunch
       // TODO: This is a HACK
@@ -270,6 +276,11 @@ void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
         }
         hm_watchdogRefresh();
       }
+
+    #else 
+      radioManager_sendInternal(radioId);
+    #endif // DO_RADIO_HACK
+
     }
 
     len -= txLen;

@@ -297,7 +297,7 @@ void NtHardwareManager::hm_pyroUpdate() {
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 #if HAS_DEV(PYRO_DESKTOP_NT)
-  for (int i = 0; i < NUM_PYRO_DESKTOP_PRINT; i++) {
+  for (int i = 0; i < NUM_PYRO_DESKTOP_NT; i++) {
     ntPyro_tick(&ntPyro[i]);
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
@@ -305,6 +305,9 @@ void NtHardwareManager::hm_pyroUpdate() {
 
 void NtHardwareManager::hm_readSensorData() {
   flightReplay->getNext(&sensorData);
+
+  // TODO SHITTY HACK -- call pyro update from here
+  this->hm_pyroUpdate();
 }
 
 SensorData_s *NtHardwareManager::hm_getSensorData() { return &sensorData; }

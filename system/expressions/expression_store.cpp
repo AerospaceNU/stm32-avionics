@@ -110,6 +110,13 @@ bool ExpressionStore::getStatusFor(uint16_t expressionNum) {
 }
 
 void ExpressionStore::tick(FilterData_s *filterData) {
+  for (int i = MAX_EXPRESSION - 1; i >= 0; --i) {
+    this->expressionPtrs[i] = variant_cast<Expression *>(&expressions[i]);
+  }
+  for (int i = MAX_EXPRESSION - 1; i >= 0; --i) {
+    expressionPtrs[i]->evaluate(filterData, expressionPtrs);
+  }
+
 // <<<<<<< HEAD
 //     for (int i = MAX_EXPRESSION - 1; i >= 0; --i) {
 // #ifdef IS_DESKTOP_SIM
@@ -122,9 +129,9 @@ void ExpressionStore::tick(FilterData_s *filterData) {
 // #endif // IS_DESKTOP_SIM
 //     }
 // =======
-  for (int i = MAX_EXPRESSION - 1; i >= 0; --i) {
-    expressionPtrs[i]->evaluate(filterData, expressionPtrs);
-  }
+//   for (int i = MAX_EXPRESSION - 1; i >= 0; --i) {
+//     expressionPtrs[i]->evaluate(filterData, expressionPtrs);
+//   }
 // >>>>>>> expression-config
 }
 
