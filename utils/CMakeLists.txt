@@ -3,7 +3,6 @@ set(UTILS_FILES_LIST
     dtoa.c
     small_strtod.c
     string_slice.cpp
-    filterdata_types.c
 )
 
 add_library(utils ${UTILS_FILES_LIST})

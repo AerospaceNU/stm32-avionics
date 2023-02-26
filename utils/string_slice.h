@@ -1,10 +1,9 @@
 #ifndef UTILS_STRING_SLICE_H_
 #define UTILS_STRING_SLICE_H_
-
 /**
  * A helper class to represent slices of strings.
  */
-struct StringSlice {
+class StringSlice {
  private:
   const char **src;
   int start;
@@ -32,25 +31,27 @@ struct StringSlice {
 
   /**
    * Get a pointer to the first character of the slice.
-   * @return
+   * @return Pointer to the first character in the slice.
    */
   const char *startPtr() const;
 
   /**
-   * Get a pointer to the base character of the backing string.
-   * @return
+   * Get a (double) pointer to the base character of the backing string.
+   * @return Double pointer to the base character of the backing string.
+   * 		 This will not necessarily be equivalent to the start of this
+   * 		 slice.
    */
   const char **basePtr() const;
 
   /**
    * Get the length of the slice.
-   * @return
+   * @return Integer length of the slice.
    */
   int length() const;
 
   /**
    * Get a character at a specific index
-   * @param index
+   * @param index Index of the character to get.
    * @return that character.
    */
   char operator[](int index) const;
@@ -63,7 +64,7 @@ struct StringSlice {
 
   /**
    * Copy characters from this slice into a buffer.
-   * @param buffer
+   * @param buffer buffer to copy into.
    * @param n number of characters to copy.
    */
   void copy(char *buffer, int n) const;

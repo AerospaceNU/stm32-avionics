@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+extern size_t strnlen(const char *str, size_t strsz);
+
 #include <cmath>
 #include <cstdio>
 
@@ -72,8 +74,8 @@ UnaryFunctionWrapper unaryFunctionWrappers[NUM_UNARY_FUNCTION] = {
 };
 
 int UnaryFuncExpression::toString(char *buffer, int n,
-                                  Expression *expressions[]) {
-  int selfLength = strlen(unaryFunctionWrappers[this->opcode].stringRep);
+                                  Expression *expressions[]) const {
+  int selfLength = strnlen(unaryFunctionWrappers[this->opcode].stringRep, 7);
   snprintf(buffer, n, "(%s ", unaryFunctionWrappers[this->opcode].stringRep);
   if (selfLength + 2 < n) {
     int operandLen = expressions[this->operandID]->toString(
@@ -94,13 +96,10 @@ void UnaryFuncExpression::evaluate(FilterData_s *filterData,
                                                expressions[operandID]);
 }
 
-void UnaryFuncExpression::serializeInto(SerializedExpression_s *serialized) {
+void UnaryFuncExpression::serializeInto(
+    SerializedExpression_s *serialized) const {
   serialized->triggerNum = this->triggerNum;
   serialized->type = unaryFunc;
   serialized->contents.unary.opcode = this->opcode;
   serialized->contents.unary.operandID = this->operandID;
-}
-
-bool UnaryFuncExpression::getDefaultValue() {
-  return unaryFunctionWrappers[this->opcode].getDefaultBoolean();
 }

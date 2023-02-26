@@ -11,7 +11,6 @@ extern "C" {
 #include "board_config_common.h"
 #include "circular_buffer.h"
 #include "data_structures.h"
-#include "event_manager.h"
 #include "expression_sharedtypes.h"
 #include "trigger_manager.h"
 /**

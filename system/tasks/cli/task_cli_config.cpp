@@ -41,8 +41,6 @@ void CliTasks::config() {
       triggerManager_removeTrigger(triggerNum);
       // Write new cli configs to flash
       dataLog_writeCliConfigs();
-      cli_sendComplete(true, nullptr);
-      return;
     }
 
     // Get trigger type
@@ -170,8 +168,8 @@ void CliTasks::config() {
 
   // Send help message to cli
   if (options.h) {
-    char name[30];
-    char val[240];
+    static char name[30];
+    static char val[240];
 
     // New line
     cli_send("\r\n");
@@ -181,7 +179,7 @@ void CliTasks::config() {
       TriggerConfig_s* triggerConfig =
           (cli_getConfigs()->triggerConfiguration + i);
 
-      char deviceText[40];
+      static char deviceText[40];
       bool format = true;
       switch (triggerConfig->mode) {
         case TRIGGER_TYPE_EMPTY:
@@ -205,17 +203,18 @@ void CliTasks::config() {
                    triggerConfig->port);
           break;
         case TRIGGER_TYPE_PWM_PYRO:
-          snprintf(deviceText, sizeof(deviceText),
-                   "PWM on pyro %d for %ds with %d width on",
-                   triggerConfig->port, (int)triggerConfig->duration,
-                   triggerConfig->pulseWidth);
+          snprintf(
+              deviceText, sizeof(deviceText),
+              "PWM on pyro %d for %ds with %ld width on", triggerConfig->port,
+              (int)(triggerConfig->duration / 1000.0),  // Convert back to ms
+              triggerConfig->pulseWidth);
           break;
         default:
           snprintf(deviceText, sizeof(deviceText), "error");
           break;
       }
 
-      char configText[200];
+      static char configText[200];
       if (format) {
         triggerManager_getConfigString(i, configText, 200);
         snprintf(val, sizeof(val), "%s%s", deviceText, configText);

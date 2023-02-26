@@ -5,6 +5,8 @@
 
 /**
  * An expression that evaluates to the value of some member of FilterData.
+ * A VarExpression is bound to one of the members of FilterData and always
+ * evaluates to the current value of that variable.
  */
 class VarExpression : public Expression {
  private:
@@ -17,25 +19,13 @@ class VarExpression : public Expression {
    * @param dataMember The filterdata member that this expression will evaluate
    * to.
    */
-  VarExpression(int triggerNum, FilterData_e dataMember) {
-    this->dataMember = dataMember;
-    this->setTriggerNum(triggerNum);
-  }
+  VarExpression(int triggerNum, FilterData_e dataMember);
 
-  void evaluate(FilterData_s *filterData, Expression *expressions[]) {
-    this->setNumberValue(getVariableValue(filterData, this->dataMember));
-  }
+  void evaluate(FilterData_s *filterData, Expression *expressions[]);
 
-  int toString(char *buffer, int n, Expression *expressions[]) {
-    fillVariableName(buffer, n, this->dataMember);
-    return strlen(buffer);
-  }
+  int toString(char *buffer, int n, Expression *expressions[]) const;
 
-  void serializeInto(SerializedExpression_s *serialized) {
-    serialized->triggerNum = this->triggerNum;
-    serialized->type = variable;
-    serialized->contents.variable.variable = this->dataMember;
-  }
+  void serializeInto(SerializedExpression_s *serialized) const;
 };
 
 #endif  // SYSTEM_EXPRESSIONS_VAR_EXPRESSION_H_

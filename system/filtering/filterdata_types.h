@@ -3,8 +3,8 @@
  * You should edit `filter_data_gen.py`
  * and run it with Python to generate this file automatically.
  */
-#ifndef UTILS_FILTERDATA_TYPES_H_
-#define UTILS_FILTERDATA_TYPES_H_
+#ifndef SYSTEM_FILTERING_FILTERDATA_TYPES_H_
+#define SYSTEM_FILTERING_FILTERDATA_TYPES_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -79,4 +79,4 @@ void fillVariableName(char *buffer, int n, FilterData_e valueType);
 #ifdef __cplusplus
 }
 #endif
-#endif  // UTILS_FILTERDATA_TYPES_H_
+#endif  // SYSTEM_FILTERING_FILTERDATA_TYPES_H_

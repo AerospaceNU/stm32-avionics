@@ -118,7 +118,7 @@ BinaryFunctionWrapper binaryFunctionWrappers[NUM_BINARY_FUNCTION] = {
     BinaryFunctionWrapper("/", divFunc, number, number, number)};
 
 int BinaryFuncExpression::toString(char *buffer, int n,
-                                   Expression *expressions[]) {
+                                   Expression *expressions[]) const {
   int selfLength = strlen(binaryFunctionWrappers[this->opcode].stringRep);
   if (n == 0) {
     return 0;
@@ -151,7 +151,8 @@ void BinaryFuncExpression::evaluate(FilterData_s *filterData,
       this, filterData, expressions[operand1ID], expressions[operand2ID]);
 }
 
-void BinaryFuncExpression::serializeInto(SerializedExpression_s *serialized) {
+void BinaryFuncExpression::serializeInto(
+    SerializedExpression_s *serialized) const {
   serialized->triggerNum = this->triggerNum;
   serialized->type = binaryFunc;
   serialized->contents.binary.opcode = this->opcode;

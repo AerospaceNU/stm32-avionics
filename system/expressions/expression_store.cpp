@@ -1,7 +1,3 @@
-//
-// Created by sam on 2/14/23.
-//
-
 #include "expression_store.h"
 
 #include "cli.h"
@@ -13,9 +9,7 @@ static UnaryFuncExpressionBuilder unaryFuncExpressionBuilder;
 static BinaryFuncExpressionBuilder binaryFuncExpressionBuilder;
 static EventExpressionBuilder eventExpressionBuilder;
 
-#define NUM_BUILDERS 5
-
-static ExpressionBuilder *builders[5] = {
+static ExpressionBuilder *builders[] = {
     &varExpressionBuilder, &constExpressionBuilder, &eventExpressionBuilder,
     &unaryFuncExpressionBuilder, &binaryFuncExpressionBuilder};
 
@@ -25,8 +19,8 @@ static ExpressionBuilder *builders[5] = {
  * @tparam T The final type to return as.
  */
 template <typename T>
-constexpr auto variant_cast = [](auto &var) -> T {
-  return std::visit([](auto &var) -> T { return &var; }, var);
+constexpr auto variant_cast = [](auto &&var) -> T {
+  return std::visit([](auto &&var) -> T { return &var; }, *var);
 };
 
 ExpressionStore::ExpressionStore() {
@@ -35,16 +29,16 @@ ExpressionStore::ExpressionStore() {
     SerializedExpression_s *serialized = cli_getConfigs()->serializedExprs + i;
     switch (serialized->type) {
       case event:
-        expressions[i] = EventExpression(serialized->triggerNum,
-                                         serialized->contents.event.event);
+        expressions[i] =
+            EventExpression(serialized->triggerNum, serialized->contents.event);
         break;
       case variable:
         expressions[i] = VarExpression(serialized->triggerNum,
-                                       serialized->contents.variable.variable);
+                                       serialized->contents.variable);
         break;
       case constant:
         expressions[i] = ConstExpression(serialized->triggerNum,
-                                         serialized->contents.constant.value);
+                                         serialized->contents.constant);
         break;
       case unaryFunc:
         expressions[i] = UnaryFuncExpression(
@@ -64,14 +58,14 @@ ExpressionStore::ExpressionStore() {
         break;
     }
 
-    this->expressionPtrs[i] = variant_cast<Expression *>(expressions[i]);
+    this->expressionPtrs[i] = variant_cast<Expression *>(&expressions[i]);
     expressionBuffer[i] = expressions[i];
   }
 }
 
 void ExpressionStore::removeExpressionsForTrigger(int triggerNum) {
   for (int i = 0; i < MAX_EXPRESSION; ++i) {
-    Expression *buffExpr = variant_cast<Expression *>(expressionBuffer[i]);
+    Expression *buffExpr = variant_cast<Expression *>(&expressionBuffer[i]);
     if (buffExpr->triggerNum == triggerNum) {
       expressionBuffer[i] = EmptyExpression();
     }
@@ -80,7 +74,7 @@ void ExpressionStore::removeExpressionsForTrigger(int triggerNum) {
 
 int ExpressionStore::getNextExpressionSpot(int startAt) {
   for (int i = startAt; i < MAX_EXPRESSION; ++i) {
-    Expression *buffExpr = variant_cast<Expression *>(expressionBuffer[i]);
+    Expression *buffExpr = variant_cast<Expression *>(&expressionBuffer[i]);
     if (buffExpr->isEmpty()) {
       return i;
     }
@@ -124,7 +118,7 @@ void ExpressionStore::tick(FilterData_s *filterData) {
 void ExpressionStore::writeNewConfigs() {
   for (int i = 0; i < MAX_EXPRESSION; ++i) {
     expressions[i] = expressionBuffer[i];
-    this->expressionPtrs[i] = variant_cast<Expression *>(expressions[i]);
+    this->expressionPtrs[i] = variant_cast<Expression *>(&expressions[i]);
     this->expressionPtrs[i]->serializeInto(cli_getConfigs()->serializedExprs +
                                            i);
   }

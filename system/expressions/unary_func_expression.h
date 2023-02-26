@@ -23,7 +23,9 @@ using UnaryFunction = void(Expression *expr, FilterData_s *filterData,
                            Expression *operand);
 
 /**
- * A wrapper class for a lambda that makes it easier to use.
+ * A wrapper class for a lambda that makes it easier to use. This wrapper class
+ * provides the utility of evaluating a lambda function with some other
+ * information about how the function works and what argument it takes.
  */
 class UnaryFunctionWrapper {
   UnaryFunction *function;
@@ -78,7 +80,10 @@ class UnaryFunctionWrapper {
 extern UnaryFunctionWrapper unaryFunctionWrappers[NUM_UNARY_FUNCTION];
 
 /**
- * An expression that performs an operation on one other expression.
+ * An expression that performs an operation on one other expression. A unary
+ * function expression has two components, an operator that performs some
+ * operation, and then the id of another expression to use as the operand of
+ * that function.
  */
 class UnaryFuncExpression : public Expression {
  protected:
@@ -100,11 +105,9 @@ class UnaryFuncExpression : public Expression {
 
   void evaluate(FilterData_s *filterData, Expression *expressions[]);
 
-  int toString(char *buffer, int n, Expression *expressions[]);
+  int toString(char *buffer, int n, Expression *expressions[]) const;
 
-  void serializeInto(SerializedExpression_s *serialized);
-
-  bool getDefaultValue();
+  void serializeInto(SerializedExpression_s *serialized) const;
 };
 
 #endif  // SYSTEM_EXPRESSIONS_UNARY_FUNC_EXPRESSION_H_

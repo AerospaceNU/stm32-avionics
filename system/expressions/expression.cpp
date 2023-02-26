@@ -10,13 +10,13 @@ Expression::Expression() {
 
 Expression::~Expression() {}
 
-bool Expression::isEmpty() { return false; }
+bool Expression::isEmpty() const { return false; }
 
-bool Expression::getBooleanValue() {
+bool Expression::getBooleanValue() const {
   return (this->valueType == boolean) && this->value.boolean;
 }
 
-float Expression::getNumberValue() {
+float Expression::getNumberValue() const {
   return (this->valueType == number) ? this->value.number : 0;
 }
 
@@ -46,5 +46,3 @@ void Expression::setBooleanValue(bool bl) {
 void Expression::setTriggerNum(int triggerNum) {
   this->triggerNum = triggerNum;
 }
-
-bool Expression::getDefaultValue() { return false; }

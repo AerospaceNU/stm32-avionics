@@ -32,11 +32,17 @@ set(SYSTEM_FILES_LIST
         filtering/altitude_kalman.cpp
         filtering/filters.cpp
         filtering/orientation_estimator.cpp
+        filtering/filterdata_types.c
 
         expressions/binary_func_expression.cpp
         expressions/expression_store.cpp
         expressions/expression.cpp
         expressions/unary_func_expression.cpp
+        expressions/empty_expression.cpp
+        expressions/expression_builder.cpp
+        expressions/var_expression.cpp
+        expressions/const_expression.cpp
+        expressions/event_expression.cpp
         )
 
 add_library(system ${SYSTEM_FILES_LIST})

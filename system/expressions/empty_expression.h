@@ -4,30 +4,28 @@
 #include "expression.h"
 
 /**
- * An empty expression.
+ * An empty expression. This serves as a placeholder in the store of expressions
+ * for an unused expression and to ensure that the expression will not be
+ * incorrectly used (i.e. rather than storing some invalid value of another type
+ * of expression that is always assumed to be active, this class of  expression
+ * means that there is no expression present).
  */
 class EmptyExpression : public Expression {
  public:
-  EmptyExpression() {
-    this->setBooleanValue(false);
-    this->triggerNum = -1;
-  }
+  /**
+   * Construct an empty expression.
+   */
+  EmptyExpression();
 
   // The only expression type that is actually empty.
-  bool isEmpty() { return true; }
+  bool isEmpty();
 
   // Does nothing
-  void evaluate(FilterData_s *filterData, Expression *expressions[]) { return; }
+  void evaluate(FilterData_s *filterData, Expression *expressions[]);
 
-  int toString(char *buffer, int n, Expression *expressions[]) {
-    strncpy(buffer, "empty", n);
-    return 5;
-  }
+  int toString(char *buffer, int n, Expression *expressions[]) const;
 
-  void serializeInto(SerializedExpression_s *serialized) {
-    serialized->triggerNum = this->triggerNum;
-    serialized->type = empty;
-  }
+  void serializeInto(SerializedExpression_s *serialized) const;
 };
 
 #endif  // SYSTEM_EXPRESSIONS_EMPTY_EXPRESSION_H_

@@ -1,6 +1,7 @@
 #include "string_slice.h"
 
 #include <string.h>
+extern size_t strnlen(const char *str, size_t strsz);
 
 StringSlice::StringSlice(const char **src, int start, int end) {
   this->src = src;
@@ -17,7 +18,7 @@ StringSlice::StringSlice() {
 }
 
 bool StringSlice::operator==(const char *other) const {
-  if (strlen(other) != (unsigned int)this->len) {
+  if (strnlen(other, this->len + 1) != (unsigned int)this->len) {
     return false;
   }
   return strncmp(other, startPtr(), this->len) == 0;

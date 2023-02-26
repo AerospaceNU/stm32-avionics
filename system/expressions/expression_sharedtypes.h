@@ -1,12 +1,15 @@
 #ifndef SYSTEM_EXPRESSIONS_EXPRESSION_SHAREDTYPES_H_
 #define SYSTEM_EXPRESSIONS_EXPRESSION_SHAREDTYPES_H_
 
+#include <inttypes.h>
+
 #include "event_manager.h"
 #include "filterdata_types.h"
-#include "inttypes.h"
 
+// The maximum number of expressions that will be allocated.
 #define MAX_EXPRESSION 50
 
+// The possible types an expression can have.
 typedef enum {
   empty,
   event,
@@ -16,18 +19,11 @@ typedef enum {
   binaryFunc
 } ExpressionType_e;
 
-typedef struct {
-  Event_e event;
-} SerializedEvent_s;
-
-typedef struct {
-  float value;
-} SerializedConstant_s;
-
-typedef struct {
-  FilterData_e variable;
-} SerializedVariable_s;
-
+/**
+ * To store an expression, it must be serialized into a form where it can be
+ * reconstructed. These structs define the information necessary to store an
+ * expression.
+ */
 typedef struct {
   uint16_t opcode;
   uint16_t operandID;
@@ -40,9 +36,9 @@ typedef struct {
 } SerializedBinaryFunc_s;
 
 typedef union {
-  SerializedEvent_s event;
-  SerializedConstant_s constant;
-  SerializedVariable_s variable;
+  Event_e event;
+  float constant;
+  FilterData_e variable;
   SerializedUnaryFunc_s unary;
   SerializedBinaryFunc_s binary;
 } SerializedExpression_u;

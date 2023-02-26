@@ -29,7 +29,10 @@ using BinaryFunction = void(Expression *expr, FilterData_s *filterData,
                             Expression *op1, Expression *op2);
 
 /**
- * Wrapper for a binary function
+ * A wrapper class for a binary function lambda that makes it easier to use.
+ * This wrapper class provides the utility of evaluating a lambda function with
+ * some other information about how the function works and what arguments it
+ * takes.
  */
 class BinaryFunctionWrapper {
  private:
@@ -60,7 +63,10 @@ class BinaryFunctionWrapper {
 extern BinaryFunctionWrapper binaryFunctionWrappers[NUM_BINARY_FUNCTION];
 
 /**
- * A binary function expression.
+ * A binary function expression that has an operation function and two
+ * expressions to use as operands. Evaluating a binary function expression
+ * passes the values of the two operands to the function and stores that result
+ * as this expression's value.
  */
 class BinaryFuncExpression : public Expression {
  private:
@@ -69,6 +75,13 @@ class BinaryFuncExpression : public Expression {
   uint16_t operand2ID;
 
  public:
+  /**
+   * Construct a BinaryFuncExpression.
+   * @param triggerNum Trigger num that this expression is used for.
+   * @param opcode One of the enum values for a binary function operation.
+   * @param operand1ID The ID of the expression used as the first operand.
+   * @param operand2ID The ID of the expression used as the second operand.
+   */
   BinaryFuncExpression(int triggerNum, BinaryFunction_e opcode,
                        uint16_t operand1ID, uint16_t operand2ID)
       : opcode{opcode}, operand1ID{operand1ID}, operand2ID{operand2ID} {
@@ -77,9 +90,9 @@ class BinaryFuncExpression : public Expression {
 
   void evaluate(FilterData_s *filterData, Expression *expressions[]);
 
-  int toString(char *buffer, int n, Expression *expressions[]);
+  int toString(char *buffer, int n, Expression *expressions[]) const;
 
-  void serializeInto(SerializedExpression_s *serialized);
+  void serializeInto(SerializedExpression_s *serialized) const;
 };
 
 #endif  // SYSTEM_EXPRESSIONS_BINARY_FUNC_EXPRESSION_H_

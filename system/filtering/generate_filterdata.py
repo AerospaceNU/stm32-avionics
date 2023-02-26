@@ -39,8 +39,8 @@ with open("filterdata_types.h", "w") as data_file:
           " * You should edit `filter_data_gen.py`\n" +
           " * and run it with Python to generate this file automatically.\n" +
           " */", file=data_file)
-    print("#ifndef UTILS_FILTERDATA_TYPES_H_", file=data_file)
-    print("#define UTILS_FILTERDATA_TYPES_H_", file=data_file)
+    print("#ifndef SYSTEM_FILTERING_FILTERDATA_TYPES_H_", file=data_file)
+    print("#define SYSTEM_FILTERING_FILTERDATA_TYPES_H_", file=data_file)
     print("#ifdef __cplusplus\n"
           + 'extern "C" {\n'
           + "#endif\n"
@@ -65,7 +65,7 @@ with open("filterdata_types.h", "w") as data_file:
     print("#ifdef __cplusplus\n"
           + '}\n'
           + "#endif\n"
-          + "#endif  // UTILS_FILTERDATA_TYPES_H_", file=data_file)
+          + "#endif  // SYSTEM_FILTERING_FILTERDATA_TYPES_H_", file=data_file)
 
 with open("filterdata_types.c", "w") as data_file:
     print("/**\n" +

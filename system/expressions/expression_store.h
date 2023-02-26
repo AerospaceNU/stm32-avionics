@@ -13,10 +13,22 @@
 #include "unary_func_expression.h"
 #include "var_expression.h"
 
+/**
+ * The possible expression types that could be stored in a given expression
+ * "spot".
+ */
 typedef std::variant<EmptyExpression, ConstExpression, VarExpression,
                      EventExpression, UnaryFuncExpression, BinaryFuncExpression>
     ExpressionVariant_v;
 
+/**
+ * The ExpressionStore is responsible for holding and managing all of the
+ * individual expressions used by the system. The expressions themselves work
+ * independently from how they are stored, but because they need a common way of
+ * being created, destroyed, and evaluated, the ExpressionStore class provides
+ * an interface to interact with and use the expression functionality without
+ * directly accessing expressions.
+ */
 class ExpressionStore {
  private:
   /**

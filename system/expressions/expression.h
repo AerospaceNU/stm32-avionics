@@ -1,9 +1,10 @@
 #ifndef SYSTEM_EXPRESSIONS_EXPRESSION_H_
 #define SYSTEM_EXPRESSIONS_EXPRESSION_H_
 
+#include <inttypes.h>
+
 #include "expression_sharedtypes.h"
 #include "filterdata_types.h"
-#include "inttypes.h"
 #include "string_slice.h"
 
 typedef enum { invalid_type, boolean, number } ExpressionValueType_e;
@@ -50,21 +51,21 @@ class Expression {
    * If this is an empty expression.
    * @return bool for empty or not.
    */
-  virtual bool isEmpty();
+  virtual bool isEmpty() const;
 
   /**
    * Get the boolean value of an expression.
    * @return The boolean value. This will be false if the value is not actually
    * a boolean.
    */
-  bool getBooleanValue();
+  bool getBooleanValue() const;
 
   /**
    * Get the number value of an expression.
    * @return The number value. This will be 0 if the value is not actually a
    * number.
    */
-  float getNumberValue();
+  float getNumberValue() const;
 
   /**
    * Set the value of this expression to be a numeric value.
@@ -91,19 +92,14 @@ class Expression {
    * @param expressions Other expressions.
    * @return Number of characters used by this expression.
    */
-  virtual int toString(char *buffer, int n, Expression *expressions[]) = 0;
+  virtual int toString(char *buffer, int n,
+                       Expression *expressions[]) const = 0;
 
   /**
    * Serialize this expression into a location.
    * @param serialized Struct to serialize into.
    */
-  virtual void serializeInto(SerializedExpression_s *serialized) = 0;
-
-  /**
-   * Get the default value of the expression.
-   * @return bool of default value
-   */
-  virtual bool getDefaultValue();
+  virtual void serializeInto(SerializedExpression_s *serialized) const = 0;
 };
 
 #endif  // SYSTEM_EXPRESSIONS_EXPRESSION_H_
