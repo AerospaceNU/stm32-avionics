@@ -61,74 +61,111 @@ bool hardwareStatusUsb[NUM_USB];
 bool hardwareStatusVbat[NUM_VBAT];
 #endif  // HAS_DEV(VBAT)
 
-
-std::shared_ptr<HardwareManagerInterface> m_hmInterface;
-
-void hm_sim_setHM(std::shared_ptr<HardwareManagerInterface> hmInterface) {
-  m_hmInterface = hmInterface;
+namespace {
+std::shared_ptr<HardwareManagerInterface> p =
+    std::make_shared<HardwareManagerInterface>();
 }
 
+void hm_sim_setHM(std::shared_ptr<HardwareManagerInterface> hmInterface) {
+  p = hmInterface;
+}
 
 extern "C" {
 
-void hm_hardwareInit(){};
-uint32_t hm_millis() { return 0; }
+void hm_hardwareInit() { p->hm_hardwareInit(); };
+uint32_t hm_millis() { return p->hm_millis(); }
 bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
                        uint8_t *pData) {
-  return false;
+  return p->hm_flashReadStart(flashId, startLoc, numBytes, pData);
 }
 bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
                         uint8_t *data) {
-  return false;
+  return p->hm_flashWriteStart(flashId, startLoc, numBytes, data);
 }
-bool hm_flashEraseSectorStart(int flashId, uint32_t sectorNum) { return false; }
-bool hm_flashEraseChipStart(int flashId) { return false; }
-bool hm_flashIsReadComplete(int flashId) { return true; }
-bool hm_flashIsWriteComplete(int flashId) { return true; }
-bool hm_flashIsEraseComplete(int flashId) { return true; }
-void hm_buzzerSetFrequency(int buzzerId, float fHz) {}
-void hm_buzzerStart(int buzzerId) {}
-void hm_buzzerStop(int buzzerId) {}
-void hm_servoSetAngle(int servoId, float degrees) {}
-void hm_ledSet(int ledId, bool set) {}
-void hm_ledToggle(int ledId) {}
-void hm_readSensorData() {}
+bool hm_flashEraseSectorStart(int flashId, uint32_t sectorNum) {
+  return p->hm_flashEraseSectorStart(flashId, sectorNum);
+}
+bool hm_flashEraseChipStart(int flashId) {
+  return p->hm_flashEraseChipStart(flashId);
+}
+bool hm_flashIsReadComplete(int flashId) {
+  return p->hm_flashIsReadComplete(flashId);
+}
+bool hm_flashIsWriteComplete(int flashId) {
+  return p->hm_flashIsWriteComplete(flashId);
+}
+bool hm_flashIsEraseComplete(int flashId) {
+  return p->hm_flashIsEraseComplete(flashId);
+}
+void hm_buzzerSetFrequency(int buzzerId, float fHz) {
+  p->hm_buzzerSetFrequency(buzzerId, fHz);
+}
+void hm_buzzerStart(int buzzerId) { p->hm_buzzerStart(buzzerId); }
+void hm_buzzerStop(int buzzerId) { p->hm_buzzerStop(buzzerId); }
+void hm_servoSetAngle(int servoId, float degrees) {
+  p->hm_servoSetAngle(servoId, degrees);
+}
+void hm_ledSet(int ledId, bool set) { p->hm_ledSet(ledId, set); }
+void hm_ledToggle(int ledId) { p->hm_ledToggle(ledId); }
+void hm_readSensorData() { p->hm_readSensorData(); }
 bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
-  return false;
+  return p->hm_radioSend(radioNum, data, numBytes);
 }
-void hm_radioUpdate() {}
-void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer){};
-void hm_radioSetChannel(int radioNum, int channel) {}
-bool hm_usbIsConnected(int usbId) { return false; }
+void hm_radioUpdate() { p->hm_radioUpdate(); }
+void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {
+  p->hm_radioRegisterConsumer(radioNum, rxBuffer);
+}
+void hm_radioSetChannel(int radioNum, int channel) {
+  p->hm_radioSetChannel(radioNum, channel);
+}
+bool hm_usbIsConnected(int usbId) { return p->hm_usbIsConnected(usbId); }
 bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
-  return false;
+  return p->hm_usbTransmit(usbId, data, numBytes);
 }
-CircularBuffer_s *hm_usbGetRxBuffer(int usbId) { return 0; }
-bool hm_bleClientConnected(int bleClientId) { return false; }
+CircularBuffer_s *hm_usbGetRxBuffer(int usbId) {
+  return p->hm_usbGetRxBuffer(usbId);
+}
+bool hm_bleClientConnected(int bleClientId) {
+  return p->hm_bleClientConnected(bleClientId);
+}
 bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
-  return false;
+  return p->hm_bleClientSend(bleClientId, data, numBytes);
 }
-CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) { return 0; }
-void hm_bleTick() {}
-LineCutterData_s *hm_getLineCutterData(int lineCutterId) { return 0; }
+CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) {
+  return p->hm_bleClientGetRxBuffer(bleClientId);
+}
+void hm_bleTick() { p->hm_bleTick(); }
+LineCutterData_s *hm_getLineCutterData(int lineCutterId) {
+  return p->hm_getLineCutterData(lineCutterId);
+}
 LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
-  return 0;
+  return p->hm_getLineCutterFlightVariables(lineCutterId);
 }
 bool hm_lineCutterSendString(int lineCutterNumber, char *string) {
-  return true;
+  return p->hm_lineCutterSendString(lineCutterNumber, string);
 }
-bool hm_lineCuttersSendCut(int chan) { return true; }
-void hm_watchdogRefresh() {}
-void hm_pyroFire(int pyroId, uint32_t duration) {}
-void hm_pyroSet(int pyroId, bool enable) {}
+bool hm_lineCuttersSendCut(int chan) { return p->hm_lineCuttersSendCut(chan); }
+void hm_watchdogRefresh() { p->hm_watchdogRefresh(); }
+void hm_pyroFire(int pyroId, uint32_t duration) {
+  p->hm_pyroFire(pyroId, duration);
+}
+void hm_pyroSet(int pyroId, bool enable) { p->hm_pyroSet(pyroId, enable); }
 void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth,
-                   uint32_t duration) {}
-void hm_pyroUpdate() {}
-void hm_dcMotorSetPercent(int dcMotorId, double percent) {}
-SensorData_s *hm_getSensorData() { return 0; }
-SensorProperties_s *hm_getSensorProperties() { return 0; }
-void hm_enableSimMode(CircularBuffer_s *rxBuffer) {}
-void hm_disableSimMode() {}
-bool hm_inSimMode() { return false; }
-void hm_observeTickComplete(uint64_t tickNum) {}
+                   uint32_t duration) {
+  p->hm_pyroSetPwm(pyroId, frequency, pulseWidth, duration);
+}
+void hm_pyroUpdate() { p->hm_pyroUpdate(); }
+void hm_dcMotorSetPercent(int dcMotorId, double percent) {
+  p->hm_dcMotorSetPercent(dcMotorId, percent);
+}
+SensorData_s *hm_getSensorData() { return p->hm_getSensorData(); }
+SensorProperties_s *hm_getSensorProperties() {
+  return p->hm_getSensorProperties();
+}
+void hm_enableSimMode(CircularBuffer_s *rxBuffer) {
+  p->hm_enableSimMode(rxBuffer);
+}
+void hm_disableSimMode() { p->hm_disableSimMode(); }
+bool hm_inSimMode() { return p->hm_inSimMode(); }
+void hm_observeTickComplete(uint64_t tickNum) { p->hm_observeTickComplete(tickNum); }
 }
