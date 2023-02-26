@@ -37,7 +37,9 @@ void CliTasks::help() {
   generateDoc("", "     -p int*1", "Pyro num or cut channel (required)");
   generateDoc("", "     -d float*1", "Duration (required for pyro and pwm)");
   generateDoc("", "     -w float*1", "Pulse width (required for pwm)");
-  generateDoc("", "     -C string*1", "Configuration using expression notation, required");
+  generateDoc(
+      "", "     -C string*1",
+      "Configuration using expression notation, required. Must be in quotes");
   generateDoc("", "     -D", "Delete this trigger");
   generateDoc("", "-e float*1", "Configure ground elevation (in meters)");
   generateDoc("", "-r float*1", "Configure ground temperature (in celsius)");

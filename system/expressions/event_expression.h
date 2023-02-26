@@ -1,40 +1,36 @@
-#ifndef EXPRESSIONS_EVENT_EXPRESSION_H_
-#define EXPRESSIONS_EVENT_EXPRESSION_H_
+#ifndef SYSTEM_EXPRESSIONS_EVENT_EXPRESSION_H_
+#define SYSTEM_EXPRESSIONS_EVENT_EXPRESSION_H_
 
-#include "expression.h"
-#include "event_manager.h"
 #include <cstdio>
-static const char *eventStrings[] = {
-	"launch",
-	"burnout",
-	"apogee",
-	"touchdown"
-};
 
+#include "event_manager.h"
+#include "expression.h"
+extern const char *eventStrings[];
+
+/**
+ * An event expression is an expression that evaluates directly to the status of
+ * a given event, as enumerated in the event manager. Essentially serves as an
+ * interface between the normal system code event manager and the events as used
+ * in the expression configuration. An event expression will always be either
+ * true or false, mirroring the state of the event it uses.
+ */
 class EventExpression : public Expression {
-private:
-	Event_e event;
-public:
-	EventExpression(int triggerNum, Event_e event) {
-		this->setTriggerNum(triggerNum);
-		this->event = event;
-	}
+ private:
+  Event_e event;
 
-	void evaluate(FilterData_s *filterData, Expression *expressions[]) {
-		this->setBooleanValue(eventManager_getEventStatus(this->event));
-	}
+ public:
+  /**
+   * Construct an EventExpression.
+   * @param triggerNum Trigger num that this expression is used for.
+   * @param event The event to reference as this expression's value.
+   */
+  EventExpression(int triggerNum, Event_e event);
 
-    int toString(char *buffer, int n, Expression *expressions[]) {
-        snprintf(buffer, n, eventStrings[this->event]);
-        return strlen(buffer);
-    }
+  void evaluate(FilterData_s *filterData, Expression *expressions[]);
 
-    void serializeInto(SerializedExpression_s *serialized) {
-    	serialized->triggerNum = this->triggerNum;
-    	serialized->type = ExpressionType_e::event;
-    	serialized->contents.event.event = this->event;
-    }
+  int toString(char *buffer, int n, Expression *expressions[]) const;
 
+  void serializeInto(SerializedExpression_s *serialized) const;
 };
 
-#endif /* EXPRESSIONS_EVENTEXPRESSION_H_ */
+#endif  // SYSTEM_EXPRESSIONS_EVENT_EXPRESSION_H_

@@ -4,10 +4,10 @@
 #include "board_config_common.h"
 #include "cli.h"
 #include "data_log.h"
+#include "event_manager.h"
 #include "filters.h"
 #include "hardware_manager.h"
 #include "radio_manager.h"
-#include "event_manager.h"
 
 #if HAS_DEV(LINE_CUTTER_BLE)
 #include "line_cutter_ble.h"

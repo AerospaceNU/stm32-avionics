@@ -4,7 +4,7 @@
  * and run it with Python to generate this file automatically.
  */
 #include "filterdata_types.h"
-FilterData_e getVariableEnumFromString(char* input) {
+FilterData_e getVariableEnumFromString(char *input) {
   if (strncmp(input, "heading", 7) == 0) {
     return heading;
   }
@@ -93,7 +93,7 @@ FilterData_e getVariableEnumFromString(char* input) {
   return invalid;
 }
 float getVariableValue(FilterData_s *filterData, FilterData_e valueType) {
-  switch(valueType) {
+  switch (valueType) {
     case invalid:
       return 0;
     case heading:
@@ -157,93 +157,93 @@ float getVariableValue(FilterData_s *filterData, FilterData_e valueType) {
   }
 }
 void fillVariableName(char *buffer, int n, FilterData_e valueType) {
-  switch(valueType) {
+  switch (valueType) {
     case invalid:
       strncpy(buffer, "invalid", n);
       return;
     case heading:
-      strncpy(buffer,  "heading", n);
+      strncpy(buffer, "heading", n);
       return;
     case vtg:
-      strncpy(buffer,  "vtg", n);
+      strncpy(buffer, "vtg", n);
       return;
     case pos_x:
-      strncpy(buffer,  "pos_x", n);
+      strncpy(buffer, "pos_x", n);
       return;
     case pos_y:
-      strncpy(buffer,  "pos_y", n);
+      strncpy(buffer, "pos_y", n);
       return;
     case pos_z_agl:
-      strncpy(buffer,  "pos_z_agl", n);
+      strncpy(buffer, "pos_z_agl", n);
       return;
     case rocket_vel_x:
-      strncpy(buffer,  "rocket_vel_x", n);
+      strncpy(buffer, "rocket_vel_x", n);
       return;
     case rocket_vel_y:
-      strncpy(buffer,  "rocket_vel_y", n);
+      strncpy(buffer, "rocket_vel_y", n);
       return;
     case rocket_vel_z:
-      strncpy(buffer,  "rocket_vel_z", n);
+      strncpy(buffer, "rocket_vel_z", n);
       return;
     case rocket_acc_x:
-      strncpy(buffer,  "rocket_acc_x", n);
+      strncpy(buffer, "rocket_acc_x", n);
       return;
     case rocket_acc_y:
-      strncpy(buffer,  "rocket_acc_y", n);
+      strncpy(buffer, "rocket_acc_y", n);
       return;
     case rocket_acc_z:
-      strncpy(buffer,  "rocket_acc_z", n);
+      strncpy(buffer, "rocket_acc_z", n);
       return;
     case world_vel_x:
-      strncpy(buffer,  "world_vel_x", n);
+      strncpy(buffer, "world_vel_x", n);
       return;
     case world_vel_y:
-      strncpy(buffer,  "world_vel_y", n);
+      strncpy(buffer, "world_vel_y", n);
       return;
     case world_vel_z:
-      strncpy(buffer,  "world_vel_z", n);
+      strncpy(buffer, "world_vel_z", n);
       return;
     case world_acc_x:
-      strncpy(buffer,  "world_acc_x", n);
+      strncpy(buffer, "world_acc_x", n);
       return;
     case world_acc_y:
-      strncpy(buffer,  "world_acc_y", n);
+      strncpy(buffer, "world_acc_y", n);
       return;
     case world_acc_z:
-      strncpy(buffer,  "world_acc_z", n);
+      strncpy(buffer, "world_acc_z", n);
       return;
     case rocket_ang_vel_x:
-      strncpy(buffer,  "rocket_ang_vel_x", n);
+      strncpy(buffer, "rocket_ang_vel_x", n);
       return;
     case rocket_ang_vel_y:
-      strncpy(buffer,  "rocket_ang_vel_y", n);
+      strncpy(buffer, "rocket_ang_vel_y", n);
       return;
     case rocket_ang_vel_z:
-      strncpy(buffer,  "rocket_ang_vel_z", n);
+      strncpy(buffer, "rocket_ang_vel_z", n);
       return;
     case qx:
-      strncpy(buffer,  "qx", n);
+      strncpy(buffer, "qx", n);
       return;
     case qy:
-      strncpy(buffer,  "qy", n);
+      strncpy(buffer, "qy", n);
       return;
     case qz:
-      strncpy(buffer,  "qz", n);
+      strncpy(buffer, "qz", n);
       return;
     case qw:
-      strncpy(buffer,  "qw", n);
+      strncpy(buffer, "qw", n);
       return;
     case roll:
-      strncpy(buffer,  "roll", n);
+      strncpy(buffer, "roll", n);
       return;
     case pitch:
-      strncpy(buffer,  "pitch", n);
+      strncpy(buffer, "pitch", n);
       return;
     case yaw:
-      strncpy(buffer,  "yaw", n);
+      strncpy(buffer, "yaw", n);
       return;
     case angle_vertical:
-      strncpy(buffer,  "angle_vertical", n);
+      strncpy(buffer, "angle_vertical", n);
       return;
   }
 }

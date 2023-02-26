@@ -27,10 +27,16 @@ set(SYSTEM_FILES_LIST
         ${CMAKE_CURRENT_SOURCE_DIR}/filtering/altitude_kalman.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/filtering/filters.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/filtering/orientation_estimator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/filtering/filterdata_types.c
         ${CMAKE_CURRENT_SOURCE_DIR}/expressions/binary_func_expression.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/expressions/expression_store.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/expressions/expression.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/expressions/unary_func_expression.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/expressions/const_expression.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/expressions/empty_expression.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/expressions/event_expression.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/expressions/var_expression.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/expressions/expression_builder.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/event_manager.cpp
         CACHE INTERNAL "")
 

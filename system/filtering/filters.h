@@ -9,8 +9,8 @@
 extern "C" {
 #endif
 
-#include "hardware_manager.h"
 #include "filterdata_types.h"
+#include "hardware_manager.h"
 
 void filter_init(double dt);
 

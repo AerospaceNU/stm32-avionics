@@ -4,11 +4,10 @@
 #include "cli.h"
 #include "cli_tasks.h"
 #include "data_log.h"
+#include "event_manager.h"
 #include "filters.h"
 #include "hardware_manager.h"
 #include "state_log.h"
-#include "trigger_manager.h"
-#include "event_manager.h"
 
 #define SIM_NO_DATA_TIMEOUT_MS \
   1000  // If no data comes in for this long, stop sim
@@ -16,7 +15,6 @@
 void PostFlightState::init() {
   // Write that the flight is completed so that we don't jump back to a flight
   // state
-  //triggerManager_setTouchdownTime(hm_millis());
   stateLog_writeComplete();
   eventManager_setEventComplete(Event_e::touchdown);
   lastSimDataTime = hm_millis();

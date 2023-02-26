@@ -39,10 +39,10 @@ with open("filterdata_types.h", "w") as data_file:
           " * You should edit `filter_data_gen.py`\n" +
           " * and run it with Python to generate this file automatically.\n" +
           " */", file=data_file)
-    print("#ifndef UTILS_FILTERDATA_TYPES_H_", file=data_file)
-    print("#define UTILS_FILTERDATA_TYPES_H_", file=data_file)
+    print("#ifndef SYSTEM_FILTERING_FILTERDATA_TYPES_H_", file=data_file)
+    print("#define SYSTEM_FILTERING_FILTERDATA_TYPES_H_", file=data_file)
     print("#ifdef __cplusplus\n"
-          + 'extern "C" { \n'
+          + 'extern "C" {\n'
           + "#endif\n"
           + "#include <stdbool.h>\n"
           + "#include <string.h>", file=data_file)
@@ -59,13 +59,13 @@ with open("filterdata_types.h", "w") as data_file:
 
     print("} FilterData_e;\n", file=data_file)
 
-    print("FilterData_e getVariableEnumFromString(char* input);", file=data_file)
+    print("FilterData_e getVariableEnumFromString(char *input);", file=data_file)
     print("float getVariableValue(FilterData_s *filterData, FilterData_e valueType);", file=data_file)
     print("void fillVariableName(char *buffer, int n, FilterData_e valueType);", file=data_file);
     print("#ifdef __cplusplus\n"
           + '}\n'
           + "#endif\n"
-          + "#endif // UTILS_FILTERDATA_TYPES_H_", file=data_file)
+          + "#endif  // SYSTEM_FILTERING_FILTERDATA_TYPES_H_", file=data_file)
 
 with open("filterdata_types.c", "w") as data_file:
     print("/**\n" +
@@ -74,7 +74,7 @@ with open("filterdata_types.c", "w") as data_file:
           " * and run it with Python to generate this file automatically.\n" +
           " */", file=data_file)
     print('#include "filterdata_types.h"', file=data_file)
-    print("FilterData_e getVariableEnumFromString(char* input) {", file=data_file)
+    print("FilterData_e getVariableEnumFromString(char *input) {", file=data_file)
     for entry in STRUCT_ENTRIES:
         print(f'  if (strncmp(input, "{entry[1]}", {len(entry[1])}) == 0) {{', file=data_file)
         print(f'    return {entry[1]};', file=data_file)
@@ -83,7 +83,7 @@ with open("filterdata_types.c", "w") as data_file:
     print("  return invalid;", file=data_file)
     print("}", file=data_file)
     print("float getVariableValue(FilterData_s *filterData, FilterData_e valueType) {", file=data_file)
-    print("  switch(valueType) {", file=data_file)
+    print("  switch (valueType) {", file=data_file)
     print(f'    case invalid:', file=data_file)
     print(f'      return 0;', file=data_file)
     for entry in STRUCT_ENTRIES:
@@ -94,13 +94,13 @@ with open("filterdata_types.c", "w") as data_file:
     print("  }\n}", file=data_file)
 
     print("void fillVariableName(char *buffer, int n, FilterData_e valueType) {", file=data_file)
-    print("  switch(valueType) {", file=data_file)
+    print("  switch (valueType) {", file=data_file)
     print(f'    case invalid:', file=data_file)
     print(f'      strncpy(buffer, "invalid", n);', file=data_file)
     print(f'      return;', file=data_file)
     for entry in STRUCT_ENTRIES:
         print(f'    case {entry[1]}:', file=data_file)
-        print(f'      strncpy(buffer,  "{entry[1]}", n);', file=data_file)
+        print(f'      strncpy(buffer, "{entry[1]}", n);', file=data_file)
         print(f'      return;', file=data_file)
     print("  }", file=data_file)
     print("}", file=data_file)

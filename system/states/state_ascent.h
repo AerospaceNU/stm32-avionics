@@ -19,10 +19,10 @@ class AscentState : public FlightState {
   static constexpr double kPosDiffThreshold = 3;
   static constexpr double kBurnoutAccThreshold = 10;
 
-  static constexpr uint32_t kTransitionResetTimeThreshold =
+  static constexpr uint32_t kBurnoutResetTimeThreshold =
       150;  // 150 ms transition timer
 
-  uint32_t transitionResetTimer = 0;
+  uint32_t burnoutResetTimer = 0;
 };
 
 #endif  // SYSTEM_STATES_STATE_ASCENT_H_
