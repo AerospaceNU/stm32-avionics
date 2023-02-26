@@ -95,7 +95,7 @@ void NtHardwareManager::hm_hardwareInit() {
     ntPyro_init(&ntPyro[i], i);
     hardwareStatusPyro[FIRST_ID_PYRO_DESKTOP_PRINT + i] = true;
   }
-#endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
+#endif  // HAS_DEV(PYRO_DESKTOP_NT)
 
 #if HAS_DEV(RADIO_DESKTOP_SOCKET)
   if (do_networking) {

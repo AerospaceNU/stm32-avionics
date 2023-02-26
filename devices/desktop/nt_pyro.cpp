@@ -1,5 +1,7 @@
 #include "nt_pyro.h"
 
+#if HAS_DEV(PYRO_DESKTOP_NT)
+
 #include <stdint.h>
 #include <stdio.h>
 
@@ -51,3 +53,5 @@ void ntPyro_tick(NtPyroCtrl_s *pyro) {
     NT_SetString(pyro->statePublisher, 0, name.c_str(), name.length());
   }
 }
+
+#endif  // HAS_DEV(PYRO_DESKTOP_NT)

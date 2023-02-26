@@ -12,6 +12,11 @@
 extern "C" {
 #endif  // __cplusplus
 
+#include "board_config.h"
+#include "board_config_common.h"
+
+#if HAS_DEV(PYRO_DESKTOP_NT)
+
 #include <stdint.h>
 #include <ntcore_c.h>
 
@@ -28,6 +33,9 @@ void ntPyro_set(NtPyroCtrl_s *pyro, bool enable);
 void ntPyro_tick(NtPyroCtrl_s *pyro);
 void ntPyro_pwmStart(NtPyroCtrl_s *pyro, uint32_t duration,
                         uint32_t frequency, uint32_t pulseWidth);
+
+#endif  // HAS_DEV(PYRO_DESKTOP_NT)
+
 #ifdef __cplusplus
 }
 #endif  // __cplusplus
