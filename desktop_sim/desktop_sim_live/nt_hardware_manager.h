@@ -70,7 +70,9 @@ class NtHardwareManager : public HardwareManagerInterface {
 #endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
 
   SensorData_s sensorData = {0};
-  SensorProperties_s sensorProperties;
+  SensorProperties_s sensorProperties = {0};
+
+  void callbackMisdirectionFun(int a, bool b);
 
  public:
   void hm_hardwareInit() override;

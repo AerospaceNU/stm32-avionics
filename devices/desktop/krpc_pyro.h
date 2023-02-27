@@ -8,6 +8,8 @@
 #ifndef DEVICES_DESKTOP_KRPC_PYRO_H_
 #define DEVICES_DESKTOP_KRPC_PYRO_H_
 
+#include <functional>
+
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
@@ -17,10 +19,10 @@ extern "C" {
 typedef struct {
   uint32_t expireTime;
   int id;
-  void (*callback)(int, bool);
+  std::function<void(int, bool)> callback;
 } KRPCPyroCtrl_s;
 
-void krpcPyro_init(KRPCPyroCtrl_s *pyro, int id, void (*callback)(int, bool));
+void krpcPyro_init(KRPCPyroCtrl_s *pyro, int id, std::function<void(int, bool)> callback);
 void krpcPyro_start(KRPCPyroCtrl_s *pyro, uint32_t duration);
 void krpcPyro_set(KRPCPyroCtrl_s *pyro, bool enable);
 void krpcPyro_tick(KRPCPyroCtrl_s *pyro);

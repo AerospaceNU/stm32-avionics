@@ -43,15 +43,11 @@ void KRPCFlightReplay::writeActionGroup(int group, bool state) {
   control.set_action_group(group, state);
 }
 
+#define R_DRY_AIR 8.314   // J/K/kg
+#define G_ACCEL_EARTH 9.80665   // m/s**2
+
 void KRPCFlightReplay::getNext(SensorData_s* data) {
   data->timestampMs = utcTime() * 1000;
-
-#if HAS_DEV(BAROMETER_DESKTOP_FILE)
-    for (int i = 0; i < NUM_BAROMETER_DESKTOP_FILE; i++) {
-      data->barometerData[i].pressureAtm = staticPress() / 101325.0;
-      data->barometerData[i].temperatureC = airTemp() - 273.15;
-    }
-#endif  // HAS_DEV(BAROMETER_DESKTOP_FILE)
 
 #if HAS_DEV(GPS_DESKTOP_FILE)
     for (int i = 0; i < NUM_GPS_DESKTOP_FILE; i++) {
@@ -60,6 +56,15 @@ void KRPCFlightReplay::getNext(SensorData_s* data) {
       data->gpsData[i].generalData.altitude = gpsAlt();
     }
 #endif  // HAS_DEV(GPS_DESKTOP_FILE)
+
+#if HAS_DEV(BAROMETER_DESKTOP_FILE)
+    for (int i = 0; i < NUM_BAROMETER_DESKTOP_FILE; i++) {
+      // https://en.wikipedia.org/wiki/Barometric_formula
+      double gps = gpsAlt();
+      data->barometerData[i].pressureAtm = 1.0 * exp(-G_ACCEL_EARTH * 0.0289644 * gps / (R_DRY_AIR * 273.15));
+      data->barometerData[i].temperatureC = airTemp() - 273.15;
+    }
+#endif  // HAS_DEV(BAROMETER_DESKTOP_FILE)
 
     // X up, Y north, Z east
     auto [wx, wy, wz] = vessel.angular_velocity(vessel.surface_reference_frame());

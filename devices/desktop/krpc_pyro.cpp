@@ -5,7 +5,7 @@
 
 #include <chrono>  // NOLINT
 
-void krpcPyro_init(KRPCPyroCtrl_s *pyro, int id, void (*callback)(int, bool)) {
+void krpcPyro_init(KRPCPyroCtrl_s *pyro, int id, std::function<void(int, bool)> callback) {
   pyro->expireTime = 0;
   pyro->id = id;
   pyro->callback = callback;

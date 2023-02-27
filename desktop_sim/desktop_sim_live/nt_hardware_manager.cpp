@@ -46,6 +46,10 @@
 
 /* Hardware objects */
 
+void NtHardwareManager::callbackMisdirectionFun(int a, bool b) {
+  dynamic_cast<KRPCFlightReplay*>(flightReplay.get())->writeActionGroup(a, b);
+}
+
 void NtHardwareManager::hm_hardwareInit() {
   printf("STARTING: output %s, ext flash %s, int flash %s\n",
          output_file.c_str(), ext_flash_path.c_str(), int_flash_path.c_str());
@@ -112,7 +116,7 @@ void NtHardwareManager::hm_hardwareInit() {
 
 #if HAS_DEV(PYRO_SIM_KRPC)
   for (int i = 0; i < NUM_PYRO_SIM_KRPC; i++) {
-    krpcPyro_init(&pyroKRPC[i], i, callbackMisdirectionFun);
+    krpcPyro_init(&pyroKRPC[i], i, [this](auto a, auto b){callbackMisdirectionFun(a, b);});
     hardwareStatusPyro[FIRST_ID_PYRO_SIM_KRPC + i] = true;
   }
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
