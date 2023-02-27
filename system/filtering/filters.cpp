@@ -18,7 +18,7 @@
 #define MATH_PI 3.141592653589  // PI
 #define R_DRY_AIR 287.0474909   // J/K/kg
 #define G_ACCEL_EARTH 9.80665   // m/s**2
-#define BARO_MAX_SPEED 248      // m/s over which to not call correct()
+#define BARO_MAX_SPEED 9999      // m/s over which to not call correct()
 
 #define ACCEL_FS_THRESHOLD \
   0.9  // How close IMU accel should be to fullscale before ignoring values
