@@ -76,6 +76,7 @@ void triggerManager_getConfigString(uint8_t triggerNum, char* buffer, int n) {
       triggerNum + cli_getConfigs()->triggerConfiguration;
   expressionStore.conditionToString(triggerConfig->rootExpressionID, buffer, n);
 }
+
 void triggerManager_triggerFire(uint8_t triggerNum, bool logFire) {
   // Pyro type
   TriggerConfig_s* triggerConfig =

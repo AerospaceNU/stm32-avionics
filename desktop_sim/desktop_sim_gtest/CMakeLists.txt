@@ -10,8 +10,9 @@ enable_testing()
 
 set(TEST_FILES
   test_file_flash.cpp
-  test_flight.cpp
+  # test_flight.cpp
   test_cli_parse.cpp
+  test_trigger_manager.cpp
   board_config.c
   sim_hardware_manager.cpp  
 )

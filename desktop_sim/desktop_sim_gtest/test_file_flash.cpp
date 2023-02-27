@@ -7,7 +7,7 @@
 TEST(FileFlash, ReadWrite) {
   std::string ext_flash_path = "flash_test_file.hex";
   FileBackedFlash *externalFlash =
-      new FileBackedFlash(ext_flash_path, 0x4000000);
+      new FileBackedFlash(ext_flash_path, 100);
 
   uint8_t pdata[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   uint8_t pdata2[10] = {0};
@@ -28,7 +28,7 @@ TEST(FileFlash, ReadWrite) {
   EXPECT_EQ(0, std::memcmp(pdata, pdata2, sizeof(pdata)));
 
   delete externalFlash;
-  auto externalFlash2 = new FileBackedFlash(ext_flash_path, 0x4000000);
+  auto externalFlash2 = new FileBackedFlash(ext_flash_path, 100);
   LOCATION = 40;
   EXPECT_TRUE(externalFlash2->ReadStart(LOCATION, 10, pdata2));
   EXPECT_EQ(0, std::memcmp(pdata, pdata2, sizeof(pdata)));
