@@ -17,11 +17,13 @@ void filter_init(double dt);
 /**
  * @brief Applies filters based on current sensor data
  * @param curSensorVals: Current measured sensor data
+ * @param curSensorsAvailable; What sensor measurements are valid
  * @param sensorProperties: Current sensor non-measured properties
  * @param hasPassedApogee: Whether rocket has passed apogee (true) or not
  * (false)
  */
 void filter_applyData(SensorData_s* curSensorVals,
+                      SensorDataAvailability_s* curSensorsAvailable,
                       SensorProperties_s* sensorProperties,
                       bool hasPassedApogee);
 

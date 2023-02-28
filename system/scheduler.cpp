@@ -14,7 +14,7 @@
 
 void Scheduler::run(void) {
   /* Create all necessary states initially and store in list */
-  uint32_t defaultPeriod = 15;
+  uint32_t defaultPeriod = 0;
   CliEraseFlashState cliEraseFlash =
       CliEraseFlashState(StateId_e::CliEraseFlash, defaultPeriod);
   CliOffloadState cliOffload =

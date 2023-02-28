@@ -305,7 +305,9 @@ void filter_addGyroRef() {
   updateGyroOffsetOneAxis(&gyroZRefBuffer, noOffset, &gyroZOffset);
 }
 
-static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
+static void filterPositionZ(SensorData_s* curSensorVals,
+                            SensorDataAvailability_s* sensorsAvailable,
+                            bool hasPassedApogee) {
   // For now, just convert pressure to altitude using the following formula
   // without any sort of real filtering
   // https://en.wikipedia.org/wiki/Barometric_formula
@@ -314,13 +316,23 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
                                // lapse rate when altitude is higher
   double tempRef = cli_getConfigs()->groundTemperatureC + 273.15;  // C to K
 
-  double presAvg = filter_getAveragePressure(curSensorVals);
-
+  // Get pressure average depending on number of valid barometer readings
+  double presAvg = 0;
+  int numBaroValid = 0;
+  for (int i = 0; i < NUM_BAROMETER; i++) {
+    if (sensorsAvailable->baroAvailable[i]) {
+      presAvg += curSensorVals->barometerData[i].pressureAtm;
+      numBaroValid++;
+    }
+  }
+  // Get altitude estimate AGL
   double baroAltAgl = 0;
-  if (fabs(presAvg) > 0.001) {
-    baroAltAgl =
-        (tempRef / lapseRate) *
-        (pow(presAvg / presRef, -R_DRY_AIR * lapseRate / G_ACCEL_EARTH) - 1);
+  if (numBaroValid > 0) {
+    if (fabs(presAvg) > 0.001) {
+      baroAltAgl =
+          (tempRef / lapseRate) *
+          (pow(presAvg / presRef, -R_DRY_AIR * lapseRate / G_ACCEL_EARTH) - 1);
+    }
   }
 #endif  // HAS_DEV(BAROMETER)
 
@@ -341,8 +353,10 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
   kalman.predict(accz);
 
 #if HAS_DEV(BAROMETER)
-  // Only correct if below max speed (above, baro readings untrustworthy)
-  if (fabs(kalman.getXhat().estimatedVelocity) < BARO_MAX_SPEED) {
+  // Only correct if below max speed (above, baro readings untrustworthy) and
+  // there are new baro readings
+  if (fabs(kalman.getXhat().estimatedVelocity) < BARO_MAX_SPEED &&
+      numBaroValid > 0) {
     kalman.correct(baroAltAgl, kalman.DEFAULT_KALMAN_GAIN);
   }
 #endif  // HAS_DEV(BAROMETER)
@@ -468,9 +482,9 @@ int8_t filter_getGravityRef() { return gravityRef; }
 
 static void filter_setWorldReference() {
   /*
-   * Data comes in through sensors relative to the board. Other filter functions
-   * convert sensor measurements into the board reference frame. We then also
-   * need to convert this into the world reference frame.
+   * Data comes in through sensors relative to the board. Other filter
+   * functions convert sensor measurements into the board reference frame. We
+   * then also need to convert this into the world reference frame.
    */
 
   // How this works is going to change significantly, so this is a very basic
@@ -484,12 +498,13 @@ static void filter_setWorldReference() {
 }
 
 void filter_applyData(SensorData_s* curSensorVals,
+                      SensorDataAvailability_s* curSensorsAvailable,
                       SensorProperties_s* sensorProperties,
                       bool hasPassedApogee) {
   // Filter z pos first so we still have the old accelerations
   // This lets us project our state estimate forward from the last
   // timestep to the current one
-  filterPositionZ(curSensorVals, hasPassedApogee);
+  filterPositionZ(curSensorVals, curSensorsAvailable, hasPassedApogee);
 
   filterAccels(curSensorVals, sensorProperties);
 

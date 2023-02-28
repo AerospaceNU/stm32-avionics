@@ -27,7 +27,8 @@ EndCondition_e FlightState::runState() {
   // Collect, filter, and log all sensor data
   hm_readSensorData();
   SensorData_s* sensorData = hm_getSensorData();
-  filter_applyData(sensorData, hm_getSensorProperties(), m_hasPassedApogee);
+  filter_applyData(sensorData, hm_getSensorDataAvailability(),
+                   hm_getSensorProperties(), m_hasPassedApogee);
   FilterData_s* filterData = filter_getData();
 
   // For now, transmit data to all attached radios

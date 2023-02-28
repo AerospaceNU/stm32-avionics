@@ -225,6 +225,7 @@ static VbatIna226Ctrl_s vbatIna226[NUM_VBAT_INA226];
 /* Sensor info */
 static SensorProperties_s sensorProperties;
 static SensorData_s sensorData;
+static SensorDataAvailability_s sensorDataAvailable;
 static size_t SENSOR_DATA_SIZE = sizeof(SensorData_s);
 
 /* Hardware manager sim mode trackers */
@@ -943,22 +944,22 @@ void hm_readSensorData() {
     // Accelerometer data
 #if HAS_DEV(ACCEL_H3LIS331DL)
     for (int i = 0; i < NUM_ACCEL_H3LIS331DL; i++) {
-      accelH3lis331dl_getData(&accelH3lis331dl[i]);
-      sensorData.accelData[i + FIRST_ID_ACCEL_H3LIS331DL] =
-          accelH3lis331dl[i].val;
+      if ((sensorDataAvailable.accelAvailable[i + FIRST_ID_ACCEL_H3LIS331DL] =
+               hardwareStatusAccel[i + FIRST_ID_ACCEL_H3LIS331DL])) {
+        accelH3lis331dl_getData(&accelH3lis331dl[i]);
+        sensorData.accelData[i + FIRST_ID_ACCEL_H3LIS331DL] =
+            accelH3lis331dl[i].val;
+      }
     }
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
     // Barometer data
 #if HAS_DEV(BAROMETER_MS5607)
-    bool allBaroComplete = false;
-    bool baroComplete[NUM_BAROMETER_MS5607] = {false};
-    while (!allBaroComplete) {
-      allBaroComplete = true;
-      for (int i = 0; i < NUM_BAROMETER_MS5607; i++) {
-        if (!baroComplete[i]) {
-          allBaroComplete = false;
-          baroComplete[i] = barometerMs5607_getData(&barometerMs5607[i]);
+    for (int i = 0; i < NUM_BAROMETER_MS5607; i++) {
+      if ((sensorDataAvailable.baroAvailable[i + FIRST_ID_BAROMETER_MS5607] =
+               hardwareStatusBarometer[i + FIRST_ID_BAROMETER_MS5607])) {
+        if ((sensorDataAvailable.baroAvailable[i + FIRST_ID_BAROMETER_MS5607] =
+                 barometerMs5607_getData(&barometerMs5607[i]))) {
           sensorData.barometerData[i + FIRST_ID_BAROMETER_MS5607] =
               barometerMs5607[i].data;
         }
@@ -968,45 +969,62 @@ void hm_readSensorData() {
 
     // GPS data
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
-    // TODO: Poll GPS status to determine if data is good
     for (int i = 0; i < NUM_GPS_STD + NUM_GPS_UBLOX; i++) {
-      gps_newData(&gps[i]);
-      sensorData.gpsData[i + FIRST_ID_GPS_STD] = gps[i].data;
+      if ((sensorDataAvailable.gpsAvailable[i + FIRST_ID_GPS_STD] =
+               hardwareStatusBarometer[i + FIRST_ID_GPS_STD])) {
+        if ((sensorDataAvailable.gpsAvailable[i + FIRST_ID_GPS_STD] =
+                 gps_newData(&gps[i]))) {
+          sensorData.gpsData[i + FIRST_ID_GPS_STD] = gps[i].data;
+        }
+      }
     }
 #endif  // HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
 
     // IMU data
 #if HAS_DEV(IMU_LSM9DS1)
     for (int i = 0; i < NUM_IMU_LSM9DS1; i++) {
-      lsm9ds1_getData(&imuLsm9ds1[i]);
-      sensorData.imuData[FIRST_ID_IMU_LSM9DS1 + i] = imuLsm9ds1[i].data;
+      if ((sensorDataAvailable.imuAvailable[i + FIRST_ID_IMU_LSM9DS1] =
+               hardwareStatusImu[i + FIRST_ID_IMU_LSM9DS1])) {
+        lsm9ds1_getData(&imuLsm9ds1[i]);
+        sensorData.imuData[FIRST_ID_IMU_LSM9DS1 + i] = imuLsm9ds1[i].data;
+      }
     }
 #endif  // HAS_DEV(IMU_LSM9DS1)
 
     // Pyro continuity data
 #if HAS_DEV(PYRO_CONT_ADC)
     for (int i = 0; i < NUM_PYRO_CONT_ADC; i++) {
-      float adcVal = 0;
-      adcDev_startSingleRead(&pyroContAdc[i]);
-      sensorData.pyroContData[i] = adcDev_getValue(&pyroContAdc[i], &adcVal, 5)
-                                       ? adcVal > PYRO_CONTINUITY_THRESHOLD
-                                       : false;
+      if ((sensorDataAvailable.pyroContAvailable[i + FIRST_ID_PYRO_CONT_ADC] =
+               hardwareStatusPyroCont[i + FIRST_ID_PYRO_CONT_ADC])) {
+        float adcVal = 0;
+        adcDev_startSingleRead(&pyroContAdc[i]);
+        sensorData.pyroContData[i + FIRST_ID_PYRO_CONT_ADC] =
+            adcDev_getValue(&pyroContAdc[i], &adcVal, 5)
+                ? adcVal > PYRO_CONTINUITY_THRESHOLD
+                : false;
+      }
     }
 #endif  // HAS_DEV(PYRO_CONT_ADC)
 
     // VBat data
 #if HAS_DEV(VBAT_ADC)
     for (int i = 0; i < NUM_VBAT_ADC; i++) {
-      float adcVal = 0;
-      adcDev_startSingleRead(&vbatAdc[i]);
-      sensorData.vbatData[FIRST_ID_VBAT_ADC + i] =
-          adcDev_getValue(&vbatAdc[i], &adcVal, 5) ? adcVal : 0;
+      if ((sensorDataAvailable.vbatAvailable[i + FIRST_ID_VBAT_ADC] =
+               hardwareStatusPyroCont[i + FIRST_ID_VBAT_ADC])) {
+        float adcVal = 0;
+        adcDev_startSingleRead(&vbatAdc[i]);
+        sensorData.vbatData[FIRST_ID_VBAT_ADC + i] =
+            adcDev_getValue(&vbatAdc[i], &adcVal, 5) ? adcVal : 0;
+      }
     }
 #endif  // HAS_DEV(VBAT_ADC)
 #if HAS_DEV(VBAT_INA226)
     for (int i = 0; i < NUM_VBAT_INA226; i++) {
-      sensorData.vbatData[FIRST_ID_VBAT_INA226 + i] =
-          vbatIna226_readBusVoltage(&vbatIna226[i]);
+      if ((sensorDataAvailable.vbatAvailable[i + FIRST_ID_VBAT_INA226] =
+               hardwareStatusPyroCont[i + FIRST_ID_VBAT_INA226])) {
+        sensorData.vbatData[FIRST_ID_VBAT_INA226 + i] =
+            vbatIna226_readBusVoltage(&vbatIna226[i]);
+      }
     }
 #endif  // HAS_DEV(VBAT_INA226)
 
@@ -1020,6 +1038,10 @@ void hm_readSensorData() {
 }
 
 SensorData_s *hm_getSensorData() { return &sensorData; }
+
+SensorDataAvailability_s *hm_getSensorDataAvailability() {
+  return &sensorDataAvailable;
+}
 
 SensorProperties_s *hm_getSensorProperties() { return &sensorProperties; }
 

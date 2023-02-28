@@ -45,6 +45,27 @@ typedef struct __attribute__((__packed__)) {
 #endif  // HAS_DEV(PYRO_CONT)
 } SensorData_s;
 
+typedef struct __attribute__((__packed__)) {
+#if HAS_DEV(IMU)
+  bool imuAvailable[NUM_IMU];
+#endif
+#if HAS_DEV(ACCEL)
+  bool accelAvailable[NUM_ACCEL];
+#endif  // HAS_DEV(ACCEL)
+#if HAS_DEV(BAROMETER)
+  bool baroAvailable[NUM_BAROMETER];
+#endif  // HAS_DEV(BAROMETER)
+#if HAS_DEV(GPS)
+  bool gpsAvailable[NUM_GPS];
+#endif  // HAS_DEV(GPS)
+#if HAS_DEV(VBAT)
+  bool vbatAvailable[NUM_VBAT];
+#endif  // HAS_DEV(VBAT)
+#if HAS_DEV(PYRO_CONT)
+  bool pyroContAvailable[NUM_PYRO_CONT];
+#endif  // HAS_DEV(PYRO_CONT)
+} SensorDataAvailability_s;
+
 // Sensor fullscales, in m/s/s
 typedef struct {
 #if HAS_DEV(IMU)
@@ -175,6 +196,11 @@ void hm_readSensorData();
  * @return Pointer to statically-allocated struct where sensor data is stored
  */
 SensorData_s* hm_getSensorData();
+
+/**
+ * @brief Returns pointer to current sensor data availability
+ */
+SensorDataAvailability_s* hm_getSensorDataAvailability();
 
 /**
  * @brief Returns a pointer to the current sensor properties
