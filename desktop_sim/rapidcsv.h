@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <limits>
 #ifdef HAS_CODECVT
 #include <codecvt>
 #include <locale>
@@ -347,7 +348,7 @@ struct LineReaderParams {
    * @param   pSkipEmptyLines       specifies whether to skip empty lines.
    * Default: false
    */
-  explicit LineReaderParams(const bool pSkipCommentLines = false,
+  explicit LineReaderParams(const bool pSkipCommentLines = true,
                             const char pCommentPrefix = '#',
                             const bool pSkipEmptyLines = false)
       : mSkipCommentLines(pSkipCommentLines),
@@ -357,7 +358,7 @@ struct LineReaderParams {
   /**
    * @brief   specifies whether to skip lines prefixed with mCommentPrefix.
    */
-  bool mSkipCommentLines;
+  bool mSkipCommentLines = true;
 
   /**
    * @brief   specifies which prefix character to indicate a comment line.

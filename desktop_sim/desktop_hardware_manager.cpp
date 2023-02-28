@@ -98,7 +98,8 @@ FileBackedFlash *internalFlash;
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
-static CsvReplay *flightReplay;
+// static FcbCsvFlightReplay *flightReplay;
+static OpenRocketFLightReplay *flightReplay;
 #endif  // HAS_DEV(XXX_DESKTOP_FILE)
 
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
@@ -131,7 +132,7 @@ void hm_hardwareInit() {
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
-  flightReplay = new CsvReplay(output_file);
+  flightReplay = new OpenRocketFLightReplay(output_file);
 #endif  // HAS_DEV(XXX_DESKTOP_FILE)
 
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
@@ -159,6 +160,7 @@ void hm_hardwareInit() {
   // TODO we shouldn't do this, and should instead record this in metadata
   for (int i = 0; i < NUM_ACCEL; i++) {
     sensorProperties.accelFs[i] = 981;  // 100G * 9.81 m/s^2
+    hardwareStatusImu[i] = false;
   }
 #endif  // HAS_DEV(ACCEL)
 
@@ -166,6 +168,7 @@ void hm_hardwareInit() {
   // TODO we shouldn't do this, and should instead record this in metadata
   for (int i = 0; i < NUM_IMU; i++) {
     sensorProperties.imuAccelFs[i] = 156.96;  // 16 * 9.81
+    hardwareStatusImu[i] = true;
   }
 #endif  // HAS_DEV(IMU)
 }

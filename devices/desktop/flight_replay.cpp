@@ -9,9 +9,9 @@
 
 #include "hardware_manager.h"
 
-CsvReplay::CsvReplay(std::string path) : doc{path} {}
+FcbCsvFlightReplay::FcbCsvFlightReplay(std::string path) : doc{path} {}
 
-void CsvReplay::getNext(SensorData_s* data) {
+void FcbCsvFlightReplay::getNext(SensorData_s* data) {
   try {
     char rowName[30];
 
@@ -85,6 +85,98 @@ void CsvReplay::getNext(SensorData_s* data) {
 #endif  // HAS_DEV(GPS_DESKTOP_FILE)
 
     m_row = std::min(m_row + 1, doc.GetRowCount() - 1);
+  } catch (const std::exception& e) {
+    std::cout << e.what();
+  }
+}
+
+OpenRocketFLightReplay::OpenRocketFLightReplay(std::string path) : doc{path} {}
+
+void OpenRocketFLightReplay::getNext(SensorData_s* data) {
+  try {
+    char rowName[30];
+
+    data->timestampMs = doc.GetCell<double>("Time (s)", m_row) * 1000;
+
+    // Since we don't care about lateral accel, and openrocket doesn't give us
+    // it, ignore
+    double verticalAccel =
+        doc.GetCell<double>("Vertical acceleration (G)", m_row) * 9.81;
+#if HAS_DEV(IMU_DESKTOP_FILE)
+    {
+      for (int i = 0; i < NUM_IMU_DESKTOP_FILE; i++) {
+        data->imuData[i].accelRealMps2.y = verticalAccel;
+        data->imuData[i].accelRealMps2.x = 0;
+        data->imuData[i].accelRealMps2.z = 0;
+
+        // rotation rate
+
+        data->imuData[i].angVelRealRadps.y =
+            doc.GetCell<double>("Roll rate (r/s)", m_row);
+        data->imuData[i].angVelRealRadps.x =
+            doc.GetCell<double>("Pitch rate (r/s)", m_row);
+        data->imuData[i].angVelRealRadps.z =
+            doc.GetCell<double>("Yaw rate (r/s)", m_row);
+
+        // no mag data
+        data->imuData[i].magRealG.x = 0;
+        data->imuData[i].magRealG.y = 0;
+        data->imuData[i].magRealG.z = 0;
+      }
+    }
+
+#endif  // HAS_DEV(IMU_DESKTOP_FILE)
+
+#if HAS_DEV(ACCEL_DESKTOP_FILE)
+    for (int i = 0; i < NUM_ACCEL_DESKTOP_FILE; i++) {
+      data->accelData[i].realMps2.y = verticalAccel;
+      data->accelData[i].realMps2.x = 0;
+      data->accelData[i].realMps2.z = 0;
+    }
+#endif  // HAS_DEV(ACCEL_DESKTOP_FILE)
+
+#if HAS_DEV(BAROMETER_DESKTOP_FILE)
+    for (int i = 0; i < NUM_BAROMETER_DESKTOP_FILE; i++) {
+      data->barometerData[i].pressureAtm =
+          doc.GetCell<double>("Air pressure (mbar)", m_row) * 0.000986923;
+      data->barometerData[i].temperatureC =
+          (doc.GetCell<double>("Air temperature (°F)", m_row) - 32.0) * 5.0 /
+          9.0;
+    }
+#endif  // HAS_DEV(BAROMETER_DESKTOP_FILE)
+
+#if HAS_DEV(VBAT_DESKTOP_FILE)
+    for (int i = 0; i < NUM_VBAT_DESKTOP_FILE; i++) {
+      data->vbatData[i] = 12.0;  // lol todo
+    }
+#endif  // HAS_DEV(VBAT_DESKTOP_FILE)
+
+#if HAS_DEV(PYRO_CONT_DESKTOP_FILE)
+    uint8_t pyroCont = 0;  // lol, todo
+    for (int i = 0; i < NUM_PYRO_CONT_DESKTOP_FILE; i++) {
+      data->pyroContData[i] = (pyroCont >> i) & 0b1;
+    }
+#endif  // HAS_DEV(PYRO_CONT_DESKTOP_FILE)
+
+#if HAS_DEV(GPS_DESKTOP_FILE)
+    for (int i = 0; i < NUM_GPS_DESKTOP_FILE; i++) {
+      data->gpsData[i].generalData.latitude =
+          doc.GetCell<double>("Latitude (°)", m_row);
+      data->gpsData[i].generalData.longitude =
+          doc.GetCell<double>("Longitude (°)", m_row);
+      data->gpsData[i].generalData.altitude =
+          doc.GetCell<double>("Altitude (ft)", m_row) * 0.3048;
+    }
+#endif  // HAS_DEV(GPS_DESKTOP_FILE)
+
+    if (m_ticksToLaunch > 0) {
+      m_ticksToLaunch--;
+    } else {
+      if ((hm_millis() - lastTime) > 65) {
+        lastTime = hm_millis();
+        m_row = std::min(m_row + 1, doc.GetRowCount() - 1);
+      }
+    }
   } catch (const std::exception& e) {
     std::cout << e.what();
   }
