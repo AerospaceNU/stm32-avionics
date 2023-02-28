@@ -19,6 +19,40 @@ class TriggerHardwareManager : public SimHardwareManager {
   }
 };
 
+TEST(TriggerManager, setStringConfigs) {
+  for (int i = 0; i < NUM_PYRO; i++) testPyrosFired[i] = false;
+
+  const int PYRO_PORT = 0;
+
+  auto hm = std::make_shared<TriggerHardwareManager>();
+  hm_sim_setHM(hm);
+
+  cli_init();
+  cli_setDefaultConfig();
+  for (int i = 0; i < MAX_TRIGGER; i++) {
+    (cli_getConfigs()->triggerConfiguration + i)->mode = TRIGGER_TYPE_EMPTY;
+  }
+
+  triggerManager_init();
+  
+  const char* apogee = "apogee";
+  const char* main = "(apogee and (pos_z_agl < 200))";
+  triggerManager_setTriggerConfig(0, &apogee);
+  triggerManager_setTriggerConfig(1, &main);
+
+  FilterData_s filterData = {0};
+  triggerManager_update(&filterData);
+
+  EXPECT_FALSE(testPyrosFired[PYRO_PORT]);
+  EXPECT_FALSE((triggerManager_status() >> PYRO_PORT) & 0b1);
+
+  triggerManager_triggerFire(0, true);
+
+  EXPECT_TRUE(testPyrosFired[PYRO_PORT]);
+  EXPECT_TRUE((triggerManager_status() >> PYRO_PORT) & 0b1);
+}
+
+
 TEST(TriggerManager, fire) {
   for (int i = 0; i < NUM_PYRO; i++) testPyrosFired[i] = false;
 

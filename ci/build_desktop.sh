@@ -12,7 +12,7 @@ then
 fi
 
 popd
-./build/desktop_sim/desktop_sim_test
+./build/desktop_sim/desktop_sim_gtest/desktop_sim_test
 if [ $? -ne 0 ];
 then
     exit -1
