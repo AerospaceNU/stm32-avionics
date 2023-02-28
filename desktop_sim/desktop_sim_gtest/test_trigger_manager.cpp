@@ -34,7 +34,7 @@ TEST(TriggerManager, setStringConfigs) {
   }
 
   triggerManager_init();
-  
+
   const char* apogee = "apogee";
   const char* main = "(apogee and (pos_z_agl < 200))";
   triggerManager_setTriggerConfig(0, &apogee);
@@ -52,7 +52,6 @@ TEST(TriggerManager, setStringConfigs) {
   EXPECT_TRUE((triggerManager_status() >> PYRO_PORT) & 0b1);
 }
 
-
 TEST(TriggerManager, fire) {
   for (int i = 0; i < NUM_PYRO; i++) testPyrosFired[i] = false;
 
@@ -66,7 +65,7 @@ TEST(TriggerManager, fire) {
   for (int i = 0; i < MAX_TRIGGER; i++) {
     (cli_getConfigs()->triggerConfiguration + i)->mode = TRIGGER_TYPE_EMPTY;
   }
-  
+
   // Set up port 0 as a pyro
   (cli_getConfigs()->triggerConfiguration + 0)->mode = TRIGGER_TYPE_PYRO;
   (cli_getConfigs()->triggerConfiguration + 0)->port = PYRO_PORT;
