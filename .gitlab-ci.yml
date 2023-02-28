@@ -36,6 +36,7 @@ lint-job:
 desktop-sim-job:
   stage: desktop-build
   script:
-    - apt-get install -y --no-install-recommends make cmake g++ gcc
+    - apt-get install -y --no-install-recommends make cmake g++ gcc python3-pip python3
+    - pip install Jinja2
     - chmod -R +x ci/build_desktop.sh
     - ./ci/build_desktop.sh
