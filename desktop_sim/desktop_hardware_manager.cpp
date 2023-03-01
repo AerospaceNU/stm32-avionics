@@ -133,8 +133,8 @@ void hm_hardwareInit() {
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
-  // flightReplay = new FcbCsvFlightReplay(output_file);
-  flightReplay = new OpenRocketFLightReplay(output_file);
+  flightReplay = new FcbCsvFlightReplay(output_file);
+  // flightReplay = new OpenRocketFLightReplay(output_file);
 #endif  // HAS_DEV(XXX_DESKTOP_FILE)
 
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
