@@ -163,7 +163,7 @@ void hm_hardwareInit() {
   // TODO we shouldn't do this, and should instead record this in metadata
   for (int i = 0; i < NUM_ACCEL; i++) {
     sensorProperties.accelFs[i] = 981;  // 100G * 9.81 m/s^2
-    hardwareStatusImu[i] = false;
+    hardwareStatusAccel[i] = true;
   }
 #endif  // HAS_DEV(ACCEL)
 
