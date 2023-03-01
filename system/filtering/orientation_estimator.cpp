@@ -51,7 +51,14 @@ void OrientationEstimator::update(float rocket_ang_vel_x,
        rocket_ang_vel_z, rocket_ang_vel_y, -rocket_ang_vel_x, 0.0});
   Matrix<3, 1> gyro({rocket_ang_vel_x, rocket_ang_vel_y, rocket_ang_vel_z});
 
-  volatile float w = gyro.norm();
+  float w = gyro.norm();
+
+  // special case -- w = 0, so omgmult becomes NaN and everything explodes
+  // But w=0 means no rotation. So just return early
+  if (fabs(w) < 1e-6) {
+    return;
+  }
+
   Matrix<4, 4> ident = (Matrix<4, 4>::identity() * cos(w * m_dt / 2.0));
   float omgmult = sin(w * m_dt / 2.0) / w;
   Matrix<4, 4> A = ident + omega * omgmult;
