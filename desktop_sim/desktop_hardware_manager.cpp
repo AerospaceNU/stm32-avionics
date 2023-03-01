@@ -99,7 +99,7 @@ FileBackedFlash *internalFlash;
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
 // static FcbCsvFlightReplay *flightReplay;
-static OpenRocketFLightReplay *flightReplay;
+static FlightReplay *flightReplay;
 #endif  // HAS_DEV(XXX_DESKTOP_FILE)
 
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
@@ -128,16 +128,19 @@ void hm_hardwareInit() {
          output_file.c_str(), ext_flash_path.c_str(), int_flash_path.c_str());
 
   internalFlash = new FileBackedFlash(int_flash_path, kFlashSizeBytes[0]);
+  internalFlash->reinit();
 
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
-  flightReplay = new OpenRocketFLightReplay(output_file);
+  flightReplay = new FcbCsvFlightReplay(output_file);
+  // flightReplay = new OpenRocketFLightReplay(output_file);
 #endif  // HAS_DEV(XXX_DESKTOP_FILE)
 
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
   for (int i = 0; i < NUM_FLASH_DESKTOP_FILE_BACKED; i++) {
     externalFlash[i] = new FileBackedFlash(ext_flash_path, kFlashSizeBytes[i]);
+    externalFlash[i]->reinit();
     hardwareStatusFlash[FIRST_ID_FLASH_DESKTOP_FILE_BACKED + i] = true;
   }
 #endif  // HAS_DEV(FLASH_DESKTOP_FILE_BACKED)

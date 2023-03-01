@@ -13,7 +13,7 @@ class FlightReplay {
   virtual void getNext(SensorData_s *data) {}
 };
 
-class OpenRocketFLightReplay : FlightReplay {
+class OpenRocketFLightReplay : public FlightReplay {
  public:
   explicit OpenRocketFLightReplay(std::string path);
 
@@ -21,12 +21,12 @@ class OpenRocketFLightReplay : FlightReplay {
 
  private:
   rapidcsv::Document doc;
-  int m_ticksToLaunch = 15 * 65; // TODO
-  double lastTime = 0;
+  double m_timeOffset = 5000; // ms
+  double m_startTime = -1; // ms
   size_t m_row = 0;
 };
 
-class FcbCsvFlightReplay : FlightReplay {
+class FcbCsvFlightReplay : public FlightReplay {
  public:
   explicit FcbCsvFlightReplay(std::string path);
 

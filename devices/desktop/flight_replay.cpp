@@ -96,6 +96,23 @@ void OpenRocketFLightReplay::getNext(SensorData_s* data) {
   try {
     char rowName[30];
 
+    // Find the row for now
+    if (m_startTime < 0) { m_startTime = hm_millis(); }
+    
+    // If we're out of bounds, no not advance sim
+    if (m_row < (doc.GetRowCount() - 1)) {
+      auto currentTime_openrocketTimebase = hm_millis() - m_startTime - m_timeOffset;
+
+      auto currentRowTime = doc.GetCell<double>("Time (s)", m_row) * 1000;
+
+      // Tick forward until we reach the end
+      while (currentTime_openrocketTimebase > currentRowTime && m_row < (doc.GetRowCount() - 1)) {
+        m_row = std::min(m_row + 1, doc.GetRowCount() - 1);
+        currentRowTime = doc.GetCell<double>("Time (s)", m_row) * 1000;
+      }
+    }
+
+
     data->timestampMs = doc.GetCell<double>("Time (s)", m_row) * 1000;
 
     // Since we don't care about lateral accel, and openrocket doesn't give us
@@ -168,15 +185,6 @@ void OpenRocketFLightReplay::getNext(SensorData_s* data) {
           doc.GetCell<double>("Altitude (ft)", m_row) * 0.3048;
     }
 #endif  // HAS_DEV(GPS_DESKTOP_FILE)
-
-    if (m_ticksToLaunch > 0) {
-      m_ticksToLaunch--;
-    } else {
-      if ((hm_millis() - lastTime) > 65) {
-        lastTime = hm_millis();
-        m_row = std::min(m_row + 1, doc.GetRowCount() - 1);
-      }
-    }
   } catch (const std::exception& e) {
     std::cout << e.what();
   }
