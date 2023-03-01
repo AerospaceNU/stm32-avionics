@@ -6,6 +6,7 @@
 
 #include <algorithm>  // std::min
 #include <string>
+#include <numbers>
 
 #include "hardware_manager.h"
 
@@ -115,10 +116,36 @@ void OpenRocketFLightReplay::getNext(SensorData_s* data) {
 
     data->timestampMs = doc.GetCell<double>("Time (s)", m_row) * 1000;
 
+
     // Since we don't care about lateral accel, and openrocket doesn't give us
     // it, ignore
     double verticalAccel =
         doc.GetCell<double>("Vertical acceleration (G)", m_row) * 9.81;
+
+    // if pre-launch, add 1 gee
+    if (m_row < 2) {
+      verticalAccel += 9.81;
+    }
+
+    // rocket frame angular velocities
+    double wx, wy, wz;
+    {
+      // in the world frame NEU
+      // in rocket, X is forward
+      // in IMU, Y is forward
+
+      double angleToVertical = doc.GetCell<double>("Vertical orientation (zenith) (°)", m_row) * 3.14159265358979 / 180.0;
+      // double angleToNorth = doc.GetCell<double>("Lateral orientation (azimuth) (°)", m_row) * std::numbers::pi / 180.0;
+      
+      if (!lastAngleToVertical) {
+        lastAngleToVertical = angleToVertical;
+      }
+      
+      // if we are lazy, and can assume that the rocket is ONLY rotating about it's Y axis,
+      // we have wy = d(angleVertical)/dt
+      wx = 0; wz = 0; wy = (angleToVertical - lastAngleToVertical.value()) / (65.0 / 1000.0);
+    }
+
 #if HAS_DEV(IMU_DESKTOP_FILE)
     {
       for (int i = 0; i < NUM_IMU_DESKTOP_FILE; i++) {

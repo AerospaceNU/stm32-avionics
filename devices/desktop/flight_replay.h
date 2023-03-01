@@ -7,6 +7,7 @@
 
 #include "hardware_manager.h"
 #include "rapidcsv.h"
+#include <optional>
 
 class FlightReplay {
  public:
@@ -21,9 +22,11 @@ class OpenRocketFLightReplay : public FlightReplay {
 
  private:
   rapidcsv::Document doc;
-  double m_timeOffset = 5000; // ms
+  double m_timeOffset = 10000; // ms
   double m_startTime = -1; // ms
   size_t m_row = 0;
+
+  std::optional<double> lastAngleToVertical = std::nullopt;
 };
 
 class FcbCsvFlightReplay : public FlightReplay {
