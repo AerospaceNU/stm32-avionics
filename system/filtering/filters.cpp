@@ -328,7 +328,8 @@ static void filterPositionZ(SensorData_s* curSensorVals,
   // Get altitude estimate AGL
   double baroAltAgl = 0;
   if (numBaroValid > 0) {
-    if (fabs(presAvg) > 0.001) {
+    presAvg /= numBaroValid;
+    if (fabs(presAvg) > 0.001 && presRef > 0) {
       baroAltAgl =
           (tempRef / lapseRate) *
           (pow(presAvg / presRef, -R_DRY_AIR * lapseRate / G_ACCEL_EARTH) - 1);
@@ -356,7 +357,7 @@ static void filterPositionZ(SensorData_s* curSensorVals,
   // Only correct if below max speed (above, baro readings untrustworthy) and
   // there are new baro readings
   if (fabs(kalman.getXhat().estimatedVelocity) < BARO_MAX_SPEED &&
-      numBaroValid > 0) {
+      numBaroValid > 0 && presRef > 0) {
     kalman.correct(baroAltAgl, kalman.DEFAULT_KALMAN_GAIN);
   }
 #endif  // HAS_DEV(BAROMETER)

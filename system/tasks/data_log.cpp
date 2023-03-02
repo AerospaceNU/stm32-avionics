@@ -133,17 +133,16 @@ static void flashWrite(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
     uint32_t pageBytes = numBytes - dataOffset > bytesToNextPage
                              ? bytesToNextPage
                              : numBytes - dataOffset;
-
     // Check which flash to write to and write there
     int flashId = -1;
     uint32_t flashOffset = 0;
     addressToFlashId(startLoc + dataOffset, &flashId, &flashOffset);
     if (flashId == -1) return;
     uint32_t waitStartMS = hm_millis();
-    hm_flashWriteStart(flashId, flashOffset, pageBytes, &pData[dataOffset]);
     while (!hm_flashIsWriteComplete(flashId) &&
            hm_millis() - waitStartMS < FLASH_TIMEOUT_MS) {
     }
+    hm_flashWriteStart(flashId, flashOffset, pageBytes, &pData[dataOffset]);
     dataOffset += pageBytes;
   }
 }
