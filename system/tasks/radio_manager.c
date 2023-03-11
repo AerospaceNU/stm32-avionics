@@ -13,8 +13,8 @@
 #include "data_structures.h"
 #include "hardware_manager.h"
 
-#define RADIO_INTERVAL_MS 200
-#define RADIO_SEND_MS 100
+#define RADIO_INTERVAL_MS 50
+#define RADIO_SEND_MS 25
 
 static DataRecieveState_s dataRx[NUM_RADIO];
 static DataTransmitState_s lastSent[NUM_RADIO];
@@ -74,14 +74,15 @@ void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
 }
 
 // Packet rates, in hz
-#define ORIENTATION_RATE 10
+#define ORIENTATION_RATE 30
 #define POSITION_RATE 10
 #define HARDWARE_STATUS_RATE 1
 
 void radioManager_transmitData(int radioId, SensorData_s *sensorData,
                                FilterData_s *filterData, uint8_t state) {
   uint32_t currentTime = hm_millis();
-  if (currentTime % RADIO_INTERVAL_MS >= RADIO_SEND_MS) return;
+  // if (currentTime % RADIO_INTERVAL_MS >= RADIO_SEND_MS) return;
+
   transmitPacket[radioId].timestampMs = currentTime;
 
   /*

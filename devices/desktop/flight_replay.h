@@ -29,14 +29,16 @@ class OpenRocketFLightReplay : public FlightReplay {
   std::optional<double> lastAngleToVertical = std::nullopt;
 };
 
-class FcbCsvFlightReplay : public FlightReplay {
+class RocketpyFlightReplay : public FlightReplay {
  public:
-  explicit FcbCsvFlightReplay(std::string path);
+  explicit RocketpyFlightReplay(std::string path);
 
   void getNext(SensorData_s *data) override;
 
  private:
   rapidcsv::Document doc;
+  double m_timeOffset = 20000; // ms
+  double m_startTime = -1; // ms
   size_t m_row = 0;
 };
 

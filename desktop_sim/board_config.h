@@ -9,7 +9,7 @@
 
 #define HAL_HEADER "fake_stm_hal.h"
 
-#define NUM_ACCEL_DESKTOP_FILE 1
+// #define NUM_ACCEL_DESKTOP_FILE 1
 
 #define NUM_BAROMETER_DESKTOP_FILE 2
 
@@ -17,7 +17,7 @@
 
 #define NUM_GPS_DESKTOP_FILE 1
 
-#define NUM_IMU_DESKTOP_FILE 2
+#define NUM_IMU_DESKTOP_FILE 1
 
 #define NUM_PYRO_DESKTOP_PRINT 6
 

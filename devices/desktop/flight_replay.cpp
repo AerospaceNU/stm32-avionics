@@ -10,23 +10,48 @@
 
 #include "hardware_manager.h"
 
-FcbCsvFlightReplay::FcbCsvFlightReplay(std::string path) : doc{path} {}
+#define R_DRY_AIR 8.314   // J/K/kg
+#define G_ACCEL_EARTH 9.80665   // m/s**2
+#define MOLAR_MASS_AIR 0.0289644 // kg/mol
 
-void FcbCsvFlightReplay::getNext(SensorData_s* data) {
+RocketpyFlightReplay::RocketpyFlightReplay(std::string path) : doc{path} {}
+
+void RocketpyFlightReplay::getNext(SensorData_s* data) {
   try {
     char rowName[30];
 
-    data->timestampMs = doc.GetCell<double>("time", m_row) * 1000.0;
+    // Find the row for now
+    if (m_startTime < 0) { m_startTime = hm_millis(); }
+    
+    // If we're out of bounds, no not advance sim
+    if (m_row < (doc.GetRowCount() - 1)) {
+      auto currentTime_openrocketTimebase = hm_millis() - m_startTime - m_timeOffset;
+
+      auto currentRowTime = doc.GetCell<double>("# Time (s)", m_row) * 1000;
+
+      // printf("%f %f %i\n", currentTime_openrocketTimebase, currentRowTime, (int)m_row);
+
+      // Tick forward until we reach the end
+      while ((currentTime_openrocketTimebase - currentRowTime) > 0 && m_row < (doc.GetRowCount() - 1)) {
+        // printf("delta %f\n", (currentTime_openrocketTimebase - currentRowTime));
+        m_row = std::min(m_row + 1, doc.GetRowCount() - 1);
+        currentRowTime = doc.GetCell<double>("# Time (s)", m_row) * 1000;
+      }
+    }
+
+    data->timestampMs = doc.GetCell<double>("# Time (s)", m_row) * 1000.0;
 
 #if HAS_DEV(IMU_DESKTOP_FILE)
     for (int i = 0; i < NUM_IMU_DESKTOP_FILE; i++) {
-      data->imuData[i].accelRealMps2.x = doc.GetCell<double>("accl_x", m_row);
-      data->imuData[i].accelRealMps2.y = doc.GetCell<double>("accl_y", m_row);
-      data->imuData[i].accelRealMps2.z = doc.GetCell<double>("accl_z", m_row);
+      data->imuData[i].accelRealMps2.x = doc.GetCell<double>(" Ax (m/s²)", m_row);
+      data->imuData[i].accelRealMps2.y = doc.GetCell<double>(" Ay (m/s²)", m_row);
+      data->imuData[i].accelRealMps2.z = doc.GetCell<double>(" Az (m/s²)", m_row);
 
-      data->imuData[i].angVelRealRadps.x = 0;
-      data->imuData[i].angVelRealRadps.y = 0;
-      data->imuData[i].angVelRealRadps.z = 0;
+      // TODO rotate into FCB sensor frame
+      data->imuData[i].angVelRealRadps.x = doc.GetCell<double>(" ω1 (rad/s)", m_row);
+      data->imuData[i].angVelRealRadps.y = doc.GetCell<double>(" ω2 (rad/s)", m_row);
+      data->imuData[i].angVelRealRadps.z = doc.GetCell<double>(" ω3 (rad/s)", m_row);
+
       data->imuData[i].magRealG.x = 0;
       data->imuData[i].magRealG.y = 0;
       data->imuData[i].magRealG.z = 0;
@@ -35,15 +60,16 @@ void FcbCsvFlightReplay::getNext(SensorData_s* data) {
 
 #if HAS_DEV(ACCEL_DESKTOP_FILE)
     for (int i = 0; i < NUM_ACCEL_DESKTOP_FILE; i++) {
-      data->accelData[i].realMps2.x = -doc.GetCell<double>("accl_y", m_row);
-      data->accelData[i].realMps2.y = doc.GetCell<double>("accl_x", m_row);
-      data->accelData[i].realMps2.z = -doc.GetCell<double>("accl_z", m_row);
+      data->imuData[i].accelRealMps2.x = -doc.GetCell<double>(" Az (m/s²)", m_row);
+      data->imuData[i].accelRealMps2.y = doc.GetCell<double>(" Ay (m/s²)", m_row);
+      data->imuData[i].accelRealMps2.z = doc.GetCell<double>(" Ax (m/s²)", m_row);
     }
 #endif  // HAS_DEV(ACCEL_DESKTOP_FILE)
 
 #if HAS_DEV(BAROMETER_DESKTOP_FILE)
     for (int i = 0; i < NUM_BAROMETER_DESKTOP_FILE; i++) {
-      data->barometerData[i].pressureAtm = doc.GetCell<double>("baro_pressure_hPa", m_row) * 0.0009869233;
+      double alt = doc.GetCell<double>(" Z (m)", m_row);
+      data->barometerData[i].pressureAtm = 1.0 * exp(-G_ACCEL_EARTH * MOLAR_MASS_AIR * alt / (R_DRY_AIR * 273.15));
       data->barometerData[i].temperatureC = 15;
     }
 #endif  // HAS_DEV(BAROMETER_DESKTOP_FILE)
@@ -62,20 +88,15 @@ void FcbCsvFlightReplay::getNext(SensorData_s* data) {
 
 #if HAS_DEV(GPS_DESKTOP_FILE)
     for (int i = 0; i < NUM_GPS_DESKTOP_FILE; i++) {
-      // data->gpsData[i].generalData.latitude =
-      //     doc.GetCell<double>("gps_lat", m_row);
-      // data->gpsData[i].generalData.longitude =
-      //     doc.GetCell<double>("gps_long", m_row);
+      data->gpsData[i].generalData.latitude =
+          doc.GetCell<double>(" Latitude (°)", m_row);
+      data->gpsData[i].generalData.longitude =
+          doc.GetCell<double>(" Longitude (°)", m_row);
       data->gpsData[i].generalData.altitude =
-          doc.GetCell<double>("gps_altitude", m_row);
+          doc.GetCell<double>(" Z (m)", m_row);
     }
 #endif  // HAS_DEV(GPS_DESKTOP_FILE)
 
-    static int i = 0;
-    i++;
-    if ((i % 4) == 0){
-      m_row = std::min(m_row + 1, doc.GetRowCount() - 1);
-    }
   } catch (const std::exception& e) {
     std::cout << e.what();
   }

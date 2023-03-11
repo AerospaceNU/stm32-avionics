@@ -98,7 +98,7 @@ FileBackedFlash *internalFlash;
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
-// static FcbCsvFlightReplay *flightReplay;
+// static RocketpyFlightReplay *flightReplay;
 static FlightReplay *flightReplay;
 #endif  // HAS_DEV(XXX_DESKTOP_FILE)
 
@@ -133,7 +133,7 @@ void hm_hardwareInit() {
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
-  flightReplay = new FcbCsvFlightReplay(output_file);
+  flightReplay = new RocketpyFlightReplay(output_file);
   // flightReplay = new OpenRocketFLightReplay(output_file);
 #endif  // HAS_DEV(XXX_DESKTOP_FILE)
 
@@ -163,7 +163,7 @@ void hm_hardwareInit() {
   // TODO we shouldn't do this, and should instead record this in metadata
   for (int i = 0; i < NUM_ACCEL; i++) {
     sensorProperties.accelFs[i] = 981;  // 100G * 9.81 m/s^2
-    hardwareStatusAccel[i] = true;
+    hardwareStatusAccel[i] = false; // TODO lol
   }
 #endif  // HAS_DEV(ACCEL)
 

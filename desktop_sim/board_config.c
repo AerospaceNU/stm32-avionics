@@ -20,11 +20,18 @@ const uint32_t kFlashSizeBytes[NUM_FLASH] = {0x4000000};
 /* IMU */
 
 #if HAS_DEV(IMU)
-const Orientation_s imuBoardToLocal[NUM_IMU][3] = {
-    {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, -1}},
-    {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, -1}},
-};
+// const Orientation_s imuBoardToLocal[NUM_IMU][3] = {
+//     {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, -1}},
+//     {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, -1}},
+// };
+
 int imuAccelFilterPriority[NUM_IMU] = {2, 2};
+
+const Orientation_s imuBoardToLocal[NUM_IMU][3] = {
+    {{AXIS_Z, 1}, {AXIS_Y, 1}, {AXIS_X, -1}},
+    // {{AXIS_Z, 1}, {AXIS_Y, 1}, {AXIS_X, -1}},
+};
+
 #endif  // HAS_DEV(IMU)
 
 /* Radio */

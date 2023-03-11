@@ -49,7 +49,7 @@ bool fileExists(const std::string &filename) {
 
 void FileBackedFlash::reinit() {
   if (fileExists(filepath)) {
-    return;
+    // return;
   }
 
   auto len = m_len;
