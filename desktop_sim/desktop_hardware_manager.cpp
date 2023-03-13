@@ -94,6 +94,9 @@ bool hardwareStatusVbat[NUM_VBAT];
 /* Hardware objects */
 
 FileBackedFlash *internalFlash;
+bool do_networking;
+CircularBuffer_s bleBuffer;
+uint8_t bleArray[1024] = {0};
 
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
@@ -128,6 +131,14 @@ void hm_hardwareInit() {
 
   internalFlash = new FileBackedFlash(int_flash_path, kFlashSizeBytes[0]);
 
+  // TODO this resets the state log, but we start at the
+  // beginning of the CSV anyways, so we shouldn't ever
+  // try to resad from it regardless
+  internalFlash->reinit(true);
+
+  // TODO stick in ifdef
+  cb_init(&bleBuffer, bleArray, sizeof(bleArray), 1);
+
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \
     HAS_DEV(PYRO_CONT_DESKTOP_FILE) || HAS_DEV(VBAT_DESKTOP_FILE)
@@ -149,9 +160,11 @@ void hm_hardwareInit() {
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 
 #if HAS_DEV(RADIO_DESKTOP_SOCKET)
-  for (int i = 0; i < NUM_RADIO_DESKTOP_SOCKET; i++) {
-    radioSocket[i] = new TcpSocket{radioDesktopSocketPort[i]};
-    hardwareStatusRadio[FIRST_ID_RADIO_DESKTOP_SOCKET + i] = true;
+  if (do_networking) {
+    for (int i = 0; i < NUM_RADIO_DESKTOP_SOCKET; i++) {
+      radioSocket[i] = new TcpSocket{radioDesktopSocketPort[i]};
+      hardwareStatusRadio[FIRST_ID_RADIO_DESKTOP_SOCKET + i] = true;
+    }
   }
 #endif  // HAS_DEV(RADIO_DESKTOP_SOCKET)
 
@@ -288,8 +301,8 @@ LineCutterData_s *hm_getLineCutterData(int lineCutterId) {
 LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
   return dummyVars + lineCutterId;
 }
-
 bool hm_lineCutterSendString(int lineCutterNumber, char *string) {
+  printf("[Sent to LC %i] %s\n", lineCutterNumber, string);
   return true;
 }
 bool hm_lineCuttersSendCut(int chan) {

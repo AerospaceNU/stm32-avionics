@@ -54,7 +54,9 @@ TcpSocket::TcpSocket(int port) {
 }
 
 bool TcpSocket::writeData(uint8_t *data, size_t len) {
-  send(client_fd, data, len, 0);
+  if (this && client_fd) {
+    send(client_fd, data, len, 0);
+  }
   return true;
 }
 

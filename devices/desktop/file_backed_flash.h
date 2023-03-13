@@ -13,10 +13,10 @@ class FileBackedFlash {
  public:
   explicit FileBackedFlash(std::string path, size_t len)
       : filepath(std::move(path)), m_len(len) {
-    reinit();
+    reinit(false);
   }
 
-  void reinit();
+  void reinit(bool overwrite);
   bool readStart(uint32_t startLoc, uint32_t numBytes, uint8_t *pdata);
   bool writeStart(uint32_t startLoc, uint32_t numBytes, uint8_t *pdata);
 

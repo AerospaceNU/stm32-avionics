@@ -10,32 +10,34 @@
 
 bool FileBackedFlash::writeStart(uint32_t startLoc, uint32_t numBytes,
                                  uint8_t *pdata) {
-  // Open a new output stream in binary mode
-  std::fstream ofs{filepath};
-  // and check it worked
-  if (!ofs.good()) return false;
+  FILE *ptr;
+  ptr = fopen(filepath.c_str(), "r+b");  // w for write, b for binary
+  if (!ptr) return false;
 
-  // Seek to the position and write the data
-  if (!ofs.seekp(startLoc, std::ios_base::beg)) return false;
-  if (!ofs.write((char *)pdata, numBytes)) return false;
+  // Seek to the start location and write
+  // TODO should we simulate flash erase?
+  fseek(ptr, startLoc, SEEK_SET);
+  fwrite(pdata, numBytes, 1, ptr);
 
-  ofs.close();
+  // clean up
+  fclose(ptr);
+
   return true;
 }
 
 bool FileBackedFlash::readStart(uint32_t startLoc, uint32_t numBytes,
                                 uint8_t *pdata) {
-  // Open a new input stream in binary mode
-  std::ifstream ifs;
-  ifs.open(filepath, std::ios::in | std::ios::binary);
-  // and check it worked
-  if (!ifs.good()) return false;
+  FILE *ptr;
+  ptr = fopen(filepath.c_str(), "rb");  // r for read, b for binary
+  if (!ptr) return false;
 
-  // Seek to the position and read the bytes
-  if (!ifs.seekg(startLoc)) return false;
-  if (!ifs.read((char *)pdata, numBytes)) return false;
+  // Seek to the start location and read
+  fseek(ptr, startLoc, SEEK_SET);
+  fread(pdata, numBytes, 1, ptr);
 
-  ifs.close();
+  // clean up
+  fclose(ptr);
+
   return true;
 }
 
@@ -47,8 +49,8 @@ bool fileExists(const std::string &filename) {
   return false;
 }
 
-void FileBackedFlash::reinit() {
-  if (fileExists(filepath)) {
+void FileBackedFlash::reinit(bool overwrite) {
+  if (fileExists(filepath) && !overwrite) {
     return;
   }
 
@@ -60,8 +62,9 @@ void FileBackedFlash::reinit() {
   std::ofstream ofs;
   ofs.open(filepath, std::ios::out | std::ios::binary);
   while (len > sizeof(ff)) {
-    ofs.write((char *)ff, sizeof(ff));
-    len -= sizeof(ff);
+    size_t bytes_to_write = std::min(sizeof(ff), len);
+    ofs.write((char *)ff, bytes_to_write);
+    len -= bytes_to_write;
   }
   ofs.write((char *)ff, len);
 }
