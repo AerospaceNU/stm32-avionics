@@ -80,7 +80,10 @@ PACKED_STRUCT {
 HardwareStatusPacket_s;
 
 #define TELEMETRY_ID_LINECUTTER_VARS 8
-PACKED_STRUCT { LineCutterFlightVars_s data; uint8_t bleId; }
+PACKED_STRUCT {
+  LineCutterFlightVars_s data;
+  uint8_t bleId;
+}
 LineCutterVarsPacket_s;
 
 typedef union {
