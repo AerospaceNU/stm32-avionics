@@ -281,6 +281,11 @@ bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
 CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) { return nullptr; }
 void hm_bleTick() {}
 
+uint8_t hm_bleGetAllClientsConnected(int chipId) {
+  // todo
+  return 0;
+}
+
 LineCutterData_s dummyData[2] = {{
                                      .lineCutterNumber = 1,
                                  },
