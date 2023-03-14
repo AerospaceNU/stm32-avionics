@@ -891,7 +891,7 @@ void hm_pyroSetPwm(int pyroId, uint32_t duration, uint32_t frequency,
 #if HAS_DEV(PYRO_DIGITAL)
   if (IS_DEVICE(pyroId, PYRO_DIGITAL)) {
     pyroDigital_pwmStart(&pyroDigital[pyroId - FIRST_ID_PYRO_DIGITAL], duration,
-                         frequency, pyroPwmPulseWidth);
+                         frequency, pulseWidth);
   }
 #endif  // HAS_DEV(PYRO_DIGITAL)
 }

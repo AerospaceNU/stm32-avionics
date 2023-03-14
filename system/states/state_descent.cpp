@@ -4,16 +4,16 @@
 #include <cmath>
 
 #include "data_log.h"
+#include "event_manager.h"
 #include "filters.h"
 #include "hardware_manager.h"
 #include "state_log.h"
-#include "trigger_manager.h"
 
 void DescentState::init() {
   uint32_t apogeeTime = hm_millis();
-  triggerManager_setApogeeTime(apogeeTime);
   dataLog_getFlightMetadata()->apogeeTimestamp = apogeeTime;
   dataLog_writeFlightMetadata();
+  eventManager_setEventComplete(Event_e::apogee);
   transitionResetTimer = hm_millis();
   altitude = 0;
   stateLog_write(this->getID());

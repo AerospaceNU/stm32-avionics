@@ -31,4 +31,6 @@
 
 #define NUM_VBAT_DESKTOP_FILE 1
 
+#define DESKTOP_SIM
+
 #endif  // DESKTOP_SIM_BOARD_CONFIG_H_

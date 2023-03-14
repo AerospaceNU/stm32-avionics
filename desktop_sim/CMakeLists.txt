@@ -28,6 +28,7 @@ enable_testing()
 set(TEST_FILES
         tests/test_file_flash.cpp
         tests/test_cli_parse.cpp
+        tests/test_expression_parse.cpp
         desktop_hardware_manager.cpp board_config.c
         )
 

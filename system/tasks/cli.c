@@ -14,7 +14,7 @@
 #include "radio_manager.h"
 
 #define INPUT_BUFFER_SIZE 2048
-#define MAX_ARGS 50
+#define MAX_ARGS 200
 
 static char
     inputBuffer[INPUT_BUFFER_SIZE +
@@ -23,24 +23,22 @@ static char
 static uint8_t radioRxBuffer[INPUT_BUFFER_SIZE];
 static CircularBuffer_s radioRxCircBuffer;
 
-static CliOptionVals_s cliOptionVals = {.f = NULL,
-                                        .t = NULL,
-                                        .m = NULL,
-                                        .p = NULL,
-                                        .H = NULL,
-                                        .D = NULL,
-                                        .e = NULL,
-                                        .r = NULL,
-                                        .c = NULL,
-                                        .A = false,
-                                        .L = false,
-                                        .T = false,
-                                        .M = false,
-                                        .C = false,
-                                        .U = false,
-                                        .h = false,
-                                        .lcCmd = NULL,
-                                        .lcId = NULL};
+static CliOptionVals_s cliOptionVals = {
+    .f = NULL,      // flight number
+    .t = NULL,      // trigger number
+    .m = NULL,      // trigger mode
+    .p = NULL,      // device port, e.g. pyro port or line cutter channel
+    .d = NULL,      // trigger duration
+    .w = NULL,      // trigger pulse width
+    .C = NULL,      // trigger configuration
+    .D = false,     // trigger delete
+    .e = NULL,      // ground elevation
+    .r = NULL,      // ground temperature
+    .h = false,     // help flag
+    .c = NULL,      // Radio channel, can be negative
+    .lcCmd = NULL,  // Line cuttter command
+    .lcId = NULL    // Line cuttter id
+};
 
 static int primaryCommand = 0;
 
@@ -94,21 +92,10 @@ void cli_init() {
 CliConfigs_s* cli_getConfigs() { return &cliConfigs; }
 
 void cli_setDefaultConfig() {
-#if NUM_PYRO > 0
-  cliConfigs.triggerConfiguration[0].mode = TRIGGER_TYPE_PYRO;
-  cliConfigs.triggerConfiguration[0].port = 0;  // Pyro # 1
-  cliConfigs.triggerConfiguration[0].flags = FLAG_APOGEE;
-#if NUM_PYRO > 1
-  cliConfigs.triggerConfiguration[1].mode = TRIGGER_TYPE_PYRO;
-  cliConfigs.triggerConfiguration[1].port = 1;  // Pyro # 2
-  cliConfigs.triggerConfiguration[1].flags = FLAG_ALT_DURING_DESCENT;
-  cliConfigs.triggerConfiguration[1].configValue = 230;  // 230 m deploy
-
-#endif  // NUM_PYRO > 1
-#endif  // NUM_PYRO > 0
   cliConfigs.groundElevationM = 0;
   cliConfigs.groundTemperatureC = 14.85;
   cliConfigs.radioChannel = 1;
+  triggerManager_setDefaultConfig();
 }
 
 CliCommand_e cli_parse(CliComms_e commsType) {
@@ -197,8 +184,8 @@ CliCommand_e cli_parse(CliComms_e commsType) {
   int optionIndex = 0;
   optind = 0;
   primaryCommand = NONE;
-  while ((opt = getopt_long(argc, argv, "m:r:p:H:D:e:t:f:c:i:ALTMhCU",
-                            longOptions, &optionIndex)) != -1) {
+  while ((opt = getopt_long(argc, argv, "f:t:m:p:d:w:C:e:r:c:i:Dh", longOptions,
+                            &optionIndex)) != -1) {
     switch (opt) {
       case 0:
         // New primary command was set
@@ -206,18 +193,14 @@ CliCommand_e cli_parse(CliComms_e commsType) {
         cliOptionVals.t = NULL;
         cliOptionVals.m = NULL;
         cliOptionVals.p = NULL;
-        cliOptionVals.H = NULL;
-        cliOptionVals.D = NULL;
+        cliOptionVals.d = NULL;
+        cliOptionVals.w = NULL;
+        cliOptionVals.C = NULL;
+        cliOptionVals.D = false;
         cliOptionVals.e = NULL;
         cliOptionVals.r = NULL;
-        cliOptionVals.c = NULL;
-        cliOptionVals.A = false;
-        cliOptionVals.L = false;
-        cliOptionVals.T = false;
-        cliOptionVals.M = false;
-        cliOptionVals.C = false;
-        cliOptionVals.U = false;
         cliOptionVals.h = false;
+        cliOptionVals.c = NULL;
         cliOptionVals.lcCmd = NULL;
         cliOptionVals.lcId = NULL;
         break;
@@ -241,44 +224,24 @@ CliCommand_e cli_parse(CliComms_e commsType) {
           cliOptionVals.p = optarg;
         }
         break;
-      case 'A':
+      case 'd':
         if (primaryCommand == CONFIG) {
-          cliOptionVals.A = true;
+          cliOptionVals.d = optarg;
         }
         break;
-      case 'L':
+      case 'w':
         if (primaryCommand == CONFIG) {
-          cliOptionVals.L = true;
-        }
-        break;
-      case 'T':
-        if (primaryCommand == CONFIG) {
-          cliOptionVals.T = true;
-        }
-        break;
-      case 'M':
-        if (primaryCommand == CONFIG) {
-          cliOptionVals.M = true;
+          cliOptionVals.w = optarg;
         }
         break;
       case 'C':
         if (primaryCommand == CONFIG) {
-          cliOptionVals.C = true;
-        }
-        break;
-      case 'U':
-        if (primaryCommand == CONFIG) {
-          cliOptionVals.U = true;
-        }
-        break;
-      case 'H':
-        if (primaryCommand == CONFIG) {
-          cliOptionVals.H = optarg;
+          cliOptionVals.C = optarg;
         }
         break;
       case 'D':
         if (primaryCommand == CONFIG) {
-          cliOptionVals.D = optarg;
+          cliOptionVals.D = true;
         }
         break;
       case 'h':

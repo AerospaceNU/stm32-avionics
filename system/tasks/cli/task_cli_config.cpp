@@ -12,10 +12,10 @@
 #include "hardware_manager.h"
 #include "small_strtod.h"
 
-static char msg[110 + 4];
+static char msg[270 + 4];
 
 static void generateConfigHelp(const char* name, const char* value) {
-  snprintf(msg, sizeof(msg), "%-30s %-80s\r\n", name, value);
+  snprintf(msg, sizeof(msg), "%-30s %-240s\r\n", name, value);
   cli_send(msg);
 }
 
@@ -35,6 +35,17 @@ void CliTasks::config() {
 
     TriggerConfig_s* triggerConfig =
         cli_getConfigs()->triggerConfiguration + triggerNum;
+
+    if (options.D) {
+      triggerConfig->mode = TRIGGER_TYPE_EMPTY;
+      triggerManager_removeTrigger(triggerNum);
+      // Write new cli configs to flash
+      dataLog_writeCliConfigs();
+      cli_sendAck(true, nullptr);
+      cli_sendComplete(true, nullptr);
+      return;
+    }
+
     // Get trigger type
     if (!options.m) {
       cli_sendAck(false, "-m flag must be provided");
@@ -66,6 +77,28 @@ void CliTasks::config() {
         return;
     }
 
+    float duration = 0;
+
+    if (mode == TRIGGER_TYPE_PYRO || mode == TRIGGER_TYPE_PWM_PYRO) {
+      duration = smallStrtod(options.d, &endPtr) * 1000;  // Convert to ms
+      if (*endPtr != '\0') {
+        cli_sendAck(false, "Pyro/PWM must specify a duration");
+        return;
+      }
+    }
+
+    int pulseWidth = 0;
+
+    if (mode == TRIGGER_TYPE_PWM_PYRO) {
+      pulseWidth = strtol(options.w, &endPtr, 10);
+      if (*endPtr != '\0') {
+        cli_sendAck(false, "PWM must specify a pulse width");
+        return;
+      }
+    }
+
+    triggerConfig->duration = duration;
+    triggerConfig->pulseWidth = pulseWidth;
     triggerConfig->mode = mode;
 
     int port = strtol(options.p, &endPtr, 10);
@@ -76,37 +109,15 @@ void CliTasks::config() {
 
     triggerConfig->port = port;
 
-    if (options.A) {
-      triggerConfig->flags = FLAG_APOGEE;
-    } else if (options.L) {
-      triggerConfig->flags = FLAG_LAUNCH;
-    } else if (options.T) {
-      triggerConfig->flags = FLAG_TOUCHDOWN;
-    } else if (options.M) {
-      triggerConfig->flags = FLAG_MANUAL;
-    } else if (options.C) {
-      triggerConfig->flags = FLAG_CUSTOM_MARMAN_CLAMP;
-    } else if (options.U) {
-      triggerConfig->flags = FLAG_CUSTOM_MARMAN_DELAY;
-    } else if (options.H) {
-      double pyroAlt = smallStrtod(options.H, &endPtr);
-      if (*endPtr != '\0') {
-        cli_sendAck(false, "Trigger deploy altitude invalid float");
+    if (options.C) {
+      const char* configString = options.C;
+      if (!triggerManager_setTriggerConfig(triggerNum, &configString)) {
+        cli_sendAck(false, "Invalid config string");
         return;
       }
-      triggerConfig->flags = FLAG_ALT_DURING_DESCENT;
-      triggerConfig->configValue = pyroAlt;
-    } else if (options.D) {
-      double apogeeDelay = smallStrtod(options.D, &endPtr);
-      if (*endPtr != '\0') {
-        cli_sendAck(false, "Apogee delay invalid float");
-        return;
-      }
-      triggerConfig->flags = FLAG_APOGEE_DELAY;
-      triggerConfig->configValue = apogeeDelay;
     } else {
       cli_sendAck(false,
-                  "Trigger config must either specify a condition (see --help "
+                  "Trigger config must specify a condition (see --help "
                   "for details)");
       return;
     }
@@ -160,9 +171,9 @@ void CliTasks::config() {
 
   // Send help message to cli
   if (options.h) {
-    char name[30];
-    char val[80];
-    char float_buff[10];
+    static char name[30];
+    static char val[240];
+
     // New line
     cli_send("\r\n");
     // Print all triggers
@@ -170,68 +181,50 @@ void CliTasks::config() {
       snprintf(name, sizeof(name), "Trigger %i Configuration:", i);
       TriggerConfig_s* triggerConfig =
           (cli_getConfigs()->triggerConfiguration + i);
-      dtoa(float_buff, sizeof(float_buff), triggerConfig->configValue, 2);
-      const char* deviceText;
 
+      static char deviceText[40];
+      bool format = true;
       switch (triggerConfig->mode) {
+        case TRIGGER_TYPE_EMPTY:
+          generateConfigHelp(name, "none");
+          format = false;
+          break;
         case TRIGGER_TYPE_PYRO:
-          deviceText = "Fire pyro";
+          snprintf(
+              deviceText, sizeof(deviceText), "Fire pyro %d for %ds on ",
+              triggerConfig->port,
+              (int)(triggerConfig->duration / 1000.0));  // Convert back to s
           break;
         case TRIGGER_TYPE_LINE_CUTTER:
-          deviceText = "Cut line cutter";
+          snprintf(deviceText, sizeof(deviceText), "Cut line cutter %d on ",
+                   triggerConfig->port);
           break;
         case TRIGGER_TYPE_DIGITAL_ON_PYRO:
-          deviceText = "Enable digital pin";
+          snprintf(deviceText, sizeof(deviceText), "Enable digital pin %d on ",
+                   triggerConfig->port);
           break;
         case TRIGGER_TYPE_DIGITAL_OFF_PYRO:
-          deviceText = "Disable digital pin";
+          snprintf(deviceText, sizeof(deviceText), "Disable digital pin %d on ",
+                   triggerConfig->port);
           break;
         case TRIGGER_TYPE_PWM_PYRO:
-          deviceText = "PWM on pyro";
+          snprintf(
+              deviceText, sizeof(deviceText),
+              "PWM on pyro %d for %ds with %ld width on", triggerConfig->port,
+              (int)(triggerConfig->duration / 1000.0),  // Convert back to ms
+              triggerConfig->pulseWidth);
           break;
         default:
-          deviceText = "";
+          snprintf(deviceText, sizeof(deviceText), "error");
           break;
       }
 
-      switch (triggerConfig->flags) {
-        case FLAG_APOGEE:
-          snprintf(val, sizeof(val), "%s %i at apogee", deviceText,
-                   triggerConfig->port);
-          break;
-        case FLAG_ALT_DURING_DESCENT:
-          snprintf(val, sizeof(val), "%s %i at descent altitude of %s m",
-                   deviceText, triggerConfig->port, float_buff);
-          break;
-        case FLAG_APOGEE_DELAY:
-          snprintf(val, sizeof(val), "%s %i %s seconds after apogee",
-                   deviceText, triggerConfig->port, float_buff);
-          break;
-        case FLAG_LAUNCH:
-          snprintf(val, sizeof(val), "%s %i on launch", deviceText,
-                   triggerConfig->port);
-          break;
-        case FLAG_TOUCHDOWN:
-          snprintf(val, sizeof(val), "%s %i on touchdown", deviceText,
-                   triggerConfig->port);
-          break;
-        case FLAG_MANUAL:
-          snprintf(val, sizeof(val), "%s %i manually", deviceText,
-                   triggerConfig->port);
-          break;
-        case FLAG_CUSTOM_MARMAN_CLAMP:
-          snprintf(val, sizeof(val), "%s %i under 20 m/s before apogee",
-                   deviceText, triggerConfig->port);
-          break;
-        case FLAG_CUSTOM_MARMAN_DELAY:
-          snprintf(val, sizeof(val), "%s %i 1s after first marman cut",
-                   deviceText, triggerConfig->port);
-          break;
-        default:
-          snprintf(val, sizeof(val), "None");
+      static char configText[200];
+      if (format) {
+        triggerManager_getConfigString(i, configText, 200);
+        snprintf(val, sizeof(val), "%s%s", deviceText, configText);
+        generateConfigHelp(name, val);
       }
-
-      generateConfigHelp(name, val);
     }
     // Ground elevation
     dtoa(val, sizeof(val), cli_getConfigs()->groundElevationM, 3);

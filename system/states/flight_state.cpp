@@ -36,8 +36,7 @@ EndCondition_e FlightState::runState() {
   }
 
   // Update pyros
-  triggerManager_update(filterData, m_hasPassedLaunch, m_hasPassedApogee,
-                        m_hasPassedTouchdown);
+  triggerManager_update(filterData);
 
   // Run buzzer heartbeat
   buzzerHeartbeat_tick();

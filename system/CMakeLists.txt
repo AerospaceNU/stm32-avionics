@@ -3,11 +3,12 @@ set(SYSTEM_FILES_LIST
 
         tasks/buzzer_heartbeat.c
         tasks/cli.c
-        tasks/data_log.c
+        tasks/data_log.cpp
         tasks/data_offload.c
         tasks/radio_manager.c
         tasks/state_log.c
-        tasks/trigger_manager.c
+        tasks/trigger_manager.cpp
+        tasks/event_manager.cpp
         tasks/cli/task_cli_config.cpp
         tasks/cli/task_cli_help.cpp
         tasks/cli/task_cli_main.cpp
@@ -31,6 +32,17 @@ set(SYSTEM_FILES_LIST
         filtering/altitude_kalman.cpp
         filtering/filters.cpp
         filtering/orientation_estimator.cpp
+        filtering/filterdata_types.c
+
+        expressions/binary_func_expression.cpp
+        expressions/expression_store.cpp
+        expressions/expression.cpp
+        expressions/unary_func_expression.cpp
+        expressions/empty_expression.cpp
+        expressions/expression_builder.cpp
+        expressions/var_expression.cpp
+        expressions/const_expression.cpp
+        expressions/event_expression.cpp
         )
 
 add_library(system ${SYSTEM_FILES_LIST})
@@ -41,6 +53,7 @@ target_include_directories(system PUBLIC states)
 target_include_directories(system PUBLIC states/cli)
 target_include_directories(system PUBLIC tasks)
 target_include_directories(system PUBLIC tasks/cli)
+target_include_directories(system PUBLIC expressions)
 target_include_directories(utils PUBLIC .)
 
 target_link_libraries(system PUBLIC utils)

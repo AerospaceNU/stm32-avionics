@@ -9,34 +9,8 @@
 extern "C" {
 #endif
 
+#include "filterdata_types.h"
 #include "hardware_manager.h"
-
-typedef struct {
-  double heading;
-  double vtg;
-  double pos_x;
-  double pos_y;
-  double pos_z_agl;
-  double rocket_vel_x;
-  double rocket_vel_y;
-  double rocket_vel_z;
-  double rocket_acc_x;
-  double rocket_acc_y;
-  double rocket_acc_z;
-  double world_vel_x;
-  double world_vel_y;
-  double world_vel_z;
-  double world_acc_x;
-  double world_acc_y;
-  double world_acc_z;
-  float rocket_ang_vel_x;
-  float rocket_ang_vel_y;
-  float rocket_ang_vel_z;
-  double qx;
-  double qy;
-  double qz;
-  double qw;
-} FilterData_s;
 
 void filter_init(double dt);
 

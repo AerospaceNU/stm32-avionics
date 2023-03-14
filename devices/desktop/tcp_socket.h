@@ -33,6 +33,8 @@ class TcpSocket {
   CircularBuffer_s *rxBuffer;
 
   std::thread acceptThread;
+
+  uint8_t lastTxId = 0;
 };
 
 #endif  // DEVICES_DESKTOP_TCP_SOCKET_H_

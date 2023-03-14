@@ -1,7 +1,3 @@
-/*
- * cli.h
- */
-
 #ifndef SYSTEM_TASKS_CLI_H_
 #define SYSTEM_TASKS_CLI_H_
 
@@ -15,8 +11,8 @@ extern "C" {
 #include "board_config_common.h"
 #include "circular_buffer.h"
 #include "data_structures.h"
+#include "expression_sharedtypes.h"
 #include "trigger_manager.h"
-
 /**
  * Ways the command line can receive information
  */
@@ -48,14 +44,10 @@ typedef struct {
   char* t;      // trigger number
   char* m;      // trigger mode
   char* p;      // device port, e.g. pyro port or line cutter channel
-  char* H;      // trigger deploy altitude
-  char* D;      // trigger deploy apogee delay
-  bool A;       // trigger mode (apogee)
-  bool L;       // trigger mode (launch)
-  bool T;       // trigger mode (touchdown)
-  bool M;       // trigger mode (manual)
-  bool C;       // trigger mode (custom marman clamp)
-  bool U;       // trigger mode (custom marman delay)
+  char* d;      // trigger duration
+  char* w;      // trigger pulse width
+  char* C;      // trigger configuration
+  bool D;       // trigger delete
   char* e;      // ground elevation
   char* r;      // ground temperature
   bool h;       // help flag
@@ -69,6 +61,7 @@ typedef struct {
  */
 typedef struct __attribute__((__packed__)) {
   TriggerConfig_s triggerConfiguration[MAX_TRIGGER];
+  SerializedExpression_s serializedExprs[MAX_EXPRESSION];
   double groundElevationM;
   double groundTemperatureC;
   int32_t radioChannel;

@@ -4,6 +4,7 @@
 #include "board_config_common.h"
 #include "cli.h"
 #include "data_log.h"
+#include "event_manager.h"
 #include "filters.h"
 #include "hardware_manager.h"
 #include "radio_manager.h"
@@ -26,6 +27,8 @@ void InitializeState::init() {
 
   // Start CLI, which will run in the background in other states
   cli_init();
+
+  eventManager_init();
 
   // Set up line cutters to forward strings to radio
 #if HAS_DEV(LINE_CUTTER_BLE)

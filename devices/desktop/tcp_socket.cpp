@@ -4,9 +4,11 @@
 
 #include "tcp_socket.h"
 
-#include "data_structures.h"
+#include <cmath>
+#include <cstddef>
 
-#define BUFFER_LEN 100
+#include "data_structures.h"
+#include "tasks/radio_packet_types.h"
 
 TcpSocket::TcpSocket(int port) {
   int new_socket;
@@ -61,25 +63,43 @@ bool TcpSocket::writeData(uint8_t *data, size_t len) {
 }
 
 bool TcpSocket::readData() {
-  char buffer[BUFFER_LEN];
-  memset(buffer, 0, BUFFER_LEN);
+  char buffer[512];
+  memset(buffer, 0, sizeof(buffer));
 
-  int bytes_received = recv(client_fd, buffer, BUFFER_LEN, 0);
+  int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
 
-  if (bytes_received > 0) {
-    printf("Received Radio Message [");
-    fwrite(buffer, 1, bytes_received, stdout);
-    printf("]\n");
-
-    static RadioRecievedPacket_s packet;
+  if (bytes_received > 0 && buffer[0] == TELEMETRY_ID_STRING) {
+    RadioRecievedPacket_s packet;
     packet.radioId = 0;
     packet.rssi = 0;
     packet.crc = true;
     packet.lqi = 0;
-    memset(packet.data, 0, sizeof(packet.data));
-    memcpy(packet.data, buffer, bytes_received);
 
-    cb_enqueue(rxBuffer, &packet);
+    void *stringPacket = buffer + offsetof(RadioPacket_s, payload);
+    uint8_t len = *((uint8_t *)stringPacket + offsetof(CliStringPacket_s, len));
+    uint8_t *fullString =
+        (uint8_t *)stringPacket + offsetof(CliStringPacket_s, string);
+
+    RadioPacket_s packetOnAir = {0};
+    packetOnAir.packetType = buffer[0];
+
+    // Copy in 48 byte chunks (ew)
+    int txlen;
+    int offset = 0;
+    do {
+      txlen = std::min<uint8_t>(len, RADIO_MAX_STRING);
+      memcpy(packetOnAir.payload.cliString.string, fullString + offset, txlen);
+      packetOnAir.payload.cliString.len = txlen;
+      offset += txlen;
+      len -= txlen;
+
+      // Force tx-id to increment every time
+      packetOnAir.payload.cliString.id = lastTxId++;
+
+      memcpy(packet.data, &packetOnAir, sizeof(packetOnAir));
+
+      cb_enqueue(rxBuffer, &packet);
+    } while (len);
   }
 
   return true;

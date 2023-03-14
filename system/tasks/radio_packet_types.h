@@ -28,6 +28,7 @@ PACKED_STRUCT {
   uint8_t state;
   int8_t qw, qx, qy, qz;
   float wx, wy, wz, ax, ay, az, bx, by, bz;
+  int16_t angle_to_vertical;
 }
 OrientationPacket_s;
 
@@ -68,7 +69,7 @@ AltInfoPacket_s;
 #define TELEMETRY_ID_HARDWARE_STATUS 7
 PACKED_STRUCT {
   uint8_t pyroContinuity;
-  uint8_t triggerFireStatus;
+  uint16_t triggerFireStatus;
   uint8_t flashUsage;
 }
 HardwareStatusPacket_s;

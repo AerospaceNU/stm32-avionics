@@ -7,6 +7,7 @@ int main(int argC, char** argv) {
     output_file = argv[1];
     ext_flash_path = argv[2];
     int_flash_path = argv[3];
+    do_networking = true;
     printf("Running with output file %s, ext flash %s, int flash %s\n",
            output_file.c_str(), ext_flash_path.c_str(), int_flash_path.c_str());
   } else {

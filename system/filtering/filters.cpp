@@ -14,9 +14,11 @@
 #include "hardware_manager.h"
 #include "orientation_estimator.h"
 
-#define R_DRY_AIR 287.0474909  // J/K/kg
-#define G_ACCEL_EARTH 9.80665  // m/s**2
-#define BARO_MAX_SPEED 248     // m/s over which to not call correct()
+#define RAD_TO_DEG 57.29578     // 180 / PI
+#define MATH_PI 3.141592653589  // PI
+#define R_DRY_AIR 287.0474909   // J/K/kg
+#define G_ACCEL_EARTH 9.80665   // m/s**2
+#define BARO_MAX_SPEED 248      // m/s over which to not call correct()
 
 #define ACCEL_FS_THRESHOLD \
   0.9  // How close IMU accel should be to fullscale before ignoring values
@@ -252,6 +254,27 @@ static void filterGyros(SensorData_s* curSensorVals) {
   filterData.qx = orientationEstimator.q(1, 0);
   filterData.qy = orientationEstimator.q(2, 0);
   filterData.qz = orientationEstimator.q(3, 0);
+
+  double qw = filterData.qw;
+  double qx = filterData.qx;
+  double qy = filterData.qy;
+  double qz = filterData.qz;
+
+  // From
+  // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Source_code_2
+  double sinr_cosp = 2 * (qw * qx + qy * qz);
+  double cosr_cosp = 1 - 2 * (qx * qx + qy * qy);
+  filterData.roll = atan2(sinr_cosp, cosr_cosp) * RAD_TO_DEG;
+
+  double sinp = std::sqrt(1 + 2 * (qw * qy - qx * qz));
+  double cosp = std::sqrt(1 - 2 * (qw * qy - qx * qz));
+  filterData.pitch = (2 * atan2(sinp, cosp) - MATH_PI / 2) * RAD_TO_DEG;
+
+  filterData.angle_vertical = 90 + filterData.pitch;
+
+  double siny_cosp = 2 * (qw * qz + qx * qy);
+  double cosy_cosp = 1 - 2 * (qy * qy + qz * qz);
+  filterData.yaw = atan2(siny_cosp, cosy_cosp) * RAD_TO_DEG;
 }
 
 void updateGyroOffsetOneAxis(CircularBuffer_s* refBuffer, const float& newValue,

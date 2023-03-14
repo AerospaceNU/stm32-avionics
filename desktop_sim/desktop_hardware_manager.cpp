@@ -145,6 +145,9 @@ void hm_hardwareInit() {
   flightReplay = new CsvReplay(output_file);
 #endif  // HAS_DEV(XXX_DESKTOP_FILE)
 
+  hardwareStatusBarometer[0] = true;
+  hardwareStatusBarometer[1] = true;
+
 #if HAS_DEV(FLASH_DESKTOP_FILE_BACKED)
   for (int i = 0; i < NUM_FLASH_DESKTOP_FILE_BACKED; i++) {
     externalFlash[i] = new FileBackedFlash(ext_flash_path, kFlashSizeBytes[i]);
@@ -179,6 +182,7 @@ void hm_hardwareInit() {
   // TODO we shouldn't do this, and should instead record this in metadata
   for (int i = 0; i < NUM_IMU; i++) {
     sensorProperties.imuAccelFs[i] = 156.96;  // 16 * 9.81
+    hardwareStatusImu[i] = true;
   }
 #endif  // HAS_DEV(IMU)
 }
