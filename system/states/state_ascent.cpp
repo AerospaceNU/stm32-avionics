@@ -12,7 +12,6 @@ void AscentState::init() {
   // Write launched status
   dataLog_getFlightMetadata()->pressureRef = filter_getPressureRef();
   dataLog_getFlightMetadata()->gravityRef = filter_getGravityRef();
-  dataLog_getFlightMetadata()->launchedCliConfigs = *cli_getConfigs();
   dataLog_getFlightMetadata()->launched = 1;
   eventManager_setEventComplete(Event_e::launch);
   burnoutResetTimer = hm_millis();

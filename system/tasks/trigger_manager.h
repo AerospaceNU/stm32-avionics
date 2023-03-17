@@ -31,6 +31,7 @@ typedef struct __attribute__((__packed__)) {
   uint8_t mode;
   uint8_t port;
   float duration;
+  bool allowedManual;
   uint32_t pulseWidth;
   uint16_t rootExpressionID;
 } TriggerConfig_s;

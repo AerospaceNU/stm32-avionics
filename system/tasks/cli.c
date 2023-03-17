@@ -32,6 +32,7 @@ static CliOptionVals_s cliOptionVals = {
     .w = NULL,      // trigger pulse width
     .C = NULL,      // trigger configuration
     .D = false,     // trigger delete
+    .N = false,     // trigger not allowed manually
     .e = NULL,      // ground elevation
     .r = NULL,      // ground temperature
     .h = false,     // help flag
@@ -184,8 +185,8 @@ CliCommand_e cli_parse(CliComms_e commsType) {
   int optionIndex = 0;
   optind = 0;
   primaryCommand = NONE;
-  while ((opt = getopt_long(argc, argv, "f:t:m:p:d:w:C:e:r:c:i:Dh", longOptions,
-                            &optionIndex)) != -1) {
+  while ((opt = getopt_long(argc, argv, "f:t:m:p:d:w:C:e:r:c:i:DhN",
+                            longOptions, &optionIndex)) != -1) {
     switch (opt) {
       case 0:
         // New primary command was set
@@ -197,6 +198,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
         cliOptionVals.w = NULL;
         cliOptionVals.C = NULL;
         cliOptionVals.D = false;
+        cliOptionVals.N = false;
         cliOptionVals.e = NULL;
         cliOptionVals.r = NULL;
         cliOptionVals.h = false;
@@ -242,6 +244,11 @@ CliCommand_e cli_parse(CliComms_e commsType) {
       case 'D':
         if (primaryCommand == CONFIG) {
           cliOptionVals.D = true;
+        }
+        break;
+      case 'N':
+        if (primaryCommand == CONFIG) {
+          cliOptionVals.N = true;
         }
         break;
       case 'h':

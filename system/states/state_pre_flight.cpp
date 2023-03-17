@@ -28,6 +28,7 @@ void PreFlightState::init() {
   filter_setPressureRef(filter_getAveragePressure(hm_getSensorData()));
 
   CliTasks::configureForGround();
+  eventManager_setEventIncomplete(Event_e::unclean_restart);
   doCleanup = false;
 }
 

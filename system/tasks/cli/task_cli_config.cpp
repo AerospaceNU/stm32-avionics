@@ -12,7 +12,7 @@
 #include "hardware_manager.h"
 #include "small_strtod.h"
 
-static char msg[270 + 4];
+static char msg[302 + 4];
 
 static void generateConfigHelp(const char* name, const char* value) {
   snprintf(msg, sizeof(msg), "%-30s %-240s\r\n", name, value);
@@ -121,6 +121,13 @@ void CliTasks::config() {
                   "for details)");
       return;
     }
+
+    if (options.N) {
+      triggerConfig->allowedManual = false;
+    } else {
+      triggerConfig->allowedManual = true;
+    }
+
     // Write new cli configs to flash
     dataLog_writeCliConfigs();
   }
@@ -172,7 +179,7 @@ void CliTasks::config() {
   // Send help message to cli
   if (options.h) {
     static char name[30];
-    static char val[240];
+    static char val[302];
 
     // New line
     cli_send("\r\n");
@@ -219,10 +226,11 @@ void CliTasks::config() {
           break;
       }
 
-      static char configText[200];
+      static char configText[250];
       if (format) {
-        triggerManager_getConfigString(i, configText, 200);
-        snprintf(val, sizeof(val), "%s%s", deviceText, configText);
+        triggerManager_getConfigString(i, configText, 250);
+        snprintf(val, sizeof(val), "%s%s%s", deviceText, configText,
+                 triggerConfig->allowedManual ? "" : ", no manual");
         generateConfigHelp(name, val);
       }
     }

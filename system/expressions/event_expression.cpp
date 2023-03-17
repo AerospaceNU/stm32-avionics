@@ -1,6 +1,7 @@
 #include "event_expression.h"
 
-const char *eventStrings[] = {"launch", "burnout", "apogee", "touchdown"};
+const char *eventStrings[] = {"launch", "burnout", "apogee", "touchdown",
+                              "unclean_restart"};
 
 EventExpression::EventExpression(int triggerNum, Event_e event) {
   this->setTriggerNum(triggerNum);
