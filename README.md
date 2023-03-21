@@ -22,27 +22,25 @@ Once the IDE is open, you can import the project. Navigate to `File -> Import ->
 
 To keep commonality among code, we will be using both a formatter and a linter for C/C++. The formatter is called clang-format, and the linter is called Cpplint.
 
-### Clang/LLVM
+### clang-format
 
-1. Navigate to https://github.com/llvm/llvm-project/releases
-2. Download "LLVM-xxxx-win64.exe" (or the one for your correct operating system)
-3. Install executable using almost all defaults, with one exception. When a checkbox shows up asking whether to add clang-format to your PATH, check it
+1. Ensure python is installed on your system. If not, download from the [Python website](https://www.python.org/downloads/). The newest version is preferred. Also ensure Python executable is added to your PATH
+2. Run `pip install clang-format`
+3. Find clang-format.exe. This should be in your python installation folder in Lib/site-packages/clang_format/data/bin. Record the full path to the clang-format.exe file.
 
 ### Cpplint
 
-1. Ensure python is installed on your system. If not, download from the [Python website](https://www.python.org/downloads/). The newest version is preferred. Also ensure Python executable is added to your PATH
-2. Run `pip install cpplint`
-3. Cpplint needs to be an executable to be run in Eclipse as a plugin. Therefore, you need to make an executable. Install pyinstaller with `pip install pyinstaller`, then run `pyinstaller path_to_cpplint.py`.
-4. In the folder where you ran pyinstaller, you should see a folder called `dist/cpplint`. Move this folder somewhere where you'll remember, outside the repository. Note there should be a `cpplint.exe` file. This will be used later.
+1. Run `pip install cpplint`
+2. Cpplint needs to be an executable to be run in Eclipse as a plugin. Therefore, you need to make an executable. Install pyinstaller with `pip install pyinstaller`, then run `pyinstaller path_to_cpplint.py`.
+3. In the folder where you ran pyinstaller, you should see a folder called `dist/cpplint`. Move this folder somewhere where you'll remember, outside the repository. Note there should be a `cpplint.exe` file. This will be used later.
 
 ### CppStyle STM32CubeIDE/Eclipse Plugin
-1. In IDE, click *Help->Eclipse Marketplace*
-2. Search for "CppStyle" extension and install it
+1. In IDE, click *Help->Install New Software*. Click Add.
+2. For name, type *CppStyle*, and for URL, type *http://www.zhanwei.wang/CppStyle/update*. Follow instructions until end and restart IDE.
 3. Go to *Window->Preferences->C/C++->Code Style->Formatter->Code Formatter*. Change to *CppStyle (clang-format)*
-4. Go to *Window->Preferences->C/C++->CppStyle*. Change *Clang-format Path* to correct executable (C:\Program Files\LLVM\bin\clang-format.exe by default). 
-5. Change *Cpplint path* to `cpplint.exe` from previous step.
-6. Check *Run clang-format on file save* and *Enable cpplint*.
-7. Go to *Preferences->C/C++->Code Analysis*. Check all boxes except:
+4. Go to *Window->Preferences->C/C++->CppStyle*. Change *Clang-format Path* to correct executable recorded in earlier section. Change *Cpplint path* to `cpplint.exe` from previous section.
+5. Check *Run clang-format on file save* and *Enable cpplint*.
+6. Go to *Preferences->C/C++->Code Analysis*. Check all boxes except:
    - Coding Style/Avoid magic numbers
    - Coding Style/C-Style cast instead of C++ cast
    - Coding Style/Goto statement used
@@ -53,8 +51,8 @@ To keep commonality among code, we will be using both a formatter and a linter f
    - Coding Style/Return with parenthesis
    - Cpplint Issues/Legal
    - Potential Programming Problems/Miss copy constructor or assignment operator
-8. By default CppStyle doesn't run on .c files. Staying on *Code Analysis* tab, highlight all items under *Cpplint Issues* by clicking on "Build/c++11", holding shift, and clicking on "Whitespace/todo." Click the *Customize Selected* button underneath. Go to the *Scope* tab and click *Add...* next to *Inclusion patterns.* Type `*.c` and click OK. Apply all changes.
-9. When you save a file, both clang-format and cpplint should now run.
+7. By default CppStyle doesn't run on .c files. Staying on *Code Analysis* tab, highlight all items under *Cpplint Issues* by clicking on "Build/c++11", holding shift, and clicking on "Whitespace/todo." Click the *Customize Selected* button underneath. Go to the *Scope* tab and click *Add...* next to *Inclusion patterns.* Type `*.c` and click OK. Apply all changes.
+8. When you save a file, both clang-format and cpplint should now run.
 
 ## Running Code Using Debug
 
