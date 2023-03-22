@@ -52,6 +52,8 @@
 #define RADIO_CLI_ID 0
 #define USB_CLI_ID 0
 
+#define NUM_MHZ_TIMER 1
+
 #define RADIO_TI_TYPE RADIO_TI_TYPE_CC1120
 
 #endif  // FCB_V0_CORE_INC_BOARD_CONFIG_H_

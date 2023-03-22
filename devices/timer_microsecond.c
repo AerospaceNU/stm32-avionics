@@ -8,13 +8,9 @@
 #include <board_config.h>
 #include HAL_HEADER
 #include "hal_callbacks.h"
+#include "timer_microsecond.h"
 
 #define MICROS_PER_MILLI 1000
-
-typedef struct {
-  TIM_HandleTypeDef *pTimer;
-  volatile uint64_t offset;
-} TimerMicrosecondCtrl_s;
 
 static void timerMicrosecond_callback(void *pData) {
   TimerMicrosecondCtrl_s *ctrl = (TimerMicrosecondCtrl_s *)pData;
@@ -42,5 +38,5 @@ uint64_t timerMicrosecond_getTimestampMicros(TimerMicrosecondCtrl_s *ctrl) {
 }
 
 uint32_t timerMicrosecond_getTimestampMillis(TimerMicrosecondCtrl_s *ctrl) {
-  return timerMicrosecond_getTimestampMicros(ctrl) / 1000;
+  return timerMicrosecond_getTimestampMicros(ctrl) / MICROS_PER_MILLI;
 }

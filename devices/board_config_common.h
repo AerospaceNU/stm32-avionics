@@ -129,6 +129,9 @@
 #ifndef NUM_VBAT_DESKTOP_FILE
 #define NUM_VBAT_DESKTOP_FILE 0
 #endif  // NUM_VBAT_DESKTOP_FILE
+#ifndef NUM_MHZ_TIMER
+#define NUM MHZ_TIMER 0
+#endif  // NUM_MHZ_TIMER
 
 /* Accelerometer */
 

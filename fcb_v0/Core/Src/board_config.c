@@ -214,6 +214,10 @@ uint8_t vbatAdcCurrentRank[NUM_VBAT_ADC] = {1};
 I2C_HandleTypeDef* vbatIna226Hi2c[NUM_VBAT_INA226];
 #endif  // HAS_DEV(VBAT_INA226)
 
+#if HAS_DEV(MHZ_TIMER)
+TIM_HandleTypeDef timerMicrosecondHtim[NUM_MHZ_TIMER] = {&htim5};
+#endif  // HAS_DEV(MHZ_TIMER)
+
 /* Watchdogs */
 
 #if HAS_DEV(WATCHDOG_INTERNAL)

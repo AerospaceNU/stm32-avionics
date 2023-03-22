@@ -79,6 +79,10 @@
 #include "adc_device.h"
 #endif  // HAS_DEV(VBAT_ADC)
 
+#if HAS_DEV(MHZ_TIMER)
+#include "timer_microsecond.h"
+#endif  // HAS_DEV(MHZ_TIMER)
+
 /* Hardware statuses */
 
 #if HAS_DEV(ACCEL)
@@ -221,6 +225,10 @@ static AdcDevCtrl_s vbatAdcCurrent[NUM_VBAT_ADC];
 #if HAS_DEV(VBAT_INA226)
 static VbatIna226Ctrl_s vbatIna226[NUM_VBAT_INA226];
 #endif  // HAS_DEV(VBAT_INA226)
+
+#if HAS_DEV(MHZ_TIMER)
+TimerMicrosecondCtrl_s timerMicrosecond[NUM_MHZ_TIMER];
+#endif  // HAS_DEV(MHZ_TIMER)
 
 /* Sensor info */
 static SensorProperties_s sensorProperties;
@@ -509,6 +517,13 @@ void hm_hardwareInit() {
         vbatIna226_init(&vbatIna226[i]);
   }
 #endif  // HAS_DEV(VBAT_INA226)
+
+#if HAS_DEV(MHZ_TIMER)
+  for (int i = 0; i < NUM_MHZ_TIMER; i++) {
+    timerMicrosecond[i].pTimer = timerMicrosecondHtim[i];
+    timerMicrosecond_init(timerMicrosecond[i]);
+  }
+#endif  // HAS_DEV(MHZ_TIMER)
 }
 
 uint32_t hm_millis() { return HAL_GetTick(); }
@@ -1024,3 +1039,12 @@ void hm_enableSimMode(CircularBuffer_s *rxBuffer) {
 void hm_disableSimMode(CircularBuffer_s *rxBuffer) { inSim = false; }
 
 bool hm_inSimMode() { return inSim; }
+
+/**
+ * @brief Provides a tick value in milliseconds. Overriden from the default HAL
+ * function
+ * @retval tick value
+ */
+uint32_t HAL_GetTick(void) {
+  return timerMicrosecond_getTimestampMillis(timerMicrosecond + 0);
+}
