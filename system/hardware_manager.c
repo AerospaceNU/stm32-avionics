@@ -320,7 +320,7 @@ void hm_hardwareInit() {
     imuLsm9ds1[i].m.lsm9ds1Spi.port = imuLsm9ds1MagCsGpioPort[i];
     imuLsm9ds1[i].m.lsm9ds1Spi.pin = imuLsm9ds1MagCsPin[i];
     imuLsm9ds1[i].ag.aFs = FS_XL_16;
-    imuLsm9ds1[i].ag.gFs = FS_G_500;
+    imuLsm9ds1[i].ag.gFs = FS_G_2000;
     imuLsm9ds1[i].m.mFs = FS_M_8;
     lsm9ds1_init(&imuLsm9ds1[i]);
     hardwareStatusImu[FIRST_ID_IMU_LSM9DS1 + i] = true;
