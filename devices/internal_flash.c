@@ -8,7 +8,7 @@
 
 #include "board_config_common.h"
 
-#define FLASH_TIMEOUT_VALUE 50000U /* 50 s */
+#define INTERNAL_FLASH_TIMEOUT_VALUE 50000U /* 50 s */
 #define FLASH_BYTE_INCREMENT 32
 #define ERASED 0xFF
 
@@ -50,7 +50,7 @@ HAL_StatusTypeDef Internal_Flash_Program(uint32_t FlashAddress,
   pFlash.ErrorCode = HAL_FLASH_ERROR_NONE;
 
   /* Wait for last operation to be completed */
-  status = FLASH_WaitForLastOperation((uint32_t)FLASH_TIMEOUT_VALUE, bank);
+  status = FLASH_WaitForLastOperation((uint32_t)INTERNAL_FLASH_TIMEOUT_VALUE, bank);
 
   SET_BIT(FLASH->CR1, FLASH_CR_PG);
 
@@ -69,7 +69,7 @@ HAL_StatusTypeDef Internal_Flash_Program(uint32_t FlashAddress,
   __DSB();
 
   /* Wait for last operation to be completed */
-  status = FLASH_WaitForLastOperation((uint32_t)FLASH_TIMEOUT_VALUE, bank);
+  status = FLASH_WaitForLastOperation((uint32_t)INTERNAL_FLASH_TIMEOUT_VALUE, bank);
 
   /* If the program operation is completed, disable the PG */
   CLEAR_BIT(FLASH->CR1, FLASH_CR_PG);

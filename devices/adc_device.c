@@ -29,12 +29,16 @@ void adcDev_init(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
 
   float maxRawVal = 0;
   switch (hadc->Init.Resolution) {
+#ifdef ADC_RESOLUTION_16B
     case ADC_RESOLUTION_16B:
       maxRawVal = MAX_RAW_VAL_16B;
       break;
+#endif // ADC_RESOLUTION_16B
+#ifdef ADC_RESOLUTION_14B
     case ADC_RESOLUTION_14B:
       maxRawVal = MAX_RAW_VAL_14B;
       break;
+#endif // ADC_RESOLUTION_14B
 
     case ADC_RESOLUTION_12B:
       maxRawVal = MAX_RAW_VAL_12B;
@@ -58,7 +62,11 @@ void adcDev_init(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
   // harm if it fails
   uint32_t singleDiff =
       bSingleEnded ? ADC_SINGLE_ENDED : ADC_DIFFERENTIAL_ENDED;
+#ifdef STM32L4
+  HAL_ADCEx_Calibration_Start(hadc, singleDiff);
+#else
   HAL_ADCEx_Calibration_Start(hadc, ADC_CALIB_OFFSET, singleDiff);
+#endif // STM32L4
 }
 
 void adcDev_startSingleRead(AdcDevCtrl_s *adc) {

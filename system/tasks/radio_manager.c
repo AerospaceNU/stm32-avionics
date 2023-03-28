@@ -54,7 +54,7 @@ void radioManager_tick() {
       cb_peek(&dataRx[i].rxBuffer, &packet, &len);
       if (len) {
         // Send to all our callbacks
-        for (int j = 0; j < dataRx[i].numCallbacks; j++) {
+        for (size_t j = 0; j < dataRx[i].numCallbacks; j++) {
           if (dataRx[i].callbacks[j]) dataRx[i].callbacks[j](&packet);
         }
 

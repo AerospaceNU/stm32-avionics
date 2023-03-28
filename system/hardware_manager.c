@@ -132,6 +132,9 @@ bool hardwareStatusUsb[NUM_USB];
 #if HAS_DEV(VBAT)
 bool hardwareStatusVbat[NUM_VBAT];
 #endif  // HAS_DEV(VBAT)
+#if HAS_DEV(CURRENT_SENSE)
+bool hardwareStatusVbat[NUM_CURRENT_SENSE];
+#endif  // HAS_DEV(CURRENT_SENSE)
 
 /* Hardware objects */
 
@@ -216,8 +219,11 @@ static ServoPwmCtrl_t servoPwm[NUM_SERVO_PWM];
 /* VBat Sensors */
 #if HAS_DEV(VBAT_ADC)
 static AdcDevCtrl_s vbatAdc[NUM_VBAT_ADC];
-static AdcDevCtrl_s vbatAdcCurrent[NUM_VBAT_ADC];
 #endif  // HAS_DEV(VBAT_ADC)
+#if HAS_DEV(CURRENT_ADC)
+static AdcDevCtrl_s vbatAdcCurrent[NUM_CURRENT_ADC];
+#endif  // HAS_DEV(CURRENT_ADC)
+
 #if HAS_DEV(VBAT_INA226)
 static VbatIna226Ctrl_s vbatIna226[NUM_VBAT_INA226];
 #endif  // HAS_DEV(VBAT_INA226)
@@ -493,12 +499,22 @@ void hm_hardwareInit() {
   // TODO why does 67 make things work?
   for (int i = 0; i < NUM_VBAT_ADC; i++) {
     adcDev_init(&vbatAdc[i], vbatAdcHadc[i], vbatAdcRank[i], 0, vbatMax, true);
-    adcDev_init(&vbatAdcCurrent[i], vbatAdcCurrentHadc[i],
-                vbatAdcCurrentRank[i], -12.5, 17.5, true);
-    hardwareStatusVbat[FIRST_ID_VBAT_ADC + i] = true;
     hardwareStatusVbat[FIRST_ID_VBAT_ADC + i] = true;
   }
 #endif  // HAS_DEV(VBAT_ADC)
+#if HAS_DEV(CURRENT_ADC)
+  // Battery voltage - 0 min, seems like 10v in = 2.4v on the voltage divider?
+  float vbatMax = 67;  // 4.72 Volts/volt, 67v fullscale??
+  // Also the scale seems non linear: at 10vin this is right, but at 13vin it
+  // reads 0.25 above the true number. Apparently this is coz our ADCs aren't
+  // buffered
+  // TODO why does 67 make things work?
+  for (int i = 0; i < NUM_VBAT_ADC; i++) {
+    adcDev_init(&vbatAdcCurrent[i], vbatAdcCurrentHadc[i],
+                vbatAdcCurrentRank[i], -12.5, 17.5, true);
+    hardwareStatusVbat[FIRST_ID_VBAT_ADC + i] = true;
+  }
+#endif  // HAS_DEV(CURRENT_ADC)
 #if HAS_DEV(VBAT_INA226)
   for (int i = 0; i < NUM_VBAT_INA226; i++) {
     vbatIna226[i].hi2c = vbatIna226Hi2c[i];
@@ -647,6 +663,7 @@ void hm_ledToggle(int ledId) {
 }
 
 bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
+	(void)numBytes;
 #if HAS_DEV(RADIO_TI_433)
   if (IS_DEVICE(radioNum, RADIO_TI_433)) {
     TiRadioCtrl_s *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
