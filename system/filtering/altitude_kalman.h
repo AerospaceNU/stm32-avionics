@@ -119,7 +119,7 @@ The kalman gain is computed by "balancing" how certain we are about each state
 and each input to find an optional gain. One of the nice things about this
 Kalman filter is that it's constant, so we can just compute it ahead of time. We
 can change Q and R to change how much we "trust" our state estimate or our
-measurements, respectively,, and Python can spit out a K that reflects those
+measurements, respectively, and Python can spit out a K that reflects those
 ratios:
 
 Q = [position state uncertainty^2, 0]
@@ -130,7 +130,7 @@ sysc = ct.ss(np.array([[0,1],[0,0]]), np.array([[0],[1]]), np.array([1,0]),
 np.array([0])) sysd = sysc.sample(dt)  # Convert to discrete-time form described
 above kalman_gain, P_steady = kalmd(sysd, Q, R).
 
-If we want to trust the barometer less, easy! Just increase the corrosponding
+If we want to trust the barometer less, easy! Just increase the corresponding
 entry in the R matrix and run it again to spit out a new kalman_gain matrix. We
 know we have two states and one output, so our kalman_gain is a 2x1 matrix. For
 example, if I set dt to 0.015 seconds, Q to diag([0.5, 1].^2) and R to
@@ -179,7 +179,7 @@ class AltitudeKalman {
   AltitudeKalmanOutput_s xHat = {0, 0};
 
   // TODO should we calculate this every loop?
-  double m_dt = 0.015;
+  double m_dt;
 };
 
 #endif  // SYSTEM_FILTERING_ALTITUDE_KALMAN_H_

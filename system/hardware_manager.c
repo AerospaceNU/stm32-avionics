@@ -971,7 +971,7 @@ void hm_readSensorData() {
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
     for (int i = 0; i < NUM_GPS_STD + NUM_GPS_UBLOX; i++) {
       if ((sensorDataAvailable.gpsAvailable[i + FIRST_ID_GPS_STD] =
-               hardwareStatusBarometer[i + FIRST_ID_GPS_STD])) {
+               hardwareStatusGps[i + FIRST_ID_GPS_STD])) {
         if ((sensorDataAvailable.gpsAvailable[i + FIRST_ID_GPS_STD] =
                  gps_newData(&gps[i]))) {
           sensorData.gpsData[i + FIRST_ID_GPS_STD] = gps[i].data;

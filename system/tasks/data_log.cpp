@@ -125,6 +125,7 @@ static void flashRead(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
 static void flashWrite(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
   uint32_t dataOffset = 0;
   // Continue writing page by page
+  int counter = 0;
   while (dataOffset < numBytes) {
     // Check how many bytes to write
     uint32_t bytesToNextPage =
@@ -144,10 +145,11 @@ static void flashWrite(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
     }
     hm_flashWriteStart(flashId, flashOffset, pageBytes, &pData[dataOffset]);
     dataOffset += pageBytes;
+    counter++;
   }
 }
 
-static void flashEraseSector(uint32_t sectorNum) {
+static void flashEraseSector(uint32_t sectorNum, bool waitForComplete) {
   int flashId = -1;
   uint32_t flashOffset = 0;
   addressToFlashId(sectorNum * FLASH_MAX_SECTOR_BYTES, &flashId, &flashOffset);
@@ -156,9 +158,11 @@ static void flashEraseSector(uint32_t sectorNum) {
   curErasingFlashId = flashId;
   hm_flashEraseSectorStart(curErasingFlashId,
                            flashOffset / FLASH_MAX_SECTOR_BYTES);
-  uint32_t waitStartMS = hm_millis();
-  while (!hm_flashIsEraseComplete(flashId) &&
-         hm_millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+  if (waitForComplete) {
+    uint32_t waitStartMS = hm_millis();
+    while (!hm_flashIsEraseComplete(flashId) &&
+           hm_millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+    }
   }
 }
 
@@ -272,7 +276,7 @@ void dataLog_assignFlight() {
   curFlightNum = dataLog_getLastFlightNum() + 1;
   if (curFlightNum == 1) {
     // Erase first sector since we don't know what's inside
-    flashEraseSector(0);
+    flashEraseSector(0, true);
     curSectorNum = 1;
   } else {
     uint32_t unused;
@@ -281,7 +285,7 @@ void dataLog_assignFlight() {
   }
 
   // Erase sector where flight metadata will go
-  flashEraseSector(curSectorNum);
+  flashEraseSector(curSectorNum, true);
 
   // Empty metadata packet
   memset(&flightMetadataPacket, 0xFF, kFlightMetadataSize);
@@ -427,7 +431,7 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
                                    (uint8_t)(curFlightNum & 0xFF)};
         flashWrite(curSectorNum * 2, 2, flightTxBuff);
         // Start erasing the upcoming sector
-        flashEraseSector(curSectorNum);
+        flashEraseSector(curSectorNum, false);
         erasing = true;
       } else {
         // Write whole log buffer. No need to worry about erasing future
@@ -435,12 +439,19 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
         LogData_s dequeuedData;
         size_t numElements = 1;
         cb_peek(&logPacketBuffer, &dequeuedData, &numElements);
+        int numDequeues = 0;
         while (numElements != 0) {
           cb_dequeue(&logPacketBuffer, 1);
+          // TODO: Write with buffer so we only write to 1 page per cycle.
+          // Probably better to go here so we don't buffer when writing
+          // metadata, etc. This is the write that matters
           flashWrite(curWriteAddress, kLogDataSize, (uint8_t *)&dequeuedData);
           // Increment write address to be next address to write to
           curWriteAddress += kLogDataSize;
           cb_peek(&logPacketBuffer, &dequeuedData, &numElements);
+          numDequeues++;
+          // Limit the number of log writes per cycle to prevent lengthy cycles
+          if (numDequeues >= 2) break;
         }
       }
     }
@@ -590,7 +601,7 @@ void dataLog_writeCliConfigs() {
   currentConfigAddress += kWrappedCliConfigSize;
   if (currentConfigAddress > FLASH_MAX_SECTOR_BYTES - kWrappedCliConfigSize) {
     flashRead(0, CONFIG_START_ADDRESS, tempPacketBuffer);
-    flashEraseSector(0);
+    flashEraseSector(0, true);
     flashWrite(0, CONFIG_START_ADDRESS, tempPacketBuffer);
     currentConfigAddress = CONFIG_START_ADDRESS;
   }
