@@ -12,7 +12,7 @@ First, pull this git repository using the following command from a directory of 
 
 **Note:** you must have git installed. You can install git for windows [here](https://gitforwindows.org/).
 
-Next, open STM32 Cube IDE. If you do not have Cube you can install it from this [link](https://www.st.com/en/development-tools/stm32cubeide.html). Please download version 1.7.0 for compatibility with our code.
+Next, open STM32 Cube IDE. If you do not have Cube you can install it from this [link](https://www.st.com/en/development-tools/stm32cubeide.html). Please download version 1.12.0 for compatibility with our code.
 
 When opening the IDE, you can use the default workspace. Using the cloned directory may cause problems.
 
