@@ -394,10 +394,17 @@ void hm_hardwareInit() {
 
   /* Pyro continuity */
 #if HAS_DEV(PYRO_CONT_ADC)
-  // Pyros - 0 min, (127k/27k*3.3V) max
+  // Voltage divider, 100k on top, 10k on the bottom
+  double voltageDividerMax = 3.3 * (110.0 / 10.0);
+#ifdef FCB_V2
+
+#else
+  // FCB V0 pyros - 0 min, (127k/27k*3.3V) max
   // I had to multiply by 10/3 on my V0 to get these to make sense. TODO
   // Why???
   double voltageDividerMax = 3.3 * (127.0 / 27.0) * 10 / 3;
+#endif // FCB_V2
+
   for (int i = 0; i < NUM_PYRO_CONT_ADC; i++) {
     adcDev_init(&pyroContAdc[i], pyroContAdcHadc[i], pyroContAdcRank[i], 0,
                 voltageDividerMax, true);
@@ -512,12 +519,19 @@ void hm_hardwareInit() {
 
   /* VBat Sensors */
 #if HAS_DEV(VBAT_ADC)
-  // Battery voltage - 0 min, seems like 10v in = 2.4v on the voltage divider?
+
+#ifdef FCB_V2
+  // Voltage divider, 34.8k on top, 10k on the bottom
+  float vbatMax = 3.3 * (34.8 + 10.0) / 10.0;
+#else
+  // FCB v0 -- battery voltage - 0 min, seems like 10v in = 2.4v on the voltage divider?
   float vbatMax = 67;  // 4.72 Volts/volt, 67v fullscale??
   // Also the scale seems non linear: at 10vin this is right, but at 13vin it
   // reads 0.25 above the true number. Apparently this is coz our ADCs aren't
   // buffered
   // TODO why does 67 make things work?
+#endif
+
   for (int i = 0; i < NUM_VBAT_ADC; i++) {
     adcDev_init(&vbatAdc[i], vbatAdcHadc[i], vbatAdcRank[i], 0, vbatMax, true);
     hardwareStatusVbat[FIRST_ID_VBAT_ADC + i] = true;
