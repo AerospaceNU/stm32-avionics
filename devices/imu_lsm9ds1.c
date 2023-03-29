@@ -1,8 +1,5 @@
 /*
  * imu_lsm9ds1.c
- *
- *  Created on: May 28, 2020
- *      Author: John
  */
 
 #include "imu_lsm9ds1.h"

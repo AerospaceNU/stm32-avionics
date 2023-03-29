@@ -261,6 +261,12 @@ extern GPIO_TypeDef* imuLsm9ds1MagCsGpioPort[NUM_IMU_LSM9DS1];
 extern uint16_t imuLsm9ds1MagCsPin[NUM_IMU_LSM9DS1];
 #endif  // HAS_DEV(IMU_LSM9DS1)
 
+#if HAS_DEV(IMU_ICM20600)
+extern SPI_HandleTypeDef* imuIcm20600Hspi[NUM_IMU_ICM20600];
+extern GPIO_TypeDef* imuIcm20600CsGpioPort[NUM_IMU_ICM20600];
+extern uint16_t imuIcm20600CsPin[NUM_IMU_ICM20600];
+#endif  // HAS_DEV(IMU_ICM20600)
+
 #if HAS_DEV(IMU)
 extern const Orientation_s imuBoardToLocal[NUM_IMU][3];
 extern int imuAccelFilterPriority[NUM_IMU];

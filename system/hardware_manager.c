@@ -40,6 +40,10 @@
 #include "imu_lsm9ds1.h"
 #endif  // HAS_DEV(IMU_LSM9DS1)
 
+#if HAS_DEV(IMU_ICM20600)
+#include "imu_icm20600.h"
+#endif  // HAS_DEV(IMU_ICM20600)
+
 #if HAS_DEV(LINE_CUTTER_BLE)
 #include "line_cutter_ble.h"
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
@@ -182,6 +186,10 @@ static GpsCtrl_s gps[NUM_GPS_STD + NUM_GPS_UBLOX];
 #if HAS_DEV(IMU_LSM9DS1)
 static ImuLsm9ds1Ctrl_s imuLsm9ds1[NUM_IMU_LSM9DS1];
 #endif  // HAS_DEV(IMU_LSM9DS1)
+
+#if HAS_DEV(IMU_ICM20600)
+static ImuICM20600Ctrl_s imuIcm20600[NUM_IMU_ICM20600];
+#endif  // HAS_DEV(IMU_ICM20600)
 
 /* Line Cutters */
 #if HAS_DEV(LINE_CUTTER_BLE)
@@ -334,6 +342,19 @@ void hm_hardwareInit() {
         156.96;  // 16 G * 9.81 mps2/G
   }
 #endif  // HAS_DEV(IMU_LSM9DS1)
+
+#if HAS_DEV(IMU_ICM20600)
+  for (int i = 0; i < NUM_IMU_LSM9DS1; i++) {
+    imuIcm20600[i].spi.hspi = imuIcm20600Hspi[i];
+    imuIcm20600[i].spi.port = imuIcm20600CsGpioPort[i];
+    imuIcm20600[i].spi.pin = imuIcm20600CsPin[i];
+    icm20600_init(&imuIcm20600[i]);
+    hardwareStatusImu[FIRST_ID_IMU_ICM20600 + i] = true;
+    // TODO set fullscale!
+    sensorProperties.imuAccelFs[FIRST_ID_IMU_ICM20600 + i] =
+        156.96;  // 16 G * 9.81 mps2/G
+  }
+#endif  // HAS_DEV(IMU_ICM20600)
 
   /* LEDs */
 #if HAS_DEV(LED_DIGITAL)
