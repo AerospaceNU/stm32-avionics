@@ -45,6 +45,11 @@ typedef struct __attribute__((packed)) {
 } AccelData_s;
 
 typedef struct __attribute__((packed)) {
+  Axis3dRaw_s raw;
+  Axis3dReal_s realMps2;
+} MagData_s;
+
+typedef struct __attribute__((packed)) {
   double temperatureC;
   double pressureAtm;
 } BarometerData_s;

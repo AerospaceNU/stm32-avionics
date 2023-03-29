@@ -22,14 +22,13 @@
 #define NUM_DC_MOTOR_PWM 0
 
 #define NUM_FLASH_S25FLX 1
-#define NUM_FRAM_MB85RS64 1
+#define NUM_FLASH_MB85RSX 1
 
 #define NUM_GPS_STD 0
 #define NUM_GPS_UBLOX 1
 
-#define NUM_IMU_LSM9DS1 0
-#define NUM_IMU_ICM20948 0
 #define NUM_IMU_ICM20600 2
+#define NUM_MAG_IIS2MDC 2
 
 #define NUM_LED_DIGITAL 1
 
