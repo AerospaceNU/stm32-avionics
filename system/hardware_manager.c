@@ -348,7 +348,7 @@ void hm_hardwareInit() {
     imuIcm20600[i].spi.hspi = imuIcm20600Hspi[i];
     imuIcm20600[i].spi.port = imuIcm20600CsGpioPort[i];
     imuIcm20600[i].spi.pin = imuIcm20600CsPin[i];
-    icm20600_init(&imuIcm20600[i]);
+    icm20600_init(&imuIcm20600[i], ICM20600_ACCEL_RANGE_16G, ICM20602_GYRO_RANGE_2000dps);
     hardwareStatusImu[FIRST_ID_IMU_ICM20600 + i] = true;
     // TODO set fullscale!
     sensorProperties.imuAccelFs[FIRST_ID_IMU_ICM20600 + i] =
@@ -1024,6 +1024,12 @@ void hm_readSensorData() {
     for (int i = 0; i < NUM_IMU_LSM9DS1; i++) {
       lsm9ds1_getData(&imuLsm9ds1[i]);
       sensorData.imuData[FIRST_ID_IMU_LSM9DS1 + i] = imuLsm9ds1[i].data;
+    }
+#endif  // HAS_DEV(IMU_LSM9DS1)
+#if HAS_DEV(IMU_ICM20600)
+    for (int i = 0; i < NUM_IMU_ICM20600; i++) {
+      icm20600_getData(&imuIcm20600[i]);
+      sensorData.imuData[FIRST_ID_IMU_ICM20600 + i] = imuIcm20600[i].data;
     }
 #endif  // HAS_DEV(IMU_LSM9DS1)
 
