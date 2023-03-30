@@ -2,7 +2,7 @@
  * flash_s25flx.c
  */
 
-#include "flash_s25flx.h"
+#include "flash_mb85rsx.h"
 
 #if HAS_DEV(FLASH_MB85RSX)
 
@@ -23,40 +23,40 @@
 #define SPI_TX_RX_TIMEOUT_MS \
   100  // For short transmit-receives that don't require DMA
 
-static void csPull(const FlashMb85rsxCtrl_s *s25flx, GPIO_PinState direction) {
-  HAL_GPIO_WritePin(s25flx->csPort, s25flx->csPin, direction);
-}
-
-static bool writeDisable(FlashMb85rsxCtrl_s *s25flx) {
-
-}
-
-static bool writeEnable(FlashMb85rsxCtrl_s *s25flx) {
-  // csPull(s25flx, GPIO_PIN_RESET);
-  // uint8_t tx = WRITE_ENABLE_CMD;
-  // // Write-enable command is too short to require DMA
-  // bool bSuccess =
-  //     HAL_SPI_Transmit(s25flx->hspi, &tx, 1, SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
-  // csPull(s25flx, GPIO_PIN_SET);
-  // return bSuccess;
-}
-
-static void checkWriteInProgress(FlashMb85rsxCtrl_s *s25flx) {
-  // csPull(s25flx, GPIO_PIN_RESET);
-  // uint8_t tx[] = {READ_STAT_REG_CMD, 0};
-  // uint8_t rx[] = {0, 0};
-  // // Read status register once
-  // bool bSuccess = HAL_SPI_TransmitReceive(s25flx->hspi, tx, rx, 2,
-  //                                         SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
-  // if (bSuccess)
-  //   s25flx->bWIP =
-  //       ((rx[1] & 0x01) == 0x01);  // Write in progress is LSB of status
-  //                                  // register (1 = busy, 0 = not busy)
-  // else
-  //   s25flx->bWIP = true;  // If status register can't be read, assume the
-  //                         // worst-case scenario: flash is busy
-  // csPull(s25flx, GPIO_PIN_SET);
-}
+//static void csPull(const FlashMb85rsxCtrl_s *s25flx, GPIO_PinState direction) {
+//  HAL_GPIO_WritePin(s25flx->csPort, s25flx->csPin, direction);
+//}
+//
+//static bool writeDisable(FlashMb85rsxCtrl_s *s25flx) {
+//	return true;
+//}
+//
+//static bool writeEnable(FlashMb85rsxCtrl_s *s25flx) {
+//  // csPull(s25flx, GPIO_PIN_RESET);
+//  // uint8_t tx = WRITE_ENABLE_CMD;
+//  // // Write-enable command is too short to require DMA
+//  // bool bSuccess =
+//  //     HAL_SPI_Transmit(s25flx->hspi, &tx, 1, SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
+//  // csPull(s25flx, GPIO_PIN_SET);
+//  // return bSuccess;
+//}
+//
+//static void checkWriteInProgress(FlashMb85rsxCtrl_s *s25flx) {
+//  // csPull(s25flx, GPIO_PIN_RESET);
+//  // uint8_t tx[] = {READ_STAT_REG_CMD, 0};
+//  // uint8_t rx[] = {0, 0};
+//  // // Read status register once
+//  // bool bSuccess = HAL_SPI_TransmitReceive(s25flx->hspi, tx, rx, 2,
+//  //                                         SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
+//  // if (bSuccess)
+//  //   s25flx->bWIP =
+//  //       ((rx[1] & 0x01) == 0x01);  // Write in progress is LSB of status
+//  //                                  // register (1 = busy, 0 = not busy)
+//  // else
+//  //   s25flx->bWIP = true;  // If status register can't be read, assume the
+//  //                         // worst-case scenario: flash is busy
+//  // csPull(s25flx, GPIO_PIN_SET);
+//}
 
 #ifdef USE_S25FLx_DMA
 static void spiTxCpltCallback(void *s25flx) {

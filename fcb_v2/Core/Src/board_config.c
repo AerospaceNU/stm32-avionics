@@ -148,7 +148,7 @@ uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL] = {FIRE1_Pin, FIRE2_Pin, FIRE3_Pin,
 #if HAS_DEV(PYRO_CONT_ADC)
 ADC_HandleTypeDef* pyroContAdcHadc[NUM_PYRO_CONT_ADC] = {
     &hadc1, &hadc1, &hadc1, &hadc1};
-uint8_t pyroContAdcRank[NUM_PYRO_CONT_ADC] = {3, 13, 16, 14};
+uint8_t pyroContAdcRank[NUM_PYRO_CONT_ADC] = {1, 2, 3, 4};
 #endif  // HAS_DEV(PYRO_CONT_ADC)
 
 /* Radio */
@@ -185,7 +185,7 @@ float servoPwmMaxPulseMs[NUM_SERVO_PWM] = {2.25, 2.25, 2.25, 2.25};
 
 #if HAS_DEV(VBAT_ADC)
 ADC_HandleTypeDef* vbatAdcHadc[NUM_VBAT_ADC] = {&hadc1, &hadc1};
-uint8_t vbatAdcRank[NUM_VBAT_ADC] = {4, 15};
+uint8_t vbatAdcRank[NUM_VBAT_ADC] = {5, 6};
 #endif  // HAS_DEV(VBAT_ADC)
 
 /* Watchdogs */
