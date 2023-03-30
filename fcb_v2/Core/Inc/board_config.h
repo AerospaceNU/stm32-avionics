@@ -28,7 +28,7 @@
 #define NUM_GPS_UBLOX 1
 
 #define NUM_IMU_ICM20600 2
-#define NUM_MAG_IIS2MDC 2
+#define NUM_MAG_IIS2MDC 1
 
 #define NUM_LED_DIGITAL 1
 

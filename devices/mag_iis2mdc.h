@@ -13,23 +13,18 @@ extern "C" {
 #endif
 
 #include "board_config_common.h"
-#include "spi_driver.h"
+#include "i2c.h"
 
 typedef struct IIS2MDCCtrl_s {
   // The most recent sensor reading
   MagData_s data;
 
-  SpiCtrl_t spi;
-  uint8_t aFs;
-  uint8_t gFs;
-  double aRes;
-  double gRes;
-  int16_t tRawVal; // raw temp
+  I2C_HandleTypeDef *hi2c;
+  uint8_t address;
 
-  double tVal;
 } ImuIIS2MDCCtrl_s;
 
-bool iis2mdc_init(ImuIIS2MDCCtrl_s *sensor);
+bool iis2mdc_init(ImuIIS2MDCCtrl_s *sensor, uint8_t address);
 void iis2mdc_getData(ImuIIS2MDCCtrl_s *sensor);
 
 #ifdef __cplusplus

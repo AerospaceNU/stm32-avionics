@@ -46,7 +46,7 @@ typedef struct __attribute__((packed)) {
 
 typedef struct __attribute__((packed)) {
   Axis3dRaw_s raw;
-  Axis3dReal_s realMps2;
+  Axis3dReal_s realGauss;
 } MagData_s;
 
 typedef struct __attribute__((packed)) {

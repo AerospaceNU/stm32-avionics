@@ -118,6 +118,11 @@ const Orientation_s imuBoardToLocal[NUM_IMU][3] = {
 int imuAccelFilterPriority[NUM_IMU] = {2, 2};
 #endif  // HAS_DEV(IMU)
 
+// TODO determine mag orientation!
+I2C_HandleTypeDef* magIis2mdcHi2c[NUM_MAG_IIS2MDC] = {&hi2c1};
+const Orientation_s magBoardToLocal[NUM_MAG][3] = {
+    {{AXIS_X, 1}, {AXIS_Y, 1}, {AXIS_Z, -1}}};
+
 /* LEDs */
 
 #if HAS_DEV(LED_DIGITAL)

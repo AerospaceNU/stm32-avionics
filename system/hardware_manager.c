@@ -394,10 +394,10 @@ void hm_hardwareInit() {
 
   /* Pyro continuity */
 #if HAS_DEV(PYRO_CONT_ADC)
+
+#ifdef FCB_V2
   // Voltage divider, 100k on top, 10k on the bottom
   double voltageDividerMax = 3.3 * (110.0 / 10.0);
-#ifdef FCB_V2
-
 #else
   // FCB V0 pyros - 0 min, (127k/27k*3.3V) max
   // I had to multiply by 10/3 on my V0 to get these to make sense. TODO
