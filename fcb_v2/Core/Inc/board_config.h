@@ -36,7 +36,12 @@
 
 #define NUM_PYRO_DIGITAL 4
 
-#define NUM_PYRO_CONT_ADC 4
+// Everything is attached to adc1, so only one HADC
+#define NUM_STM_HADC 1
+
+// Number of pyro and battery analog inputs total
+#define NUM_PYRO_CONT_HADC 4
+#define NUM_VBAT_ADC 2
 
 #define NUM_RADIO_TI_433 1
 #define NUM_RADIO_TI_915 0
@@ -45,7 +50,6 @@
 
 #define NUM_USB_STD 1
 
-#define NUM_VBAT_ADC 2
 
 #define NUM_WATCHDOG_INTERNAL 1
 

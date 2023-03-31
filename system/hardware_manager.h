@@ -28,6 +28,9 @@ typedef struct __attribute__((__packed__)) {
 #if HAS_DEV(IMU)
   ImuData_s imuData[NUM_IMU];
 #endif  // HAS_DEV(IMU)
+#if HAS_DEV(MAG)
+  MagData_s magData[NUM_MAG];
+#endif  // HAS_DEV(MAG)
 #if HAS_DEV(ACCEL)
   AccelData_s accelData[NUM_ACCEL];
 #endif  // HAS_DEV(ACCEL)
@@ -100,8 +103,8 @@ extern bool hardwareStatusServo[NUM_SERVO];
 #if HAS_DEV(USB)
 extern bool hardwareStatusUsb[NUM_USB];
 #endif  // HAS_DEV(USB)
-#if HAS_DEV(VBAT)
-extern bool hardwareStatusVbat[NUM_VBAT];
+#if HAS_DEV(ADC)
+extern bool hardwareStatusAdcs[NUM_ADC];
 #endif  // // HAS_DEV(USB)
 
 void hm_hardwareInit();

@@ -145,14 +145,6 @@ uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL] = {FIRE1_Pin, FIRE2_Pin, FIRE3_Pin,
                                              FIRE4_Pin, FIRE5_Pin, FIRE6_Pin};
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
-/* Pyro continuinty */
-
-#if HAS_DEV(PYRO_CONT_ADC)
-ADC_HandleTypeDef* pyroContAdcHadc[NUM_PYRO_CONT_ADC] = {
-    &hadc1, &hadc1, &hadc1, &hadc1, &hadc1, &hadc1};
-uint8_t pyroContAdcRank[NUM_PYRO_CONT_ADC] = {2, 5, 6, 3, 1, 4};
-#endif  // HAS_DEV(PYRO_CONT_ADC)
-
 /* Radio */
 
 #if HAS_DEV(RADIO_TI_433)
@@ -202,6 +194,21 @@ uint32_t servoPwmChannel[NUM_SERVO_PWM] = {TIM_CHANNEL_4, TIM_CHANNEL_3,
 float servoPwmMinPulseMs[NUM_SERVO_PWM] = {0.75, 0.75, 0.75, 0.75};
 float servoPwmMaxPulseMs[NUM_SERVO_PWM] = {2.25, 2.25, 2.25, 2.25};
 #endif  // HAS_DEV(SERVO_PWM)
+
+/* Various analog sensors */
+
+ADC_HandleTypeDef* stmHadcInstances[NUM_STM_HADC] = {
+    &hadc1};
+
+// Maps pyro entry number to [hadc_idx, rank]
+StmHadcEntry_s pyroHadcEntries[NUM_PYRO_CONT_HADC] = {
+	{0, 2, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+	{0, 5, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+	{0, 6, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+	{0, 3, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+	{0, 1, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+	{0, 4, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+};
 
 /* VBat Sensors */
 

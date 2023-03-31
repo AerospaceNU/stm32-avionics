@@ -148,14 +148,6 @@ uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL] = {FIRE1_Pin, FIRE2_Pin, FIRE3_Pin,
                                              FIRE4_Pin};
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
-/* Pyro continuinty */
-
-#if HAS_DEV(PYRO_CONT_ADC)
-ADC_HandleTypeDef* pyroContAdcHadc[NUM_PYRO_CONT_ADC] = {
-    &hadc1, &hadc1, &hadc1, &hadc1};
-uint8_t pyroContAdcRank[NUM_PYRO_CONT_ADC] = {1, 2, 3, 4};
-#endif  // HAS_DEV(PYRO_CONT_ADC)
-
 /* Radio */
 
 #if HAS_DEV(RADIO_TI_433)
@@ -186,12 +178,24 @@ float servoPwmMinPulseMs[NUM_SERVO_PWM] = {0.75, 0.75, 0.75, 0.75};
 float servoPwmMaxPulseMs[NUM_SERVO_PWM] = {2.25, 2.25, 2.25, 2.25};
 #endif  // HAS_DEV(SERVO_PWM)
 
-/* VBat Sensors */
+/* Various analog sensors */
 
-#if HAS_DEV(VBAT_ADC)
-ADC_HandleTypeDef* vbatAdcHadc[NUM_VBAT_ADC] = {&hadc1, &hadc1};
-uint8_t vbatAdcRank[NUM_VBAT_ADC] = {5, 6};
-#endif  // HAS_DEV(VBAT_ADC)
+ADC_HandleTypeDef* stmHadcInstances[NUM_STM_HADC] = {
+    &hadc1};
+
+// Maps vbat entry number to [hadc_idx, rank]
+StmHadcEntry_s vbatHadcEntries[NUM_VBAT_ADC] = {
+		{0, 5, 0, 3.3 * (34.8 + 10.0) / 10.0},
+		{0, 6, 0, 3.3 * (34.8 + 10.0) / 10.0}
+};
+
+// Maps pyro entry number to [hadc_idx, rank]
+StmHadcEntry_s pyroHadcEntries[NUM_PYRO_CONT_HADC] = {
+	{0, 1, 0, 3.3 * (110.0 / 10.0)},
+	{0, 2, 0, 3.3 * (110.0 / 10.0)},
+	{0, 3, 0, 3.3 * (110.0 / 10.0)},
+	{0, 4, 0, 3.3 * (110.0 / 10.0)}
+};
 
 /* Watchdogs */
 

@@ -82,7 +82,7 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
   Axis3dRaw_s accel;
   Axis3dRaw_s angVel;
-  Axis3dRaw_s mag;
+//  Axis3dRaw_s mag;
 } ImuDataRaw_s;
 
 typedef struct __attribute__((packed)) {
@@ -90,8 +90,8 @@ typedef struct __attribute__((packed)) {
   Axis3dReal_s accelRealMps2;
   Axis3dRaw_s angVelRaw;
   Axis3dReal_s angVelRealRadps;
-  Axis3dRaw_s magRaw;
-  Axis3dReal_s magRealG;
+//  Axis3dRaw_s magRaw;
+//  Axis3dReal_s magRealG;
 } ImuData_s;
 
 // The data struct from the line cutter

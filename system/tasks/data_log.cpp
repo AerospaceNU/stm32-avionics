@@ -38,6 +38,9 @@ typedef struct __attribute__((__packed__)) {
 #if HAS_DEV(IMU)
   ImuDataRaw_s imuData[NUM_IMU];
 #endif  // HAS_DEV(IMU)
+#if HAS_DEV(MAG)
+  Axis3dRaw_s magData[NUM_MAG];
+#endif  // HAS_DEV(MAG)
 #if HAS_DEV(ACCEL)
   Axis3dRaw_s accelData[NUM_ACCEL];
 #endif  // HAS_DEV(ACCEL)
@@ -341,11 +344,11 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
     logPacket.packetType = LOG_ID_FCB;
     logPacket.timestampMs = sensorData->timestampMs;
     FcbLogData_s *fcbLogData = &(logPacket.dataPacket.fcbData);
-#if HAS_DEV(IMU)
+#if HAS_DEV(MAG)
     for (int i = 0; i < NUM_IMU; i++) {
       fcbLogData->imuData[i].accel = sensorData->imuData[i].accelRaw;
       fcbLogData->imuData[i].angVel = sensorData->imuData[i].angVelRaw;
-      fcbLogData->imuData[i].mag = sensorData->imuData[i].magRaw;
+      fcbLogData->magData[i] = sensorData->magData[i].raw;
     }
 #endif  // HAS_DEV(IMU)
 #if HAS_DEV(ACCEL)

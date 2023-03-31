@@ -117,10 +117,10 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       filterData->world_acc_x,
       filterData->world_acc_y,
       filterData->world_acc_z,
-#if HAS_DEV(IMU)
-      sensorData->imuData[0].magRealG.x,
-      sensorData->imuData[0].magRealG.y,
-      sensorData->imuData[0].magRealG.z,
+#if HAS_DEV(MAG)
+      sensorData->magData[0].realGauss.x,
+      sensorData->magData[0].realGauss.y,
+      sensorData->magData[0].realGauss.z,
 #else
       0,
       0,

@@ -52,9 +52,13 @@ void CliTasks::sense() {
     snprintf(cliStr, sizeof(cliStr), "IMU %d Gyro XYZ (rad/s): %s %s %s\r\n", i,
              float1, float2, float3);
     cli_send(cliStr);
-    dtoa(float1, sizeof(float1), data->imuData[i].magRealG.x, 3);
-    dtoa(float2, sizeof(float2), data->imuData[i].magRealG.y, 3);
-    dtoa(float3, sizeof(float3), data->imuData[i].magRealG.z, 3);
+  }
+#endif  // HAS_DEV(IMU)
+#if HAS_DEV(MAG)
+  for (int i = 0; i < NUM_MAG; i++) {
+    dtoa(float1, sizeof(float1), data->magData[i].realGauss.x, 3);
+    dtoa(float2, sizeof(float2), data->magData[i].realGauss.y, 3);
+    dtoa(float3, sizeof(float3), data->magData[i].realGauss.z, 3);
     snprintf(cliStr, sizeof(cliStr), "IMU %d Mag XYZ (gauss): %s %s %s\r\n", i,
              float1, float2, float3);
     cli_send(cliStr);

@@ -162,7 +162,8 @@ typedef struct {
 } Lsm9ds1MCtrl_s;
 
 typedef struct LSM9DS1Ctrl_s {
-  ImuData_s data;
+  ImuData_s agData;
+  MagData_s mData;
   Lsm9ds1AgCtrl_s ag;
   Lsm9ds1MCtrl_s m;
 } ImuLsm9ds1Ctrl_s;

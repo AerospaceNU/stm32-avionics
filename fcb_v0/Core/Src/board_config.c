@@ -143,13 +143,6 @@ uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL] = {FIRE1_Pin, FIRE2_Pin, FIRE3_Pin,
                                              FIRE4_Pin, FIRE5_Pin, FIRE6_Pin};
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
-/* Pyro continuity */
-#if HAS_DEV(PYRO_CONT_ADC)
-ADC_HandleTypeDef* pyroContAdcHadc[NUM_PYRO_CONT_ADC] = {
-    &hadc2, &hadc2, &hadc2, &hadc2, &hadc1, &hadc1};
-uint8_t pyroContAdcRank[NUM_PYRO_CONT_ADC] = {1, 4, 3, 2, 3, 2};
-#endif  // HAS_DEV(PYRO_CONT_ADC)
-
 /* Radios */
 
 #if HAS_DEV(RADIO_TI_433)
@@ -202,16 +195,29 @@ float servoPwmMaxPulseMs[NUM_SERVO_PWM] = {2.25, 2.25, 2.25, 2.25};
 
 /* VBat Sensors */
 
-#if HAS_DEV(VBAT_ADC)
-ADC_HandleTypeDef* vbatAdcHadc[NUM_VBAT_ADC] = {&hadc3};
-uint8_t vbatAdcRank[NUM_VBAT_ADC] = {1};
-ADC_HandleTypeDef* vbatAdcCurrentHadc[NUM_VBAT_ADC] = {&hadc1};
-uint8_t vbatAdcCurrentRank[NUM_VBAT_ADC] = {1};
-#endif  // HAS_DEV(VBAT_ADC)
-
 #if HAS_DEV(VBAT_INA226)
 I2C_HandleTypeDef* vbatIna226Hi2c[NUM_VBAT_INA226];
 #endif  // HAS_DEV(VBAT_INA226)
+
+/* Various analog sensors */
+
+ADC_HandleTypeDef* stmHadcInstances[NUM_STM_HADC] = {
+    &hadc1, &hadc2, &hadc3};
+
+// Maps vbat entry number to [hadc_idx, rank]
+StmHadcEntry_s vbatHadcEntries[NUM_VBAT_ADC] = {
+		{0, 1, 0, 67},
+};
+
+// Maps pyro entry number to [hadc_idx, rank]
+StmHadcEntry_s pyroHadcEntries[NUM_PYRO_CONT_HADC] = {
+	{1, 1, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+	{1, 4, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+	{1, 3, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+	{1, 2, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+	{2, 3, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+	{2, 2, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+};
 
 /* Watchdogs */
 
