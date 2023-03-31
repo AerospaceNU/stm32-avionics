@@ -191,16 +191,16 @@ ADC_HandleTypeDef* stmHadcInstances[NUM_STM_HADC] = {
 
 // Maps vbat entry number to [hadc_idx, rank]
 StmHadcEntry_s vbatHadcEntries[NUM_VBAT_ADC] = {
-		{0, 5, 0, 3.3 * (34.8 + 10.0) / 10.0},
-		{0, 6, 0, 3.3 * (34.8 + 10.0) / 10.0}
+		{.stmAdcIdx=0, .rank=5, .min=0, .max=3.3 * (34.8 + 10.0) / 10.0},
+		{.stmAdcIdx=0, .rank=6, .min=0, .max= 3.3 * (34.8 + 10.0) / 10.0}
 };
 
 // Maps pyro entry number to [hadc_idx, rank]
 StmHadcEntry_s pyroHadcEntries[NUM_PYRO_CONT_HADC] = {
-	{0, 1, 0, 3.3 * (110.0 / 10.0)},
-	{0, 2, 0, 3.3 * (110.0 / 10.0)},
-	{0, 3, 0, 3.3 * (110.0 / 10.0)},
-	{0, 4, 0, 3.3 * (110.0 / 10.0)}
+	{.stmAdcIdx=0, .rank=1, .min=0, .max=3.3 * (110.0 / 10.0)},
+	{.stmAdcIdx=0, .rank=2, .min=0, .max=3.3 * (110.0 / 10.0)},
+	{.stmAdcIdx=0, .rank=3, .min=0, .max=3.3 * (110.0 / 10.0)},
+	{.stmAdcIdx=0, .rank=4, .min=0, .max=3.3 * (110.0 / 10.0)}
 };
 
 /* Watchdogs */
