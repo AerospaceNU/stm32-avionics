@@ -241,6 +241,12 @@ extern GPIO_TypeDef* flashS25flxCsGpioPort[NUM_FLASH_S25FLX];
 extern uint16_t flashS25flxCsPin[NUM_FLASH_S25FLX];
 #endif  // HAS_DEV(FLASH_S25FL)
 
+#if HAS_DEV(FLASH_MB85RSX)
+extern SPI_HandleTypeDef* flashMb85rsxHspi[NUM_FLASH_MB85RSX];
+extern GPIO_TypeDef* flashMb85rsxCsGpioPort[NUM_FLASH_MB85RSX];
+extern uint16_t flashMb85rsxCsPin[NUM_FLASH_MB85RSX];
+#endif  // HAS_DEV(FLASH_MB85RSX)
+
 extern const uint32_t kFlashSizeBytes[NUM_FLASH];
 
 /* GPS */

@@ -91,6 +91,12 @@ GPIO_TypeDef* flashS25flxCsGpioPort[NUM_FLASH_S25FLX] = {FLASH_CS_GPIO_Port};
 uint16_t flashS25flxCsPin[NUM_FLASH_S25FLX] = {FLASH_CS_Pin};
 #endif  // HAS_DEV(FLASH_S25FL)
 
+#if HAS_DEV(FLASH_MB85RSX)
+SPI_HandleTypeDef* flashMb85rsxHspi[NUM_FLASH_MB85RSX] = {&hspi2};
+GPIO_TypeDef* flashMb85rsxCsGpioPort[NUM_FLASH_MB85RSX] = {FRAM_CS_GPIO_Port};
+uint16_t flashMb85rsxCsPin[NUM_FLASH_MB85RSX] = {FRAM_CS_Pin};
+#endif  // HAS_DEV(FLASH_S25FL)
+
 const uint32_t kFlashSizeBytes[NUM_FLASH] = {0x4000000};
 
 // TODO FRAM configuration!!

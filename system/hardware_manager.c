@@ -32,6 +32,10 @@
 #include "flash_s25flx.h"
 #endif  // HAS_DEV(FLASH_S25FLX)
 
+#if HAS_DEV(FLASH_MB85RSX)
+#include "flash_mb85rsx.h"
+#endif  // HAS_DEV(FLASH_MB85RSX)
+
 #if HAS_DEV(MAG_IIS2MDC)
 #include "mag_iis2mdc.h"
 #endif  // HAS_DEV(MAG_IIS2MDC)
@@ -177,6 +181,9 @@ static DcMotorPwmCtrl_s dcMotorPwm[NUM_DC_MOTOR_PWM];
 #if HAS_DEV(FLASH_S25FLX)
 static FlashS25flxCtrl_s flashS25flx[NUM_FLASH_S25FLX];
 #endif  // HAS_DEV(FLASH_S25FLX)
+#if HAS_DEV(FLASH_MB85RSX)
+static FlashMb85rsxCtrl_s flashMb85rsx[NUM_FLASH_MB85RSX];
+#endif  // HAS_DEV(FLASH_MB85RSX)
 
 /* GPS */
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
@@ -319,6 +326,13 @@ void hm_hardwareInit() {
     hardwareStatusFlash[FIRST_ID_FLASH_S25FLX + i] = true;
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
+#if HAS_DEV(FLASH_MB85RSX)
+  for (int i = 0; i < NUM_FLASH_MB85RSX; i++) {
+    flashMb85rsx_init(&(flashMb85rsx[i]), flashMb85rsxHspi[i],
+                     flashS25flxCsGpioPort[i], flashS25flxCsPin[i]);
+    hardwareStatusFlash[FIRST_ID_FLASH_MB85RSX + i] = true;
+  }
+#endif  // HAS_DEV(FLASH_MB85RSX)
 
   /* GPS */
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
@@ -543,7 +557,13 @@ bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
         pData);
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
-
+#if HAS_DEV(FLASH_MB85RSX)
+  if (IS_DEVICE(flashId, FLASH_MB85RSX)) {
+    return flashMb85rsx_readStart(
+        &(flashMb85rsx[flashId - FIRST_ID_FLASH_MB85RSX]), startLoc, numBytes,
+        pData);
+  }
+#endif  // HAS_DEV(FLASH_MB85RSX)
   return false;
 }
 
@@ -556,6 +576,13 @@ bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
         data);
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
+#if HAS_DEV(FLASH_MB85RSX)
+  if (IS_DEVICE(flashId, FLASH_MB85RSX)) {
+    return flashMb85rsx_writeStart(
+        &(flashMb85rsx[flashId - FIRST_ID_FLASH_MB85RSX]), startLoc, numBytes,
+		data);
+  }
+#endif  // HAS_DEV(FLASH_MB85RSX)
 
   return false;
 }

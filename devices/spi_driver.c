@@ -44,4 +44,15 @@ void spi_writeRegister(SpiCtrl_t *sensor, uint8_t reg, uint8_t val) {
   HAL_GPIO_WritePin(sensor->port, sensor->pin, 1);
 }
 
+void spi_writeArray(SpiCtrl_t *sensor, uint8_t *pTxData, size_t len) {
+	  // bring CS pin low
+	  HAL_GPIO_WritePin(sensor->port, sensor->pin, 0);
+
+	  // Send whole user buffer
+	  HAL_SPI_Transmit(sensor->hspi, pTxData, len, SPI_MAX_DELAY);
+
+	  // bring CS pin high
+	  HAL_GPIO_WritePin(sensor->port, sensor->pin, 1);
+}
+
 #endif  // HAL_SPI_MODULE_ENABLED
