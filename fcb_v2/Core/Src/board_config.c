@@ -40,12 +40,12 @@ GPIO_TypeDef* accelH3lis331dlCsGpioPort[NUM_ACCEL_H3LIS331DL] = {
 uint16_t accelH3lis331dlCsPin[NUM_ACCEL_H3LIS331DL] = {HIGH_G_CS_Pin};
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
-#if HAS_DEV(ACCEL)
+// Index 0 of this struct is read to determine the sensor axis to measure accel in board X
+// So if board X = - sensor Y, the first index should be {AXIS_Y, -1}
 const Orientation_s accelBoardToLocal[NUM_ACCEL][3] = {
-    {{AXIS_Y, -1}, {AXIS_X, -1}, {AXIS_Z, -1}},
+    {{AXIS_X, -1}, {AXIS_Y, 1}, {AXIS_Z, -1}},
 };
 int accelFilterPriority[NUM_ACCEL] = {1};
-#endif  // HAS_DEV(ACCEL)
 
 /* Barometer */
 
@@ -117,17 +117,17 @@ uint16_t imuIcm20600CsPin[NUM_IMU_ICM20600] = {IMU1_CS_Pin, IMU2_CS_Pin};
 #endif  // HAS_DEV(IMU_ICM20600)
 
 #if HAS_DEV(IMU)
-// TODO actually determine orientations!
+// Index 0 of this struct is read to determine the sensor axis to measure accel in board X
+// So if board X = - sensor Y, the first index should be {AXIS_Y, -1}
 const Orientation_s imuBoardToLocal[NUM_IMU][3] = {
-    {{AXIS_X, 1}, {AXIS_Y, 1}, {AXIS_Z, -1}},
-    {{AXIS_X, 1}, {AXIS_Y, 1}, {AXIS_Z, -1}}};
+    {{AXIS_Y, -1}, {AXIS_X, -1}, {AXIS_Z, -1}},
+    {{AXIS_Y, -1}, {AXIS_X, -1}, {AXIS_Z, -1}}};
 int imuAccelFilterPriority[NUM_IMU] = {2, 2};
 #endif  // HAS_DEV(IMU)
 
-// TODO determine mag orientation!
 I2C_HandleTypeDef* magIis2mdcHi2c[NUM_MAG_IIS2MDC] = {&hi2c1};
 const Orientation_s magBoardToLocal[NUM_MAG][3] = {
-    {{AXIS_X, 1}, {AXIS_Y, 1}, {AXIS_Z, -1}}};
+    {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, -1}}};
 
 /* LEDs */
 
