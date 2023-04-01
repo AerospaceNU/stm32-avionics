@@ -121,6 +121,7 @@ typedef struct
 } BDMA_Base_Registers;
 
 /* Private variables ---------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private constants ---------------------------------------------------------*/
 /** @addtogroup DMA_Private_Constants
  * @{

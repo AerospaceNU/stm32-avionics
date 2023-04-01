@@ -36,6 +36,7 @@
 #ifdef HAL_RCC_MODULE_ENABLED
 
 /* Private typedef -----------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private defines -----------------------------------------------------------*/
 /** @defgroup RCCEx_Private_defines RCCEx Private Defines
  * @{
