@@ -144,6 +144,9 @@ bool hardwareStatusUsb[NUM_USB];
 #if HAS_DEV(STM_HADC)
 bool hardwareStatusAdcs[NUM_STM_HADC];
 #endif  // HAS_DEV(STM_HADC)
+#if HAS_DEV(MAG)
+bool hardwareStatusMag[NUM_MAG];
+#endif  // HAS_DEV(MAG)
 
 /* Hardware objects */
 
@@ -374,6 +377,14 @@ void hm_hardwareInit() {
         156.96;  // 16 G * 9.81 mps2/G
   }
 #endif  // HAS_DEV(IMU_ICM20600)
+
+#if HAS_DEV(MAG_IIS2MDC)
+  for (int i = 0; i < NUM_MAG_IIS2MDC; i++) {
+	// TODO don't hard-code i2c address
+	iis2mdc_init(imuIis2mdc + i, 0b11110);
+    hardwareStatusMag[i] = true;
+  }
+#endif
 
   /* LEDs */
 #if HAS_DEV(LED_DIGITAL)

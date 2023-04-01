@@ -61,6 +61,9 @@ typedef struct {
 #if HAS_DEV(ACCEL)
 extern bool hardwareStatusAccel[NUM_ACCEL];
 #endif  // HAS_DEV(ACCEL)
+#if HAS_DEV(MAG)
+extern bool hardwareStatusMag[NUM_MAG];
+#endif  // HAS_DEV(MAG)
 #if HAS_DEV(BAROMETER)
 extern bool hardwareStatusBarometer[NUM_BAROMETER];
 #endif  // HAS_DEV(BAROMETER)

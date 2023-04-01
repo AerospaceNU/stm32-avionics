@@ -4,7 +4,7 @@
 
 #include "mag_iis2mdc.h"
 
-#if HAS_DEV(IMU_ICM20600)
+#if HAS_DEV(MAG_IIS2MDC)
 
 static uint8_t readByte(ImuIIS2MDCCtrl_s *sensor, uint8_t addr) {
 	HAL_I2C_Master_Transmit(sensor->hi2c, sensor->address, &addr, 1, HAL_MAX_DELAY);
