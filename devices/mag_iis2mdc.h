@@ -24,7 +24,7 @@ typedef struct IIS2MDCCtrl_s {
 
 } ImuIIS2MDCCtrl_s;
 
-bool iis2mdc_init(ImuIIS2MDCCtrl_s *sensor, uint8_t address);
+bool iis2mdc_init(ImuIIS2MDCCtrl_s *sensor, uint8_t address7bit);
 void iis2mdc_getData(ImuIIS2MDCCtrl_s *sensor);
 
 #ifdef __cplusplus
