@@ -6,16 +6,16 @@ EmptyExpression::EmptyExpression() {
 }
 
 // The only expression type that is actually empty.
-bool EmptyExpression::isEmpty() { return true; }
+bool EmptyExpression::isEmpty() const { return true; }
 
 // Does nothing
 void EmptyExpression::evaluate(FilterData_s *filterData,
-                               Expression *expressions[]) {
+                               ExpressionPtrCallback &expressionPtrCallback) {
   return;
 }
 
-int EmptyExpression::toString(char *buffer, int n,
-                              Expression *expressions[]) const {
+int EmptyExpression::toString(
+    char *buffer, int n, ExpressionPtrCallback &expressionPtrCallback) const {
   strncpy(buffer, "empty", n);
   return 5;
 }

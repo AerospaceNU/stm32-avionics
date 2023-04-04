@@ -146,7 +146,7 @@ uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL] = {FIRE1_Pin, FIRE2_Pin, FIRE3_Pin,
 /* Pyro continuity */
 #if HAS_DEV(PYRO_CONT_ADC)
 ADC_HandleTypeDef* pyroContAdcHadc[NUM_PYRO_CONT_ADC] = {
-    &hadc2, &hadc2, &hadc2, &hadc1, &hadc1, &hadc1};
+    &hadc2, &hadc2, &hadc2, &hadc2, &hadc1, &hadc1};
 uint8_t pyroContAdcRank[NUM_PYRO_CONT_ADC] = {1, 4, 3, 2, 3, 2};
 #endif  // HAS_DEV(PYRO_CONT_ADC)
 

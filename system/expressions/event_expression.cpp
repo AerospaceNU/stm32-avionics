@@ -1,6 +1,7 @@
 #include "event_expression.h"
 
-const char *eventStrings[] = {"launch", "burnout", "apogee", "touchdown"};
+const char *eventStrings[] = {"launch", "burnout", "apogee", "touchdown",
+                              "unclean_restart"};
 
 EventExpression::EventExpression(int triggerNum, Event_e event) {
   this->setTriggerNum(triggerNum);
@@ -8,12 +9,12 @@ EventExpression::EventExpression(int triggerNum, Event_e event) {
 }
 
 void EventExpression::evaluate(FilterData_s *filterData,
-                               Expression *expressions[]) {
+                               ExpressionPtrCallback &expressionPtrCallback) {
   this->setBooleanValue(eventManager_getEventStatus(this->event));
 }
 
-int EventExpression::toString(char *buffer, int n,
-                              Expression *expressions[]) const {
+int EventExpression::toString(
+    char *buffer, int n, ExpressionPtrCallback &expressionPtrCallback) const {
   snprintf(buffer, n, eventStrings[this->event]);
   return strlen(buffer);
 }

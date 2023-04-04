@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "data_log.h"
+#include "event_manager.h"
 #include "filters.h"
 #include "hardware_manager.h"
 #include "internal_flash.h"
@@ -38,6 +39,8 @@ void stateLog_reloadFlight() {
   // Set new metadata to values in old packet
   *dataLog_getFlightMetadata() = oldMetadataPacket;
   dataLog_writeFlightMetadata();
+
+  eventManager_setEventComplete(unclean_restart);
 }
 
 void stateLog_write(int currentState) {

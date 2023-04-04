@@ -48,6 +48,7 @@ typedef struct {
   char* w;      // trigger pulse width
   char* C;      // trigger configuration
   bool D;       // trigger delete
+  bool N;       // trigger not allowed manually
   char* e;      // ground elevation
   char* r;      // ground temperature
   bool h;       // help flag

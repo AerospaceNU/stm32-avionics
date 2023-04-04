@@ -28,6 +28,7 @@ PACKED_STRUCT {
   uint8_t state;
   int8_t qw, qx, qy, qz;
   float wx, wy, wz, ax, ay, az, bx, by, bz;
+  int16_t angle_to_vertical;
 }
 OrientationPacket_s;
 

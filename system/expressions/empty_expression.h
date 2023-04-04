@@ -18,12 +18,14 @@ class EmptyExpression : public Expression {
   EmptyExpression();
 
   // The only expression type that is actually empty.
-  bool isEmpty();
+  bool isEmpty() const;
 
   // Does nothing
-  void evaluate(FilterData_s *filterData, Expression *expressions[]);
+  void evaluate(FilterData_s *filterData,
+                ExpressionPtrCallback &expressionPtrCallback);
 
-  int toString(char *buffer, int n, Expression *expressions[]) const;
+  int toString(char *buffer, int n,
+               ExpressionPtrCallback &expressionPtrCallback) const;
 
   void serializeInto(SerializedExpression_s *serialized) const;
 };

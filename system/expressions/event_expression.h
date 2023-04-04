@@ -26,9 +26,11 @@ class EventExpression : public Expression {
    */
   EventExpression(int triggerNum, Event_e event);
 
-  void evaluate(FilterData_s *filterData, Expression *expressions[]);
+  void evaluate(FilterData_s *filterData,
+                ExpressionPtrCallback &expressionPtrCallback);
 
-  int toString(char *buffer, int n, Expression *expressions[]) const;
+  int toString(char *buffer, int n,
+               ExpressionPtrCallback &expressionPtrCallback) const;
 
   void serializeInto(SerializedExpression_s *serialized) const;
 };

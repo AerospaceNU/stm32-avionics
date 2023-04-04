@@ -16,12 +16,12 @@ ConstExpression::ConstExpression(int triggerNum, int value) {
 }
 
 void ConstExpression::evaluate(FilterData_s *filterData,
-                               Expression *expressions[]) {
+                               ExpressionPtrCallback &expressionPtrCallback) {
   return;
 }
 
-int ConstExpression::toString(char *buffer, int n,
-                              Expression *expressions[]) const {
+int ConstExpression::toString(
+    char *buffer, int n, ExpressionPtrCallback &expressionPtrCallback) const {
   static char floatBuf[10];
   dtoa(floatBuf, 10, this->getNumberValue(), 2);
   snprintf(buffer, n, "%s", floatBuf);

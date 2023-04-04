@@ -7,6 +7,7 @@
 
 #include "trigger_manager.h"
 
+#include <limits.h>
 #include <math.h>
 #include <stdbool.h>
 
@@ -23,7 +24,7 @@ static bool triggerFireStatus[MAX_TRIGGER] = {0};
 
 void triggerManager_init() {
   for (int i = 0; i < MAX_TRIGGER; ++i) triggerFireStatus[i] = 0;
-  expressionStore = ExpressionStore();
+  expressionStore.init();
 }
 
 uint16_t triggerManager_status() {
@@ -32,6 +33,17 @@ uint16_t triggerManager_status() {
     status |= triggerFireStatus[i] << i;
   }
   return status;
+}
+
+void triggerManager_setDefaultConfig() {
+  int i;
+  for (i = 0; i < MAX_TRIGGER; ++i) {
+    cli_getConfigs()->triggerConfiguration[i].mode = TRIGGER_TYPE_EMPTY;
+  }
+  for (i = 0; i < MAX_EXPRESSION; ++i) {
+    cli_getConfigs()->serializedExprs[i].type = empty;
+  }
+  expressionStore.init();
 }
 
 void triggerManager_setTriggerFireStatus(uint16_t status) {
@@ -45,7 +57,7 @@ void triggerManager_update(FilterData_s* filterData) {
 
   for (int i = 0; i < MAX_TRIGGER; i++) {
     TriggerConfig_s* triggerConfig = i + cli_getConfigs()->triggerConfiguration;
-    if (expressionStore.getStatusFor(triggerConfig->rootExpressionID) &&
+    if (expressionStore.getExprBoolValue(triggerConfig->rootExpressionID) &&
         !triggerFireStatus[i]) {
       triggerManager_triggerFire(i, true);
     }
@@ -55,12 +67,16 @@ void triggerManager_update(FilterData_s* filterData) {
 bool triggerManager_setTriggerConfig(uint8_t triggerNum,
                                      const char** configString) {
   int resultID;
-  StringSlice slice = StringSlice(configString, 0, strlen(*configString));
+  StringSlice slice =
+      StringSlice(configString, 0, strnlen(*configString, INT16_MAX));
   expressionStore.removeExpressionsForTrigger(triggerNum);
   ExpressionValueType_e valueType = expressionStore.parseForTrigger(
       &resultID, triggerNum, slice, expressionStore.getNextExpressionSpot(0));
   if (valueType == ExpressionValueType_e::boolean) {
     expressionStore.writeNewConfigs();
+    TriggerConfig_s* triggerConfig =
+        triggerNum + cli_getConfigs()->triggerConfiguration;
+    triggerConfig->rootExpressionID = resultID;
     return true;
   }
   return false;
@@ -76,7 +92,6 @@ void triggerManager_getConfigString(uint8_t triggerNum, char* buffer, int n) {
       triggerNum + cli_getConfigs()->triggerConfiguration;
   expressionStore.conditionToString(triggerConfig->rootExpressionID, buffer, n);
 }
-
 void triggerManager_triggerFire(uint8_t triggerNum, bool logFire) {
   // Pyro type
   TriggerConfig_s* triggerConfig =

@@ -117,15 +117,15 @@ BinaryFunctionWrapper binaryFunctionWrappers[NUM_BINARY_FUNCTION] = {
     BinaryFunctionWrapper("*", mulFunc, number, number, number),
     BinaryFunctionWrapper("/", divFunc, number, number, number)};
 
-int BinaryFuncExpression::toString(char *buffer, int n,
-                                   Expression *expressions[]) const {
+int BinaryFuncExpression::toString(
+    char *buffer, int n, ExpressionPtrCallback &expressionPtrCallback) const {
   int selfLength = strlen(binaryFunctionWrappers[this->opcode].stringRep);
   if (n == 0) {
     return 0;
   }
   buffer[0] = '(';
-  int operand1Len =
-      expressions[this->operand1ID]->toString(buffer + 1, n - 1, expressions);
+  int operand1Len = expressionPtrCallback(this->operand1ID)
+                        ->toString(buffer + 1, n - 1, expressionPtrCallback);
   int remaining = n - operand1Len - 1;
   if (remaining > selfLength) {
     snprintf(buffer + operand1Len + 1, remaining, " %s ",
@@ -134,8 +134,9 @@ int BinaryFuncExpression::toString(char *buffer, int n,
   }
   int operand2Len = 0;
   if (remaining > 0) {
-    operand2Len = expressions[this->operand2ID]->toString(
-        buffer + 1 + operand1Len + selfLength + 2, remaining, expressions);
+    operand2Len = expressionPtrCallback(this->operand2ID)
+                      ->toString(buffer + 1 + operand1Len + selfLength + 2,
+                                 remaining, expressionPtrCallback);
     remaining -= operand2Len;
   }
   if (remaining > 0) {
@@ -145,10 +146,11 @@ int BinaryFuncExpression::toString(char *buffer, int n,
   return 1 + operand1Len + 2 + selfLength + operand2Len + 1;
 }
 
-void BinaryFuncExpression::evaluate(FilterData_s *filterData,
-                                    Expression *expressions[]) {
+void BinaryFuncExpression::evaluate(
+    FilterData_s *filterData, ExpressionPtrCallback &expressionPtrCallback) {
   binaryFunctionWrappers[this->opcode].evaluate(
-      this, filterData, expressions[operand1ID], expressions[operand2ID]);
+      this, filterData, expressionPtrCallback(operand1ID),
+      expressionPtrCallback(operand2ID));
 }
 
 void BinaryFuncExpression::serializeInto(

@@ -6,7 +6,14 @@
  * apogee, and touchdown, but can also represent an event like burnout that does
  * not have a state transition but is still useful to record globally.
  */
-typedef enum { launch, burnout, apogee, touchdown, NUM_EVENT } Event_e;
+typedef enum {
+  launch,
+  burnout,
+  apogee,
+  touchdown,
+  unclean_restart,
+  NUM_EVENT
+} Event_e;
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,11 +25,16 @@ extern "C" {
 void eventManager_init();
 
 /**
- * Mark an event as complete. This will use the current timestamp to store as
- * the timestamp of the event.
- * @param event Nne of the possible event enum values to mark as completed.
+ * Mark an event as complete.
+ * @param event One of the possible event enum values to mark as completed.
  */
 void eventManager_setEventComplete(Event_e event);
+
+/**
+ * Mark an event as imcomplete, as in no longer having happened.
+ * @param event One of the possible event enum values to mark as incomplete.
+ */
+void eventManager_setEventIncomplete(Event_e event);
 
 /**
  * Query the status of an event.

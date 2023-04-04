@@ -9,6 +9,7 @@
 
 #include "board_config_common.h"
 #include "cli.h"
+#include "crc16.h"
 
 #define PACKET_BUFFER_SIZE 1000
 #define CONFIG_START_ADDRESS 0x200
@@ -74,16 +75,28 @@ typedef struct __attribute__((__packed__)) {
   LogDataPacket_s dataPacket;
 } LogData_s;
 
+/**
+ * A wrapped version of a CliConfigs_s packet with a stored CRC.
+ */
+typedef struct __attribute__((__packed__)) {
+  CliConfigs_s cliConfigs;
+  uint16_t crc;
+} WrappedCliConfigs_s;
+
 static LogData_s logPackets[MAX_LOG_PACKETS];
 static CircularBuffer_s logPacketBuffer;
 
 static FlightMetadata_s flightMetadataPacket;
 
+static CRC16 crc;
+
+static WrappedCliConfigs_s wrappedConfig;
+
 static const uint16_t kLogDataSize = sizeof(LogData_s);
 
 static const uint16_t kFlightMetadataSize = sizeof(FlightMetadata_s);
 
-static const uint16_t kCliConfigSize = sizeof(CliConfigs_s);
+static const uint16_t kWrappedCliConfigSize = sizeof(WrappedCliConfigs_s);
 
 static void addressToFlashId(uint32_t startLoc, int *flashId,
                              uint32_t *flashOffset) {
@@ -276,7 +289,8 @@ void dataLog_assignFlight() {
 
   // Write flight number and sector to metadata (since flight metadata written
   // to it)
-  uint8_t flightTxBuff[2] = {(curFlightNum >> 8) & 0xFF, curFlightNum & 0xFF};
+  uint8_t flightTxBuff[2] = {(uint8_t)((curFlightNum >> 8) & 0xFF),
+                             (uint8_t)(curFlightNum & 0xFF)};
 
   // We can't have a flight past the last sector
   if (curSectorNum * FLASH_MAX_SECTOR_BYTES < logSizeBytes)
@@ -410,8 +424,8 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
           curSectorNum) {
         curSectorNum++;
         // Write flight number and sector to metadata
-        uint8_t flightTxBuff[2] = {(curFlightNum >> 8) & 0xFF,
-                                   curFlightNum & 0xFF};
+        uint8_t flightTxBuff[2] = {(uint8_t)((curFlightNum >> 8) & 0xFF),
+                                   (uint8_t)(curFlightNum & 0xFF)};
         flashWrite(curSectorNum * 2, 2, flightTxBuff);
         // Start erasing the upcoming sector
         flashEraseSector(curSectorNum);
@@ -464,7 +478,7 @@ uint32_t dataLog_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata,
   // read bytes is large enough. Otherwise, the 0xFF could be caused by the data
   if (maxBytes > 20 &&
       (readAddress + maxBytes) > FLASH_MAX_SECTOR_BYTES * lastSector) {
-    for (int i = 0; i < maxBytes; i++) {
+    for (uint32_t i = 0; i < maxBytes; i++) {
       if (*(pdata + i) != 0xFF) break;
       if (i == maxBytes - 1) {
         return 0;
@@ -541,14 +555,20 @@ void dataLog_loadCliConfigs() {
   CliConfigs_s *cliConfig = cli_getConfigs();
   uint32_t firstAddress = CONFIG_START_ADDRESS;
   uint32_t maxCount =
-      (FLASH_MAX_SECTOR_BYTES - CONFIG_START_ADDRESS) / kCliConfigSize;
+      (FLASH_MAX_SECTOR_BYTES - CONFIG_START_ADDRESS) / kWrappedCliConfigSize;
   uint32_t lastPacketAddress =
-      dataLog_getLastPacketType(firstAddress, maxCount, kCliConfigSize);
-  currentConfigAddress = kCliConfigSize + lastPacketAddress;
-  *cliConfig = *(CliConfigs_s *)tempPacketBuffer;
-  if (packetIsEmpty((uint8_t *)cliConfig, kCliConfigSize)) {
-    currentConfigAddress -= kCliConfigSize;
+      dataLog_getLastPacketType(firstAddress, maxCount, kWrappedCliConfigSize);
+  flashRead(lastPacketAddress, kWrappedCliConfigSize, tempPacketBuffer);
+  currentConfigAddress = kWrappedCliConfigSize + lastPacketAddress;
+  wrappedConfig = *(WrappedCliConfigs_s *)tempPacketBuffer;
+  crc.reset();
+  crc.add((uint8_t *)&(wrappedConfig.cliConfigs), sizeof(CliConfigs_s));
+  uint16_t calculatedCRC = crc.getCRC();
+  if (calculatedCRC != wrappedConfig.crc) {
     cli_setDefaultConfig();
+    dataLog_writeCliConfigs();
+  } else {
+    *cliConfig = wrappedConfig.cliConfigs;
   }
 #if HAS_DEV(RADIO)
   // Set the radio channel to be whatever we are using from the cli configs,
@@ -560,18 +580,16 @@ void dataLog_loadCliConfigs() {
 
 void dataLog_writeCliConfigs() {
   CliConfigs_s *cliConfig = cli_getConfigs();
-  uint32_t second_page_bytes =
-      (currentConfigAddress + kCliConfigSize) % FLASH_MIN_PAGE_SIZE_BYTES;
-  if (second_page_bytes >= kCliConfigSize) second_page_bytes = 0;
-  uint32_t first_page_bytes = kCliConfigSize - second_page_bytes;
-  // Write to first page and, if necessary, second page
-  flashWrite(currentConfigAddress, first_page_bytes, (uint8_t *)cliConfig);
-  if (second_page_bytes > 0) {
-    flashWrite(currentConfigAddress + first_page_bytes, second_page_bytes,
-               (uint8_t *)cliConfig + first_page_bytes);
-  }
-  currentConfigAddress += kCliConfigSize;
-  if (currentConfigAddress > FLASH_MAX_SECTOR_BYTES - kCliConfigSize) {
+  wrappedConfig.cliConfigs = *cliConfig;
+  crc.reset();
+  crc.add((uint8_t *)cliConfig, sizeof(CliConfigs_s));
+  wrappedConfig.crc = crc.getCRC();
+  // Write configs to flash
+  flashWrite(currentConfigAddress, kWrappedCliConfigSize,
+             (uint8_t *)&wrappedConfig);
+
+  currentConfigAddress += kWrappedCliConfigSize;
+  if (currentConfigAddress > FLASH_MAX_SECTOR_BYTES - kWrappedCliConfigSize) {
     flashRead(0, CONFIG_START_ADDRESS, tempPacketBuffer);
     flashEraseSector(0);
     flashWrite(0, CONFIG_START_ADDRESS, tempPacketBuffer);

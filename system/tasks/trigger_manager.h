@@ -31,6 +31,7 @@ typedef struct __attribute__((__packed__)) {
   uint8_t mode;
   uint8_t port;
   float duration;
+  bool allowedManual;
   uint32_t pulseWidth;
   uint16_t rootExpressionID;
 } TriggerConfig_s;
@@ -59,6 +60,12 @@ void triggerManager_setTriggerFireStatus(uint16_t status);
  * @param filterData: Current filter data
  */
 void triggerManager_update(FilterData_s *filterData);
+
+/**
+ * @brief Sets a default configuration for triggers, presuming that current
+ * 		  configs are invalid.
+ */
+void triggerManager_setDefaultConfig();
 
 /**
  * @brief Fire a given trigger

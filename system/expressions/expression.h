@@ -3,6 +3,8 @@
 
 #include <inttypes.h>
 
+#include <functional>
+
 #include "expression_sharedtypes.h"
 #include "filterdata_types.h"
 #include "string_slice.h"
@@ -24,6 +26,14 @@ class Expression {
   ExpressionValue_u value;
 
  public:
+  /**
+   * An ExpressionPtrCallback is a callback function that allows an expression
+   * pointer to be obtained given the index of the expression to find.
+   * @param expressionNum The index/number of the expression in the
+   * ExpressionStore to fetch from.
+   * @return Pointer to that expression as the base class Expression.
+   */
+  using ExpressionPtrCallback = std::function<Expression *(uint16_t)>;
   uint32_t firstTrue;
   uint32_t trueSince;
   uint16_t triggerNum;
@@ -41,11 +51,11 @@ class Expression {
   /**
    * Evaluate this expression.
    * @param filterData Filter data to evaluate with.
-   * @param expressions Array of expression pointers, for expressions that
-   * rely on the value of other expressions.
+   * @param expressionPtrCallback ExpressionPtrCallback to get a pointer to a
+   * given child expression.
    */
   virtual void evaluate(FilterData_s *filterData,
-                        Expression *expressions[]) = 0;
+                        ExpressionPtrCallback &expressionPtrCallback) = 0;
 
   /**
    * If this is an empty expression.
@@ -68,20 +78,22 @@ class Expression {
   float getNumberValue() const;
 
   /**
-   * Set the value of this expression to be a numeric value.
-   * @param value
+   * Set the value of this expression to be a numeric value. Will also mark that
+   * this expression contains a numeric value.
+   * @param value Float value to set to.
    */
   void setNumberValue(float num);
 
   /**
-   * Set the value of this expression to be a boolean.
-   * @param value
+   * Set the value of this expression to be a boolean. Will also mark that this
+   * expression contains a boolean value.
+   * @param value Boolean value to set to.
    */
   void setBooleanValue(bool bl);
 
   /**
    * Set the trigger number that this expression is used for.
-   * @param triggerNum
+   * @param triggerNum Trigger number to associate with this expression.
    */
   void setTriggerNum(int triggerNum);
 
@@ -89,11 +101,12 @@ class Expression {
    * Put a string representation of this expression into a buffer.
    * @param buffer Buffer to print into.
    * @param n Size of buffer available
-   * @param expressions Other expressions.
-   * @return Number of characters used by this expression.
+   * @param expressionPtrCallback ExpressionPtrCallback to get a pointer to a
+   * given child expression.
+   * @return Number of characters used by this expression in the buffer.
    */
   virtual int toString(char *buffer, int n,
-                       Expression *expressions[]) const = 0;
+                       ExpressionPtrCallback &expressionPtrCallback) const = 0;
 
   /**
    * Serialize this expression into a location.

@@ -24,6 +24,9 @@ static RadioPacket_s transmitPacket[NUM_RADIO];
 
 static const char *call = "KM6GNL";
 
+// https://stackoverflow.com/q/9695329
+#define ROUND_2_INT(f) ((int)((f) >= 0.0 ? (f + 0.5) : (f - 0.5)))
+
 void radioManager_init() {
   for (int i = 0; i < NUM_RADIO; i++) {
     cb_init(&(dataRx[i].rxBuffer), dataRx[i].rxArray, RX_BUFF_LEN,
@@ -124,6 +127,11 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       0,
       0,
 #endif  // HAS_DEV(IMU)
+
+      // 16 bit means 16,000 max
+      // we can just multiply by 10 for 0.1 precision
+      // and improve more if required later
+      .angle_to_vertical = ROUND_2_INT(filterData->angle_vertical * 10)
     };
     transmitPacket[radioId].packetType = 2;
     transmitPacket[radioId].payload.orientation = data;
@@ -254,13 +262,12 @@ void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
     transmitPacket[radioId].payload.cliString.len = txLen;
     transmitPacket[radioId].payload.cliString.id = lastTxId++;
 
-#if DO_RADIO_HACK == 1
+#ifndef DESKTOP_SIM
     for (int i = 0; i < 3; i++) {
 #else
     {
-#endif  // DO_RADIO_HACK
+#endif  // DESKTOP_SIM
 
-#if DO_RADIO_HACK == 1
       // This is intended to be called twice to hopefully successfully send at
       // least once
       radioManager_sendInternal(radioId);
@@ -276,10 +283,6 @@ void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
         }
         hm_watchdogRefresh();
       }
-
-#else
-      radioManager_sendInternal(radioId);
-#endif  // DO_RADIO_HACK
     }
 
     len -= txLen;

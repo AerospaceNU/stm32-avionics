@@ -14,6 +14,13 @@ void CliTasks::triggerFire() {
       return;
     }
 
+    TriggerConfig_s* triggerConfig =
+        cli_getConfigs()->triggerConfiguration + triggerNum;
+    if (!triggerConfig->allowedManual) {
+      cli_sendAck(false, "Manual ignition of that trigger is disabled");
+      return;
+    }
+
     char msg[70 + 4] = {0};
     snprintf(msg, sizeof(msg), "Initializing trigger %i\r\n", triggerNum);
     cli_send(msg);

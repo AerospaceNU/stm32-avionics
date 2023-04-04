@@ -41,6 +41,7 @@ void CliTasks::help() {
       "", "     -C string*1",
       "Configuration using expression notation, required. Must be in quotes");
   generateDoc("", "     -D", "Delete this trigger");
+  generateDoc("", "     -N", "Disallow manual triggering");
   generateDoc("", "-e float*1", "Configure ground elevation (in meters)");
   generateDoc("", "-r float*1", "Configure ground temperature (in celsius)");
   generateDoc("", "-c int*1",

@@ -23,7 +23,7 @@ EndCondition_e CliEraseFlashState::run() {
   if (!hm_flashIsEraseComplete(_curFlashId)) {
     if ((hm_millis() - last_time) > SEND_PERIOD) {
       // Inform user that erase operation is still in progress
-      cli_send("Erasing...");
+      cli_send("Erasing...\r\n");
       last_time = hm_millis();
     }
   } else {

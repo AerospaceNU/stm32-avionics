@@ -2,8 +2,6 @@
 
 #include <string.h>
 
-extern size_t strnlen(const char *str, size_t strsz);
-
 #include <cmath>
 #include <cstdio>
 
@@ -73,13 +71,14 @@ UnaryFunctionWrapper unaryFunctionWrappers[NUM_UNARY_FUNCTION] = {
     UnaryFunctionWrapper("tan", tanFunc, number, number, false),
 };
 
-int UnaryFuncExpression::toString(char *buffer, int n,
-                                  Expression *expressions[]) const {
+int UnaryFuncExpression::toString(
+    char *buffer, int n, ExpressionPtrCallback &expressionPtrCallback) const {
   int selfLength = strnlen(unaryFunctionWrappers[this->opcode].stringRep, 7);
   snprintf(buffer, n, "(%s ", unaryFunctionWrappers[this->opcode].stringRep);
   if (selfLength + 2 < n) {
-    int operandLen = expressions[this->operandID]->toString(
-        buffer + 2 + selfLength, n - selfLength - 2, expressions);
+    int operandLen = expressionPtrCallback(this->operandID)
+                         ->toString(buffer + 2 + selfLength, n - selfLength - 2,
+                                    expressionPtrCallback);
     if (operandLen + selfLength + 2 < n) {
       buffer[operandLen + selfLength + 2] = ')';
       buffer[operandLen + selfLength + 2 + 1] = '\0';
@@ -90,10 +89,10 @@ int UnaryFuncExpression::toString(char *buffer, int n,
   return selfLength;
 }
 
-void UnaryFuncExpression::evaluate(FilterData_s *filterData,
-                                   Expression *expressions[]) {
-  unaryFunctionWrappers[this->opcode].evaluate(this, filterData,
-                                               expressions[operandID]);
+void UnaryFuncExpression::evaluate(
+    FilterData_s *filterData, ExpressionPtrCallback &expressionPtrCallback) {
+  unaryFunctionWrappers[this->opcode].evaluate(
+      this, filterData, expressionPtrCallback(operandID));
 }
 
 void UnaryFuncExpression::serializeInto(
