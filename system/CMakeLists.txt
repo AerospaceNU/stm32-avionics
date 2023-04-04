@@ -3,7 +3,7 @@ set(SYSTEM_FILES_LIST
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/radio_manager.c
         ${CMAKE_CURRENT_SOURCE_DIR}/scheduler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/state_log.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/data_log.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/data_log.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/trigger_manager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/buzzer_heartbeat.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/data_offload.c

@@ -6,7 +6,6 @@ execute_process(
 set(SIM_COMMON_FILES_LIST
   ${CMAKE_CURRENT_SOURCE_DIR}/desktop_hardware_manager.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/sim_timing.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/rocket_physics_sim.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/nt_interface.cpp
   CACHE INTERNAL "")
 

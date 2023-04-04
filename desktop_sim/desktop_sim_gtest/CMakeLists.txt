@@ -26,7 +26,7 @@ add_executable(
   ${SYSTEM_FILES_LIST}
 )
 
-target_link_libraries(desktop_sim_test gtest_main wpimath)
+target_link_libraries(desktop_sim_test gtest_main)
 target_include_directories(desktop_sim_test PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${SIM_COMMON_INCLUDE_DIRS}
