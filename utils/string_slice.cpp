@@ -1,7 +1,6 @@
 #include "string_slice.h"
 
 #include <string.h>
-extern size_t strnlen(const char *str, size_t strsz);
 
 StringSlice::StringSlice(const char **src, int start, int end) {
   this->src = src;

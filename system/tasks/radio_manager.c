@@ -264,10 +264,6 @@ void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
 
 #ifndef DESKTOP_SIM
     for (int i = 0; i < 3; i++) {
-#else
-    {
-#endif  // DESKTOP_SIM
-
       // This is intended to be called twice to hopefully successfully send at
       // least once
       radioManager_sendInternal(radioId);
@@ -284,6 +280,9 @@ void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
         hm_watchdogRefresh();
       }
     }
+#else
+    radioManager_sendInternal(radioId);
+#endif  // DESKTOP_SIM
 
     len -= txLen;
     data += txLen;
