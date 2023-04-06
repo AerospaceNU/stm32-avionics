@@ -32,7 +32,7 @@ static void writeByte(ImuIIS2MDCCtrl_s *sensor, uint8_t addr, uint8_t val) {
 #define OUTX_L_REG 0x68
 
 bool iis2mdc_init(ImuIIS2MDCCtrl_s *sensor, uint8_t address7bit) {
-	sensor->address = address8bit;
+	sensor->address = address7bit;
 	if (WHO_AM_I_VALUE != readByte(sensor, WHO_AM_I)) {
 		return false;
 	}
