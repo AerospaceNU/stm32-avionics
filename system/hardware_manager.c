@@ -381,8 +381,7 @@ void hm_hardwareInit() {
 #if HAS_DEV(MAG_IIS2MDC)
   for (int i = 0; i < NUM_MAG_IIS2MDC; i++) {
 	// TODO don't hard-code i2c address
-	iis2mdc_init(imuIis2mdc + i, 0b11110);
-    hardwareStatusMag[i] = true;
+	hardwareStatusMag[i] = iis2mdc_init(imuIis2mdc + i, 0b11110);
   }
 #endif
 
