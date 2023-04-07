@@ -76,12 +76,17 @@ static void setAccelFullscale(ImuICM20600Ctrl_s *sensor, ImuICM20600AccelFullsca
 }
 
 static bool isConnected(ImuICM20600Ctrl_s *sensor) {
-	return spi_readRegister(&sensor->spi, REG_WHO_AM_I) == WHOAMI;
+	uint8_t id = spi_readRegister(&sensor->spi, REG_WHO_AM_I);
+	return (id == WHOAMI) || (id == 0xAF); // icm 20608-g special case
+	// page 21, https://invensense.tdk.com/wp-content/uploads/2015/03/RM-000030-v1.0.pdf
 }
 
 bool icm20600_init(ImuICM20600Ctrl_s *sensor,
 		ImuICM20600AccelFullscale_e accelFullscale,
 		ImuICM20600GyroFullscale_e gyroFullscale) {
+	HAL_GPIO_WritePin(sensor->spi.port, sensor->spi.pin, 1);
+	HAL_Delay(1);
+
 	// Reset the device
 	//Serial.println("resetting");
 	spi_writeRegister(&sensor->spi, PWR_MGMT_1, (1 << 7));
@@ -89,6 +94,7 @@ bool icm20600_init(ImuICM20600Ctrl_s *sensor,
 
 	// Disable sleep, use the best clock source
 	spi_writeRegister(&sensor->spi, PWR_MGMT_1, 0x00 | 0);
+
 	if (!isConnected(sensor)) {
 		return false;
 	}

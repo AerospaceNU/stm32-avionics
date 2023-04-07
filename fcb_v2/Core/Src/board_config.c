@@ -112,7 +112,7 @@ UART_HandleTypeDef* gpsStdHuart[NUM_GPS_STD + NUM_GPS_UBLOX] = {&huart3};
 #if HAS_DEV(IMU_ICM20600)
 SPI_HandleTypeDef* imuIcm20600Hspi[NUM_IMU_ICM20600] = {&hspi2, &hspi2};
 GPIO_TypeDef* imuIcm20600CsGpioPort[NUM_IMU_ICM20600] = {IMU1_CS_GPIO_Port,
-                                                         IMU1_CS_GPIO_Port};
+                                                         IMU2_CS_GPIO_Port};
 uint16_t imuIcm20600CsPin[NUM_IMU_ICM20600] = {IMU1_CS_Pin, IMU2_CS_Pin};
 #endif  // HAS_DEV(IMU_ICM20600)
 

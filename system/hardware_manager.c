@@ -366,7 +366,7 @@ void hm_hardwareInit() {
 #endif  // HAS_DEV(IMU_LSM9DS1)
 
 #if HAS_DEV(IMU_ICM20600)
-  for (int i = 0; i < NUM_IMU_LSM9DS1; i++) {
+  for (int i = 0; i < NUM_IMU_ICM20600; i++) {
     imuIcm20600[i].spi.hspi = imuIcm20600Hspi[i];
     imuIcm20600[i].spi.port = imuIcm20600CsGpioPort[i];
     imuIcm20600[i].spi.pin = imuIcm20600CsPin[i];
