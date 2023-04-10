@@ -54,7 +54,7 @@ bool adcDev_init(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc,
       break;
   }
 
-  // Make sure ADC is idle (TODO idk if this actually helps)
+  // Make sure ADC is actually idle
   HAL_ADC_Stop(hadc);
 
   // Run ADC calibration. Don't care about result because there's no critical
