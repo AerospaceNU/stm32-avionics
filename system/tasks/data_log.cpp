@@ -439,19 +439,35 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
         LogData_s dequeuedData;
         size_t numElements = 1;
         cb_peek(&logPacketBuffer, &dequeuedData, &numElements);
+        static uint8_t flashWriteBuffer[FLASH_MIN_PAGE_SIZE_BYTES];
+        static uint16_t flashWriteBufferCount = 0;
         int numDequeues = 0;
-        while (numElements != 0) {
+        while (numElements != 0 && numDequeues < 2) {
           cb_dequeue(&logPacketBuffer, 1);
-          // TODO: Write with buffer so we only write to 1 page per cycle.
-          // Probably better to go here so we don't buffer when writing
-          // metadata, etc. This is the write that matters
-          flashWrite(curWriteAddress, kLogDataSize, (uint8_t *)&dequeuedData);
-          // Increment write address to be next address to write to
-          curWriteAddress += kLogDataSize;
+          // If there is still room in the buffer, just stuff data there
+          if (kLogDataSize <
+              FLASH_MIN_PAGE_SIZE_BYTES - flashWriteBufferCount) {
+            memcpy(flashWriteBuffer + flashWriteBufferCount, &dequeuedData,
+                   kLogDataSize);
+            flashWriteBufferCount += kLogDataSize;
+            // If there is not enough room in the buffer, fill it up, write, and
+            // put the remaining data in there.
+          } else {
+            memcpy(flashWriteBuffer + flashWriteBufferCount, &dequeuedData,
+                   FLASH_MIN_PAGE_SIZE_BYTES - flashWriteBufferCount);
+            flashWrite(curWriteAddress, FLASH_MIN_PAGE_SIZE_BYTES,
+                       flashWriteBuffer);
+            curWriteAddress += FLASH_MIN_PAGE_SIZE_BYTES;
+            memcpy(flashWriteBuffer,
+                   &dequeuedData + FLASH_MIN_PAGE_SIZE_BYTES -
+                       flashWriteBufferCount,
+                   kLogDataSize - FLASH_MIN_PAGE_SIZE_BYTES +
+                       flashWriteBufferCount);
+            flashWriteBufferCount = kLogDataSize - FLASH_MIN_PAGE_SIZE_BYTES +
+                                    flashWriteBufferCount;
+          }
           cb_peek(&logPacketBuffer, &dequeuedData, &numElements);
           numDequeues++;
-          // Limit the number of log writes per cycle to prevent lengthy cycles
-          if (numDequeues >= 2) break;
         }
       }
     }
