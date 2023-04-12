@@ -8,11 +8,11 @@
 
 #include "hal_callbacks.h"
 
-#define MAX_RAW_VAL_16B 2 << 16
-#define MAX_RAW_VAL_14B 2 << 14
-#define MAX_RAW_VAL_12B 2 << 12
-#define MAX_RAW_VAL_10B 2 << 10
-#define MAX_RAW_VAL_8B 2 << 8
+#define MAX_RAW_VAL_16B 1 << 16
+#define MAX_RAW_VAL_14B 1 << 14
+#define MAX_RAW_VAL_12B 1 << 12
+#define MAX_RAW_VAL_10B 1 << 10
+#define MAX_RAW_VAL_8B 1 << 8
 
 static void adcDev_conversionCpltCallback(void *adc) {
   ((AdcDevCtrl_s *)adc)->bConvCplt = true;

@@ -3,6 +3,8 @@
 #include "hal_callbacks.h"
 #include "radio_packet_types.h"
 
+#include <stdio.h>
+
 /* Device includes */
 
 #if HAS_DEV(ACCEL_H3LIS331DL)
@@ -1062,24 +1064,36 @@ void hm_readSensorData() {
     // Sort into the appropriate places
 #if HAS_DEV(VBAT_ADC)
     for (int i = 0; i < NUM_VBAT_ADC; i++) {
-      sensorData.vbatData[FIRST_ID_VBAT_ADC + i] = adcDev_getValue(
+      bool success = adcDev_getValue(
     		  &stmAdcs[pyroHadcEntries[i].stmAdcIdx],
-			  pyroHadcEntries[i].rank,
+			  vbatHadcEntries[i].rank,
 			  &adcVal,
 			  vbatHadcEntries[i].min,
 			  vbatHadcEntries[i].max,
-			  5) ? (adcVal > PYRO_CONTINUITY_THRESHOLD) : false;
+			  500);
+      if (success) {
+    	  sensorData.vbatData[FIRST_ID_VBAT_ADC + i] = adcVal;
+    	  if (i == 0) printf("%i\n", (int) (adcVal*100));
+      } else {
+    	  sensorData.vbatData[FIRST_ID_VBAT_ADC + i] = -1;
+      }
     }
 #endif  // HAS_DEV(VBAT_ADC)
 #if HAS_DEV(PYRO_CONT_HADC)
     for (int i = 0; i < NUM_PYRO_CONT_HADC; i++) {
-      sensorData.pyroContData[FIRST_ID_PYRO_CONT_HADC + i] = adcDev_getValue(
+      bool success = adcDev_getValue(
     		  &stmAdcs[pyroHadcEntries[i].stmAdcIdx],
 			  pyroHadcEntries[i].rank,
 			  &adcVal,
 			  pyroHadcEntries[i].min,
 			  pyroHadcEntries[i].max,
-			  5) ? (adcVal > PYRO_CONTINUITY_THRESHOLD) : false;
+			  500);
+      if (success) {
+    	  sensorData.pyroContData[FIRST_ID_PYRO_CONT_HADC + i] =
+    			  (adcVal > PYRO_CONTINUITY_THRESHOLD);
+      } else {
+    	  sensorData.pyroContData[FIRST_ID_PYRO_CONT_HADC + i] = false;
+      }
     }
 #endif  // HAS_DEV(PYRO_CONT_ADC)
 #endif  // HAS_DEV(STM_HADC)
