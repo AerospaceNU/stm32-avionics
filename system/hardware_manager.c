@@ -1073,7 +1073,6 @@ void hm_readSensorData() {
 			  500);
       if (success) {
     	  sensorData.vbatData[FIRST_ID_VBAT_ADC + i] = adcVal;
-    	  if (i == 0) printf("%i\n", (int) (adcVal*100));
       } else {
     	  sensorData.vbatData[FIRST_ID_VBAT_ADC + i] = -1;
       }
