@@ -125,7 +125,6 @@ static void flashRead(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
 static void flashWrite(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
   uint32_t dataOffset = 0;
   // Continue writing page by page
-  int counter = 0;
   while (dataOffset < numBytes) {
     // Check how many bytes to write
     uint32_t bytesToNextPage =
@@ -145,7 +144,6 @@ static void flashWrite(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
     }
     hm_flashWriteStart(flashId, flashOffset, pageBytes, &pData[dataOffset]);
     dataOffset += pageBytes;
-    counter++;
   }
 }
 

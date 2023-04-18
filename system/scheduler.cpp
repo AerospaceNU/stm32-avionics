@@ -14,7 +14,7 @@
 
 void Scheduler::run(void) {
   /* Create all necessary states initially and store in list */
-  uint32_t defaultPeriod = 0;
+  uint32_t defaultPeriod = 15;
   CliEraseFlashState cliEraseFlash =
       CliEraseFlashState(StateId_e::CliEraseFlash, defaultPeriod);
   CliOffloadState cliOffload =
@@ -37,7 +37,7 @@ void Scheduler::run(void) {
   State* pNextState = &initialize;
 
   // Helper functions throughout infinite loop
-  volatile uint32_t lastTime_ = hm_millis();
+  uint32_t lastTime_ = hm_millis();
   EndCondition_e endCondition = NoChange;
 
   // Keep running scheduler forever
@@ -48,9 +48,6 @@ void Scheduler::run(void) {
       }
     }
 
-    if (hm_millis() - lastTime_ > 5) {
-      hm_ledToggle(1);
-    }
     lastTime_ = hm_millis();
     // Visually show how fast scheduler is running using LED
     hm_ledToggle(1);
