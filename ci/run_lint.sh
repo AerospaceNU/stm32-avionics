@@ -12,3 +12,4 @@ done
 
 # Cpplint
 cpplint --counting=detailed --recursive devices/ system/ utils/ desktop_sim/
+git config user.name --global
