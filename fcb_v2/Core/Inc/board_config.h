@@ -34,7 +34,7 @@
 
 #define NUM_LINE_CUTTER_BLE 2
 
-#define NUM_PYRO_DIGITAL 4
+#define NUM_PYRO_DIGITAL 5
 
 // Everything is attached to adc1, so only one HADC
 #define NUM_STM_HADC 1

@@ -148,10 +148,10 @@ uint8_t lineCutterBleAddress[NUM_LINE_CUTTER_BLE] = {2, 3};
 #if HAS_DEV(PYRO_DIGITAL)
 GPIO_TypeDef* pyroDigitalGpioPort[NUM_PYRO_DIGITAL] = {
     FIRE1_GPIO_Port, FIRE2_GPIO_Port, FIRE3_GPIO_Port,
-    FIRE4_GPIO_Port};
+    FIRE4_GPIO_Port, PERIPH_EN_GPIO_Port};
 TIM_HandleTypeDef* pyroDigitalTickTim = &htim2;
 uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL] = {FIRE1_Pin, FIRE2_Pin, FIRE3_Pin,
-                                             FIRE4_Pin};
+                                             FIRE4_Pin, PERIPH_EN_Pin};
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
 /* Radio */
