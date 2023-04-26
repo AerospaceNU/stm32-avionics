@@ -40,6 +40,45 @@ static bool manualCalibration(TiRadioCtrl_s *radio);
 
 #define TIRADIO_MAX_DELAY 10  // ms
 
+
+// ================== From ao_cc1200.c ==================
+/*
+ * Copyright © 2012 Keith Packard <keithp@keithp.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+ */
+#include "ao_cc1200.h"
+static const uint16_t radio_setup[] = {
+#include "ao_cc1200_CC1200.h"
+};
+#define ao_radio_set_regs(radio, setup) _ao_radio_set_regs(radio, setup, (sizeof (setup) / sizeof(setup[0])) >> 1)
+static void
+_ao_radio_set_regs(TiRadioCtrl_s *radio, const uint16_t *regs, int nreg)
+{
+	int i;
+
+	for (i = 0; i < nreg; i++) {
+		uint16_t address = regs[0];
+		uint8_t writeByte = (uint8_t) regs[1];
+		tiRadio_spiWriteReg(radio, address, &writeByte, sizeof(writeByte));
+		regs += 2;
+	}
+}
+// ===================================================
+
+
 // Initially configure radio, apply settings provided
 bool tiRadio_init(TiRadioCtrl_s *radio) {
   // Set SPI pins into a known good state. Lots of waiting to make sure it
@@ -56,13 +95,16 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
   // Reset everything
   tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SRES);
 
-  // Write provided default register settings
-  uint8_t writeByte;
-  for (uint16_t i = 0; i < (radio->settingsSize / sizeof(RegisterSetting_s));
-       i++) {
-    writeByte = radio->settingsPtr[i].data;
-    tiRadio_spiWriteReg(radio, radio->settingsPtr[i].addr, &writeByte, 1);
-  }
+  // HACK: swap out settings with the settings from Altos
+  ao_radio_set_regs(radio, radio_setup);
+
+//  // Write provided default register settings
+//  uint8_t writeByte;
+//  for (uint16_t i = 0; i < (radio->settingsSize / sizeof(RegisterSetting_s));
+//       i++) {
+//    writeByte = radio->settingsPtr[i].data;
+//    tiRadio_spiWriteReg(radio, radio->settingsPtr[i].addr, &writeByte, 1);
+//  }
 
   // Put radio back into RX after receiving a good packet
   uint8_t rfend1 = 0b00110000 | (0x07 << 1) | 0x01;
@@ -89,7 +131,11 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
 
   tiRadio_spiWriteReg(radio, TIRADIO_FIFO_CFG, &radio->payloadSize, 0x01);
 
-  // SetFrequency is broken, for now the prefered settings do this for us
+  // Flush any old FIFO data (source: Aao_cc1200.c:244)
+  tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SFTX);
+  tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SFRX);
+
+  // SetFrequency is broken, for now the preferred settings do this for us
   // tiRadio_setFrequency(radio);
 
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120

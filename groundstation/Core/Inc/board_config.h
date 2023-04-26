@@ -37,7 +37,7 @@
 #define NUM_PYRO_CONT_ADC 0
 
 #define NUM_RADIO_TI_433 1
-#define NUM_RADIO_TI_915 1
+#define NUM_RADIO_TI_915 0
 
 #define NUM_SERVO_PWM 0
 
