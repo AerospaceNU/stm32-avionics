@@ -112,6 +112,8 @@ static void OnDataRx(RadioRecievedPacket_s *packet) {
 
 #define min(a, b) (a < b) ? a : b
 
+int cc1200_main();
+
 /* USER CODE END 0 */
 
 /**
@@ -164,6 +166,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
   hm_hardwareInit();
+
+  while (1) {
+	  cc1200_main();
+  }
+  return -1;
+
 
   radioManager_init();
   for (int i = 0; i < NUM_RADIO; i++) {

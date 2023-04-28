@@ -13,21 +13,6 @@
 #include "board_config_common.h"
 #include <inttypes.h>
 
-//// Pin definitions
-//// change these to match your board setup
-//#define PIN_SPI_MOSI P0_9
-//#define PIN_SPI_MISO P0_8
-//#define PIN_SPI_SCLK P0_7
-//
-//#define PIN_TX_CS P0_6
-//#define PIN_TX_RST P0_29
-//
-//#define PIN_RX_CS P0_4
-//#define PIN_RX_RST P0_30
-
-//BufferedSerial serial(USBTX, USBRX, 115200);
-//SerialStream<BufferedSerial> pc(serial);
-
 CC1200 txRadio(
 		radioTi433Hspi[0],
 		radioTi433RstGpioPort[0],

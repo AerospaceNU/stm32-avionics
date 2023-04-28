@@ -65,4 +65,32 @@ int _write(int file, char *ptr, int len) {
   return 0;
 }
 
+// redirect scanf, too
+#ifdef __GNUC__
+#define GETCHAR_PROTOTYPE int __io_getchar(void)
+#else
+#define GETCHAR_PROTOTYPE int fgetc(FILE *f)
+#endif
+
+GETCHAR_PROTOTYPE
+{
+  uint8_t ch = 0;
+
+  /* Wait for reception of a character on the USB RX and echo this
+   * character on console */
+  size_t count;
+  do {
+	  count = 1;
+	  cb_peek(usbStd_getRxBuffer(), &ch, &count);
+	  HAL_Delay(1);
+  } while (count < 1);
+
+  cb_dequeue(usbStd_getRxBuffer(), 1);
+
+  CDC_Transmit_FS(&ch, 1);
+
+  return ch;
+}
+
+
 #endif  // HAS_DEV(USB_STD)
