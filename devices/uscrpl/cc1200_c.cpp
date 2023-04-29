@@ -57,8 +57,8 @@ void checkSignalTransmit()
 	printf("Running test with config %d:\n\n", config);
 
 	CC1200::PacketMode mode = CC1200::PacketMode::VARIABLE_LENGTH;
-	CC1200::Band band = CC1200::Band::BAND_820_960MHz;
-	float frequency = 915e6;
+	CC1200::Band band = CC1200::Band::BAND_410_480MHz;
+	float frequency = 433e6;
 	const float txPower = 0;
 	float fskDeviation;
 	float symbolRate;
@@ -102,6 +102,7 @@ void checkSignalTransmit()
 	}
 	else if(config == 3)
 	{
+		// This is basically our (AeroNU's) present config
 		fskDeviation = 19989;
 		symbolRate = 38400;
 		rxFilterBW = 104200;
