@@ -334,7 +334,7 @@ void hm_hardwareInit() {
 #if HAS_DEV(FLASH_MB85RSX)
   for (int i = 0; i < NUM_FLASH_MB85RSX; i++) {
     flashMb85rsx_init(&(flashMb85rsx[i]), flashMb85rsxHspi[i],
-                     flashS25flxCsGpioPort[i], flashS25flxCsPin[i]);
+                     flashMb85rsxCsGpioPort[i], flashMb85rsxCsPin[i]);
     hardwareStatusFlash[FIRST_ID_FLASH_MB85RSX + i] = true;
   }
 #endif  // HAS_DEV(FLASH_MB85RSX)
