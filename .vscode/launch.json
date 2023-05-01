@@ -1,0 +1,49 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "(gdb) Launch",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceRoot}/build/desktop_sim/desktop_sim",
+      "args": [
+        "~/Downloads/LDRS-beanboozler-l265-output-post.csv",
+        "external_flash.dat",
+        "internal_flash.dat"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "preLaunchTask": "build live sim",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Set Disassembly Flavor to Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
+      "name": "Stm32 test",
+      "cwd": "${workspaceRoot}",
+      "executable": "${workspaceRoot}/fcb_v1/Build/fcb_v1.elf",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "stlink",
+      "interface": "swd",
+      "device": "STM32H743ZIT",
+      "runToEntryPoint": "main",
+      "preLaunchTask": "build FCB V1",
+    }
+  ]
+}

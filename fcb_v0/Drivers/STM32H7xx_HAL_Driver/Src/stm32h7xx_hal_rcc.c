@@ -81,6 +81,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private macro -------------------------------------------------------------*/
 /** @defgroup RCC_Private_Macros RCC Private Macros
   * @{
