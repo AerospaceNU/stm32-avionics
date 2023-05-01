@@ -46,4 +46,10 @@ void halCallbacks_registerTimPeriodElapsedCallback(TIM_HandleTypeDef *htim,
                                                    void *userData);
 #endif  // HAL_TIM_MODULE_ENABLED
 
+#ifdef USB_IS_COMPOSITE
+void halCallbacks_registerUsbCdcReceiveCallback(
+    uint8_t cdc_ch, void (*callback)(void *, uint8_t, uint8_t *, uint32_t *),
+    void *userData);
+#endif  // USB_IS_COMPOSITE
+
 #endif  // DEVICES_HAL_CALLBACKS_H_

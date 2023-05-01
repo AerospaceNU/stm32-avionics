@@ -5,7 +5,7 @@ set(SYSTEM_FILES_LIST
         tasks/cli.c
         tasks/data_log.cpp
         tasks/data_offload.c
-        tasks/radio_manager.c
+        tasks/radio_manager.cpp
         tasks/state_log.c
         tasks/trigger_manager.cpp
         tasks/event_manager.cpp

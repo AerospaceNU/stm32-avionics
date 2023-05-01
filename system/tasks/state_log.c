@@ -56,7 +56,7 @@ void stateLog_write(int currentState) {
     writeAddress += 32;  // Increase the write address by 32 bytes to account
                          // for the flash write size
     if (writeAddress > MAX_FLASH_ADDRESS) {
-      return;  // Return if the address is too high
+      return;            // Return if the address is too high
     }
   }
 

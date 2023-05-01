@@ -353,7 +353,7 @@ static void cc1120EnqueuePacket(TiRadioCtrl_s *radio, uint8_t *buff,
   static RadioRecievedPacket_s packet;
   packet.radioId = radio->id;
   packet.rssi = radio->RSSI;
-  packet.crc = crc;
+  packet.crcFromRadio = crc;
   packet.lqi = radio->LQI;
   memset(packet.data, 0, sizeof(packet.data));
   memcpy(packet.data, buff, size);
@@ -799,7 +799,7 @@ void tiRadio_txRxReadWriteBurstSingle(TiRadioCtrl_s *radio, uint8_t addr,
       HAL_SPI_TransmitReceive(radio->radhspi, &pushByte, pData, 1,
                               TIRADIO_MAX_DELAY);
     }
-  } else {  // if writing to radio registers
+  } else {                         // if writing to radio registers
     if (addr & RADIO_BURST_ACCESS) {
       for (i = 0; i < len; i++) {  // push in data
         HAL_SPI_TransmitReceive(radio->radhspi, pData, &rxdump, 1,

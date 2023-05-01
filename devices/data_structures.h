@@ -16,9 +16,15 @@ typedef struct __attribute__((packed)) {
   uint8_t data[RADIO_MAX_LEN];
   uint8_t radioId;
   int8_t rssi;
-  bool crc;
+  bool crcFromRadio;
   uint8_t lqi;
 } RadioRecievedPacket_s;
+
+typedef struct __attribute__((packed)) {
+  uint8_t magic;
+  RadioRecievedPacket_s packet;
+  uint16_t crc;
+} GroundstationUsbPacket_s;
 
 typedef enum { AXIS_X = 0, AXIS_Y, AXIS_Z } Axis_e;
 

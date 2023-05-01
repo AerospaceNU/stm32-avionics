@@ -503,9 +503,9 @@ int minmea_gettime(struct timespec *ts, const struct minmea_date *date,
   if (date->year < 80) {
     tm.tm_year = 2000 + date->year - 1900;  // 2000-2079
   } else if (date->year >= 1900) {
-    tm.tm_year = date->year - 1900;  // 4 digit year, use directly
+    tm.tm_year = date->year - 1900;         // 4 digit year, use directly
   } else {
-    tm.tm_year = date->year;  // 1980-1999
+    tm.tm_year = date->year;                // 1980-1999
   }
   tm.tm_mon = date->month - 1;
   tm.tm_mday = date->day;

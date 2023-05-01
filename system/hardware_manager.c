@@ -274,7 +274,7 @@ void hm_hardwareInit() {
     sensorProperties.accelFs[FIRST_ID_ACCEL_H3LIS331DL + i] =
         981;  // 100G * 9.81 m/s^2
   }
-#endif  // HAS_DEV(ACCEL_H3LIS331DL)
+#endif        // HAS_DEV(ACCEL_H3LIS331DL)
 
   /* Barometers */
 #if HAS_DEV(BAROMETER_MS5607)
@@ -365,7 +365,7 @@ void hm_hardwareInit() {
     sensorProperties.imuAccelFs[FIRST_ID_IMU_LSM9DS1 + i] =
         156.96;  // 16 G * 9.81 mps2/G
   }
-#endif  // HAS_DEV(IMU_LSM9DS1)
+#endif           // HAS_DEV(IMU_LSM9DS1)
 
 #if HAS_DEV(IMU_ICM20600)
   for (int i = 0; i < NUM_IMU_ICM20600; i++) {
@@ -1010,7 +1010,7 @@ void hm_readSensorData() {
     }
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
-    // Barometer data
+        // Barometer data
 #if HAS_DEV(BAROMETER_MS5607)
     for (int i = 0; i < NUM_BAROMETER_MS5607; i++) {
       barometerMs5607_getData(&barometerMs5607[i]);
@@ -1019,7 +1019,7 @@ void hm_readSensorData() {
     }
 #endif  // HAS_DEV(BAROMETER_MS5607)
 
-    // GPS data
+        // GPS data
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
     // TODO: Poll GPS status to determine if data is good
     for (int i = 0; i < NUM_GPS_STD + NUM_GPS_UBLOX; i++) {
@@ -1028,7 +1028,7 @@ void hm_readSensorData() {
     }
 #endif  // HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
 
-    // IMU data
+        // IMU data
 #if HAS_DEV(IMU_LSM9DS1)
     for (int i = 0; i < NUM_IMU_LSM9DS1; i++) {
       lsm9ds1_getData(&imuLsm9ds1[i]);

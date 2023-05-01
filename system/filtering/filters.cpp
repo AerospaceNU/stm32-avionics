@@ -428,7 +428,9 @@ void filter_addGravityRef() {
   // Check that we are mostly in the direction of gravity in some direction.
   // If the sum of our accelerations averages out to less than half G per
   // reaing, don't flip gravity
-  if (fabs(accelSum) < 0.5 * G_ACCEL_EARTH * gravCount) return;
+  if ((fabs(accelSum) < 0.5 * G_ACCEL_EARTH * gravCount) ||
+      (2 * G_ACCEL_EARTH * gravCount < (fabs(accelSum))))
+    return;
 
   // We have a semi-realistic gravity vector, and we know we're in
   // preflight. Reset the orientation estimation to this new gravity vector

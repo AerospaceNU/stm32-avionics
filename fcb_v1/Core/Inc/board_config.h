@@ -41,6 +41,7 @@
 #define NUM_SERVO_PWM 4
 
 #define NUM_USB_STD 1
+#define USB_IS_COMPOSITE
 
 #define NUM_VBAT_INA226 1
 

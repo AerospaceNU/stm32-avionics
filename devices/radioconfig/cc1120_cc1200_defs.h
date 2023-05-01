@@ -41,7 +41,7 @@
 typedef enum {
   CCA_MODE_NONE = 0,
   CCA_MODE_RSSI,
-  CCA_MODE_INRX,  // Not currently recieving packet
+  CCA_MODE_INRX,     // Not currently recieving packet
   CCA_MODE_RRSI_RX,
   CCA_MODE_RSSI_LBT  // Listen-before-talk, adds 5-10ms per transmit
 } CcaMode_e;

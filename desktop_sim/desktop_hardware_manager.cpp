@@ -176,7 +176,7 @@ void hm_hardwareInit() {
   for (int i = 0; i < NUM_ACCEL; i++) {
     sensorProperties.accelFs[i] = 981;  // 100G * 9.81 m/s^2
   }
-#endif  // HAS_DEV(ACCEL)
+#endif                                  // HAS_DEV(ACCEL)
 
 #if HAS_DEV(IMU)
   // TODO we shouldn't do this, and should instead record this in metadata
