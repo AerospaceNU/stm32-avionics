@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include "board_config.h"
 #ifdef USB_IS_COMPOSITE
 #include "usbd_cdc_acm.h"
 #endif                      // USB_IS_COMPOSITE
@@ -352,7 +353,7 @@ void halCallbacks_registerUsbCdcReceiveCallback(
   usbRecieveCallbacks[cdc_ch].irqCallbackUserData = userData;
 }
 
-void halCallbacks_usbCdcRecieve(uint8_t cdc_ch, uint8_t *buf, uint32_t *len) {
+void halCallbacks_usbCdcReceive(uint8_t cdc_ch, uint8_t *buf, uint32_t *len) {
   for (int i = 0; i < MAX_CDC_CHANNELS; i++) {
     if (usbRecieveCallbacks[i].cdcChannel == cdc_ch) {
       if (usbRecieveCallbacks[i].irqCallback != NULL) {

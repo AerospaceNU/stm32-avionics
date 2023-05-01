@@ -6,6 +6,7 @@
 #define DEVICES_HAL_CALLBACKS_H_
 
 #include "board_config_common.h"
+#include "board_config.h"
 
 #ifdef HAL_SPI_MODULE_ENABLED
 void halCallbacks_registerSpiTxCpltCallback(SPI_HandleTypeDef *hspi,
@@ -50,6 +51,7 @@ void halCallbacks_registerTimPeriodElapsedCallback(TIM_HandleTypeDef *htim,
 void halCallbacks_registerUsbCdcReceiveCallback(
     uint8_t cdc_ch, void (*callback)(void *, uint8_t, uint8_t *, uint32_t *),
     void *userData);
+void halCallbacks_usbCdcReceive(uint8_t cdc_ch, uint8_t *buf, uint32_t *len);
 #endif  // USB_IS_COMPOSITE
 
 #endif  // DEVICES_HAL_CALLBACKS_H_

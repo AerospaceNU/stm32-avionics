@@ -26,12 +26,12 @@
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
-#include "usb_device.h"
+#include "usb_otg.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "usb_device.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -109,9 +109,13 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM17_Init();
   MX_IWDG_Init();
-  MX_USB_DEVICE_Init();
+  MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
 
+  // USB Composite library init
+  MX_USB_DEVICE_Init();
+
+  // Call into actual flight code
   main_cpp();
 
   /* USER CODE END 2 */

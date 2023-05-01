@@ -29,7 +29,8 @@ static RadioPacket_s transmitPacket[NUM_RADIO];
 static const char *call = "KM6GNL";
 
 // https://stackoverflow.com/q/9695329
-#define ROUND_2_INT(f) ((int)((f) >= 0.0 ? (f + 0.5) : (f - 0.5)))
+template <typename In, typename Out>
+Out ROUND_2_INT(In f) { return (Out)((f) >= 0.0 ? (f + 0.5) : (f - 0.5)); }
 
 void radioManager_init() {
   for (int i = 0; i < NUM_RADIO; i++) {
@@ -94,12 +95,13 @@ void radioManager_sendInternal(int radioId) {
     crc.add((uint8_t *)&packet, sizeof(packet));
     usbPacket.crc = crc.getCRC();
 
-    uint8_t ret = CDC_Transmit(1, (uint8_t *)&usbPacket, sizeof(usbPacket));
+    // TODO transmit include start byte and CRC 
+    uint8_t ret = CDC_Transmit(1, (uint8_t *)&packet, sizeof(packet));
     if (USBD_OK != ret) {
-      // TODO handle failed tx
+      // TODO handle failed tx -- it seems like USB will often report BUSY
     }
 
-    HAL_Delay(50);
+//    HAL_Delay(50);
   }
 #endif
 }
@@ -140,20 +142,20 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       1000 / ORIENTATION_RATE) {
     OrientationPacket_s data = {
       state,
-      filterData->qw * 100.0,
-      filterData->qx * 100.0,
-      filterData->qy * 100.0,
-      filterData->qz * 100.0,
+      (int8_t) (filterData->qw * 100),
+	  (int8_t) (filterData->qx * 100),
+	  (int8_t) (filterData->qy * 100),
+	  (int8_t) (filterData->qz * 100),
       filterData->rocket_ang_vel_x,
       filterData->rocket_ang_vel_y,
       filterData->rocket_ang_vel_z,
-      filterData->world_acc_x,
-      filterData->world_acc_y,
-      filterData->world_acc_z,
+      (float) filterData->world_acc_x,
+      (float) filterData->world_acc_y,
+      (float) filterData->world_acc_z,
 #if HAS_DEV(MAG)
-      sensorData->magData[0].realGauss.x,
-      sensorData->magData[0].realGauss.y,
-      sensorData->magData[0].realGauss.z,
+	  (float) sensorData->magData[0].realGauss.x,
+	  (float) sensorData->magData[0].realGauss.y,
+	  (float) sensorData->magData[0].realGauss.z,
 #else
       0,
       0,
@@ -163,7 +165,7 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       // 16 bit means 16,000 max
       // we can just multiply by 10 for 0.1 precision
       // and improve more if required later
-      .angle_to_vertical = ROUND_2_INT(filterData->angle_vertical * 10)
+      .angle_to_vertical = ROUND_2_INT<double, int16_t>(filterData->angle_vertical * 10)
     };
     transmitPacket[radioId].packetType = 2;
     transmitPacket[radioId].payload.orientation = data;
@@ -176,12 +178,12 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       1000 / POSITION_RATE) {
     PositionPacket_s data = {
 #if HAS_DEV(BAROMETER)
-      sensorData->barometerData[0].temperatureC,
+      (float) sensorData->barometerData[0].temperatureC,
 #else
       0,
 #endif  // HAS_DEV(BAROMETER)
-      filterData->pos_z_agl,
-      filterData->world_vel_z,
+      (float) filterData->pos_z_agl,
+	  (float) filterData->world_vel_z,
 #if HAS_DEV(GPS)
       sensorData->gpsData[0].generalData.latitude,
       sensorData->gpsData[0].generalData.longitude,
@@ -192,14 +194,14 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       0,
 #endif  // HAS_DEV(GPS)
 #if HAS_DEV(VBAT)
-      sensorData->vbatData[0],
+      (float) sensorData->vbatData[0],
 #else
       0,
 #endif  // HAS_DEV(VBAT)
       0,
       0,
 #if HAS_DEV(GPS)
-      sensorData->gpsData[0].timeData.timestamp,
+      (uint32_t) sensorData->gpsData[0].timeData.timestamp,
       sensorData->gpsData[0].generalData.satsTracked,
 #else
       0,

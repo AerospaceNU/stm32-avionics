@@ -95,7 +95,7 @@ GETCHAR_PROTOTYPE
 
   cb_dequeue(usbStd_getRxBuffer(), 1);
 
-  CDC_Transmit_FS(&ch, 1);
+  CDC_Transmit(0, &ch, 1);
 
   return ch;
 }

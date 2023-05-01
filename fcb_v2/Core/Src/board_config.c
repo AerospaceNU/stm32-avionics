@@ -208,3 +208,11 @@ StmHadcEntry_s pyroHadcEntries[NUM_PYRO_CONT_HADC] = {
 #if HAS_DEV(WATCHDOG_INTERNAL)
 IWDG_HandleTypeDef* watchdogInternalHiwdg[NUM_WATCHDOG_INTERNAL] = {&hiwdg};
 #endif  // HAS_DEV(WATCHDOG_INTERNAL)
+
+/* USB */
+
+#include "usbd_composite.h"
+char* CDC_DESC_STRINGS[USBD_CDC_ACM_COUNT] = {
+    "FCB V2 Command Line",
+    "FCB V2 USB Telemetry"
+};

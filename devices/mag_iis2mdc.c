@@ -45,11 +45,11 @@ bool iis2mdc_init(ImuIIS2MDCCtrl_s *sensor, uint8_t address7bit) {
         uint8_t ret = HAL_I2C_IsDeviceReady(sensor->hi2c, (uint16_t)(i<<1), 3, 5);
         if (ret != HAL_OK) /* No ACK Received At That Address */
         {
-            printf("No ack\n");
+//            printf("No ack\n");
         }
         else if(ret == HAL_OK)
         {
-            printf("Got %i\n", i);
+//            printf("Got %i\n", i);
         }
     }
 

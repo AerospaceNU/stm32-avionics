@@ -23,7 +23,11 @@
 #include "usbd_cdc_acm_if.h"
 
 /* USER CODE BEGIN INCLUDE */
+//#include "usart.h"
+//#include "tim.h"
+
 #include "hal_callbacks.h"
+
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -89,7 +93,16 @@
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
 
+/** RX buffer for USB */
+uint8_t RX_Buffer[NUMBER_OF_CDC][APP_RX_DATA_SIZE];
+
+/** TX buffer for USB, RX buffer for UART */
+uint8_t TX_Buffer[NUMBER_OF_CDC][APP_TX_DATA_SIZE];
+
 USBD_CDC_ACM_LineCodingTypeDef Line_Coding[NUMBER_OF_CDC];
+
+uint32_t Write_Index[NUMBER_OF_CDC]; /* keep track of received data over UART */
+uint32_t Read_Index[NUMBER_OF_CDC];  /* keep track of sent data to USB */
 
 /* USER CODE END PRIVATE_VARIABLES */
 
@@ -273,16 +286,16 @@ static int8_t CDC_Init(uint8_t cdc_ch)
 {
   /* USER CODE BEGIN 3 */
 
-  // /* ##-1- Set Application Buffers */
-  // USBD_CDC_SetRxBuffer(cdc_ch, &hUsbDevice, RX_Buffer[cdc_ch]);
+  /* ##-1- Set Application Buffers */
+  USBD_CDC_SetRxBuffer(cdc_ch, &hUsbDevice, RX_Buffer[cdc_ch]);
 
-  // //  /*##-2- Start the TIM Base generation in interrupt mode ####################*/
-  // //  /* Start Channel1 */
-  // //  if (HAL_TIM_Base_Start_IT(&htim4) != HAL_OK)
-  // //  {
-  // //    /* Starting Error */
-  // //    Error_Handler();
-  // //  }
+  //  /*##-2- Start the TIM Base generation in interrupt mode ####################*/
+  //  /* Start Channel1 */
+  //  if (HAL_TIM_Base_Start_IT(&htim4) != HAL_OK)
+  //  {
+  //    /* Starting Error */
+  //    Error_Handler();
+  //  }
 
   return (USBD_OK);
   /* USER CODE END 3 */
@@ -409,13 +422,13 @@ static int8_t CDC_Receive(uint8_t cdc_ch, uint8_t *Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
 
-  // Uncomment me to echo
-  // CDC_Transmit(cdc_ch, Buf, *Len);
-
+  // Call into our flight code's usb receive
   halCallbacks_usbCdcReceive(cdc_ch, Buf, Len);
 
+  // Matt: I don't actually know what these 2 functions do
   USBD_CDC_SetRxBuffer(cdc_ch, &hUsbDevice, &Buf[0]);
   USBD_CDC_ReceivePacket(cdc_ch, &hUsbDevice);
+
   return (USBD_OK);
   /* USER CODE END 6 */
 }
@@ -466,7 +479,61 @@ uint8_t CDC_Transmit(uint8_t ch, uint8_t *Buf, uint16_t Len)
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+//void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+//{
+//  /* Initiate next USB packet transfer once UART completes transfer (transmitting data over Tx line) */
+//  //USBD_CDC_ReceivePacket(UART_Handle_TO_CDC_CH(huart), &hUsbDevice);
+//}
 
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+//{
+//  for (uint8_t i = 0; i < NUMBER_OF_CDC; i++)
+//  {
+//    uint32_t buffptr;
+//    uint32_t buffsize;
+//
+//    if (Read_Index[i] != Write_Index[i])
+//    {
+//      if (Read_Index[i] > Write_Index[i]) /* Rollback */
+//      {
+//        buffsize = APP_TX_DATA_SIZE - Read_Index[i];
+//      }
+//      else
+//      {
+//        buffsize = Write_Index[i] - Read_Index[i];
+//      }
+//
+//      buffptr = Read_Index[i];
+//
+//      USBD_CDC_SetTxBuffer(i, &hUsbDevice, &TX_Buffer[i][buffptr], buffsize);
+//
+//      if (USBD_CDC_TransmitPacket(i, &hUsbDevice) == USBD_OK)
+//      {
+//        Read_Index[i] += buffsize;
+//        if (Read_Index[i] == APP_RX_DATA_SIZE)
+//        {
+//          Read_Index[i] = 0;
+//        }
+//      }
+//    }
+//  }
+//}
+
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+//{
+//  uint8_t cdc_ch = UART_Handle_TO_CDC_CH(huart);
+//  /* Increment Index for buffer writing */
+//  Write_Index[cdc_ch]++;
+//
+//  /* To avoid buffer overflow */
+//  if (Write_Index[cdc_ch] == APP_RX_DATA_SIZE)
+//  {
+//    Write_Index[cdc_ch] = 0;
+//  }
+//
+//  /* Start another reception: provide the buffer pointer with offset and the buffer size */
+//  HAL_UART_Receive_IT(huart, (TX_Buffer[cdc_ch] + Write_Index[cdc_ch]), 1);
+//}
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
