@@ -1,5 +1,6 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "readability-magic-numbers"
+//#pragma clang diagnostic push
+//#pragma ide diagnostic ignored "readability-magic-numbers"
+
 //
 // Created by jamie on 3/27/2020.
 //

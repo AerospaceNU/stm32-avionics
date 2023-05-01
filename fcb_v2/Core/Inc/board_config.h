@@ -43,7 +43,7 @@
 #define NUM_PYRO_CONT_HADC 4
 #define NUM_VBAT_ADC 2
 
-#define NUM_RADIO_TI_433 1
+#define NUM_RADIO_TI_433 0
 #define NUM_RADIO_TI_915 0
 
 #define NUM_SERVO_PWM 4

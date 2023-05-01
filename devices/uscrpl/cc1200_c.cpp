@@ -1,3 +1,6 @@
+#include "board_config.h"
+#if NUM_RADIO_TI_433 > 0
+
 #include "cc1200_cpp.h"
 
 //
@@ -251,4 +254,6 @@ int cc1200_main()
 	return 0;
 
 }
+
+#endif
 
