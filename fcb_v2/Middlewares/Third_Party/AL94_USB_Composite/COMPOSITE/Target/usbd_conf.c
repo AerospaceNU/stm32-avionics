@@ -163,12 +163,10 @@ void HAL_PCD_ResetCallback(PCD_HandleTypeDef *hpcd)
     speed = USBD_SPEED_FULL; 
   }
   #if(!STM32F1_DEVICE)
-#ifdef PCD_SPEED_HIGH
   else if (hpcd->Init.speed == PCD_SPEED_HIGH)
   {
     speed = USBD_SPEED_HIGH;
   }
-#endif
   #endif
   else
   {

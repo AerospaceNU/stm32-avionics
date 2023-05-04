@@ -25,9 +25,6 @@
 /* USER CODE BEGIN INCLUDE */
 //#include "usart.h"
 //#include "tim.h"
-
-#include "hal_callbacks.h"
-
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -92,6 +89,9 @@
   */
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
+
+#define APP_RX_DATA_SIZE 128
+#define APP_TX_DATA_SIZE 128
 
 /** RX buffer for USB */
 uint8_t RX_Buffer[NUMBER_OF_CDC][APP_RX_DATA_SIZE];
@@ -421,14 +421,11 @@ static int8_t CDC_Control(uint8_t cdc_ch, uint8_t cmd, uint8_t *pbuf, uint16_t l
 static int8_t CDC_Receive(uint8_t cdc_ch, uint8_t *Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
+  //HAL_UART_Transmit_DMA(CDC_CH_To_UART_Handle(cdc_ch), Buf, *Len);
+  CDC_Transmit(cdc_ch, Buf, *Len); // echo back on same channel
 
-  // Call into our flight code's usb receive
-  halCallbacks_usbCdcReceive(cdc_ch, Buf, Len);
-
-  // Matt: I don't actually know what these 2 functions do
   USBD_CDC_SetRxBuffer(cdc_ch, &hUsbDevice, &Buf[0]);
   USBD_CDC_ReceivePacket(cdc_ch, &hUsbDevice);
-
   return (USBD_OK);
   /* USER CODE END 6 */
 }

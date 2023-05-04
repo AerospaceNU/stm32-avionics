@@ -43,6 +43,8 @@ extern "C" {
   * @{
   */
 
+#define CDC_ACM_STR_DESC                            "STM32 CDC ACM%d"
+
 #define NUMBER_OF_CDC                               _USBD_CDC_ACM_COUNT
 #ifndef CDC_HS_BINTERVAL
 #define CDC_HS_BINTERVAL                            0x10U
