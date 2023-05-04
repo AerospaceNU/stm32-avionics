@@ -92,6 +92,9 @@ static uint8_t *USBD_COMPOSITE_GetOtherSpeedCfgDesc(uint16_t *length);
 static uint8_t *USBD_COMPOSITE_GetDeviceQualifierDesc(uint16_t *length);
 static uint8_t *USBD_COMPOSITE_GetUsrStringDesc(USBD_HandleTypeDef *pdev, uint8_t index, uint16_t *length);
 
+// MATT: hack in cdc strings
+extern char* CDC_DESC_STRINGS[USBD_CDC_ACM_COUNT];
+
 /**
   * @}
   */
@@ -804,12 +807,11 @@ static uint8_t *USBD_COMPOSITE_GetUsrStringDesc(USBD_HandleTypeDef *pdev, uint8_
   if (index <= USBD_Track_String_Index)
   {
 #if (USBD_USE_CDC_ACM == 1)
-    char str_buffer[16] = "";
     for (uint8_t i = 0; i < USBD_CDC_ACM_COUNT; i++)
     {
       if (index == CDC_STR_DESC_IDX[i])
       {
-        snprintf(str_buffer, sizeof(str_buffer), CDC_ACM_STR_DESC, i);
+        char* str_buffer = CDC_DESC_STRINGS[i];
         USBD_GetString((uint8_t *)str_buffer, USBD_StrDesc, length);
       }
     }
