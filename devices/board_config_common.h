@@ -129,6 +129,9 @@
 #ifndef NUM_VBAT_DESKTOP_FILE
 #define NUM_VBAT_DESKTOP_FILE 0
 #endif  // NUM_VBAT_DESKTOP_FILE
+#ifndef NUM_SERIAL_DUCER
+#define NUM_SERIAL_DUCER 0
+#endif
 
 /* Accelerometer */
 
@@ -398,6 +401,10 @@ extern uint8_t vbatAdcCurrentRank[NUM_VBAT_ADC];
 #if HAS_DEV(VBAT_INA226)
 extern I2C_HandleTypeDef* vbatIna226Hi2c[NUM_VBAT_INA226];
 #endif  // HAS_DEV(VBAT_INA226)
+
+#if HAS_DEV(SERIAL_DUCER)
+extern UART_HandleTypeDef* serialDucerUart[NUM_SERIAL_DUCER];
+#endif  // HAS_DEV(SERIAL_DUCER)
 
 /* Watchdogs */
 

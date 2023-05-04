@@ -79,6 +79,11 @@
 #include "adc_device.h"
 #endif  // HAS_DEV(VBAT_ADC)
 
+
+#if HAS_DEV(SERIAL_DUCER)
+#include "serial_ducer.h"
+#endif // HAS_DEV(SERIAL_DUCER)
+
 /* Hardware statuses */
 
 #if HAS_DEV(ACCEL)
@@ -221,6 +226,11 @@ static AdcDevCtrl_s vbatAdcCurrent[NUM_VBAT_ADC];
 #if HAS_DEV(VBAT_INA226)
 static VbatIna226Ctrl_s vbatIna226[NUM_VBAT_INA226];
 #endif  // HAS_DEV(VBAT_INA226)
+
+// Serial pressure transducer
+#if HAS_DEV(SERIAL_DUCER)
+static SerialDucerCtrl_s serialDucer[NUM_SERIAL_DUCER];
+#endif // HAS_DEV(SERIAL_DUCER)
 
 /* Sensor info */
 static SensorProperties_s sensorProperties;
@@ -509,6 +519,13 @@ void hm_hardwareInit() {
         vbatIna226_init(&vbatIna226[i]);
   }
 #endif  // HAS_DEV(VBAT_INA226)
+
+  #if HAS_DEV(SERIAL_DUCER)
+  	  for (int i = 0; i < NUM_SERIAL_DUCER; i++) {
+  		  serialDucer_init(serialDucer, serialDucerUart[i]);
+  	  }
+  #endif
+
 }
 
 uint32_t hm_millis() { return HAL_GetTick(); }

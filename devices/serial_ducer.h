@@ -5,13 +5,11 @@
  *      Author: matth
  */
 
-#ifndef DEVICES_BLE_CHIP_NRF_H_
-#define DEVICES_BLE_CHIP_NRF_H_
+#ifndef DEVICES_SERIAL_DUCER_H
+#define DEVICES_SERIAL_DUCER_H
 
 #include "board_config_common.h"
 #include "circular_buffer.h"
-
-#if HAS_DEV(SERIAL_DUCER)
 
 typedef struct __attribute__((packed)) {
 	uint8_t status;
@@ -34,11 +32,9 @@ typedef struct {
   PressureSensorData_t rx_firstBuff, rx_secondBuff;
   bool firstBuf;
   bool data_available;
-} SerialDucerCtrl_t;
+} SerialDucerCtrl_s;
 
-void serialDucer_init(SerialDucerCtrl_t *ctrl, UART_HandleTypeDef *uart);
-void serialDucer_tick(SerialDucerCtrl_t *ctrl);
+void serialDucer_init(SerialDucerCtrl_s *ctrl, UART_HandleTypeDef *uart);
+void serialDucer_tick(SerialDucerCtrl_s *ctrl);
 
-#endif
-
-#endif  // DEVICES_BLE_CHIP_NRF_H_
+#endif  // DEVICES_SERIAL_DUCER_H

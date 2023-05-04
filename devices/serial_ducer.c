@@ -6,14 +6,14 @@
  */
 #include "serial_ducer.h"
 
-#if HAS_DEV(BLE_CHIP_NRF)
+#if HAS_DEV(SERIAL_DUCER)
 
 #include <stdio.h>
 #include <string.h>
 
 #include "hal_callbacks.h"
 
-static PressureSensorData_t* getDmaBuff(SerialDucerCtrl_t *ctrl, bool swapBuff) {
+static PressureSensorData_t* getDmaBuff(SerialDucerCtrl_s *ctrl, bool swapBuff) {
 	bool desiredBuff = swapBuff ? ctrl->firstBuf : !ctrl->firstBuf;
 	  return desiredBuff ?
 			  &ctrl->rx_firstBuff : &ctrl->rx_secondBuff;
@@ -27,7 +27,7 @@ static PressureSensorData_t* getDmaBuff(SerialDucerCtrl_t *ctrl, bool swapBuff) 
 
 // A transmission Size bytes long just ended that began at the old dma_buff_head
 static void serialDucer_rxEventCallback(void *userData, size_t Size) {
-	SerialDucerCtrl_t *ctrl = (SerialDucerCtrl_t*) userData;
+	SerialDucerCtrl_s *ctrl = (SerialDucerCtrl_s*) userData;
 
 
 	ctrl->data_available = true;
@@ -42,7 +42,7 @@ static void serialDucer_rxCpltCallback(void *userData) {
 	serialDucer_rxEventCallback(userData, SERIAL_DUCER_INCOMING_PACKET_SIZE);
 }
 
-void serialDucer_init(SerialDucerCtrl_t *ctrl, UART_HandleTypeDef *uart) {
+void serialDucer_init(SerialDucerCtrl_s *ctrl, UART_HandleTypeDef *uart) {
 
 	ctrl->uart = uart;
 	ctrl->data_available = false;
@@ -57,7 +57,7 @@ void serialDucer_init(SerialDucerCtrl_t *ctrl, UART_HandleTypeDef *uart) {
 	START_DMA;
 }
 
-bool serialDucer_newData(SerialDucerCtrl_t *ctrl) {
+bool serialDucer_newData(SerialDucerCtrl_s *ctrl) {
 	if (ctrl->data_available) {
 	    PressureSensorData_t *buff = getDmaBuff(ctrl, false);
 	    ctrl->latestResult.pressureData = *buff;

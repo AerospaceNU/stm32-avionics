@@ -216,6 +216,12 @@ uint8_t vbatAdcCurrentRank[NUM_VBAT_ADC];
 I2C_HandleTypeDef* vbatIna226Hi2c[NUM_VBAT_INA226] = {&hi2c2};
 #endif  // HAS_DEV(VBAT_INA226)
 
+/* Serial pressure sensors */
+
+#if HAS_DEV(SERIAL_DUCER)
+UART_HandleTypeDef *serialDucerUart[NUM_SERIAL_DUCER] = {&huart1};
+#endif
+
 /* Watchdogs */
 
 #if HAS_DEV(WATCHDOG_INTERNAL)
