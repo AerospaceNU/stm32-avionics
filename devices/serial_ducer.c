@@ -13,7 +13,7 @@
 
 #include "hal_callbacks.h"
 
-static PressureSensorData_t* getDmaBuff(SerialDucerCtrl_s *ctrl, bool swapBuff) {
+static SerialDucerData_t* getDmaBuff(SerialDucerCtrl_s *ctrl, bool swapBuff) {
 	bool desiredBuff = swapBuff ? ctrl->firstBuf : !ctrl->firstBuf;
 	  return desiredBuff ?
 			  &ctrl->rx_firstBuff : &ctrl->rx_secondBuff;
@@ -59,7 +59,7 @@ void serialDucer_init(SerialDucerCtrl_s *ctrl, UART_HandleTypeDef *uart) {
 
 bool serialDucer_newData(SerialDucerCtrl_s *ctrl) {
 	if (ctrl->data_available) {
-	    PressureSensorData_t *buff = getDmaBuff(ctrl, false);
+	    SerialDucerData_t *buff = getDmaBuff(ctrl, false);
 	    ctrl->latestResult.pressureData = *buff;
 	    ctrl->latestResult.timestamp = HAL_GetTick();
 	    ctrl->data_available = false;

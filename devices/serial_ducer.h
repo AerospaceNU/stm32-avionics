@@ -11,25 +11,19 @@
 #include "board_config_common.h"
 #include "circular_buffer.h"
 
-typedef struct __attribute__((packed)) {
-	uint8_t status;
-	float temp;
-	float pressure;
-} PressureSensorData_t;
-
 typedef struct {
 	uint32_t timestamp;
-	PressureSensorData_t pressureData;
+	SerialDucerData_t pressureData;
 } PressureSensorTimestampedData_t;
 
-#define SERIAL_DUCER_INCOMING_PACKET_SIZE sizeof(PressureSensorData_t)
+#define SERIAL_DUCER_INCOMING_PACKET_SIZE sizeof(SerialDucerData_t)
 
 typedef struct {
   UART_HandleTypeDef *uart;
 
   PressureSensorTimestampedData_t latestResult;
 
-  PressureSensorData_t rx_firstBuff, rx_secondBuff;
+  SerialDucerData_t rx_firstBuff, rx_secondBuff;
   bool firstBuf;
   bool data_available;
 } SerialDucerCtrl_s;

@@ -123,4 +123,11 @@ typedef struct __attribute__((packed)) {
   uint32_t seaLevelPressure;
 } LineCutterFlightVars_s;
 
+// Data from the serial pressure transducer breakout
+typedef struct __attribute__((packed)) {
+	uint8_t status;
+	float temp;
+	float pressure;
+} SerialDucerData_t;
+
 #endif  // DEVICES_DATA_STRUCTURES_H_

@@ -43,6 +43,9 @@ typedef struct __attribute__((__packed__)) {
 #if HAS_DEV(PYRO_CONT)
   bool pyroContData[NUM_PYRO_CONT];
 #endif  // HAS_DEV(PYRO_CONT)
+#if HAS_DEV(SERIAL_DUCER)
+  SerialDucerData_t serialDucerData[NUM_SERIAL_DUCER];
+#endif
 } SensorData_s;
 
 // Sensor fullscales, in m/s/s

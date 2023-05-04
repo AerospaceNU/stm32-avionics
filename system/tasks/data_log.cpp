@@ -60,6 +60,9 @@ typedef struct __attribute__((__packed__)) {
   double acc_x, acc_y, acc_z;
   double qx, qy, qz, qw;
   uint8_t state;
+#if HAS_DEV(SERIAL_DUCER)
+  SerialDucerData_t serialDucerData[NUM_SERIAL_DUCER];
+#endif
 } FcbLogData_s;
 
 #define LOG_ID_LINE_CUTTER 1
@@ -374,6 +377,12 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
       fcbLogData->pyroContinuity |= ((sensorData->pyroContData[i] & 0x01) << i);
     }
 #endif  // HAS_DEV(PYRO_CONT)
+#if HAS_DEV(SERIAL_DUCER)
+    for (int i = 0; i < NUM_SERIAL_DUCER; ++i) {
+    	fcbLogData->serialDucerData[i] = sensorData->serialDucerData[i];
+    }
+#endif
+
     fcbLogData->triggerStatus = triggerManager_status();
     fcbLogData->heading = filterData->heading;
     fcbLogData->vtg = filterData->vtg;

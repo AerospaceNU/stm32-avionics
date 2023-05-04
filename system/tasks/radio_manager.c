@@ -192,6 +192,9 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
     data.pressureRef = filter_getPressureRef();
     data.groundElevation = cli_getConfigs()->groundElevationM;
     data.groundTemp = cli_getConfigs()->groundTemperatureC;
+    for (int i = 0; i < NUM_SERIAL_DUCER; i++) {
+    	data.ducerPressures[i] = sensorData->serialDucerData[i].pressure;
+    }
 
     transmitPacket[radioId].packetType = TELEMETRY_ID_ALT_INFO;
     transmitPacket[radioId].payload.altitudeInfo = data;
