@@ -9,6 +9,7 @@
 #include "imu_icm20948.h"
 
 #define PI 3.14159265358979323
+#define EARTH_G 9.8065
 
 #define USER_BANK_SEL	(0x7F)
 #define USER_BANK_0		(0x00)
@@ -19,6 +20,7 @@
 #define PWR_MGMT_1 		(0x06)
 #define PWR_MGMT_2		(0x07)
 #define GYRO_CONFIG_1	(0x01)
+#define ACCEL_CONFIG    (0x14)
 
 #define CLK_BEST_AVAIL	(0x01)
 #define GYRO_RATE_250	(0x00)
@@ -190,8 +192,8 @@ uint16_t ICM_Initialize(ImuIcm20948Ctrl_s *sensor) {
 	ICM_WriteOneByte(sensor, 0x00, 0x0A);
 	HAL_Delay(10);
 
-	// Set accelerometer low pass filter to 136hz (0x11) and the rate to 8G (0x04) in register ACCEL_CONFIG (0x14)
-	ICM_WriteOneByte(sensor, 0x14, (0x04 | 0x11));
+	// Set accelerometer low pass filter to 136hz (0x11) and +-16 G fs
+	ICM_WriteOneByte(sensor, ACCEL_CONFIG, (0b110 | 0x11));
 
 	// Set accelerometer sample rate to 225hz (0x00) in ACCEL_SMPLRT_DIV_1 register (0x10)
 	ICM_WriteOneByte(sensor, 0x10, 0x00);
@@ -233,13 +235,14 @@ void ICM_ReadAccelGyro(ImuIcm20948Ctrl_s *sensor) {
 	sensor->agData.angVelRaw.y = (raw_data[8] << 8) | raw_data[9];
 	sensor->agData.angVelRaw.z = (raw_data[10] << 8) | raw_data[11];
 
-	sensor->agData.accelRealMps2.x = sensor->agData.accelRaw.x / 8.0;
-	sensor->agData.accelRealMps2.y = sensor->agData.accelRaw.y / 8.0;
-	sensor->agData.accelRealMps2.z = sensor->agData.accelRaw.z / 8.0;
-	const float gyroScale = (1.0 / 250.0 * PI / 180.0);
-	sensor->agData.angVelRealRadps.x = sensor->agData.angVelRaw.x * gyroScale;
-	sensor->agData.angVelRealRadps.y = sensor->agData.angVelRaw.y * gyroScale;
-	sensor->agData.angVelRealRadps.z = sensor->agData.angVelRaw.z * gyroScale;
+	// 16 g fullscale
+	sensor->agData.accelRealMps2.x = sensor->agData.accelRaw.x / 2048.0 * EARTH_G;
+	sensor->agData.accelRealMps2.y = sensor->agData.accelRaw.y / 2048.0 * EARTH_G;
+	sensor->agData.accelRealMps2.z = sensor->agData.accelRaw.z / 2048.0 * EARTH_G;
+	// 2000 dps fullscale
+	sensor->agData.angVelRealRadps.x = sensor->agData.angVelRaw.x / 16.4 * (PI / 180.0);
+	sensor->agData.angVelRealRadps.y = sensor->agData.angVelRaw.y / 16.4 * (PI / 180.0);
+	sensor->agData.angVelRealRadps.z = sensor->agData.angVelRaw.z / 16.4 * (PI / 180.0);
 }
 void ICM_SelectBank(ImuIcm20948Ctrl_s *sensor, uint8_t bank) {
 	ICM_WriteOneByte(sensor, USER_BANK_SEL, bank);
@@ -262,7 +265,7 @@ uint8_t ICM_WHOAMI(ImuIcm20948Ctrl_s *sensor) {
 	return spiData;
 }
 void ICM_SetGyroRateLPF(ImuIcm20948Ctrl_s *sensor, uint8_t rate, uint8_t lpf) {
-	ICM_WriteOneByte(sensor, GYRO_CONFIG_1, (rate | lpf));
+	ICM_WriteOneByte(sensor, GYRO_CONFIG_1, (rate | lpf | 0b1100));
 }
 
 bool icm20948_init(ImuIcm20948Ctrl_s *sensor, I2C_HandleTypeDef *hi2c,
