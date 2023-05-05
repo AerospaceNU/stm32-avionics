@@ -9,7 +9,7 @@
 
 #define HAL_HEADER "stm32l4xx.h"
 
-#define NUM_ACCEL_H3LIS331DL 1
+#define NUM_ACCEL_H3LIS331DL 0
 
 #define NUM_BAROMETER_MS5607 2
 
@@ -27,8 +27,9 @@
 #define NUM_GPS_STD 0
 #define NUM_GPS_UBLOX 1
 
-#define NUM_IMU_ICM20600 2
-#define NUM_MAG_IIS2MDC 1
+#define NUM_IMU_ICM20600 0
+#define NUM_MAG_IIS2MDC 0
+#define NUM_IMU_ICM20948 1
 
 #define NUM_LED_DIGITAL 1
 

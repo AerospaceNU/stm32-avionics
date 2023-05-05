@@ -93,6 +93,8 @@
 #include "adc_device.h"
 #endif  // HAS_DEV(VBAT_ADC)
 
+#include "imu_icm20948.h"
+
 /* Hardware statuses */
 
 #if HAS_DEV(ACCEL)
@@ -252,6 +254,8 @@ static AdcDevCtrl_s vbatAdcCurrent[NUM_CURRENT_ADC];
 #if HAS_DEV(VBAT_INA226)
 static VbatIna226Ctrl_s vbatIna226[NUM_VBAT_INA226];
 #endif  // HAS_DEV(VBAT_INA226)
+
+ImuIcm20948Ctrl_s imuIcm20948_i2c[1];
 
 /* Sensor info */
 static SensorProperties_s sensorProperties;
@@ -556,6 +560,8 @@ void hm_hardwareInit() {
         vbatIna226_init(&vbatIna226[i]);
   }
 #endif  // HAS_DEV(VBAT_INA226)
+
+  icm20948_init(imuIcm20948_i2c, &hi2c2, 0x69);
 }
 
 uint32_t hm_millis() { return HAL_GetTick(); }
@@ -1104,6 +1110,10 @@ void hm_readSensorData() {
           vbatIna226_readBusVoltage(&vbatIna226[i]);
     }
 #endif  // HAS_DEV(VBAT_INA226)
+
+    icm20948_getData(imuIcm20948_i2c);
+    sensorData.imuData[FIRST_ID_IMU_ICM20948] = imuIcm20948_i2c[0].agData;
+    sensorData.magData[FIRST_ID_MAG_ICM20948] = imuIcm20948_i2c[0].mData;
 
     // Timestamp data
     // TODO: Make sensor data timestamp get time from PPS-updated timer

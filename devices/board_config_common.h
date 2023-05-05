@@ -141,6 +141,9 @@
 #ifndef NUM_VBAT_DESKTOP_FILE
 #define NUM_VBAT_DESKTOP_FILE 0
 #endif  // NUM_VBAT_DESKTOP_FILE
+#ifndef NUM_IMU_ICM20948
+#define NUM_IMU_ICM20948 0
+#endif
 
 #ifndef NUM_STM_HADC
 #define NUM_STM_HADC 0
