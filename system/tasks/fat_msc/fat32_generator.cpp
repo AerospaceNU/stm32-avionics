@@ -10,245 +10,8 @@
 
 // Looks like two copies of the boot sector?? interesting
 uint8_t bootsector[] = {
-    235, 88,  144, 109, 107, 102, 115, 46,  102, 97,  116, 0,   2,   8,   32,
-    0,   1,   0,   0,   0,   0,   248, 0,   0,   32,  0,   64,  0,   0,   0,
-    0,   0,   64,  66,  15,  0,   208, 3,   0,   0,   0,   0,   0,   0,   2,
-    0,   0,   0,   1,   0,   6,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   128, 0,   41,  38,  132, 148, 221, 69,  77,  66,  69,
-    68,  68,  69,  68,  32,  70,  83,  70,  65,  84,  51,  50,  32,  32,  32,
-    14,  31,  190, 119, 124, 172, 34,  192, 116, 11,  86,  180, 14,  187, 7,
-    0,   205, 16,  94,  235, 240, 50,  228, 205, 22,  205, 25,  235, 254, 84,
-    104, 105, 115, 32,  105, 115, 32,  110, 111, 116, 32,  97,  32,  98,  111,
-    111, 116, 97,  98,  108, 101, 32,  100, 105, 115, 107, 46,  32,  32,  80,
-    108, 101, 97,  115, 101, 32,  105, 110, 115, 101, 114, 116, 32,  97,  32,
-    98,  111, 111, 116, 97,  98,  108, 101, 32,  102, 108, 111, 112, 112, 121,
-    32,  97,  110, 100, 13,  10,  112, 114, 101, 115, 115, 32,  97,  110, 121,
-    32,  107, 101, 121, 32,  116, 111, 32,  116, 114, 121, 32,  97,  103, 97,
-    105, 110, 32,  46,  46,  46,  32,  13,  10,  0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    85,  170, 82,  82,  97,  65,  0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   114, 114, 65,  97,  201, 231, 1,   0,   2,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   85,  170, 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   235, 88,  144,
-    109, 107, 102, 115, 46,  102, 97,  116, 0,   2,   8,   32,  0,   1,   0,
-    0,   0,   0,   248, 0,   0,   32,  0,   64,  0,   0,   0,   0,   0,   64,
-    66,  15,  0,   208, 3,   0,   0,   0,   0,   0,   0,   2,   0,   0,   0,
-    1,   0,   6,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   128, 0,   41,  38,  132, 148, 221, 69,  77,  66,  69,  68,  68,  69,
-    68,  32,  70,  83,  70,  65,  84,  51,  50,  32,  32,  32,  14,  31,  190,
-    119, 124, 172, 34,  192, 116, 11,  86,  180, 14,  187, 7,   0,   205, 16,
-    94,  235, 240, 50,  228, 205, 22,  205, 25,  235, 254, 84,  104, 105, 115,
-    32,  105, 115, 32,  110, 111, 116, 32,  97,  32,  98,  111, 111, 116, 97,
-    98,  108, 101, 32,  100, 105, 115, 107, 46,  32,  32,  80,  108, 101, 97,
-    115, 101, 32,  105, 110, 115, 101, 114, 116, 32,  97,  32,  98,  111, 111,
-    116, 97,  98,  108, 101, 32,  102, 108, 111, 112, 112, 121, 32,  97,  110,
-    100, 13,  10,  112, 114, 101, 115, 115, 32,  97,  110, 121, 32,  107, 101,
-    121, 32,  116, 111, 32,  116, 114, 121, 32,  97,  103, 97,  105, 110, 32,
-    46,  46,  46,  32,  13,  10,  0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   85,  170};
+  #include "fat32_bootsector.h"
+};
 
 typedef struct __attribute__((packed)) {
   unsigned int days : 5;    // 1-31
@@ -300,10 +63,8 @@ struct FlightInFlash {
   uint32_t internalFlashOnePastEndAddress;
 
   uint32_t
-      metadataCluster;  // The cluster in MSC address land occupied by metadata
-  uint32_t
       firstFlightCluster;  // The first FAT cluster this flight "occupies". The
-                           // FAT entry here should point to first + 1, and that
+                           // FAT entry hre should peoint to first + 1, and that
                            // to first + 2... up to the last. Note that the
                            // first file will occupy sector #2, technically
   uint32_t lastFlightCluster;  // The last FAT cluster this flight "occupies".
@@ -315,23 +76,10 @@ struct FlightInFlash {
                                    // entry. The flight has (lastFATcluster -
                                    // firstFATcluster) + 1 many entries in the
 
-  // We expect the entries to have correct date/time
-  FileEntry_t metadataFile;
   FileEntry_t actualDataFile;
-
-  // If the rocket launched
-  bool launched;
-
-  // Total flight duration, in seconds
-  uint32_t flightDurationSeconds;
-
-  // More misc metadata that might be helpful to know
-  float maxAltitude;
-  float maxVelocity;
-  float maxAccel;
 };
 
-#define MAX_FLIGHTS 256
+#define MAX_FLIGHTS 100
 FlightInFlash flightArray[MAX_FLIGHTS] = {0};
 int maxFlightNum;
 
@@ -350,6 +98,7 @@ int maxFlightNum;
  */
 void updateFileTimestamp(FileEntry_t *entry, int64_t gpsTimeStart,
                          int64_t gpsTimeEnd) {
+  // set created timetsamp to the first GPS time
   tm *dt = gmtime(&gpsTimeStart);
   if (dt && dt->tm_year > 20 && dt->tm_year < 300) {
     entry->createDate.years = dt->tm_year + 1900 - 1980;
@@ -361,6 +110,7 @@ void updateFileTimestamp(FileEntry_t *entry, int64_t gpsTimeStart,
     entry->creationTimeTenths = 0;
   }
 
+  // Set modified timestamp to gps end time
   dt = gmtime(&gpsTimeEnd);
   if (dt && dt->tm_year > 20 && dt->tm_year < 300) {
     entry->modifyDate.years = dt->tm_year + 1900 - 1980;
@@ -372,66 +122,15 @@ void updateFileTimestamp(FileEntry_t *entry, int64_t gpsTimeStart,
   }
 }
 
-/**
- * So what's really annoying about this is we don't have a way of knowing the
- * file size before we try writing it. We could run this function while caching
- * all the flights, or (lmao lol rofl) we could just create a file 512 bytes
- * long, padded with blank ASCII braile characters. I'm lazy, so let's do that
- *
- * @param pFile
- * @param pFlight
- */
-void write_metadata_text(FlightInFlash *pFlight, char *pSectorStart) {
-  const unsigned int sector_size = 512;
-  int string_len = 0;
-  string_len +=
-      snprintf(pSectorStart, sector_size - string_len,
-               "Flight starts: %2d/%2d/%2d %2d:%2d:%2f\n",
-               pFlight->actualDataFile.createDate.months,
-               pFlight->actualDataFile.createDate.days,
-               pFlight->actualDataFile.createDate.years + 1980,
-               pFlight->actualDataFile.createTime.hours,
-               pFlight->actualDataFile.createTime.minutes,
-               pFlight->actualDataFile.createTime.seconds_periods / 2.0);
-
-  string_len +=
-      snprintf(pSectorStart + string_len, sector_size - string_len,
-               "Flight ends:   %2d/%2d/%2d %2d:%2d:%2f\n",
-               pFlight->actualDataFile.createDate.months,
-               pFlight->actualDataFile.createDate.days,
-               pFlight->actualDataFile.createDate.years + 1980,
-               pFlight->actualDataFile.createTime.hours,
-               pFlight->actualDataFile.createTime.minutes,
-               pFlight->actualDataFile.createTime.seconds_periods / 2.0);
-
-  string_len +=
-      snprintf(pSectorStart + string_len, sector_size - string_len,
-               "Duration:      %u seconds\n", pFlight->flightDurationSeconds);
-
-  string_len +=
-      snprintf(pSectorStart + string_len, sector_size - string_len,
-               "Launched?      %s\n", pFlight->launched ? "YES" : "NO");
-
-  string_len += snprintf(pSectorStart + string_len, sector_size - string_len,
-                         "Max altitude:  %f\n", pFlight->maxAltitude);
-
-  string_len += snprintf(pSectorStart + string_len, sector_size - string_len,
-                         "Max velocity:  %f\n", pFlight->maxVelocity);
-
-  string_len += snprintf(pSectorStart + string_len, sector_size - string_len,
-                         "Max accel:     %f\n", pFlight->maxAccel);
-
-  // Pad rest of file with a bunch of spaces
-  memset(pSectorStart + string_len, ' ', sector_size - string_len);
-}
-
 // Update the list of flights in the flightArray based on internal flash state
+// This should be called before any of the other MSC functions start doing any
+// work!
 void mapFlashToClusters() {
   int bound = dataLog_getLastFlightNum() - 1;
   printf("Found %i flights\n", bound);
 
-  // The first flight will have metadata at cluster 3, and
-  // flight at 4-???
+  // The first flight will start at FAT fluster 3
+  // TODO matt what are the first two used by?
   int firstFreeCluster = 3;
 
   for (int i = 0; i < bound; i++) {
@@ -456,6 +155,11 @@ void mapFlashToClusters() {
     dataLog_readFlightNumMetadata(datalog_flight_idx);
     FlightMetadata_s *meta = dataLog_getFlightMetadata();
 
+
+    // Use the first GPS fix timestamp from metadata as the start time
+    // This isn't actually correct -- we record the GPS timestamp when
+    // we first get a fix, not the GPS timestamp of board start.
+    // So the end time is actually later than it ought to be
     uint64_t startTime = meta->gpsTimestamp;  // seconds
     uint64_t duration =
         dataLog_getLastFlightTimestamp(datalog_flight_idx) / 1000;
@@ -463,15 +167,12 @@ void mapFlashToClusters() {
     updateFileTimestamp(&flight.actualDataFile, startTime, endTime);
     updateFileTimestamp(&flight.metadataFile, startTime, endTime);
 
-    // Also set filename and jazz
+
+    // Also set filename
     char buff[8] = {0};
-    snprintf(buff, sizeof(buff), "%i_meta", i);
-    memcpy(flight.metadataFile.filename, buff, sizeof(buff));
-    snprintf(buff, sizeof(buff), "%i_data", i);
+    snprintf(buff, sizeof(buff), "%03i_data", i);
     memcpy(flight.actualDataFile.filename, buff, sizeof(buff));
-    char txt_ext[3] = {'t', 'x', 't'};
     char hex_ext[3] = {'h', 'e', 'x'};
-    memcpy(flight.metadataFile.extension, txt_ext, sizeof(txt_ext));
     memcpy(flight.actualDataFile.extension, hex_ext, sizeof(hex_ext));
 
     // Figure out what clusters to allocate to which part of the flight
@@ -598,16 +299,19 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
     // if a cluster is the last of a file, write [ff ff ff 0f]
     // if not, write little-endian the next cluster -- ex, [05, 00, 00, 00]
 
-    static uint8_t eoc[] = {0xff, 0xff, 0xff, 0x0f};
-    static uint8_t boot[] = {0xf8, 0xff, 0xff, 0x0f};
+    // EOC: end-of-chain marker
+    static uint8_t end_of_chain[] = {0xff, 0xff, 0xff, 0x0f};
+    // Magic marker for the boot sector
+    static uint8_t bootsector_fat_entry[] = {0xf8, 0xff, 0xff, 0x0f};
 
     // write boot and root dir entries
     uint32_t offset = 0;
     if (mscAddress == FAT_START_ADDRESS) {
       // start with boot and root dir clusters
-      memcpy(pSector, boot, sizeof(boot));
-      memcpy(pSector + sizeof(boot), eoc, sizeof(eoc));
-      offset = 8;
+      memcpy(pSector, bootsector_fat_entry, sizeof(bootsector_fat_entry));
+      offset += sizeof(bootsector_fat_entry);
+      memcpy(pSector + sizeof(bootsector_fat_entry), end_of_chain, sizeof(end_of_chain));
+      offset += sizeof(end_of_chain);
     }
 
     /*
@@ -623,6 +327,7 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
     - Do the rest of the logic I already have below
     */
 
+
     int flightIdx = 0;
     while (offset < 512) {
       // Find the flight responsible for a given cluster
@@ -634,8 +339,8 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
       
       // metadata will always come first
       if (flight.metadataCluster == clusterNum) {
-        memcpy(pSector + offset, eoc, sizeof(eoc));
-        offset += sizeof(eoc);
+        memcpy(pSector + offset, end_of_chain, sizeof(end_of_chain));
+        offset += sizeof(end_of_chain);
       } else if (clusterNum >= flight.firstFlightCluster) {
         // Check if it's time to write end-of-chain yet
         if (clusterNum < flight.lastFlightCluster) {
@@ -646,18 +351,18 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
             (next_cluster >> 16) & 0xff,
             (next_cluster >> 24) & 0xff,
           };
-          memcpy(pSector + offset, entry, sizeof(eoc));
+          memcpy(pSector + offset, entry, sizeof(entry));
           offset += sizeof(entry);
         } else {
-          memcpy(pSector + offset, eoc, sizeof(eoc));
-          offset += sizeof(eoc);
+          memcpy(pSector + offset, end_of_chain, sizeof(end_of_chain));
+          offset += sizeof(end_of_chain);
           flightIdx ++;
         }
       } else {
           // Unknown, just write 0xff
           // memcpy(pSector + offset, eoc, sizeof(eoc));
           memset(pSector + offset, 0xff, 4);
-          offset += sizeof(eoc);
+          offset += sizeof(end_of_chain);
       }
 
     }
@@ -670,7 +375,7 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
            mscAddress < FIRST_FILE_ADDRESS) {
     const bool add_root_dir = (mscAddress == ROOT_DIRECTORY_ADDR);
     if (add_root_dir) {
-      FileEntry_t entry{
+      FileEntry_t entry = {
           .filename = {'E', 'M', 'B', 'E', 'D', 'D', 'E', 'D'},
           .extension =
               {
@@ -678,7 +383,7 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
                   'F',
                   'S',
               },
-          .attributes = (char)FileAttributes::VOLUME_LABEL,
+          .attributes = (uint8_t)FileAttributes::VOLUME_LABEL,
           .reserved = {0},
           .creationTimeTenths = 0,
           .createTime = {},
@@ -693,7 +398,8 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
               },
           .modifyDate = {.days = 22, .months = 10, .years = 2022 - 1980},
           .startingClusterLowBytes = 0,
-          .fileSizeBytes = 0};
+          .fileSizeBytes = 0
+          };
 
       memcpy(pSector + 0, &entry, sizeof(entry));
 
