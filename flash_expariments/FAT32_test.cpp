@@ -403,7 +403,7 @@ int main() {
       .createTime = {},
       .createDate = {},
       .accessDate = {},
-      .startingClusterHighBytes = {0},
+      .startingClusterHighBytes = 0,
       .modifyTime =
           {
               .seconds_periods = 0,

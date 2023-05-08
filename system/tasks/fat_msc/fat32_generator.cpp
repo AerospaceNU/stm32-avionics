@@ -64,7 +64,7 @@ struct FlightInFlash {
 
   uint32_t
       firstFlightCluster;  // The first FAT cluster this flight "occupies". The
-                           // FAT entry hre should peoint to first + 1, and that
+                           // FAT entry here should point to first + 1, and that
                            // to first + 2... up to the last. Note that the
                            // first file will occupy sector #2, technically
   uint32_t lastFlightCluster;  // The last FAT cluster this flight "occupies".
@@ -126,11 +126,10 @@ void updateFileTimestamp(FileEntry_t *entry, int64_t gpsTimeStart,
 // This should be called before any of the other MSC functions start doing any
 // work!
 void mapFlashToClusters() {
-  int bound = dataLog_getLastFlightNum() - 1;
-  printf("Found %i flights\n", bound);
+  // int bound = dataLog_getLastFlightNum() - 1;
+  int bound = 2; // hard coded for now, lol
 
-  // The first flight will start at FAT fluster 3
-  // TODO matt what are the first two used by?
+  // The first flight will start at FAT cluster 3 (TODO Matt: Why 3?)
   int firstFreeCluster = 3;
 
   for (int i = 0; i < bound; i++) {
@@ -176,8 +175,7 @@ void mapFlashToClusters() {
     memcpy(flight.actualDataFile.extension, hex_ext, sizeof(hex_ext));
 
     // Figure out what clusters to allocate to which part of the flight
-    flight.metadataCluster = firstFreeCluster;
-    flight.firstFlightCluster = firstFreeCluster + 1;
+    flight.firstFlightCluster = firstFreeCluster;
 
     uint64_t flightSizeBytes =
         (lastSector - firstSector + 1) * FLASH_MAX_SECTOR_BYTES;
@@ -186,20 +184,11 @@ void mapFlashToClusters() {
         (int)ceil(flightSizeBytes / CLUSTER_SIZE_BYTES);
     flight.lastFlightCluster = flight.firstFlightCluster + numClusters;
 
-    // Update the actual FileEntry as well
-    // TODO this assumes 32-bit size, b/c am lazy. should be sufficient,
-    // technically
-    flight.metadataFile.startingClusterHighBytes = 0;
-    flight.metadataFile.startingClusterLowBytes = flight.metadataCluster;
+    flight.actualDataFile.startingClusterHighBytes = (flight.firstFlightCluster >> 16) & 0xffff;
+    flight.actualDataFile.startingClusterLowBytes = flight.firstFlightCluster & 0xffff;
 
-    flight.actualDataFile.startingClusterHighBytes = 0;
-    flight.actualDataFile.startingClusterLowBytes = flight.firstFlightCluster;
-
-    // Hard coded, coz it's padded with spaces at the end, lol
-    flight.metadataFile.fileSizeBytes = 512;
-
-    printf("Meta cluster: %i data cluster %i\n",
-           flight.metadataFile.startingClusterLowBytes,
+    printf("Data cluster %i %i\n",
+           flight.actualDataFile.startingClusterHighBytes,
            flight.actualDataFile.startingClusterLowBytes);
 
     firstFreeCluster += numClusters;
@@ -226,7 +215,7 @@ FlightInFlash *getFlightFromMSCaddress(uint32_t mscAddress) {
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 uint32_t clusterToMSCglobalAddress(uint32_t cluster) {
@@ -284,9 +273,9 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
     // so try not to do that
     uint8_t *pBootsectorEnd = bootsector + sizeof(bootsector);
 
-    // TODO do I need the -1
+    // TODO do I need a -1?
     memcpy(pSector, bootsector + mscAddress,
-           (size_t)MIN(512, (unsigned long)(pBootsectorEnd - mscAddress - 1)));
+           (size_t)MIN(512, (unsigned long)(pBootsectorEnd - mscAddress)));
     return;
   }
 
@@ -314,6 +303,9 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
       offset += sizeof(end_of_chain);
     }
 
+    // MVP -- just return ASAP
+    return;
+
     /*
     TODO so I started a really hacky impl, but it turns out it's a bit more involved.
     Flights in the fat aren't guaranteed to be aligned with the bounds of sectors, so
@@ -335,7 +327,7 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
       // FAT32 -- each entry takes up 4 bytes
       auto clusterNum = offset / 4;
 
-      auto &flight = flightArray[flightIdx];
+      auto &flight = find
       
       // metadata will always come first
       if (flight.metadataCluster == clusterNum) {
@@ -389,7 +381,7 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
           .createTime = {},
           .createDate = {},
           .accessDate = {},
-          .startingClusterHighBytes = {0},
+          .startingClusterHighBytes = 0,
           .modifyTime =
               {
                   .seconds_periods = 0,
@@ -406,6 +398,8 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
       uint32_t zeros[sizeof(entry)] = {0};
       memcpy(pSector + 32, zeros, sizeof(zeros));
     }
+
+    // MVP -- just return here
 
     // How far, in bytes, into the root directory we are
     const uint32_t offset = mscAddress - ROOT_DIRECTORY_ADDR;
@@ -439,6 +433,9 @@ void retrieveSector(uint32_t mscAddress, uint32_t lengthBytes,
 
     return;
   } else if (mscAddress >= FIRST_FILE_ADDRESS) {
+
+    return;
+
     // Search through all flights
     for (int i = 0; i < maxFlightNum; i++) {
       FlightInFlash &flight = flightArray[i];
