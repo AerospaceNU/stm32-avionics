@@ -121,6 +121,16 @@ void dataLog_loadCliConfigs();
  */
 void dataLog_writeCliConfigs();
 
+/**
+ * @brief Get the sectors for a given flight number. The flight data lies within [firstSector, lastSector]
+ * 
+ * @param flightNum 
+ * @param firstSector 
+ * @param lastSector 
+ */
+void dataLog_getFlightSectors(uint32_t flightNum, uint32_t *firstSector,
+                                     uint32_t *lastSector);
+
 #ifdef __cplusplus
 }
 #endif

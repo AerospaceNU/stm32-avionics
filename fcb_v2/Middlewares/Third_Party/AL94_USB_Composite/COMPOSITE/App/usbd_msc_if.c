@@ -23,7 +23,7 @@
 #include "usbd_msc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include "fat32_generator.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,7 +32,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-uint8_t MSC_Storage[32*1024];
+
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -63,8 +63,9 @@ uint8_t MSC_Storage[32*1024];
   * @{
   */
 
+#define STORAGE_SIZE_BYTES               512000000
 #define STORAGE_LUN_NBR                  1
-#define STORAGE_BLK_NBR                  32*1024/512
+#define STORAGE_BLK_NBR                  STORAGE_SIZE_BYTES/512
 #define STORAGE_BLK_SIZ                  512
 
 /* USER CODE BEGIN PRIVATE_DEFINES */
@@ -178,6 +179,9 @@ USBD_StorageTypeDef USBD_Storage_Interface_fops =
 int8_t STORAGE_Init(uint8_t lun)
 {
   /* USER CODE BEGIN 2 */
+
+
+
   return (USBD_OK);
   /* USER CODE END 2 */
 }
@@ -231,13 +235,16 @@ int8_t STORAGE_Read(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_l
 {
   /* USER CODE BEGIN 6 */
 
+  //printf("[storage] LUN %u addr %lu bytes %u\r\n", lun, blk_addr*STORAGE_BLK_SIZ, blk_len*STORAGE_BLK_SIZ);
+
   uint32_t bytecount = blk_len*STORAGE_BLK_SIZ;
   uint32_t mem_address = blk_addr*STORAGE_BLK_SIZ;
 
-  for(uint32_t i=0; i<bytecount; i++)
-      {
-	  buf[i] = MSC_Storage[mem_address+i];
-      }
+  retrieveSector(mem_address, bytecount, buf);
+//  for(uint32_t i=0; i<bytecount; i++)
+//      {
+//	  buf[i] = MSC_Storage[mem_address+i];
+//      }
 
   return (USBD_OK);
   /* USER CODE END 6 */
@@ -252,13 +259,14 @@ int8_t STORAGE_Write(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_
 {
   /* USER CODE BEGIN 7 */
 
-   uint32_t bytecount = blk_len*STORAGE_BLK_SIZ;
-   uint32_t mem_address = blk_addr*STORAGE_BLK_SIZ;
-
-    for(uint32_t i=0; i<bytecount; i++)
-    {
-	MSC_Storage[mem_address+i] = buf[i];
-    }
+	// TODO we should probably return something idk?
+//   uint32_t bytecount = blk_len*STORAGE_BLK_SIZ;
+//   uint32_t mem_address = blk_addr*STORAGE_BLK_SIZ;
+//
+//    for(uint32_t i=0; i<bytecount; i++)
+//    {
+//	MSC_Storage[mem_address+i] = buf[i];
+//    }
 
   return (USBD_OK);
   /* USER CODE END 7 */

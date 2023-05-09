@@ -226,7 +226,7 @@ uint32_t dataLog_getLastLaunchedFlightNum() {
   return dataLog_getLastFlightNumType(true);
 }
 
-static void dataLog_getFlightSectors(uint32_t flightNum, uint32_t *firstSector,
+void dataLog_getFlightSectors(uint32_t flightNum, uint32_t *firstSector,
                                      uint32_t *lastSector) {
   *firstSector = 0;
   *lastSector = 0;

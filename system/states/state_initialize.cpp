@@ -8,6 +8,7 @@
 #include "filters.h"
 #include "hardware_manager.h"
 #include "radio_manager.h"
+#include "fat32_generator.h"
 
 #if HAS_DEV(LINE_CUTTER_BLE)
 #include "line_cutter_ble.h"
@@ -34,6 +35,9 @@ void InitializeState::init() {
 #if HAS_DEV(LINE_CUTTER_BLE)
   lineCutterBle_registerForwardStringCb(radioManager_transmitStringDefault);
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
+
+  HAL_Delay(1000);
+  mapFlashToClusters();
 }
 
 EndCondition_e InitializeState::run() { return EndCondition_e::Initialized; }

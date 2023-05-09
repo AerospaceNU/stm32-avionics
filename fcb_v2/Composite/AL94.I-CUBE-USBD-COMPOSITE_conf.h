@@ -64,7 +64,7 @@
 #define _USBD_USE_UVC      false
 
 /*---------- _USBD_USE_MSC  -----------*/
-#define _USBD_USE_MSC      false
+#define _USBD_USE_MSC      true
 
 /*---------- _USBD_USE_DFU  -----------*/
 #define _USBD_USE_DFU      false
