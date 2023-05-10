@@ -15,6 +15,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "board_config.h"
 #include "board_config_common.h"
 
 #if (HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915))

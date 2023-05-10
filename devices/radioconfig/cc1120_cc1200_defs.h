@@ -279,7 +279,7 @@ typedef enum {
 
 #endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
 
-#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200 && false
 
 /* configuration registers */
 #define TIRADIO_IOCFG3 0x0000

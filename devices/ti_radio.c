@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "cc1120_cc1200_defs.h"
 
@@ -463,7 +464,7 @@ static const size_t maxValue24Bits = 16777216 - 1;
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
 #define RADIO_OSC_FREQ CC1120_OSC_FREQ
 #endif
-#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200 && false
 #define RADIO_OSC_FREQ CC1200_OSC_FREQ
 #endif
 
