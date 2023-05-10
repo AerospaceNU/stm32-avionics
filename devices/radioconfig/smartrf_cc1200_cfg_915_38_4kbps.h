@@ -23,7 +23,7 @@
 // Symbol rate = 38.4
 // Whitening = true, FEC = true
 
-#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200 && false
 const RegisterSetting_s cc1200_916_1_2kbps_cfg[] = {
     {TIRADIO_IOCFG2, 0x06},     // GPIO2 IO Pin Configuration
     {TIRADIO_SYNC_CFG1, 0xA9},  // Sync Word Detection Configuration Reg. 1

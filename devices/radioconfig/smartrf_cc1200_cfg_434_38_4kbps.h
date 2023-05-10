@@ -23,7 +23,7 @@
 // Symbol rate = 38.4
 // Whitening = false
 
-#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200 && false
 const RegisterSetting_s cc1200_433_1_2kbps_cfg[] = {
     {TIRADIO_IOCFG3,
      0x06},  // asserted when sync word, de-asserted at end of packet (in RX)

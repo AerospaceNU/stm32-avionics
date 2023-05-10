@@ -402,7 +402,7 @@ void hm_hardwareInit() {
     // All 433 chips do NOT have a 1190 -- how can they?
     radioTi433[i].has_cc1190 = false;
 
-#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200 && false
     radioTi433[i].settingsPtr = cc1200_433_1_2kbps_cfg;
     radioTi433[i].settingsSize = cc1200_433_1_2kbps_size;
 #endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
@@ -734,11 +734,12 @@ bool hm_usbIsConnected(int usbId) {
 }
 
 bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
-#if HAS_DEV(USB_STD)
-  if (IS_DEVICE(usbId, USB_STD)) {
+//  NUM_USB_STD;
+//#if HAS_DEV(USB_STD)
+//  if (IS_DEVICE(usbId, USB_STD)) {
     return usbStd_transmit(data, numBytes);
-  }
-#endif  // HAS_DEV(USB_STD)
+//  }
+//#endif  // HAS_DEV(USB_STD)
 
   return false;
 }

@@ -41,6 +41,11 @@
 			<location>D:/Documents/GitHub/stm32-avionics/devices/radioconfig</location>
 		</link>
 		<link>
+			<name>system</name>
+			<type>2</type>
+			<location>D:/Documents/GitHub/stm32-avionics/system</location>
+		</link>
+		<link>
 			<name>utils</name>
 			<type>2</type>
 			<location>D:/Documents/GitHub/stm32-avionics/utils</location>

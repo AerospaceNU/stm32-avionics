@@ -9,11 +9,11 @@
 
 #if HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915)
 
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 
 #include "cc1120_cc1200_defs.h"
 
@@ -354,7 +354,7 @@ bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
   static uint8_t rxBuffer[128] = {0};
 
   // Read GPIO, should be high until the RX FIFO is empty
-//  if (HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_SET) {
+  //  if (HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_SET) {
   {
     // Read number of bytes in RX FIFO
     tiRadio_spiReadReg(radio, TIRADIO_NUM_RXBYTES, &rxbytes, 1);
@@ -649,7 +649,7 @@ void tiRadio_setOutputPower(TiRadioCtrl_s *radio, uint8_t powerDbM) {
   tiRadio_spiReadReg(radio, pa_reg_addr, &pa_cfg_val, 1);
   uint8_t reg = 0b01000000;  // bit 7 set to enable ramping
   reg |= power;              // Lower 6 bits are power
-  tiRadio_spiWriteReg(radio, pa_reg_addr, &pa_cfg_val, 1);
+  tiRadio_spiWriteReg(radio, pa_reg_addr, &reg, 1);
 }
 
 //! Configure a GPIO pin. register should be TIRADIO_IOCFG3 or TIRADIO_IOCFG2 or

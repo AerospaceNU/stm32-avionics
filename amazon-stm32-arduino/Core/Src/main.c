@@ -27,7 +27,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdbool.h>
+#include "board_config_common.h"
+#include "data_structures.h"
+#include "hardware_manager.h"
+#include "radio_manager.h"
+#include "radio_packet_types.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,37 +57,51 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+typedef struct __attribute__((__packed__)) {
+  uint8_t packetType;
+  float latitude;
+  float longitude;
+  float gps_alt;
+  double groundPressure;
+  double groundTemp;
+} HeartbeatData_s;
+typedef enum {
+  RAD_433 = FIRST_ID_RADIO_TI_433,
+  RAD_915 = FIRST_ID_RADIO_TI_915,
+  GROUNDSTATION = 0xff
+} MessageDestination_e;
+
+typedef struct __attribute__((packed)) {
+  uint8_t destination;
+  uint16_t len;
+  uint8_t data[256];
+} GroundstationUsbCommand_s;
+#define min(a, b) (a < b) ? a : b
+#define CHANNEL_COMMAND_ID 1
+#define RADIO_HARDWARE_COMMAND_ID 2
+static void GroundstationParseCommand(GroundstationUsbCommand_s *command) {
+  if (command->data[0] == CHANNEL_COMMAND_ID) {
+    uint8_t radioHw = command->data[1];
+    int8_t channel = command->data[2];
+
+    hm_radioSetChannel((int)radioHw, channel);
+  }
+
+  //  if (command->data[0] == CHANNEL_COMMAND_ID) {
+  //    uint8_t radioHw = command->data[1];
+  //    int8_t channel = command->data[2];
+  //
+  //    HM_RadioSetChannel(radioHw, channel);
+  //  }
+}
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-// Defined deep within STM32 driver code, but we yank it out here
-extern USBD_HandleTypeDef hUsbDeviceFS;
-
-#include "usbd_cdc_if.h"
-
-// Overwrite _write so printf prints to USB
-int _write(int file, char *ptr, int len) {
-  // Check here to make sure that USB things are actually set up
-  if (hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED) return 0;
-
-  // Try to send -- CDC_Transmit_FS is what actually sends our data
-  if (USBD_OK == CDC_Transmit_FS((uint8_t *)ptr, len)) return len;
-
-  // Failure, report sending zero bytes
-  return 0;
+static void OnDataRx(RadioRecievedPacket_s *packet) {
+  hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)packet, sizeof(*packet));
 }
-
-#include "../system/tasks/radio_packet_types.h"
-#include "circular_buffer.h"
-#include "data_structures.h"
-#include "radioconfig/smartrf_cc1120_cfg_434_38_4kbps.h"
-#include "ti_radio.h"
-
-TiRadioCtrl_s radio;
-
 /* USER CODE END 0 */
 
 /**
@@ -119,68 +137,88 @@ int main(void) {
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
-  radio.CS_pin = RAD_CS_Pin;
-  radio.CS_port = RAD_CS_GPIO_Port;
-  radio.RST_pin = RAD_RST_Pin;
-  radio.RST_port = RAD_RST_GPIO_Port;
-  radio.radhspi = &hspi1;
-  radio.settingsPtr = cc1120_433_1_2kbps_cfg;
-  radio.settingsSize = sizeof(cc1120_433_1_2kbps_cfg);
-  radio.payloadSize = sizeof(RadioPacket_s);
-  radio.id = 0;
-  radio.packetCfg = TIRADIO_PKTLEN_FIXED;
-
-  bool success = tiRadio_init(&radio);
-  if (!success) {
-    printf("REEEEEEEE\n");
-    return 0;
-  }
-  tiRadio_setRadioFrequency(&radio, TIRADIO_BAND_410_480MHz, 433 * 1e6);
-  tiRadio_setOutputPower(&radio, 14);
-
-  RadioRecievedPacket_s buff[10];
-  CircularBuffer_s circBuff;
-  cb_init(&circBuff, buff, sizeof(buff), sizeof(buff[0]));
-  tiRadio_registerConsumer(&radio, &circBuff);
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
+
   /* USER CODE BEGIN WHILE */
+
+  hm_hardwareInit();
+
+  radioManager_init();
+  for (int i = 0; i < NUM_RADIO; i++) {
+    radioManager_addMessageCallback(i, OnDataRx);
+  }
+
+  uint32_t start = HAL_GetTick();
+  CircularBuffer_s *buffer = hm_usbGetRxBuffer(FIRST_ID_USB_STD);
+
   while (1) {
-    /* USER CODE END WHILE */
+    // Update sensors
+    hm_watchdogRefresh();
+    hm_readSensorData();
+    hm_radioUpdate();
 
-    RadioPacket_s tx;
-    tx.packetType = TELEMETRY_ID_STRING;
-    static int i = 0;
-    i++;
-    tx.payload.cliString.id = i;
-    char *str = "Hellowowowowowowo";
-    memcpy(tx.payload.cliString.string, str, strlen(str));
-    tx.payload.cliString.len = strlen(str);
-    tiRadio_addTxPacket(&radio, (uint8_t *)&tx, sizeof(tx));
+    if ((HAL_GetTick() - start) >= 2000) {
+      start = HAL_GetTick();
 
-    // Wait for packet for (100x * 10ms each) = 1 second
-    for (int i = 0; i < 100; i++) {
-      tiRadio_update(&radio);
-      HAL_Delay(10);
+      static HeartbeatData_s heartbeat;
+      heartbeat.packetType = 200;
+      //      heartbeat.latitude =
+      //      hm_getSensorData()->gpsData->generalData.latitude;
+      //      heartbeat.longitude =
+      //      hm_getSensorData()->gpsData->generalData.longitude;
+      //      heartbeat.gps_alt =
+      //      hm_getSensorData()->gpsData->generalData.altitude;
+      //      heartbeat.groundPressure =
+      //          hm_getSensorData()->barometerData[0].pressureAtm;
+      //      heartbeat.groundTemp =
+      //      hm_getSensorData()->barometerData[0].temperatureC;
 
-      while (cb_count(&circBuff)) {
-        RadioRecievedPacket_s packet;
-        size_t one = 1;
-        cb_peek(&circBuff, &packet, &one);
-        if (one) {
-          printf("Got packet, rssi=%i lqi=%i\r\n", packet.rssi, packet.lqi);
-          cb_dequeue(&circBuff, 1);
+      // Hack to make all packets the same length when sent over USB
+      static uint8_t heartbeatArr[sizeof(RadioRecievedPacket_s)] = {0};
+      memset(heartbeatArr, 0, sizeof(heartbeatArr));
+      memcpy(heartbeatArr, &heartbeat, sizeof(heartbeat));
+      hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr,
+                     sizeof(heartbeatArr));
+    }
+
+    // A packet must mave at least a destination [1 byte] and a len [2 bytes],
+    // and a non-zero quantity of data
+    if (cb_count(buffer) > 3) {
+      static GroundstationUsbCommand_s command;
+      size_t count = min(cb_count(buffer), sizeof(command));
+      cb_peek(buffer, (uint8_t *)&command, &count);
+
+      // If we got at least enough bytes for one message to be done
+      if (count >= command.len + 3) {
+        if (command.destination == GROUNDSTATION) {
+          GroundstationParseCommand(&command);
         } else {
-          break;
+          int dest = command.destination == RAD_433 ? FIRST_ID_RADIO_TI_433
+                                                    : FIRST_ID_RADIO_TI_915;
+
+          radioManager_transmitString(dest, command.data, command.len);
         }
+        cb_dequeue(buffer, count);
+      } else if (command.destination != GROUNDSTATION ||
+                 command.destination != RAD_433 ||
+                 command.destination != RAD_915) {
+        cb_flush(buffer);
       }
     }
 
+    // Process incoming data
+    radioManager_tick();
+
+    HAL_Delay(1);
+
+    /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
+
+    /* USER CODE END 3 */
   }
-  /* USER CODE END 3 */
 }
 
 /**
@@ -233,7 +271,8 @@ void SystemClock_Config(void) {
  */
 void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
+  /* User can add his own implementation to report the HAL error return state
+   */
   __disable_irq();
   while (1) {
   }
@@ -251,10 +290,11 @@ void Error_Handler(void) {
 void assert_failed(uint8_t *file, uint32_t line) {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line
-     number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
-     line) */
+     number, ex: printf("Wrong parameters value: file %s on line %d\r\n",
+     file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF
+ * FILE****/

@@ -12,8 +12,8 @@
 
 #define HAS_CC1120
 //#define HAS_ADC_DEVICE
-#define HAS_GPS
-#define HAS_MS5607
+//#define HAS_GPS
+//#define HAS_MS5607
 //#define HAS_S25FLX
 //#define HAS_BUZZER
 //#define HAS_SERVO
@@ -27,10 +27,11 @@
 // define LED1_Pin 0
 #define HAS_SPI
 //#define HAS_ADC
-#define HAS_UART
+//#define HAS_UART
 #define NUM_RADIO_TI_433 1
 #define NUM_RADIO_TI_915 0
 #define RADIO_TI_TYPE RADIO_TI_TYPE_CC1120
+#define NUM_USB_STD 1
 
 /*
  * IMU Types:
