@@ -76,6 +76,9 @@ int _write(int file, char *ptr, int len) {
   return 0;
 }
 
+#include "../system/tasks/radio_packet_types.h"
+#include "circular_buffer.h"
+#include "data_structures.h"
 #include "radioconfig/smartrf_cc1120_cfg_434_38_4kbps.h"
 #include "ti_radio.h"
 
@@ -123,15 +126,22 @@ int main(void) {
   radio.radhspi = &hspi1;
   radio.settingsPtr = cc1120_433_1_2kbps_cfg;
   radio.settingsSize = sizeof(cc1120_433_1_2kbps_cfg);
-  radio.payloadSize = 40;
+  radio.payloadSize = sizeof(RadioPacket_s);
+  radio.id = 0;
+  radio.packetCfg = TIRADIO_PKTLEN_FIXED;
+
   bool success = tiRadio_init(&radio);
   if (!success) {
     printf("REEEEEEEE\n");
     return 0;
   }
-  tiRadio_setRadioFrequency(&radio, TIRADIO_BAND_410_480MHz, 434000000);
+  tiRadio_setRadioFrequency(&radio, TIRADIO_BAND_410_480MHz, 433 * 1e6);
+  tiRadio_setOutputPower(&radio, 14);
 
-//  tiRadio_setOutputPower(&radio, -20);
+  RadioRecievedPacket_s buff[10];
+  CircularBuffer_s circBuff;
+  cb_init(&circBuff, buff, sizeof(buff), sizeof(buff[0]));
+  tiRadio_registerConsumer(&radio, &circBuff);
 
   /* USER CODE END 2 */
 
@@ -140,12 +150,32 @@ int main(void) {
   while (1) {
     /* USER CODE END WHILE */
 
-    uint8_t data[40] = {0};
-    tiRadio_addTxPacket(&radio, data, sizeof(data));
+    RadioPacket_s tx;
+    tx.packetType = TELEMETRY_ID_STRING;
+    static int i = 0;
+    i++;
+    tx.payload.cliString.id = i;
+    char *str = "Hellowowowowowowo";
+    memcpy(tx.payload.cliString.string, str, strlen(str));
+    tx.payload.cliString.len = strlen(str);
+    tiRadio_addTxPacket(&radio, (uint8_t *)&tx, sizeof(tx));
 
-    for (int i = 0; i < 10; i++) {
+    // Wait for packet for (100x * 10ms each) = 1 second
+    for (int i = 0; i < 100; i++) {
       tiRadio_update(&radio);
       HAL_Delay(10);
+
+      while (cb_count(&circBuff)) {
+        RadioRecievedPacket_s packet;
+        size_t one = 1;
+        cb_peek(&circBuff, &packet, &one);
+        if (one) {
+          printf("Got packet, rssi=%i lqi=%i\r\n", packet.rssi, packet.lqi);
+          cb_dequeue(&circBuff, 1);
+        } else {
+          break;
+        }
+      }
     }
 
     /* USER CODE BEGIN 3 */

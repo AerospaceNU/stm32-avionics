@@ -354,7 +354,8 @@ bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
   static uint8_t rxBuffer[128] = {0};
 
   // Read GPIO, should be high until the RX FIFO is empty
-  if (HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_SET) {
+//  if (HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_SET) {
+  {
     // Read number of bytes in RX FIFO
     tiRadio_spiReadReg(radio, TIRADIO_NUM_RXBYTES, &rxbytes, 1);
     if (rxbytes < 1) {
