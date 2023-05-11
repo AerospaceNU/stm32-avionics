@@ -103,6 +103,8 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
   // We look for when full above thresh or packet end reached
   tiRadio_configGpio(radio, TIRADIO_IOCFG3, TIRADIO_RXFIFO_THR_PKT, false);
 
+  tiRadio_configGpio(radio, TIRADIO_IOCFG0, TIRADIO_PKT_SYNC_RXTX, false);
+
   tiRadio_forceIdle(radio);
 
   radio->initialized = true;
@@ -121,6 +123,14 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
 void tiRadio_update(TiRadioCtrl_s *radio) {
   // Don't let anything happen if radio isn't initialized
   if (!radio->initialized) return;
+
+  static bool edge = false;
+  if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) && !edge) {
+    printf("SYNC FOUND\r\n");
+    edge = true;
+  } else {
+    edge = false;
+  }
 
   // The MARC_STATUS1 register "tells us what caused MCU_WAKEUP to be asserted"
   // We don't actually check if it's been asserted here, though -- that's

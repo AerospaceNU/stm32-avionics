@@ -140,7 +140,6 @@ int main(void) {
   /* USER CODE END 2 */
 
   /* Infinite loop */
-
   /* USER CODE BEGIN WHILE */
 
   hm_hardwareInit();
@@ -296,5 +295,4 @@ void assert_failed(uint8_t *file, uint32_t line) {
 }
 #endif /* USE_FULL_ASSERT */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF
- * FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
