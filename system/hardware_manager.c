@@ -415,6 +415,9 @@ void hm_hardwareInit() {
     // Enable our radio and configure pins
     hardwareStatusRadio[FIRST_ID_RADIO_TI_433 + i] =
         tiRadio_init(&radioTi433[i]);
+
+    tiRadio_setRadioFrequency(&radioTi433[i], TIRADIO_BAND_410_480MHz,
+                              433 * 1e6);
   }
 #endif  // HAS_DEV(RADIO_TI_433)
 
@@ -734,12 +737,12 @@ bool hm_usbIsConnected(int usbId) {
 }
 
 bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
-//  NUM_USB_STD;
-//#if HAS_DEV(USB_STD)
-//  if (IS_DEVICE(usbId, USB_STD)) {
-    return usbStd_transmit(data, numBytes);
-//  }
-//#endif  // HAS_DEV(USB_STD)
+  //  NUM_USB_STD;
+  //#if HAS_DEV(USB_STD)
+  //  if (IS_DEVICE(usbId, USB_STD)) {
+  return usbStd_transmit(data, numBytes);
+  //  }
+  //#endif  // HAS_DEV(USB_STD)
 
   return false;
 }

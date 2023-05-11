@@ -172,6 +172,10 @@ void tiRadio_update(TiRadioCtrl_s *radio) {
     tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SFRX);
   }
 
+  uint8_t modem_stat1 = 0;
+  tiRadio_spiReadReg(radio, TIRADIO_MODEM_STATUS1, &modem_stat1, 1);
+  printf("Stat %u\r\n", modem_stat1);
+
   // Check for new packets until the GPIO goes low
   // realistically, we'll only ever get like 2, but
   // it doesn't hurt since the cost for each check
