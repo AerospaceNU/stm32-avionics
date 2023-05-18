@@ -127,6 +127,17 @@ void CliTasks::sense() {
   cli_send(cliStr);
   cli_send(flashStr);
 #endif  // HAS_DEV(FLASH)
+#if HAS_DEV(SERIAL_DUCER)
+  for (int i = 0; i < NUM_SERIAL_DUCER; i++) {
+    dtoa(float1, sizeof(float1), data->serialDucerData[i].pressure, 5);
+    snprintf(cliStr, sizeof(cliStr), "Ducer %d Pressure (atm): %s\r\n", i,
+             float1);
+    cli_send(cliStr);
+    dtoa(float1, sizeof(float1), data->serialDucerData[i].temp, 1);
+    snprintf(cliStr, sizeof(cliStr), "Ducer %d Temp (C): %s\r\n", i, float1);
+    cli_send(cliStr);
+  }
+#endif  // HAS_DEV(SERIAL_DUCER)
   snprintf(cliStr, sizeof(cliStr), "\r\n");
   cli_send(cliStr);
 
