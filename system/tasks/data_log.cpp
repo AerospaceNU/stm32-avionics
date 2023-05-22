@@ -169,6 +169,13 @@ void dataLog_init() {
   for (int i = 0; i < NUM_FLASH; i++) {
     logSizeBytes += kFlashSizeBytes[i];
   }
+  // Initialize the counts for sensors.
+  flightMetadataPacket.numImu = NUM_IMU;
+  flightMetadataPacket.numAccel = NUM_ACCEL;
+  flightMetadataPacket.numBarometer = NUM_BAROMETER;
+  flightMetadataPacket.numGps = NUM_GPS;
+  flightMetadataPacket.numVbat = NUM_VBAT;
+  flightMetadataPacket.numPyroCont = NUM_PYRO_CONT;
 }
 
 void dataLog_flashErase(int flashId) {

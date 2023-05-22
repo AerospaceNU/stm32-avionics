@@ -16,13 +16,11 @@ uint8_t flashBuf_[FLASH_READ_BUF_SIZE];
 // Reads data of current flight ID and transmits it over USB
 bool dataOffload_tick() {
   if (!metadataReadComplete) {
+    // Transmit metadata
     dataLog_readFlightNumMetadata(flightId_);
     FlightMetadata_s* metadata = dataLog_getFlightMetadata();
     metadataReadComplete = true;
     hm_usbTransmit(USB_CLI_ID, (uint8_t*)metadata, sizeof(FlightMetadata_s));
-    // TODO: Either transmit rest of sector as 0xFF to allow for variable-sized
-    // metadata across systems, or transmit number of each hardware
-    // at beginning of metadata
     return false;
   }
   if (!readComplete_) {
