@@ -3,7 +3,7 @@
 # Clang-format
 for file in $(find devices system utils desktop_sim -type f -iregex '.*\.\(h\|c\|cpp\)')
 do
-	clang-format -i $file
+	clang-format-11 -i $file
         if [ $? -ne 0 ];
         then
             exit -1

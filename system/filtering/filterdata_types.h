@@ -31,6 +31,9 @@ typedef struct {
   float rocket_ang_vel_x;
   float rocket_ang_vel_y;
   float rocket_ang_vel_z;
+  float rocket_magnetic_flux_x;
+  float rocket_magnetic_flux_y;
+  float rocket_magnetic_flux_z;
   double qx;
   double qy;
   double qz;

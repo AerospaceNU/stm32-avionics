@@ -41,6 +41,9 @@
 #ifndef NUM_FLASH_S25FLX
 #define NUM_FLASH_S25FLX 0
 #endif  // NUM_FLASH_S25FLX
+#ifndef NUM_FLASH_MB85RSX
+#define NUM_FLASH_MB85RSX 0
+#endif  // NUM_FLASH_MB85RSX
 #ifndef NUM_GPS_STD
 #define NUM_GPS_STD 0
 #endif  // NUM_GPS_STD
@@ -53,6 +56,12 @@
 #ifndef NUM_IMU_ICM20948
 #define NUM_IMU_ICM20948 0
 #endif  // NUM_IMU_ICM20948
+#ifndef NUM_IMU_ICM20600
+#define NUM_IMU_ICM20600 0
+#endif  // NUM_IMU_ICM20600
+#ifndef NUM_MAG_IIS2MDC
+#define NUM_MAG_IIS2MDC 0
+#endif  // NUM_MAG_IIS2MDC
 #ifndef NUM_LED_DIGITAL
 #define NUM_LED_DIGITAL 0
 #endif  // NUM_LED_DIGITAL
@@ -65,9 +74,9 @@
 #ifndef NUM_PYRO_DIGITAL
 #define NUM_PYRO_DIGITAL 0
 #endif  // NUM_PYRO_DIGITAL
-#ifndef NUM_PYRO_CONT_ADC
-#define NUM_PYRO_CONT_ADC 0
-#endif  // NUM_PYRO_CONT_ADC
+#ifndef NUM_PYRO_CONT_HADC
+#define NUM_PYRO_CONT_HADC 0
+#endif  // NUM_PYRO_CONT_HADC
 #ifndef NUM_RADIO_TI_433
 #define NUM_RADIO_TI_433 0
 #endif  // NUM_RADIO_TI_433
@@ -83,6 +92,9 @@
 #ifndef NUM_VBAT_ADC
 #define NUM_VBAT_ADC 0
 #endif  // NUM_VBAT_ADC
+#ifndef NUM_CURRENT_ADC
+#define NUM_CURRENT_ADC 0
+#endif  // NUM_CURRENT_ADC
 #ifndef NUM_VBAT_INA226
 #define NUM_VBAT_INA226 0
 #endif  // NUM_VBAT_INA226
@@ -117,6 +129,9 @@
 #ifndef NUM_IMU_DESKTOP_FILE
 #define NUM_IMU_DESKTOP_FILE 0
 #endif  // NUM_IMU_DESKTOP_FILE
+#ifndef NUM_MAG_DESKTOP_FILE
+#define NUM_MAG_DESKTOP_FILE 0
+#endif  // NUM_MAG_DESKTOP_FILE
 #ifndef NUM_PYRO_DESKTOP_PRINT
 #define NUM_PYRO_DESKTOP_PRINT 0
 #endif  // NUM_PYRO_DESKTOP_PRINT
@@ -129,6 +144,10 @@
 #ifndef NUM_VBAT_DESKTOP_FILE
 #define NUM_VBAT_DESKTOP_FILE 0
 #endif  // NUM_VBAT_DESKTOP_FILE
+
+#ifndef NUM_STM_HADC
+#define NUM_STM_HADC 0
+#endif  // NUM_STM_HADC
 
 /* Accelerometer */
 
@@ -211,17 +230,26 @@ extern uint32_t dcMotorPwmChannel[NUM_DC_MOTOR_PWM];
 
 /* Flash */
 
-#define NUM_FLASH (NUM_FLASH_S25FLX + NUM_FLASH_DESKTOP_FILE_BACKED)
+#define NUM_FLASH \
+  (NUM_FLASH_S25FLX + NUM_FLASH_DESKTOP_FILE_BACKED + NUM_FLASH_MB85RSX)
 
 #define FIRST_ID_FLASH_S25FLX 0
 #define FIRST_ID_FLASH_DESKTOP_FILE_BACKED \
   (FIRST_ID_FLASH_S25FLX + NUM_FLASH_S25FLX)
+#define FIRST_ID_FLASH_MB85RSX \
+  (FIRST_ID_FLASH_DESKTOP_FILE_BACKED + NUM_FLASH_DESKTOP_FILE_BACKED)
 
 #if HAS_DEV(FLASH_S25FLX)
 extern SPI_HandleTypeDef* flashS25flxHspi[NUM_FLASH_S25FLX];
 extern GPIO_TypeDef* flashS25flxCsGpioPort[NUM_FLASH_S25FLX];
 extern uint16_t flashS25flxCsPin[NUM_FLASH_S25FLX];
 #endif  // HAS_DEV(FLASH_S25FL)
+
+#if HAS_DEV(FLASH_MB85RSX)
+extern SPI_HandleTypeDef* flashMb85rsxHspi[NUM_FLASH_MB85RSX];
+extern GPIO_TypeDef* flashMb85rsxCsGpioPort[NUM_FLASH_MB85RSX];
+extern uint16_t flashMb85rsxCsPin[NUM_FLASH_MB85RSX];
+#endif  // HAS_DEV(FLASH_MB85RSX)
 
 extern const uint32_t kFlashSizeBytes[NUM_FLASH];
 
@@ -239,11 +267,27 @@ extern UART_HandleTypeDef* gpsStdHuart[NUM_GPS_STD + NUM_GPS_UBLOX];
 
 /* IMU */
 
-#define NUM_IMU (NUM_IMU_LSM9DS1 + NUM_IMU_ICM20948 + NUM_IMU_DESKTOP_FILE)
+#define NUM_IMU \
+  (NUM_IMU_LSM9DS1 + NUM_IMU_ICM20948 + NUM_IMU_ICM20600 + NUM_IMU_DESKTOP_FILE)
+
+#define NUM_MAG_LSM9DS1 NUM_IMU_LSM9DS1
+#define NUM_MAG_ICM20948 NUM_IMU_ICM20948
+#define FIRST_ID_MAG_LSM9DS1 0
+#define FIRST_ID_MAG_ICM20948 (FIRST_ID_MAG_LSM9DS1 + NUM_MAG_LSM9DS1)
+#define FIRST_ID_MAG_IIS2DS1 (FIRST_ID_MAG_ICM20948 + NUM_MAG_ICM20948)
 
 #define FIRST_ID_IMU_LSM9DS1 0
 #define FIRST_ID_IMU_ICM20948 (FIRST_ID_IMU_LSM9DS1 + NUM_IMU_LSM9DS1)
-#define FIRST_ID_IMU_DESKTOP_FILE (FIRST_ID_IMU_ICM20948 + NUM_IMU_ICM20948)
+#define FIRST_ID_IMU_ICM20600 (FIRST_ID_IMU_ICM20948 + NUM_IMU_ICM20948)
+#define FIRST_ID_IMU_DESKTOP_FILE (FIRST_ID_IMU_ICM20600 + NUM_IMU_ICM20600)
+
+// Magnetometers
+#define NUM_MAG \
+  (NUM_MAG_IIS2MDC + NUM_IMU_LSM9DS1 + NUM_IMU_ICM20948 + NUM_MAG_DESKTOP_FILE)
+
+#if HAS_DEV(MAG)
+extern const Orientation_s magBoardToLocal[NUM_MAG][3];
+#endif  // HAS_DEV(MAG)
 
 #if HAS_DEV(IMU_LSM9DS1)
 extern SPI_HandleTypeDef* imuLsm9ds1AgHspi[NUM_IMU_LSM9DS1];
@@ -253,6 +297,12 @@ extern SPI_HandleTypeDef* imuLsm9ds1MagHspi[NUM_IMU_LSM9DS1];
 extern GPIO_TypeDef* imuLsm9ds1MagCsGpioPort[NUM_IMU_LSM9DS1];
 extern uint16_t imuLsm9ds1MagCsPin[NUM_IMU_LSM9DS1];
 #endif  // HAS_DEV(IMU_LSM9DS1)
+
+#if HAS_DEV(IMU_ICM20600)
+extern SPI_HandleTypeDef* imuIcm20600Hspi[NUM_IMU_ICM20600];
+extern GPIO_TypeDef* imuIcm20600CsGpioPort[NUM_IMU_ICM20600];
+extern uint16_t imuIcm20600CsPin[NUM_IMU_ICM20600];
+#endif  // HAS_DEV(IMU_ICM20600)
 
 #if HAS_DEV(IMU)
 extern const Orientation_s imuBoardToLocal[NUM_IMU][3];
@@ -293,11 +343,15 @@ extern TIM_HandleTypeDef* pyroDigitalTickTim;
 extern uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL];
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
+// ADCs
+
+#define NUM_ADC (NUM_STM_HADC)
+
 /* Pyro continuinty */
 
-#define NUM_PYRO_CONT (NUM_PYRO_CONT_ADC + NUM_PYRO_CONT_DESKTOP_FILE)
+#define NUM_PYRO_CONT (NUM_PYRO_CONT_HADC + NUM_PYRO_CONT_DESKTOP_FILE)
 
-#define FIRST_ID_PYRO_CONT_ADC 0
+#define FIRST_ID_PYRO_CONT_HADC 0
 #define FIRST_ID_PYRO_CONT_DESKTOP_FILE \
   (FIRST_ID_PYRO_CONT_ADC + NUM_PYRO_CONT_ADC)
 
@@ -383,21 +437,44 @@ extern float servoPwmMaxPulseMs[NUM_SERVO_PWM];
 /* VBat Sensors */
 
 #define NUM_VBAT (NUM_VBAT_ADC + NUM_VBAT_INA226 + NUM_VBAT_DESKTOP_FILE)
+#define NUM_CURRENT_SENSE (NUM_CURRENT_ADC)
 
 #define FIRST_ID_VBAT_ADC 0
 #define FIRST_ID_VBAT_INA226 (FIRST_ID_VBAT_ADC + NUM_VBAT_ADC)
 #define FIRST_ID_VBAT_DESKTOP_FILE (FIRST_ID_VBAT_INA226 + NUM_VBAT_INA226)
 
-#if HAS_DEV(VBAT_ADC)
-extern ADC_HandleTypeDef* vbatAdcHadc[NUM_VBAT_ADC];
+#if HAS_DEV(STM_HADC)
+extern ADC_HandleTypeDef* stmHadcInstances[NUM_STM_HADC];
 extern uint8_t vbatAdcRank[NUM_VBAT_ADC];
-extern ADC_HandleTypeDef* vbatAdcCurrentHadc[NUM_VBAT_ADC];
-extern uint8_t vbatAdcCurrentRank[NUM_VBAT_ADC];
-#endif  // HAS_DEV(VBAT_ADC)
+
+#define FIRST_ID_STM_HADC 0
+
+typedef struct {
+  uint8_t stmAdcIdx;  // Index in the stmHadcInstances array
+  uint8_t rank;
+
+  float min;
+  float max;
+} StmHadcEntry_s;
+
+#endif  // HAS_DEV(STM_HADC)
+#if HAS_DEV(VBAT_ADC)
+extern StmHadcEntry_s vbatHadcEntries[NUM_VBAT_ADC];
+#endif
+#if HAS_DEV(PYRO_CONT_HADC)
+extern StmHadcEntry_s pyroHadcEntries[NUM_PYRO_CONT_HADC];
+#endif
 
 #if HAS_DEV(VBAT_INA226)
 extern I2C_HandleTypeDef* vbatIna226Hi2c[NUM_VBAT_INA226];
 #endif  // HAS_DEV(VBAT_INA226)
+
+/* ADC calculations */
+
+// #define NUM_STM_HADCS (NUM_VBAT_ADC + NUM_PYRO_CONT_HADC)
+// #define FIRST_ARRAY_INDEX_PYRO_CONT_ADC 0
+// #define FIRST_ARRAY_INDEX_VBAT (FIRST_ARRAY_INDEX_PYRO_CONT_ADC +
+// NUM_PYRO_CONT_ADC)
 
 /* Watchdogs */
 

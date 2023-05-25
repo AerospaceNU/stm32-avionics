@@ -28,7 +28,7 @@ EndCondition_e CliEraseFlashState::run() {
     }
   } else {
     _curFlashId++;
-    if (_curFlashId == NUM_FLASH) {
+    if (_curFlashId == FIRST_ID_FLASH_S25FLX + NUM_FLASH_S25FLX) {
       return EndCondition_e::CliCommandComplete;
     }
     dataLog_flashErase(_curFlashId);
