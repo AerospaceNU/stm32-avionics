@@ -194,9 +194,9 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
     data.groundTemp = cli_getConfigs()->groundTemperatureC;
     for (int i = 0; i < NUM_SERIAL_DUCER; i++) {
 #if HAS_DEV(SERIAL_DUCER)
-    	data.ducerPressures[i] = sensorData->serialDucerData[i].pressure;
+      data.ducerPressures[i] = sensorData->serialDucerData[i].pressure;
 #else
-    	data.ducerPressures[i] = 0;
+      data.ducerPressures[i] = 0;
 #endif
     }
     transmitPacket[radioId].packetType = TELEMETRY_ID_ALT_INFO;

@@ -125,9 +125,9 @@ typedef struct __attribute__((packed)) {
 
 // Data from the serial pressure transducer breakout
 typedef struct __attribute__((packed)) {
-	uint8_t status;
-	float temp;
-	float pressure;
+  uint8_t status;
+  float temp;
+  float pressure;
 } SerialDucerData_t;
 
 #endif  // DEVICES_DATA_STRUCTURES_H_

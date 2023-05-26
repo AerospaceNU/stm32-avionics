@@ -379,7 +379,7 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
 #endif  // HAS_DEV(PYRO_CONT)
 #if HAS_DEV(SERIAL_DUCER)
     for (int i = 0; i < NUM_SERIAL_DUCER; ++i) {
-    	fcbLogData->serialDucerData[i] = sensorData->serialDucerData[i];
+      fcbLogData->serialDucerData[i] = sensorData->serialDucerData[i];
     }
 #endif
 
