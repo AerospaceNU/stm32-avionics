@@ -130,7 +130,7 @@ void CliTasks::sense() {
 #if HAS_DEV(SERIAL_DUCER)
   for (int i = 0; i < NUM_SERIAL_DUCER; i++) {
     dtoa(float1, sizeof(float1), data->serialDucerData[i].pressure, 5);
-    snprintf(cliStr, sizeof(cliStr), "Ducer %d Pressure (atm): %s\r\n", i,
+    snprintf(cliStr, sizeof(cliStr), "\r\nDucer %d Pressure (atm): %s\r\n", i,
              float1);
     cli_send(cliStr);
     dtoa(float1, sizeof(float1), data->serialDucerData[i].temp, 1);

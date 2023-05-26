@@ -62,9 +62,7 @@ CliStringPacket_s;
 PACKED_STRUCT {
   float pressure[NUM_BAROMETER];
   float pressureRef, groundElevation, groundTemp;
-#if HAS_DEV(SERIAL_DUCER)
-  float ducerPressures[NUM_SERIAL_DUCER];
-#endif
+  float ducerPressures[1];
 }
 AltInfoPacket_s;
 #endif  // HAS_DEV(BAROMETER)
