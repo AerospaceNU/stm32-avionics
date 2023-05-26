@@ -36,8 +36,6 @@
 
 #define NUM_PYRO_DIGITAL 6
 
-#define NUM_PYRO_CONT_ADC 6
-
 #define NUM_RADIO_TI_433 0
 #define NUM_RADIO_TI_915 1
 
@@ -45,8 +43,10 @@
 
 #define NUM_USB_STD 1
 
-#define NUM_VBAT_ADC 0
 #define NUM_VBAT_INA226 1
+
+#define NUM_STM_HADC 1
+#define NUM_PYRO_CONT_HADC 6
 
 #define NUM_WATCHDOG_INTERNAL 1
 

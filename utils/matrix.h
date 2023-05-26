@@ -8,7 +8,15 @@
 #ifndef UTILS_MATRIX_H_
 #define UTILS_MATRIX_H_
 
+#include <board_config.h>
+#include HAL_HEADER
+
+#ifdef STM32H7
 #define ARM_MATH_CM7
+#endif  // STM32h7
+#ifdef STM32L4
+#define ARM_MATH_CM4
+#endif  // STM32h7
 
 #include <cmath>
 #include <cstring>

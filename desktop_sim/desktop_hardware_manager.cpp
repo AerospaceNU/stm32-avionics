@@ -87,9 +87,12 @@ bool hardwareStatusServo[NUM_SERVO];
 #if HAS_DEV(USB)
 bool hardwareStatusUsb[NUM_USB];
 #endif  // HAS_DEV(USB)
-#if HAS_DEV(VBAT)
-bool hardwareStatusVbat[NUM_VBAT];
-#endif  // HAS_DEV(VBAT)
+#if HAS_DEV(DESKTOP_ADC)
+bool hardwareStatusAdcs[DESKTOP_ADC];
+#endif  // HAS_DEV(DESKTOP_ADC)
+#if HAS_DEV(MAG)
+bool hardwareStatusMag[NUM_MAG];
+#endif  // HAS_DEV(MAG)
 
 /* Hardware objects */
 

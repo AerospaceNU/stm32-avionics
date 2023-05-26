@@ -97,18 +97,18 @@ void triggerManager_triggerFire(uint8_t triggerNum, bool logFire) {
   TriggerConfig_s* triggerConfig =
       triggerNum + cli_getConfigs()->triggerConfiguration;
   if (triggerConfig->mode == TRIGGER_TYPE_PYRO) {
-    if (!(triggerConfig->port >= 0 && triggerConfig->port < NUM_PYRO)) return;
+    if (!(triggerConfig->port < NUM_PYRO)) return;
     hm_pyroFire(triggerConfig->port, triggerConfig->duration);
 
   } else if (triggerConfig->mode == TRIGGER_TYPE_DIGITAL_ON_PYRO) {
-    if (!(triggerConfig->port >= 0 && triggerConfig->port < NUM_PYRO)) return;
+    if (!(triggerConfig->port < NUM_PYRO)) return;
     hm_pyroSet(triggerConfig->port, true);
 
   } else if (triggerConfig->mode == TRIGGER_TYPE_DIGITAL_OFF_PYRO) {
-    if (!(triggerConfig->port >= 0 && triggerConfig->port < NUM_PYRO)) return;
+    if (!(triggerConfig->port < NUM_PYRO)) return;
     hm_pyroSet(triggerConfig->port, false);
   } else if (triggerConfig->mode == TRIGGER_TYPE_PWM_PYRO) {
-    if (!(triggerConfig->port >= 0 && triggerConfig->port < NUM_PYRO)) return;
+    if (!(triggerConfig->port < NUM_PYRO)) return;
     hm_pyroSetPwm(triggerConfig->port, triggerConfig->duration, 100,
                   triggerConfig->pulseWidth);
     // Line cutter type

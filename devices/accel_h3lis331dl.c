@@ -62,6 +62,7 @@ static void accelH3lis331dl_getGain(AccelH3lis331dlCtrl_s *sensor) {
 bool accelH3lis331dl_init(AccelH3lis331dlCtrl_s *sensor, SpiCtrl_t spi) {
   sensor->spi = spi;
   HAL_GPIO_WritePin(sensor->spi.port, sensor->spi.pin, GPIO_PIN_SET);
+  HAL_Delay(1);
 
   uint8_t me = whoAmI(sensor);
   if (me == 0x00 || me == 0xFF) {

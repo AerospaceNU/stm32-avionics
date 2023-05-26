@@ -155,6 +155,41 @@ static double getSensorAxis(const Axis_e boardAxis,
   return multiplier * sensorVals[sensorOrient.axis];
 }
 
+static void filterMags(SensorData_s* curSensorVals) {
+#if HAS_DEV(MAG)
+  // Get mag readings along sensor axes
+  double magData[3] = {0};
+  double magReadings[3][NUM_MAG];
+  for (int i = 0; i < NUM_MAG; i++) {
+    memcpy(magData, &curSensorVals->magData[i].realGauss, 3 * sizeof(double));
+
+    // Remap from sensor frame to board frame
+    for (int axis = 0; axis < 3; axis++) {
+      magReadings[axis][i] =
+          getSensorAxis((Axis_e)axis, magBoardToLocal[i], magData);
+    }
+  }
+
+  uint8_t count = 0;
+  float accum[3] = {0};
+  for (int i = 0; i < NUM_MAG; i++) {
+    // Only use working magnetometer sensors
+    if (!hardwareStatusMag[i]) continue;
+
+    double* readings = magReadings[i];
+    for (int i = 0; i < 3; i++) accum[i] += readings[i];
+  }
+
+  if (count) {
+    for (int i = 0; i < 3; i++) accum[i] /= count;
+  }
+
+  filterData.rocket_magnetic_flux_x = accum[0];
+  filterData.rocket_magnetic_flux_y = accum[1];
+  filterData.rocket_magnetic_flux_z = accum[2];
+
+#endif  // HAS_DEV(MAG)
+}
 static void filterAccels(SensorData_s* curSensorVals,
                          SensorProperties_s* sensorProperties) {
   // Get acceleration readings along raw axes
@@ -494,6 +529,7 @@ void filter_applyData(SensorData_s* curSensorVals,
   filterPositionZ(curSensorVals, hasPassedApogee);
 
   filterAccels(curSensorVals, sensorProperties);
+  filterMags(curSensorVals);
 
   filter_setWorldReference();
 

@@ -1,5 +1,7 @@
 #include "hardware_manager.h"
 
+#include <stdio.h>
+
 #include "hal_callbacks.h"
 #include "radio_packet_types.h"
 
@@ -32,6 +34,14 @@
 #include "flash_s25flx.h"
 #endif  // HAS_DEV(FLASH_S25FLX)
 
+#if HAS_DEV(FLASH_MB85RSX)
+#include "flash_mb85rsx.h"
+#endif  // HAS_DEV(FLASH_MB85RSX)
+
+#if HAS_DEV(MAG_IIS2MDC)
+#include "mag_iis2mdc.h"
+#endif  // HAS_DEV(MAG_IIS2MDC)
+
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
 #include "gps.h"
 #endif  // HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
@@ -39,6 +49,10 @@
 #if HAS_DEV(IMU_LSM9DS1)
 #include "imu_lsm9ds1.h"
 #endif  // HAS_DEV(IMU_LSM9DS1)
+
+#if HAS_DEV(IMU_ICM20600)
+#include "imu_icm20600.h"
+#endif  // HAS_DEV(IMU_ICM20600)
 
 #if HAS_DEV(LINE_CUTTER_BLE)
 #include "line_cutter_ble.h"
@@ -75,7 +89,7 @@
 #include "vbat_ina226.h"
 #endif  // HAS_DEV(USB_STD)
 
-#if HAS_DEV(PYRO_CONT_ADC) || HAS_DEV(VBAT_ADC)
+#if HAS_DEV(STM_HADC)
 #include "adc_device.h"
 #endif  // HAS_DEV(VBAT_ADC)
 
@@ -133,9 +147,12 @@ bool hardwareStatusServo[NUM_SERVO];
 #if HAS_DEV(USB)
 bool hardwareStatusUsb[NUM_USB];
 #endif  // HAS_DEV(USB)
-#if HAS_DEV(VBAT)
-bool hardwareStatusVbat[NUM_VBAT];
-#endif  // HAS_DEV(VBAT)
+#if HAS_DEV(STM_HADC)
+bool hardwareStatusAdcs[NUM_STM_HADC];
+#endif  // HAS_DEV(STM_HADC)
+#if HAS_DEV(MAG)
+bool hardwareStatusMag[NUM_MAG];
+#endif  // HAS_DEV(MAG)
 
 /* Hardware objects */
 
@@ -173,6 +190,9 @@ static DcMotorPwmCtrl_s dcMotorPwm[NUM_DC_MOTOR_PWM];
 #if HAS_DEV(FLASH_S25FLX)
 static FlashS25flxCtrl_s flashS25flx[NUM_FLASH_S25FLX];
 #endif  // HAS_DEV(FLASH_S25FLX)
+#if HAS_DEV(FLASH_MB85RSX)
+static FlashMb85rsxCtrl_s flashMb85rsx[NUM_FLASH_MB85RSX];
+#endif  // HAS_DEV(FLASH_MB85RSX)
 
 /* GPS */
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
@@ -183,6 +203,14 @@ static GpsCtrl_s gps[NUM_GPS_STD + NUM_GPS_UBLOX];
 #if HAS_DEV(IMU_LSM9DS1)
 static ImuLsm9ds1Ctrl_s imuLsm9ds1[NUM_IMU_LSM9DS1];
 #endif  // HAS_DEV(IMU_LSM9DS1)
+
+#if HAS_DEV(IMU_ICM20600)
+static ImuICM20600Ctrl_s imuIcm20600[NUM_IMU_ICM20600];
+#endif  // HAS_DEV(IMU_ICM20600)
+
+#if HAS_DEV(MAG_IIS2MDC)
+static ImuIIS2MDCCtrl_s imuIis2mdc[NUM_MAG_IIS2MDC];
+#endif  // HAS_DEV(MAG_IIS2MDC)
 
 /* Line Cutters */
 #if HAS_DEV(LINE_CUTTER_BLE)
@@ -199,10 +227,10 @@ static PyroDigitalCtrl_s pyroDigital[NUM_PYRO_DIGITAL];
 static LedCtrl_s ledDigital[NUM_LED_DIGITAL];
 #endif  // HAS_DEV(LED_DIGITAL)
 
-/* Pyro continuity */
-#if HAS_DEV(PYRO_CONT_ADC)
-static AdcDevCtrl_s pyroContAdc[NUM_PYRO_CONT_ADC];
-#endif  // HAS_DEV(PYRO_CONT_ADC)
+/* ADC inputs */
+#if HAS_DEV(STM_HADC)
+static AdcDevCtrl_s stmAdcs[NUM_STM_HADC];
+#endif  // HAS_DEV(STM_HADC)
 
 /* Radio */
 #if HAS_DEV(RADIO_TI_433)
@@ -219,9 +247,12 @@ static ServoPwmCtrl_t servoPwm[NUM_SERVO_PWM];
 
 /* VBat Sensors */
 #if HAS_DEV(VBAT_ADC)
-static AdcDevCtrl_s vbatAdc[NUM_VBAT_ADC];
-static AdcDevCtrl_s vbatAdcCurrent[NUM_VBAT_ADC];
+// static AdcDevCtrl_s vbatAdc[NUM_VBAT_ADC];
 #endif  // HAS_DEV(VBAT_ADC)
+#if HAS_DEV(CURRENT_ADC)
+static AdcDevCtrl_s vbatAdcCurrent[NUM_CURRENT_ADC];
+#endif  // HAS_DEV(CURRENT_ADC)
+
 #if HAS_DEV(VBAT_INA226)
 static VbatIna226Ctrl_s vbatIna226[NUM_VBAT_INA226];
 #endif  // HAS_DEV(VBAT_INA226)
@@ -309,6 +340,13 @@ void hm_hardwareInit() {
     hardwareStatusFlash[FIRST_ID_FLASH_S25FLX + i] = true;
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
+#if HAS_DEV(FLASH_MB85RSX)
+  for (int i = 0; i < NUM_FLASH_MB85RSX; i++) {
+    flashMb85rsx_init(&(flashMb85rsx[i]), flashMb85rsxHspi[i],
+                      flashMb85rsxCsGpioPort[i], flashMb85rsxCsPin[i]);
+    hardwareStatusFlash[FIRST_ID_FLASH_MB85RSX + i] = true;
+  }
+#endif  // HAS_DEV(FLASH_MB85RSX)
 
   /* GPS */
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
@@ -338,6 +376,27 @@ void hm_hardwareInit() {
   }
 #endif  // HAS_DEV(IMU_LSM9DS1)
 
+#if HAS_DEV(IMU_ICM20600)
+  for (int i = 0; i < NUM_IMU_ICM20600; i++) {
+    imuIcm20600[i].spi.hspi = imuIcm20600Hspi[i];
+    imuIcm20600[i].spi.port = imuIcm20600CsGpioPort[i];
+    imuIcm20600[i].spi.pin = imuIcm20600CsPin[i];
+    icm20600_init(&imuIcm20600[i], ICM20600_ACCEL_RANGE_16G,
+                  ICM20602_GYRO_RANGE_2000dps);
+    hardwareStatusImu[FIRST_ID_IMU_ICM20600 + i] = true;
+    // TODO set fullscale!
+    sensorProperties.imuAccelFs[FIRST_ID_IMU_ICM20600 + i] =
+        156.96;  // 16 G * 9.81 mps2/G
+  }
+#endif  // HAS_DEV(IMU_ICM20600)
+
+#if HAS_DEV(MAG_IIS2MDC)
+  for (int i = 0; i < NUM_MAG_IIS2MDC; i++) {
+    // TODO don't hard-code i2c address
+    hardwareStatusMag[i] = iis2mdc_init(imuIis2mdc + i, 0b11110);
+  }
+#endif
+
   /* LEDs */
 #if HAS_DEV(LED_DIGITAL)
   for (int i = 0; i < NUM_LED_DIGITAL; i++) {
@@ -348,7 +407,7 @@ void hm_hardwareInit() {
   }
 #endif  // HAS_DEV(LED_DIGITAL)
 
-  /* Pyros */
+  /* Pyro outputs */
 #if HAS_DEV(PYRO_DIGITAL)
   for (int i = 0; i < NUM_PYRO_DIGITAL; i++) {
     pyroDigital[i].port = pyroDigitalGpioPort[i];
@@ -373,19 +432,6 @@ void hm_hardwareInit() {
 #endif  // HAS_DEV(BLE_CHIP_NRF)
   }
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
-
-  /* Pyro continuity */
-#if HAS_DEV(PYRO_CONT_ADC)
-  // Pyros - 0 min, (127k/27k*3.3V) max
-  // I had to multiply by 10/3 on my V0 to get these to make sense. TODO
-  // Why???
-  double voltageDividerMax = 3.3 * (127.0 / 27.0) * 10 / 3;
-  for (int i = 0; i < NUM_PYRO_CONT_ADC; i++) {
-    adcDev_init(&pyroContAdc[i], pyroContAdcHadc[i], pyroContAdcRank[i], 0,
-                voltageDividerMax, true);
-    hardwareStatusPyroCont[FIRST_ID_PYRO_CONT_ADC + i] = true;
-  }
-#endif  // HAS_DEV(PYRO_CONT_ADC)
 
   /* Radios */
 #if HAS_DEV(RADIO_TI_433)
@@ -492,30 +538,32 @@ void hm_hardwareInit() {
   hardwareStatusUsb[FIRST_ID_USB_STD] = true;
 #endif  // HAS_DEV(USB_STD)
 
-  /* VBat Sensors */
-#if HAS_DEV(VBAT_ADC)
+  /* stm32 hadcs */
+#if HAS_DEV(STM_HADC)
+  for (int i = 0; i < NUM_STM_HADC; i++) {
+    adcDev_init(stmAdcs + i, stmHadcInstances[i], true);
+    hardwareStatusAdcs[FIRST_ID_STM_HADC + i] = true;
+  }
+#endif
+
+// TODO fix current sensors, they're totally commented out rn
+#if HAS_DEV(CURRENT_ADC)
   // Battery voltage - 0 min, seems like 10v in = 2.4v on the voltage divider?
   float vbatMax = 67;  // 4.72 Volts/volt, 67v fullscale??
   // Also the scale seems non linear: at 10vin this is right, but at 13vin it
   // reads 0.25 above the true number. Apparently this is coz our ADCs aren't
   // buffered
   // TODO why does 67 make things work?
-  for (int i = 0; i < NUM_VBAT_ADC; i++) {
-    adcDev_init(&vbatAdc[i], vbatAdcHadc[i], vbatAdcRank[i], 0, vbatMax, true);
-    adcDev_init(&vbatAdcCurrent[i], vbatAdcCurrentHadc[i],
-                vbatAdcCurrentRank[i], -12.5, 17.5, true);
-    hardwareStatusVbat[FIRST_ID_VBAT_ADC + i] = true;
-    hardwareStatusVbat[FIRST_ID_VBAT_ADC + i] = true;
-  }
-#endif  // HAS_DEV(VBAT_ADC)
+
+#endif  // HAS_DEV(CURRENT_ADC)
 #if HAS_DEV(VBAT_INA226)
   for (int i = 0; i < NUM_VBAT_INA226; i++) {
     vbatIna226[i].hi2c = vbatIna226Hi2c[i];
     vbatIna226[i].addr = 0x40;  // (01000000b)
     vbatIna226[i].rShuntVal = 0.002;
     vbatIna226[i].iMaxExpected = 10;
-    hardwareStatusVbat[FIRST_ID_VBAT_INA226 + i] =
-        vbatIna226_init(&vbatIna226[i]);
+    //    hardwareStatusVbat[FIRST_ID_VBAT_INA226 + i] =
+    vbatIna226_init(&vbatIna226[i]);
   }
 #endif  // HAS_DEV(VBAT_INA226)
 
@@ -537,7 +585,13 @@ bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
         pData);
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
-
+#if HAS_DEV(FLASH_MB85RSX)
+  if (IS_DEVICE(flashId, FLASH_MB85RSX)) {
+    return flashMb85rsx_readStart(
+        &(flashMb85rsx[flashId - FIRST_ID_FLASH_MB85RSX]), startLoc, numBytes,
+        pData);
+  }
+#endif  // HAS_DEV(FLASH_MB85RSX)
   return false;
 }
 
@@ -550,6 +604,13 @@ bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
         data);
   }
 #endif  // HAS_DEV(FLASH_S25FLX)
+#if HAS_DEV(FLASH_MB85RSX)
+  if (IS_DEVICE(flashId, FLASH_MB85RSX)) {
+    return flashMb85rsx_writeStart(
+        &(flashMb85rsx[flashId - FIRST_ID_FLASH_MB85RSX]), startLoc, numBytes,
+        data);
+  }
+#endif  // HAS_DEV(FLASH_MB85RSX)
 
   return false;
 }
@@ -662,6 +723,7 @@ void hm_ledToggle(int ledId) {
 }
 
 bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
+  (void)numBytes;
 #if HAS_DEV(RADIO_TI_433)
   if (IS_DEVICE(radioNum, RADIO_TI_433)) {
     TiRadioCtrl_s *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
@@ -986,30 +1048,64 @@ void hm_readSensorData() {
 #if HAS_DEV(IMU_LSM9DS1)
     for (int i = 0; i < NUM_IMU_LSM9DS1; i++) {
       lsm9ds1_getData(&imuLsm9ds1[i]);
-      sensorData.imuData[FIRST_ID_IMU_LSM9DS1 + i] = imuLsm9ds1[i].data;
+      sensorData.imuData[FIRST_ID_IMU_LSM9DS1 + i] = imuLsm9ds1[i].agData;
+      sensorData.magData[FIRST_ID_MAG_LSM9DS1 + i] = imuLsm9ds1[i].mData;
+    }
+#endif  // HAS_DEV(IMU_LSM9DS1)
+#if HAS_DEV(IMU_ICM20600)
+    for (int i = 0; i < NUM_IMU_ICM20600; i++) {
+      icm20600_getData(&imuIcm20600[i]);
+      sensorData.imuData[FIRST_ID_IMU_ICM20600 + i] = imuIcm20600[i].data;
     }
 #endif  // HAS_DEV(IMU_LSM9DS1)
 
-    // Pyro continuity data
-#if HAS_DEV(PYRO_CONT_ADC)
-    for (int i = 0; i < NUM_PYRO_CONT_ADC; i++) {
-      float adcVal = 0;
-      adcDev_startSingleRead(&pyroContAdc[i]);
-      sensorData.pyroContData[i] = adcDev_getValue(&pyroContAdc[i], &adcVal, 5)
-                                       ? adcVal > PYRO_CONTINUITY_THRESHOLD
-                                       : false;
+    // Mag data
+#if HAS_DEV(MAG_IIS2MDC)
+    for (int i = 0; i < NUM_MAG_IIS2MDC; i++) {
+      iis2mdc_getData(imuIis2mdc + i);
+      sensorData.magData[FIRST_ID_MAG_IIS2DS1 + i] = imuIis2mdc[i].data;
     }
-#endif  // HAS_DEV(PYRO_CONT_ADC)
+#endif  // HAS_DEV(MAG_IIS2MDC)
 
-    // VBat data
+#if HAS_DEV(STM_HADC)
+
+    // Start conversion on all HADCs
+    for (int i = 0; i < NUM_STM_HADC; i++) {
+      adcDev_convertAllChannels(&stmAdcs[i]);
+    }
+
+    // Temp value for storing readings
+    float adcVal = 0;
+
+    // Sort into the appropriate places
 #if HAS_DEV(VBAT_ADC)
     for (int i = 0; i < NUM_VBAT_ADC; i++) {
-      float adcVal = 0;
-      adcDev_startSingleRead(&vbatAdc[i]);
-      sensorData.vbatData[FIRST_ID_VBAT_ADC + i] =
-          adcDev_getValue(&vbatAdc[i], &adcVal, 5) ? adcVal : 0;
+      bool success = adcDev_getValue(
+          &stmAdcs[pyroHadcEntries[i].stmAdcIdx], vbatHadcEntries[i].rank,
+          &adcVal, vbatHadcEntries[i].min, vbatHadcEntries[i].max, 500);
+      if (success) {
+        sensorData.vbatData[FIRST_ID_VBAT_ADC + i] = adcVal;
+      } else {
+        sensorData.vbatData[FIRST_ID_VBAT_ADC + i] = -1;
+      }
     }
 #endif  // HAS_DEV(VBAT_ADC)
+#if HAS_DEV(PYRO_CONT_HADC)
+    for (int i = 0; i < NUM_PYRO_CONT_HADC; i++) {
+      bool success = adcDev_getValue(
+          &stmAdcs[pyroHadcEntries[i].stmAdcIdx], pyroHadcEntries[i].rank,
+          &adcVal, pyroHadcEntries[i].min, pyroHadcEntries[i].max, 500);
+      if (success) {
+        sensorData.pyroContData[FIRST_ID_PYRO_CONT_HADC + i] =
+            (adcVal > PYRO_CONTINUITY_THRESHOLD);
+      } else {
+        sensorData.pyroContData[FIRST_ID_PYRO_CONT_HADC + i] = false;
+      }
+    }
+#endif  // HAS_DEV(PYRO_CONT_ADC)
+#endif  // HAS_DEV(STM_HADC)
+
+    // VBat data
 #if HAS_DEV(VBAT_INA226)
     for (int i = 0; i < NUM_VBAT_INA226; i++) {
       sensorData.vbatData[FIRST_ID_VBAT_INA226 + i] =

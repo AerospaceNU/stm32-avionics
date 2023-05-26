@@ -1,0 +1,35 @@
+{
+    "tasks": [
+        {
+            "label": "build FCB V1",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "fcb_v1.elf", "-j",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/fcb_v1/Build"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        },
+        {
+            "label": "build live sim",
+            "type": "shell",
+            "command": "ninja",
+            "args": [
+                "",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        },
+    ],
+    "version": "2.0.0"
+}

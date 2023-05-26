@@ -5,7 +5,7 @@
 
 static uint32_t last_time = 0;
 static bool isOn;
-static int buzzerId_;
+static int buzzerId_ = 0;
 
 void buzzerHeartbeat_setBuzzer(int buzzerId) { buzzerId_ = buzzerId; }
 

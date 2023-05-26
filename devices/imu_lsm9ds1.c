@@ -1,8 +1,5 @@
 /*
  * imu_lsm9ds1.c
- *
- *  Created on: May 28, 2020
- *      Author: John
  */
 
 #include "imu_lsm9ds1.h"
@@ -68,34 +65,37 @@ static void lsm9ds1_getDataRaw(ImuLsm9ds1Ctrl_s *sensor) {
                                  LSM9DS1_SPI_REG_MASK | OUT_TEMP_H);
 
   // Writes combined h and l byte to struct
-  sensor->data.accelRaw.x = ((int16_t)x_h_xl << 8) | (x_l_xl);
-  sensor->data.accelRaw.y = ((int16_t)y_h_xl << 8) | (y_l_xl);
-  sensor->data.accelRaw.z = ((int16_t)z_h_xl << 8) | (z_l_xl);
+  sensor->agData.accelRaw.x = ((int16_t)x_h_xl << 8) | (x_l_xl);
+  sensor->agData.accelRaw.y = ((int16_t)y_h_xl << 8) | (y_l_xl);
+  sensor->agData.accelRaw.z = ((int16_t)z_h_xl << 8) | (z_l_xl);
 
-  sensor->data.angVelRaw.x = ((int16_t)x_h_g << 8) | (x_l_g);
-  sensor->data.angVelRaw.y = ((int16_t)y_h_g << 8) | (y_l_g);
-  sensor->data.angVelRaw.z = ((int16_t)z_h_g << 8) | (z_l_g);
+  sensor->agData.angVelRaw.x = ((int16_t)x_h_g << 8) | (x_l_g);
+  sensor->agData.angVelRaw.y = ((int16_t)y_h_g << 8) | (y_l_g);
+  sensor->agData.angVelRaw.z = ((int16_t)z_h_g << 8) | (z_l_g);
 
-  sensor->data.magRaw.x = ((int16_t)x_h_m << 8) | (x_l_m);
-  sensor->data.magRaw.y = ((int16_t)y_h_m << 8) | (y_l_m);
-  sensor->data.magRaw.z = ((int16_t)z_h_m << 8) | (z_l_m);
+  sensor->mData.raw.x = ((int16_t)x_h_m << 8) | (x_l_m);
+  sensor->mData.raw.y = ((int16_t)y_h_m << 8) | (y_l_m);
+  sensor->mData.raw.z = ((int16_t)z_h_m << 8) | (z_l_m);
 
   sensor->ag.tRawVal = ((int16_t)t_h << 8) | (t_l);
 }
 
 void lsm9ds1_getData(ImuLsm9ds1Ctrl_s *sensor) {
   lsm9ds1_getDataRaw(sensor);
-  sensor->data.accelRealMps2.x = sensor->ag.aRes * sensor->data.accelRaw.x;
-  sensor->data.accelRealMps2.y = sensor->ag.aRes * sensor->data.accelRaw.y;
-  sensor->data.accelRealMps2.z = sensor->ag.aRes * sensor->data.accelRaw.z;
+  sensor->agData.accelRealMps2.x = sensor->ag.aRes * sensor->agData.accelRaw.x;
+  sensor->agData.accelRealMps2.y = sensor->ag.aRes * sensor->agData.accelRaw.y;
+  sensor->agData.accelRealMps2.z = sensor->ag.aRes * sensor->agData.accelRaw.z;
 
-  sensor->data.angVelRealRadps.x = sensor->ag.gRes * sensor->data.angVelRaw.x;
-  sensor->data.angVelRealRadps.y = sensor->ag.gRes * sensor->data.angVelRaw.y;
-  sensor->data.angVelRealRadps.z = sensor->ag.gRes * sensor->data.angVelRaw.z;
+  sensor->agData.angVelRealRadps.x =
+      sensor->ag.gRes * sensor->agData.angVelRaw.x;
+  sensor->agData.angVelRealRadps.y =
+      sensor->ag.gRes * sensor->agData.angVelRaw.y;
+  sensor->agData.angVelRealRadps.z =
+      sensor->ag.gRes * sensor->agData.angVelRaw.z;
 
-  sensor->data.magRealG.x = sensor->m.mRes * sensor->data.magRaw.x;
-  sensor->data.magRealG.y = sensor->m.mRes * sensor->data.magRaw.y;
-  sensor->data.magRealG.z = sensor->m.mRes * sensor->data.magRaw.z;
+  sensor->mData.realGauss.x = sensor->m.mRes * sensor->mData.raw.x;
+  sensor->mData.realGauss.y = sensor->m.mRes * sensor->mData.raw.y;
+  sensor->mData.realGauss.z = sensor->m.mRes * sensor->mData.raw.z;
 }
 
 static void lsm9ds1_calcRes(ImuLsm9ds1Ctrl_s *sensor) {

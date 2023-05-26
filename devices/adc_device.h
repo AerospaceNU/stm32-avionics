@@ -15,39 +15,35 @@ extern "C" {
 
 #define MAX_CHANNELS 14
 
-#if (HAS_DEV(PYRO_CONT_ADC) || HAS_DEV(VBAT_ADC))
+#if (HAS_DEV(STM_HADC))
 
 typedef struct {
   ADC_HandleTypeDef *hadc;
-  uint8_t rank;
-  float scaler;
-  float offset;
   bool bConvCplt;
   uint32_t rawVals[MAX_CHANNELS];
+  float maxRawVal;
 } AdcDevCtrl_s;
 
 /**
  * Initializes/calibrates ADC.
- * @param rank: the sequence number the channel is collected in for given ADC
- * handle (1-based index for consistency with STM32Cube)
  * @param minVal: correlates to raw 0
  * @param maxVal: correlates to highest raw value of ADC's resolution
  */
-void adcDev_init(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc, uint8_t rank,
-                 float minVal, float maxVal, bool bSingleEnded);
+bool adcDev_init(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc, bool bSingleEnded);
 
 /**
- * Starts a one-time ADC read/conversion. This type of conversion takes time, so
- * starting read gives flexibility for higher code to perform other tasks while
- * the read/conversion is occurring
+ * Starts a one-time ADC read/conversion on all channels currently configured.
+ * Access the results using adcDev_getValue.
  */
-void adcDev_startSingleRead(AdcDevCtrl_s *adc);
+void adcDev_convertAllChannels(AdcDevCtrl_s *adc);
 
 /**
  * Returns true with converted ADC value if available, otherwise returns false
  * (hardware conversion hasn't completed)
+ * @param rank: The rank of the ADC channel to retrieve the value orf
  */
-bool adcDev_getValue(AdcDevCtrl_s *adc, float *pval, uint32_t timeoutMS);
+bool adcDev_getValue(AdcDevCtrl_s *adc, uint8_t rank, float *pval,
+                     float minValue, float maxValue, uint32_t timeoutMS);
 
 #endif
 

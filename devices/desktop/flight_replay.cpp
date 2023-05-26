@@ -32,11 +32,11 @@ void CsvReplay::getNext(SensorData_s* data) {
       snprintf(rowName, sizeof(rowName), "imu%i_gyro_z_real", i + 1);
       data->imuData[i].angVelRealRadps.z = doc.GetCell<double>(rowName, m_row);
       snprintf(rowName, sizeof(rowName), "imu%i_mag_x_real", i + 1);
-      data->imuData[i].magRealG.x = doc.GetCell<double>(rowName, m_row);
+      data->magData[i].realGauss.x = doc.GetCell<double>(rowName, m_row);
       snprintf(rowName, sizeof(rowName), "imu%i_mag_y_real", i + 1);
-      data->imuData[i].magRealG.y = doc.GetCell<double>(rowName, m_row);
+      data->magData[i].realGauss.y = doc.GetCell<double>(rowName, m_row);
       snprintf(rowName, sizeof(rowName), "imu%i_mag_z_real", i + 1);
-      data->imuData[i].magRealG.z = doc.GetCell<double>(rowName, m_row);
+      data->magData[i].realGauss.z = doc.GetCell<double>(rowName, m_row);
     }
 #endif  // HAS_DEV(IMU_DESKTOP_FILE)
 

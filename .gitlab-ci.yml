@@ -39,3 +39,6 @@ desktop-sim-job:
     - apt-get install -y --no-install-recommends make cmake g++ gcc
     - chmod -R +x ci/build_desktop.sh
     - ./ci/build_desktop.sh
+  artifacts:
+    paths:
+      - build/desktop_sim/desktop_sim

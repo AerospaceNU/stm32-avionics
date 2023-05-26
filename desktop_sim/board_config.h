@@ -18,6 +18,7 @@
 #define NUM_GPS_DESKTOP_FILE 1
 
 #define NUM_IMU_DESKTOP_FILE 2
+#define NUM_MAG_DESKTOP_FILE 2
 
 // TODO add fake bluetooth
 
