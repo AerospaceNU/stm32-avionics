@@ -154,7 +154,7 @@ static void flashWrite(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
   }
 }
 
-static void flashEraseSector(uint32_t sectorNum) {
+static void flashEraseSector(uint32_t sectorNum, bool waitComplete) {
   int flashId = -1;
   uint32_t flashOffset = 0;
   addressToFlashId(sectorNum * FLASH_MAX_SECTOR_BYTES, &flashId, &flashOffset);
@@ -163,9 +163,11 @@ static void flashEraseSector(uint32_t sectorNum) {
   curErasingFlashId = flashId;
   hm_flashEraseSectorStart(curErasingFlashId,
                            flashOffset / FLASH_MAX_SECTOR_BYTES);
-  uint32_t waitStartMS = hm_millis();
-  while (!hm_flashIsEraseComplete(flashId) &&
-         hm_millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+  if (waitComplete) {
+    uint32_t waitStartMS = hm_millis();
+    while (!hm_flashIsEraseComplete(flashId) &&
+           hm_millis() - waitStartMS < FLASH_TIMEOUT_MS) {
+    }
   }
 }
 
@@ -279,7 +281,7 @@ void dataLog_assignFlight() {
   curFlightNum = dataLog_getLastFlightNum() + 1;
   if (curFlightNum == 1) {
     // Erase first sector since we don't know what's inside
-    flashEraseSector(0);
+    flashEraseSector(0, true);
     curSectorNum = 1;
   } else {
     uint32_t unused;
@@ -288,7 +290,7 @@ void dataLog_assignFlight() {
   }
 
   // Erase sector where flight metadata will go
-  flashEraseSector(curSectorNum);
+  flashEraseSector(curSectorNum, true);
 
   // Empty metadata packet
   memset(&flightMetadataPacket, 0xFF, kFlightMetadataSize);
@@ -440,7 +442,7 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
                                    (uint8_t)(curFlightNum & 0xFF)};
         flashWrite(curSectorNum * 2, 2, flightTxBuff);
         // Start erasing the upcoming sector
-        flashEraseSector(curSectorNum);
+        flashEraseSector(curSectorNum, false);
         erasing = true;
       } else {
         // Write whole log buffer. No need to worry about erasing future
@@ -603,7 +605,7 @@ void dataLog_writeCliConfigs() {
   currentConfigAddress += kWrappedCliConfigSize;
   if (currentConfigAddress > FLASH_MAX_SECTOR_BYTES - kWrappedCliConfigSize) {
     flashRead(0, CONFIG_START_ADDRESS, tempPacketBuffer);
-    flashEraseSector(0);
+    flashEraseSector(0, true);
     flashWrite(0, CONFIG_START_ADDRESS, tempPacketBuffer);
     currentConfigAddress = CONFIG_START_ADDRESS;
   }
