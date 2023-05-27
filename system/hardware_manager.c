@@ -1026,6 +1026,10 @@ void hm_readSensorData() {
     }
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
+    if (serialDucer_newData(&serialDucer[0])) {
+        sensorData.serialDucerData[0] = serialDucer[0].latestResult.pressureData;
+    }
+
     // Barometer data
 #if HAS_DEV(BAROMETER_MS5607)
     for (int i = 0; i < NUM_BAROMETER_MS5607; i++) {

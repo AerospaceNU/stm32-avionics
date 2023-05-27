@@ -30,6 +30,7 @@ static void serialDucer_rxEventCallback(void *userData, size_t Size) {
 
   ctrl->data_available = true;
   // todo swap buffers n shit
+  ctrl->firstBuf = !ctrl->firstBuf;
 
   // We need to restart DMA at the end
   START_DMA;
@@ -43,6 +44,9 @@ static void serialDucer_rxCpltCallback(void *userData) {
 void serialDucer_init(SerialDucerCtrl_s *ctrl, UART_HandleTypeDef *uart) {
   ctrl->uart = uart;
   ctrl->data_available = false;
+
+  //SerialDucerData_t buff;
+  //HAL_UART_Receive(ctrl->uart, (uint8_t*)&buff, sizeof(buff), HAL_MAX_DELAY);
 
   // Set up our "Event" callback, which should only happen when idle happens
   halCallbacks_registerUartRxIdleCallback(ctrl->uart,
