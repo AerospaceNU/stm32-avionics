@@ -217,7 +217,7 @@ void CliTasks::config() {
         case TRIGGER_TYPE_PWM_PYRO:
           snprintf(
               deviceText, sizeof(deviceText),
-              "PWM on pyro %d for %ds with %ld width on", triggerConfig->port,
+              "PWM on pyro %d for %ds with %ld width on ", triggerConfig->port,
               (int)(triggerConfig->duration / 1000.0),  // Convert back to ms
               triggerConfig->pulseWidth);
           break;
