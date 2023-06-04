@@ -47,6 +47,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/system</locationURI>
 		</link>
 		<link>
+			<name>usb_composite</name>
+			<type>2</type>
+			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/usb_composite</locationURI>
+		</link>
+		<link>
 			<name>utils</name>
 			<type>2</type>
 			<locationURI>PARENT-1-PROJECT_LOC/utils</locationURI>

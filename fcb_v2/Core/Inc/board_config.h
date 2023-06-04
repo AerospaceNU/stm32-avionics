@@ -8,6 +8,7 @@
 #include "board_config_types.h"
 
 #define HAL_HEADER "stm32l4xx.h"
+#define HAL_PCD_HEADER "stm32l4xx_hal_pcd.h"
 
 #define NUM_ACCEL_H3LIS331DL 1
 
@@ -48,7 +49,7 @@
 
 #define NUM_SERVO_PWM 4
 
-#define NUM_USB_STD 1
+#define NUM_USB_STD 0
 
 
 #define NUM_WATCHDOG_INTERNAL 1

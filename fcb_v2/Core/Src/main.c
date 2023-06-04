@@ -26,11 +26,15 @@
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
-#include "usb_device.h"
+#include "usb_otg.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+#include "usbd_core.h"
+#include "usbd_desc.h"
+#include "usbd_composite.h"
 
 /* USER CODE END Includes */
 
@@ -62,7 +66,11 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
 void main_cpp();
+
+USBD_HandleTypeDef USBD_Device;
+
 /* USER CODE END 0 */
 
 /**
@@ -73,6 +81,13 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+	  /*
+	  With code compiled outside Rowley, I'm seeing the USB ISR fire between USBD_Init() and USBD_RegisterClass().
+	  Interrupts are enabled at reset, and ST's (mis)decision is to start enabling NVIC interrupts in USBD_Init().
+	  By disabling interrupts here, and enabling later when everything is ready, we avoid this race condition.
+	  */
+	  __disable_irq();
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -81,6 +96,8 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+
+
 
   /* USER CODE END Init */
 
@@ -109,8 +126,21 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM17_Init();
   MX_IWDG_Init();
-  MX_USB_DEVICE_Init();
+  MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
+
+  /* Initialize Device Library */
+  USBD_Init(&USBD_Device, &USBD_Desc, 0);
+
+  /* to work within ST's drivers, I've written a special USBD_Composite class that then invokes several classes */
+  USBD_RegisterClass(&USBD_Device, &USBD_Composite);
+
+
+  /* Start Device Process */
+  USBD_Start(&USBD_Device);
+
+  /* OK, only *now* it is OK for the USB interrupts to fire */
+  __enable_irq();
 
   main_cpp();
 
