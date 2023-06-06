@@ -193,6 +193,7 @@
   */
 
 /* Private macros ------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /** @addtogroup UART_Private_Functions

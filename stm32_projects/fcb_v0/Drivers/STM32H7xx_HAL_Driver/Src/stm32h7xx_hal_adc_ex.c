@@ -54,6 +54,7 @@
 #ifdef HAL_ADC_MODULE_ENABLED
 
 /* Private typedef -----------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private define ------------------------------------------------------------*/
 
 /** @defgroup ADCEx_Private_Constants ADC Extended Private Constants

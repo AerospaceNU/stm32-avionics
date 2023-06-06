@@ -69,6 +69,7 @@
   */
 
 /* Private macros ------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /** @defgroup UARTEx_Private_Functions UARTEx Private Functions

@@ -117,6 +117,8 @@ int main(void) {
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
+  MX_USB_DEVICE_Init();
+
   /* Initialize scheduler */
   Scheduler scheduler = Scheduler();
 

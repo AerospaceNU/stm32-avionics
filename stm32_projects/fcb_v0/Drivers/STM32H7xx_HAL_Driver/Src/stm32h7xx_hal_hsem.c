@@ -99,6 +99,7 @@
 #ifdef HAL_HSEM_MODULE_ENABLED
 
 /* Private typedef -----------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private define ------------------------------------------------------------*/
 #if defined(DUAL_CORE)
 /** @defgroup HSEM_Private_Constants  HSEM Private Constants

@@ -165,6 +165,7 @@
 #ifdef HAL_PWR_MODULE_ENABLED
 
 /* Private typedef -----------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private define ------------------------------------------------------------*/
 
 /** @addtogroup PWREx_Private_Constants

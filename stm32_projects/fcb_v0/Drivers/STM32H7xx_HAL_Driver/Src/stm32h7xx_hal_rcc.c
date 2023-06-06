@@ -80,8 +80,8 @@
 #ifdef HAL_RCC_MODULE_ENABLED
 
 /* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
 #pragma GCC optimize ("Os")
+/* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /** @defgroup RCC_Private_Macros RCC Private Macros
   * @{

@@ -22,6 +22,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 /* USER CODE BEGIN Includes */
+#pragma GCC optimize ("Os")
 
 /* USER CODE END Includes */
 

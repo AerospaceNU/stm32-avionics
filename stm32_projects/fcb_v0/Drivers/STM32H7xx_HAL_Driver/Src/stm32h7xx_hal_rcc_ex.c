@@ -52,6 +52,8 @@
   */
 
 /* Private macros ------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
+
 /** @defgroup RCCEx_Private_Macros RCCEx Private Macros
  * @{
  */
