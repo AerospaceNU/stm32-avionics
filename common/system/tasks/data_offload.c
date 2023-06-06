@@ -19,7 +19,7 @@ bool dataOffload_tick() {
     dataLog_readFlightNumMetadata(flightId_);
     FlightMetadata_s* metadata = dataLog_getFlightMetadata();
     metadataReadComplete = true;
-    hm_usbTransmit(USB_CLI_ID, (uint8_t*)metadata, sizeof(FlightMetadata_s));
+    hm_usbTransmit(USB_ID_CLI, (uint8_t*)metadata, sizeof(FlightMetadata_s));
     // TODO: Either transmit rest of sector as 0xFF to allow for variable-sized
     // metadata across systems, or transmit number of each hardware
     // at beginning of metadata
@@ -31,7 +31,7 @@ bool dataOffload_tick() {
     if (bytesRead == 0) {
       readComplete_ = true;
     } else {
-      hm_usbTransmit(USB_CLI_ID, flashBuf_, (uint16_t)bytesRead);
+      hm_usbTransmit(USB_ID_CLI, flashBuf_, (uint16_t)bytesRead);
     }
   }
   return readComplete_;

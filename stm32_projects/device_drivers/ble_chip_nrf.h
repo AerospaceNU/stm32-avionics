@@ -14,6 +14,10 @@
 
 #if HAS_DEV(BLE_CHIP_NRF)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define BLEINTERFACE_SELF_ADDR 0
 #define MAX_ADDRESSES \
   10  // The maximum number of addresses we could possibly have
@@ -68,6 +72,10 @@ typedef struct {
 
 void bleChipNrf_init(BleChipNrfCtrl_t *ctrl, UART_HandleTypeDef *ble_uart);
 void bleChipNrf_tick(BleChipNrfCtrl_t *ctrl);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

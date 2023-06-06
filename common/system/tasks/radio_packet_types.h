@@ -13,8 +13,30 @@
 
 #define RX_BUFF_LEN 15
 
+typedef enum {
+  TELEMETRY_ID_PROPSTUFF = 1,
+  TELEMETRY_ID_ORIENTATION = 2,
+  TELEMETRY_ID_POSITION = 3,
+  TELEMETRY_ID_LINECUTTER = 4,
+  TELEMETRY_ID_STRING = 5,
+  TELEMETRY_ID_ALT_INFO = 6,
+  TELEMETRY_ID_HARDWARE_STATUS = 7,
+  TELEMETRY_ID_LINECUTTER_VARS = 8,
+
+  TELEMETRY_ID_USB_STRING = 9,
+
+  TELEMETRY_ID_GROUNDSTATION_HEARTBEAT = 200,
+} RadioMessageId_e;
+
+typedef struct __attribute__((__packed__)) {
+  float latitude;
+  float longitude;
+  float gps_alt;
+  double groundPressure;
+  double groundTemp;
+} HeartbeatData_s;
+
 // Orientation, angular rates
-#define TELEMETRY_ID_ORIENTATION 2
 PACKED_STRUCT {
   uint8_t state;
   int8_t qw, qx, qy, qz;
@@ -24,7 +46,6 @@ PACKED_STRUCT {
 OrientationPacket_s;
 
 // Location data?? from the link budget Google sheet
-#define TELEMETRY_ID_POSITION 3
 PACKED_STRUCT {
   float temp, pos_z, vel_z, lat, lon, gps_alt, batt_volts, speedKnots,
       courseDeg;
@@ -34,12 +55,10 @@ PACKED_STRUCT {
 }
 PositionPacket_s;
 
-#define TELEMETRY_ID_LINECUTTER 4
 PACKED_STRUCT { LineCutterData_s data; }
 LineCutterPacket_s;
 
 // Uplinked string (not necessarily null-terminated)
-#define TELEMETRY_ID_STRING 5
 #define RADIO_MAX_STRING 48
 #if RADIO_MAX_STRING > 0xff
 #error "Radio string length longer than 1 byte!"
@@ -51,7 +70,6 @@ PACKED_STRUCT {
 }
 CliStringPacket_s;
 
-#if HAS_DEV(BAROMETER)
 #define PRESSURE_MESSAGE_NUM_BAROMETERS 2
 
 #define TELEMETRY_ID_ALT_INFO 6
@@ -60,9 +78,7 @@ PACKED_STRUCT {
   float pressureRef, groundElevation, groundTemp;
 }
 AltInfoPacket_s;
-#endif  // HAS_DEV(BAROMETER)
 
-#define TELEMETRY_ID_HARDWARE_STATUS 7
 PACKED_STRUCT {
   uint8_t pyroContinuity;
   uint16_t triggerFireStatus;
@@ -70,7 +86,6 @@ PACKED_STRUCT {
 }
 HardwareStatusPacket_s;
 
-#define TELEMETRY_ID_LINECUTTER_VARS 8
 PACKED_STRUCT { LineCutterFlightVars_s data; }
 LineCutterVarsPacket_s;
 
@@ -84,10 +99,11 @@ typedef union {
   AltInfoPacket_s altitudeInfo;
 #endif  // HAS_DEV(BAROMETER)
   HardwareStatusPacket_s hardwareStatus;
+  HeartbeatData_s groundstationHeartbeat;
 } PayloadPacket_u;
 
 PACKED_STRUCT {
-  uint8_t packetType;
+  uint8_t packetType;  // One of RadioMessageId_e
   uint8_t softwareVersion;
   uint8_t board_serial_num;
   uint32_t timestampMs;

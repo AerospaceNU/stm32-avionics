@@ -8,6 +8,10 @@
 #ifndef STM32_PROJECTS_DEVICE_DRIVERS_BLE_CLIENT_STD_H_
 #define STM32_PROJECTS_DEVICE_DRIVERS_BLE_CLIENT_STD_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #include "ble_chip.h"
@@ -36,4 +40,8 @@ void bleClientStd_init(BleClientStdCtrl_s *ctrl, BleChip_s *bleChip,
                        uint8_t address);
 void bleClientStd_tick(BleClientStdCtrl_s *ctrl);
 
-#endif  // STM32_PROJECTS_DEVICE_DRIVERS_BLE_CLIENT_STD_H_
+#ifdef __cplusplus
+}
+#endif
+
+#endif  // DEVICES_BLE_CLIENT_STD_H_

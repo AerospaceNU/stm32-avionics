@@ -238,7 +238,7 @@ void hm_ledToggle(int ledId) {}
 
 bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
   static RadioRecievedPacket_s packet;
-  packet.crc = true;
+  packet.crcFromRadio = true;
   packet.lqi = 4;
   packet.rssi = 10;
   memcpy(packet.data, data, numBytes);
@@ -345,7 +345,7 @@ void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth,
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
 
-void hm_pyroUpdate() {
+void hm_pyroUpdate(void *) {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   for (int i = 0; i < NUM_PYRO_DESKTOP_PRINT; i++) {
     printPyro_tick(&printPyro[i]);

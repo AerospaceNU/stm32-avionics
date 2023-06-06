@@ -12,6 +12,10 @@
 
 #ifdef HAL_TIM_MODULE_ENABLED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CLOCK_FREQUENCY_HZ 1000
 
 typedef struct {
@@ -32,6 +36,10 @@ void pyroDigital_set(PyroDigitalCtrl_s *pyro, bool enable);
 void pyroDigital_tick(PyroDigitalCtrl_s *pyro);
 void pyroDigital_pwmStart(PyroDigitalCtrl_s *pyro, uint32_t duration,
                           uint32_t frequency, uint32_t pulseWidth);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // HAL_TIM_MODULE_ENABLED
 
