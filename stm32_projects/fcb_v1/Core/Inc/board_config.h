@@ -43,7 +43,9 @@
 
 #define NUM_SERVO_PWM 4
 
-#define NUM_USB_STD 1
+#define NUM_USB_STD 0
+#define USB_IS_COMPOSITE
+#define NUM_USB_CDC_COMPOSITE 2
 
 #define NUM_VBAT_INA226 1
 
@@ -51,10 +53,6 @@
 #define NUM_PYRO_CONT_HADC 6
 
 #define NUM_WATCHDOG_INTERNAL 1
-
-#define BLE_CLI_ID 0
-#define RADIO_CLI_ID 0
-#define USB_CLI_ID 0
 
 #define RADIO_TI_TYPE RADIO_TI_TYPE_CC1200
 
