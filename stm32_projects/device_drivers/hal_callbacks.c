@@ -6,11 +6,16 @@
 
 #include <stdint.h>
 
+#ifdef USB_IS_COMPOSITE
+#include "usbd_cdc_acm.h"
+#endif  // USB_IS_COMPOSITE
+
 #define MAX_SPI_HANDLES 6   // SPI 1-6
 #define MAX_ADC_HANDLES 3   // ADC 1-3
 #define MAX_UART_HANDLES 5  // UART 1-5
 #define MAX_EXTI_HANDLES 6
 #define MAX_TIM_HANDLES 8  // TIM 1-8
+#define MAX_CDC_CHANNELS NUMBER_OF_CDC
 
 #ifdef HAL_SPI_MODULE_ENABLED
 typedef struct {
@@ -325,3 +330,38 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 }
 
 #endif  // HAL_TIM_MODULE_ENABLED
+
+#ifdef USB_IS_COMPOSITE
+
+typedef struct {
+  uint8_t cdcChannel;
+  void (*irqCallback)(void *, uint8_t, uint8_t *, uint32_t *);
+  void *irqCallbackUserData;
+} UsbCdcCallbackProperty_s;
+
+static UsbCdcCallbackProperty_s usbRecieveCallbacks[MAX_CDC_CHANNELS] = {0};
+
+void halCallbacks_registerUsbCdcReceiveCallback(
+    uint8_t cdc_ch, void (*callback)(void *, uint8_t, uint8_t *, uint32_t *),
+    void *userData) {
+  // Guaranteed cdc_ch is bounded on 0, MAX_CDC_CHANNELS but just in case
+  if (cdc_ch >= MAX_CDC_CHANNELS) return;
+
+  usbRecieveCallbacks[cdc_ch].cdcChannel = cdc_ch;
+  usbRecieveCallbacks[cdc_ch].irqCallback = callback;
+  usbRecieveCallbacks[cdc_ch].irqCallbackUserData = userData;
+}
+
+void halCallbacks_usbCdcRecieve(uint8_t cdc_ch, uint8_t *buf, uint32_t *len) {
+  for (int i = 0; i < MAX_CDC_CHANNELS; i++) {
+    if (usbRecieveCallbacks[i].cdcChannel == cdc_ch) {
+      if (usbRecieveCallbacks[i].irqCallback != NULL) {
+        usbRecieveCallbacks[i].irqCallback(
+            usbRecieveCallbacks[i].irqCallbackUserData, cdc_ch, buf, len);
+      }
+      return;  // No need to keep searching if callback was found
+    }
+  }
+}
+
+#endif  // USB_IS_COMPOSITE
