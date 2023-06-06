@@ -86,8 +86,12 @@ Read this to understand how the code is set up. We will start with important fol
 - HAL drivers
 - Directory is created after generating code from the configuration GUI. The contents of each file should never change after a project is created.
 
-## Middlewares
-- Contains third-party tools, such as ST USB Device library. Folders may be generated or imported.
+## AL94_USB_Composite
+- Contains third-party code from [this USB composite library](https://github.com/alambe94/I-CUBE-USBD-Composite). This allows one FCB to show up as multiple serial devices (or even a USB stick!) when you plug it into your laptop.
+
+## Patches
+
+- Contains software patches that you might find handy. Right now that's just a patch that optomizes the V0 HAL for size (-Os) to claw back a couple k of flash.
 
 ## Other Important Files
 - ioc: Defines configuration GUI to generate code for the Core folder. This is where all settings for peripherals should be changed.
