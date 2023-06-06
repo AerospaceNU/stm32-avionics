@@ -26,3 +26,8 @@ build
 git_info.h
 *.hex
 *.dat
+
+# Platformio stuff
+.pio/
+cmake-build*
+CMakeListsPrivate.txt

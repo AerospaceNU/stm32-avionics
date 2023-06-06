@@ -41,4 +41,5 @@ desktop-sim-job:
     - ./ci/build_desktop.sh
   artifacts:
     paths:
-      - build/desktop_sim/desktop_sim
+      - build/desktop_projects/desktop_sim/desktop_sim
+      - build/desktop_projects/desktop_sim/desktop_sim_test
