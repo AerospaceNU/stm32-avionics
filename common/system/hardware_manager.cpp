@@ -1,6 +1,6 @@
 #include "hardware_manager.h"
 
-#ifdef USE_STM_HARDWARE_MANAGER
+#include <stdio.h>
 
 #include "hal_callbacks.h"
 #include "radio_packet_types.h"
@@ -85,13 +85,17 @@
 #include "usb_std.h"
 #endif  // HAS_DEV(USB_STD)
 
+#if HAS_DEV(USB_CDC_COMPOSITE)
+#include "usb_cdc_composite.h"
+#endif  // HAS_DEV(USB_CDC_COMPOSITE)
+
 #if HAS_DEV(VBAT_INA226)
 #include "vbat_ina226.h"
-#endif  // HAS_DEV(USB_STD)
+#endif  // HAS_DEV(VBAT_INA226)
 
 #if HAS_DEV(STM_HADC)
 #include "adc_device.h"
-#endif  // HAS_DEV(STM_HADC)
+#endif  // HAS_DEV(VBAT_ADC)
 
 /* Hardware statuses */
 
@@ -149,6 +153,10 @@ bool hardwareStatusAdcs[NUM_STM_HADC];
 #if HAS_DEV(MAG)
 bool hardwareStatusMag[NUM_MAG];
 #endif  // HAS_DEV(MAG)
+
+#if HAS_DEV(USB_CDC_COMPOSITE)
+UsbCDCCtrl usbCDCs[NUM_USB_CDC_COMPOSITE];
+#endif  // HAS_DEV(USB_CDC_COMPOSITE)
 
 /* Hardware objects */
 
@@ -242,9 +250,9 @@ static ServoPwmCtrl_t servoPwm[NUM_SERVO_PWM];
 #endif  // HAS_DEV(SERVO_PWM)
 
 /* VBat Sensors */
-#if HAS_DEV(VBAT_STM_ADC)
-// static AdcDevCtrl_s vbatAdc[NUM_VBAT_STM_ADC];
-#endif  // HAS_DEV(VBAT_STM_ADC)
+#if HAS_DEV(VBAT_ADC)
+// static AdcDevCtrl_s vbatAdc[NUM_VBAT_ADC];
+#endif  // HAS_DEV(VBAT_ADC)
 #if HAS_DEV(CURRENT_ADC)
 static AdcDevCtrl_s vbatAdcCurrent[NUM_CURRENT_ADC];
 #endif  // HAS_DEV(CURRENT_ADC)
@@ -261,6 +269,32 @@ static size_t SENSOR_DATA_SIZE = sizeof(SensorData_s);
 /* Hardware manager sim mode trackers */
 static bool inSim = false;
 static CircularBuffer_s *simRxBuffer = NULL;
+
+#include "radio_manager.h"
+extern "C" {
+
+static void gpsCallback(char *line) {
+  // Return early if not connected
+  if (!hm_usbIsConnected(USB_ID_TELEM)) {
+    return;
+  }
+
+#ifndef TEST_GS_USB
+  // Copy the line to a static buffer, just to be safe
+  // That way we don't try to mutate the message mid transmit
+  // (USB transmit is from an interrupt)
+  static char line2[200];
+
+  strncpy(line2, line, sizeof(line2));
+  radioManager_transmitUsbString(USB_ID_TELEM, (uint8_t *)line2,
+                                 strnlen(line2, sizeof(line2)));
+#else
+  const char *str3 =
+      "$GPGGA,115739.00,4158.8441367,N,09147.4416929,W,4,13,0.9,255.747,M,-32."
+      "00,M,01,0000*6E\r\n";
+  radioManager_transmitUsbString(USB_ID_TELEM, (uint8_t *)str3, strlen(str3));
+#endif
+}
 
 void hm_hardwareInit() {
   /* Accelerometers */
@@ -343,7 +377,8 @@ void hm_hardwareInit() {
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
   for (int i = 0; i < NUM_GPS_STD + NUM_GPS_UBLOX; i++) {
     gps_init(&gps[i], gpsStdHuart[i],
-             IS_DEVICE(i, GPS_STD) ? GPS_TYPE_STD : GPS_TYPE_UBLOX);
+             IS_DEVICE(i, GPS_STD) ? GPS_TYPE_STD : GPS_TYPE_UBLOX,
+             gpsCallback);
     hardwareStatusGps[FIRST_ID_GPS_STD + i] = true;
   }
 #endif  // HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
@@ -525,9 +560,16 @@ void hm_hardwareInit() {
 
   /* USB */
 #if HAS_DEV(USB_STD)
-  usbStd_init();
+  usbStd_init(USB_ID_CLI);
   hardwareStatusUsb[FIRST_ID_USB_STD] = true;
 #endif  // HAS_DEV(USB_STD)
+
+#if HAS_DEV(USB_CDC_COMPOSITE)
+  for (int i = 0; i < NUM_USB_CDC_COMPOSITE; i++) {
+    usbCDCs[i].init(i);
+    hardwareStatusUsb[i + FIRST_ID_USB_CDC_COMPOSITE] = true;
+  }
+#endif  // HAS_DEV(USB_CDC_COMPOSITE)
 
   /* stm32 hadcs */
 #if HAS_DEV(STM_HADC)
@@ -792,25 +834,51 @@ bool hm_usbIsConnected(int usbId) {
   }
 #endif  // HAS_DEV(USB_STD)
 
+#if HAS_DEV(USB_CDC_COMPOSITE)
+  if (IS_DEVICE(usbId, USB_CDC_COMPOSITE)) {
+    return usbCDCs[usbId - FIRST_ID_USB_CDC_COMPOSITE].isConnected();
+  }
+#endif  // HAS_DEV(USB_CDC_COMPOSITE)
+
   return false;
 }
 
 bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
 #if HAS_DEV(USB_STD)
   if (IS_DEVICE(usbId, USB_STD)) {
-    return usbStd_transmit(data, numBytes);
+    return usbStd_transmit(cdc_ch, data, numBytes);
   }
 #endif  // HAS_DEV(USB_STD)
 
+#if HAS_DEV(USB_CDC_COMPOSITE)
+  if (IS_DEVICE(usbId, USB_CDC_COMPOSITE)) {
+    return usbCDCs[usbId - FIRST_ID_USB_CDC_COMPOSITE].transmit(data, numBytes);
+  }
+#endif  // HAS_DEV(USB_CDC_COMPOSITE)
+  return false;
+}
+
+bool hm_usbIsBusy(int usbId) {
+#if HAS_DEV(USB_CDC_COMPOSITE)
+  if (IS_DEVICE(usbId, USB_CDC_COMPOSITE)) {
+    return usbCDCs[usbId - FIRST_ID_USB_CDC_COMPOSITE].busy();
+  }
+#endif  // HAS_DEV(USB_CDC_COMPOSITE)
   return false;
 }
 
 CircularBuffer_s *hm_usbGetRxBuffer(int usbId) {
 #if HAS_DEV(USB_STD)
   if (IS_DEVICE(usbId, USB_STD)) {
-    return usbStd_getRxBuffer();
+    return usbStd_getRxBuffer(cdc_ch);
   }
 #endif  // HAS_DEV(USB_STD)
+
+#if HAS_DEV(USB_CDC_COMPOSITE)
+  if (IS_DEVICE(usbId, USB_CDC_COMPOSITE)) {
+    return usbCDCs[usbId - FIRST_ID_USB_CDC_COMPOSITE].getRxBuffer();
+  }
+#endif  // HAS_DEV(USB_CDC_COMPOSITE)
 
   return NULL;
 }
@@ -958,7 +1026,7 @@ void hm_pyroSetPwm(int pyroId, uint32_t duration, uint32_t frequency,
 #endif  // HAS_DEV(PYRO_DIGITAL)
 }
 
-void hm_pyroUpdate() {
+void hm_pyroUpdate(void *) {
 #if HAS_DEV(PYRO_DIGITAL)
   for (int i = 0; i < NUM_PYRO_DIGITAL; i++) {
     pyroDigital_tick(&pyroDigital[i]);
@@ -1063,18 +1131,18 @@ void hm_readSensorData() {
     float adcVal = 0;
 
     // Sort into the appropriate places
-#if HAS_DEV(VBAT_STM_ADC)
-    for (int i = 0; i < NUM_VBAT_STM_ADC; i++) {
+#if HAS_DEV(VBAT_ADC)
+    for (int i = 0; i < NUM_VBAT_ADC; i++) {
       bool success = adcDev_getValue(
           &stmAdcs[pyroHadcEntries[i].stmAdcIdx], vbatHadcEntries[i].rank,
           &adcVal, vbatHadcEntries[i].min, vbatHadcEntries[i].max, 500);
       if (success) {
-        sensorData.vbatData[FIRST_ID_VBAT_STM_ADC + i] = adcVal;
+        sensorData.vbatData[FIRST_ID_VBAT_ADC + i] = adcVal;
       } else {
-        sensorData.vbatData[FIRST_ID_VBAT_STM_ADC + i] = -1;
+        sensorData.vbatData[FIRST_ID_VBAT_ADC + i] = -1;
       }
     }
-#endif  // HAS_DEV(VBAT_STM_ADC)
+#endif  // HAS_DEV(VBAT_ADC)
 #if HAS_DEV(PYRO_CONT_HADC)
     for (int i = 0; i < NUM_PYRO_CONT_HADC; i++) {
       bool success = adcDev_getValue(
@@ -1117,8 +1185,15 @@ void hm_enableSimMode(CircularBuffer_s *rxBuffer) {
   simRxBuffer = rxBuffer;
 }
 
-void hm_disableSimMode(CircularBuffer_s *rxBuffer) { inSim = false; }
+void hm_disableSimMode() { inSim = false; }
 
 bool hm_inSimMode() { return inSim; }
+}
 
-#endif  // USE_STM_HARDWARE_MANAGER
+// Overwrite _write so printf prints to USB
+int _write(int file, char *ptr, int len) {
+  //  if (hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED) return 0;
+  if (USBD_OK == hm_usbTransmit(PRINTF_USB_CHAN, (uint8_t *)ptr, len))
+    return len;
+  return 0;
+}
