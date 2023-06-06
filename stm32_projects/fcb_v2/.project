@@ -46,5 +46,10 @@
 			<type>2</type>
 			<locationURI>PARENT-2-PROJECT_LOC/common</locationURI>
 		</link>
+		<link>
+			<name>AL94_USB_Composite</name>
+			<type>2</type>
+			<location>PARENT-1-PROJECT_LOC/AL94_USB_Composite</location>
+		</link>
 	</linkedResources>
 </projectDescription>
