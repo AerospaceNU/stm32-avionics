@@ -74,7 +74,7 @@ static void cli_parseRadio(RadioRecievedPacket_s* packet) {
       const uint8_t len = parsedPacket->payload.cliString.len;
       const uint8_t* pdata = parsedPacket->payload.cliString.string;
       for (size_t i = 0; i < len; i++) {
-        cb_enqueue(&radioRxCircBuffer, pdata + i);
+        cb_enqueue(&radioRxCircBuffer, (unknownPtr_t)pdata + i);
       }
     } else {
       cli_sendAck(false, "Bad CRC!");
@@ -86,7 +86,8 @@ void cli_init() {
   opterr = 0;  // Don't print any messages to standard error stream since this
                // is embedded device
 
-  cb_init(&radioRxCircBuffer, radioRxBuffer, sizeof(radioRxBuffer), 1);
+  cb_init(&radioRxCircBuffer, (unknownPtr_t)radioRxBuffer,
+          sizeof(radioRxBuffer), 1);
   radioManager_addMessageCallback(RADIO_CLI_ID, cli_parseRadio);
 }
 
@@ -116,7 +117,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
     cb_flush(selectedRxBuffer);
     bytesRead = 0;
   }
-  cb_peek(selectedRxBuffer, inputBuffer, NULL);
+  cb_peek(selectedRxBuffer, (unknownPtr_t)inputBuffer, NULL);
 
   // Only keep buffer through first \n in this iteration
   bool endFound = false;
@@ -134,7 +135,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
 
   // Bytes extracted counts number of bytes minus stripped \r\n from the end (\r
   // might not be there depending on input)
-  uint8_t bytesExtracted = 0;
+  uint32_t bytesExtracted = 0;
   if (bytesRead >= 2 && inputBuffer[bytesRead - 2] == '\r') {
     bytesExtracted = bytesRead - 2;
   } else if (bytesRead >= 1 && inputBuffer[bytesRead - 1] == '\n') {
@@ -159,7 +160,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
     argv[argc] = token;
     argc++;
 
-    int tokenLength = strnlen(token, inputBuffer - token);
+    size_t tokenLength = strnlen(token, (size_t)(inputBuffer - token));
 
     if (!isInString) {
       if (*(token + tokenLength + 1) == '\"')

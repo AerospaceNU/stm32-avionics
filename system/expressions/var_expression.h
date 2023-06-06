@@ -19,7 +19,7 @@ class VarExpression : public Expression {
    * @param dataMember The filterdata member that this expression will evaluate
    * to.
    */
-  VarExpression(int triggerNum, FilterData_e dataMember);
+  VarExpression(uint16_t triggerNum, FilterData_e dataMember);
 
   void evaluate(FilterData_s *filterData,
                 ExpressionPtrCallback &expressionPtrCallback);

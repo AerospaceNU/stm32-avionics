@@ -42,11 +42,11 @@ bool lineCutterBle_sendString(LineCutterBleCtrl_t *lineCutter,
     return lineCutterBle_sendString(lineCutter, CMD);          \
   }
 
-BT_CMD_DEF(requestData, REQ_DATA_CMD);
-BT_CMD_DEF(requestConfig, REQ_CFG_CMD);
-BT_CMD_DEF(cut1, REQ_CUT_1_CMD);
-BT_CMD_DEF(cut2, REQ_CUT_2_CMD);
-BT_CMD_DEF(reset, REQ_RESET_CMD);
+BT_CMD_DEF(requestData, REQ_DATA_CMD)
+BT_CMD_DEF(requestConfig, REQ_CFG_CMD)
+BT_CMD_DEF(cut1, REQ_CUT_1_CMD)
+BT_CMD_DEF(cut2, REQ_CUT_2_CMD)
+BT_CMD_DEF(reset, REQ_RESET_CMD)
 
 #undef BT_CMD_DEF
 
@@ -57,7 +57,7 @@ BT_CMD_DEF(reset, REQ_RESET_CMD);
 #define LC_VARS_INTERVAL_MS 10000 + 124
 
 void lineCutterBle_tick(LineCutterBleCtrl_t *lineCutter) {
-  uint16_t dequeuedLen;
+  size_t dequeuedLen;
   uint8_t packetCount = 0;
   do {
     dequeuedLen =
@@ -126,8 +126,8 @@ void lineCutterBle_init(LineCutterBleCtrl_t *lineCutter, BleChip_s *bleChip,
   lineCutter->bleChip = bleChip;
   lineCutter->address = address;
 
-  cb_init(&lineCutter->buffer, lineCutter->packetArray, LINE_CUTTER_CB_SIZE,
-          sizeof(uint8_t));
+  cb_init(&lineCutter->buffer, (unknownPtr_t)lineCutter->packetArray,
+          LINE_CUTTER_CB_SIZE, sizeof(uint8_t));
   lineCutter->bleChip->registerAddress(lineCutter->bleChip, lineCutter->address,
                                        &lineCutter->buffer);
 }

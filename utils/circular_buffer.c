@@ -6,7 +6,8 @@
 
 #include <string.h>
 
-void cb_init(CircularBuffer_s *cb, void *buffer, size_t capacity, size_t size) {
+void cb_init(CircularBuffer_s *cb, unknownPtr_t buffer, size_t capacity,
+             size_t size) {
   if (cb == NULL) {
     return;
   }
@@ -19,7 +20,8 @@ void cb_init(CircularBuffer_s *cb, void *buffer, size_t capacity, size_t size) {
   cb->tail = cb->buffer;
 }
 
-void cb_peek(CircularBuffer_s *cb, void *outputBuffer, size_t *numElements) {
+void cb_peek(CircularBuffer_s *cb, unknownPtr_t outputBuffer,
+             size_t *numElements) {
   if (cb == NULL || outputBuffer == NULL) return;
 
   size_t count = cb_count(cb);
@@ -33,7 +35,7 @@ void cb_peek(CircularBuffer_s *cb, void *outputBuffer, size_t *numElements) {
     memcpy(outputBuffer, cb->tail, *numElements * cb->size);
   } else {
     // Two copies to outputBuffer needed
-    size_t bytesToEnd = cb->buffer_end - cb->tail;
+    size_t bytesToEnd = (size_t)cb->buffer_end - (size_t)cb->tail;
     memcpy(outputBuffer, cb->tail, bytesToEnd);
     memcpy(outputBuffer + bytesToEnd, cb->buffer,
            *numElements * cb->size - bytesToEnd);
@@ -47,9 +49,9 @@ size_t cb_count(CircularBuffer_s *cb) {
 
   size_t ret_bytes = 0;
   if (cb->head < cb->tail) {
-    ret_bytes += cb->buffer_end - cb->tail + cb->head - cb->buffer;
+    ret_bytes += (size_t)(cb->buffer_end - cb->tail + cb->head - cb->buffer);
   } else {
-    ret_bytes = cb->head - cb->tail;
+    ret_bytes = (size_t)cb->head - (size_t)cb->tail;
   }
 
   size_t size = cb->size;
@@ -58,12 +60,12 @@ size_t cb_count(CircularBuffer_s *cb) {
 }
 
 size_t cb_capacity(CircularBuffer_s *cb) {
-  return ((cb->buffer_end - cb->buffer) / cb->size) - 1;
+  return ((size_t)(cb->buffer_end - cb->buffer) / cb->size) - (size_t)1u;
 }
 
-bool cb_enqueue(CircularBuffer_s *cb, const void *item) {
+bool cb_enqueue(CircularBuffer_s *cb, const unknownPtr_t item) {
   // Figure out what next spot to fill in buffer is
-  void *next = cb->head + cb->size;
+  unknownPtr_t next = cb->head + cb->size;
   if (next >= cb->buffer_end) {
     next = cb->buffer;
   }
@@ -92,7 +94,7 @@ void cb_dequeue(CircularBuffer_s *cb, size_t numElements) {
 }
 
 bool cb_full(CircularBuffer_s *cb) {
-  void *next = cb->head + cb->size;
+  unknownPtr_t next = cb->head + cb->size;
   if (next >= cb->buffer_end) {
     next = cb->buffer;
   }

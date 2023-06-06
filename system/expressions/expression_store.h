@@ -50,7 +50,7 @@ class ExpressionStore {
    * @param startAt Index to start at
    * @return The index of the next available expression spot.
    */
-  int getNextExpressionSpot(int startAt) const;
+  uint16_t getNextExpressionSpot(uint16_t startAt) const;
 
   /**
    * Construct an ExpressionStore.
@@ -88,8 +88,9 @@ class ExpressionStore {
    * @param startAt The start location to potentially store this expression.
    * @return The value type of this expression, or invalid if it couldn't parse.
    */
-  ExpressionValueType_e parseForTrigger(int *resultID, int triggerNum,
-                                        const StringSlice &slice, int startAt);
+  ExpressionValueType_e parseForTrigger(uint16_t *resultID, uint16_t triggerNum,
+                                        const StringSlice &slice,
+                                        uint16_t startAt = 0);
 
   /**
    * Get the boolean status for a given expression.

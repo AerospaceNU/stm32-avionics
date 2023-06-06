@@ -13,7 +13,8 @@ UnaryFunctionWrapper::UnaryFunctionWrapper(const char *stringRep,
                                            ExpressionValueType_e valueType,
                                            bool defaultValue) {
   strncpy(this->stringRep, stringRep, 10);
-  this->stringLen = strlen(stringRep);
+  // TODO: This is a bit sketchy (no strnlen)
+  this->stringLen = static_cast<uint16_t>(strlen(stringRep));
   this->opType = opType;
   this->function = function;
   this->valueType = valueType;
@@ -51,15 +52,15 @@ static auto everFunc = UNARY_FUNCTION_HEADER {
 };
 
 static auto sinFunc = UNARY_FUNCTION_HEADER {
-  expr->setNumberValue(sin(operand->getNumberValue()));
+  expr->setNumberValue(sinf(operand->getNumberValue()));
 };
 
 static auto cosFunc = UNARY_FUNCTION_HEADER {
-  expr->setNumberValue(cos(operand->getNumberValue()));
+  expr->setNumberValue(cosf(operand->getNumberValue()));
 };
 
 static auto tanFunc = UNARY_FUNCTION_HEADER {
-  expr->setNumberValue(tan(operand->getNumberValue()));
+  expr->setNumberValue(tanf(operand->getNumberValue()));
 };
 
 UnaryFunctionWrapper unaryFunctionWrappers[NUM_UNARY_FUNCTION] = {

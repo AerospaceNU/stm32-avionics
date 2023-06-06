@@ -140,7 +140,7 @@ void hm_hardwareInit() {
   internalFlash->reinit(true);
 
   // TODO stick in ifdef
-  cb_init(&bleBuffer, bleArray, sizeof(bleArray), 1);
+  cb_init(&bleBuffer, (unknownPtr_t)bleArray, sizeof(bleArray), 1);
 
 #if HAS_DEV(ACCEL_DESKTOP_FILE) || HAS_DEV(BAROMETER_DESKTOP_FILE) || \
     HAS_DEV(GPS_DESKTOP_FILE) || HAS_DEV(IMU_DESKTOP_FILE) ||         \

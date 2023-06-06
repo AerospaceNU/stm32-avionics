@@ -13,15 +13,6 @@
 
 #define RX_BUFF_LEN 15
 
-// Prop data, from the link budget Google sheet
-#define TELEMETRY_ID_PROPSTUFF 1
-PACKED_STRUCT {
-  // float loxTankDucer, kerTankDucer, purgeDucer, loxInletDucer, kerInletDucer,
-  // loxVenturi, kerVenturi, loadcell, loxTank, injector, engine;
-  //  etc
-}
-PropulsionPacket_s;
-
 // Orientation, angular rates
 #define TELEMETRY_ID_ORIENTATION 2
 PACKED_STRUCT {
@@ -50,6 +41,9 @@ LineCutterPacket_s;
 // Uplinked string (not necessarily null-terminated)
 #define TELEMETRY_ID_STRING 5
 #define RADIO_MAX_STRING 48
+#if RADIO_MAX_STRING > 0xff
+#error "Radio string length longer than 1 byte!"
+#endif
 PACKED_STRUCT {
   uint8_t len;
   uint8_t id;
@@ -79,7 +73,6 @@ PACKED_STRUCT { LineCutterFlightVars_s data; }
 LineCutterVarsPacket_s;
 
 typedef union {
-  PropulsionPacket_s propStuff;
   OrientationPacket_s orientation;
   PositionPacket_s positionData;
   LineCutterPacket_s lineCutter;

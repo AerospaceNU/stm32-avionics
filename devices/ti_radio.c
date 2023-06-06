@@ -107,7 +107,7 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
 
   radio->initialized = true;
 
-  cb_init(&radio->txBuffer, radio->txArray, PACKET_TX_SIZE, 1);
+  cb_init(&radio->txBuffer, (unknownPtr_t)radio->txArray, PACKET_TX_SIZE, 1);
   radio->currentConsumerCount = 0;
 
   // TODO we should be smart about not killing our LNA by accident, that's why I
@@ -178,7 +178,7 @@ void tiRadio_update(TiRadioCtrl_s *radio) {
     // Try to dequeue radio->payloadSize many bytes
     static uint8_t tempBuffer[128] = {0};
     size_t size = radio->payloadSize;
-    cb_peek(&radio->txBuffer, tempBuffer, &size);
+    cb_peek(&radio->txBuffer, (unknownPtr_t)tempBuffer, &size);
 
     // If we managed to dequeue bytes we're good
     if (size == radio->payloadSize) {
@@ -315,7 +315,7 @@ static void cc1120EnqueuePacket(TiRadioCtrl_s *radio, uint8_t *buff,
     CircularBuffer_s *consumer = radio->messageConsumers[i];
     if (consumer == NULL) continue;
 
-    cb_enqueue(consumer, &packet);
+    cb_enqueue(consumer, (unknownPtr_t)&packet);
   }
 }
 
@@ -333,7 +333,7 @@ bool tiRadio_addTxPacket(TiRadioCtrl_s *radio, uint8_t *packet, uint8_t len) {
       cb_capacity(&radio->txBuffer)) {
     // Add our whole packet to the queue
     for (int j = 0; j < radio->payloadSize; j++) {
-      cb_enqueue(&radio->txBuffer, packet + j);
+      cb_enqueue(&radio->txBuffer, (unknownPtr_t)packet + j);
     }
   } else {
     // Buffer full, all we can do is return

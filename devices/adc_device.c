@@ -97,7 +97,7 @@ bool adcDev_getValue(AdcDevCtrl_s *adc, uint8_t rank, float *pval, float minVal,
     float scaler = adc->maxRawVal / (maxVal - minVal);
 
     // Get value from buffer and convert into meaningful number
-    *pval = adc->rawVals[rank - 1] / scaler + offset;
+    *pval = ((float)adc->rawVals[rank - 1]) / scaler + offset;
 
     // Stop interrupt. If this fails, don't care because stopping is just best
     // practice, not critical.

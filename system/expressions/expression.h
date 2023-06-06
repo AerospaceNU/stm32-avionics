@@ -95,7 +95,7 @@ class Expression {
    * Set the trigger number that this expression is used for.
    * @param triggerNum Trigger number to associate with this expression.
    */
-  void setTriggerNum(int triggerNum);
+  void setTriggerNum(uint16_t triggerNum);
 
   /**
    * Put a string representation of this expression into a buffer.

@@ -131,8 +131,10 @@ bool flashS25flx_readStart(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
 
   // Transmit read command and location
   csPull(s25flx, GPIO_PIN_RESET);
-  uint8_t txBuf1[5] = {READ_DATA_CMD, startLoc >> 24, startLoc >> 16,
-                       startLoc >> 8, startLoc & 0xFF};
+  uint8_t txBuf1[5] = {READ_DATA_CMD, (uint8_t)(startLoc >> 24) & 0xff,
+                       (uint8_t)(startLoc >> 16) & 0xff,
+                       (uint8_t)(startLoc >> 8 & 0xff),
+                       (uint8_t)(startLoc & 0xff)};
   // No need to transmit 5-byte read command with DMA since it should occur in
   // very short period of time
   if (HAL_SPI_Transmit(s25flx->hspi, txBuf1, 5, SPI_TX_RX_TIMEOUT_MS) !=

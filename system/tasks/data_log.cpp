@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "bit_helper.h"
 #include "board_config_common.h"
 #include "cli.h"
 #include "crc16.h"
@@ -193,7 +194,8 @@ static uint32_t dataLog_getLastFlightNumType(bool launched) {
   uint32_t metadataReadAddress;
   while (!flightNumFound) {
     flashRead(searchSectorNum * 2, 2, sectorRxBuff);
-    uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
+    uint16_t tempFlightNum =
+        (uint16_t)((((uint16_t)sectorRxBuff[0]) << 8) | sectorRxBuff[1]);
     if (tempFlightNum == 0xFFFF) {
       flightNumFound = true;
     } else {
@@ -238,7 +240,9 @@ static void dataLog_getFlightSectors(uint32_t flightNum, uint32_t *firstSector,
   while (*firstSector == 0 &&
          tempCurSectorNum < logSizeBytes / FLASH_MAX_SECTOR_BYTES) {
     flashRead(tempCurSectorNum * 2, 2, sectorRxBuff);
-    uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
+
+    uint16_t tempFlightNum = combine_to_u16(sectorRxBuff[0], sectorRxBuff[1]);
+
     if (tempFlightNum == flightNum) {
       *firstSector = tempCurSectorNum;
     }
@@ -256,7 +260,8 @@ static void dataLog_getFlightSectors(uint32_t flightNum, uint32_t *firstSector,
          tempCurSectorNum < logSizeBytes / FLASH_MAX_SECTOR_BYTES) {
     flashRead(tempCurSectorNum * 2, 2, sectorRxBuff);
 
-    uint16_t tempFlightNum = (sectorRxBuff[0] << 8) | sectorRxBuff[1];
+    uint16_t tempFlightNum = combine_to_u16(sectorRxBuff[0], sectorRxBuff[1]);
+
     if (tempFlightNum != flightNum) {
       *lastSector = tempCurSectorNum - 1;
     }
@@ -272,7 +277,8 @@ static void dataLog_getFlightSectors(uint32_t flightNum, uint32_t *firstSector,
 
 void dataLog_assignFlight() {
   // Initialize circular buffer of packets
-  cb_init(&logPacketBuffer, logPackets, MAX_LOG_PACKETS, kLogDataSize);
+  cb_init(&logPacketBuffer, (unknownPtr_t)logPackets, MAX_LOG_PACKETS,
+          kLogDataSize);
 
   // Assign flight number
   curFlightNum = dataLog_getLastFlightNum() + 1;
@@ -312,7 +318,7 @@ void dataLog_loadLastStoredFlightMetadata() {
   dataLog_readFlightNumMetadata(flightNum);
 }
 
-void dataLog_readFlightNumMetadata(uint8_t flightNum) {
+void dataLog_readFlightNumMetadata(uint32_t flightNum) {
   uint32_t firstSector, lastSector;
   dataLog_getFlightSectors(flightNum, &firstSector, &lastSector);
   // Create a buffer for the metadata
@@ -376,7 +382,8 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
 #if HAS_DEV(PYRO_CONT)
     fcbLogData->pyroContinuity = 0;
     for (int i = 0; i < NUM_PYRO_CONT; i++) {
-      fcbLogData->pyroContinuity |= ((sensorData->pyroContData[i] & 0x01) << i);
+      fcbLogData->pyroContinuity |=
+          (uint8_t)((sensorData->pyroContData[i] & 0b1) << i);
     }
 #endif  // HAS_DEV(PYRO_CONT)
     fcbLogData->triggerStatus = triggerManager_status();
@@ -401,7 +408,7 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
     if (cb_full(&logPacketBuffer)) {
       cb_dequeue(&logPacketBuffer, 1);
     }
-    cb_enqueue(&logPacketBuffer, &logPacket);
+    cb_enqueue(&logPacketBuffer, (unknownPtr_t)&logPacket);
 
 #if HAS_DEV(LINE_CUTTER_BLE)
     for (int i = 0; i < NUM_LINE_CUTTER_BLE; ++i) {
@@ -412,7 +419,7 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
         // Line cutter data is less important so don't dequeue other data if it
         // can't fit
         if (!cb_full(&logPacketBuffer)) {
-          cb_enqueue(&logPacketBuffer, &logPacket);
+          cb_enqueue(&logPacketBuffer, (unknownPtr_t)&logPacket);
         }
       }
     }
@@ -440,13 +447,13 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
         // sector since log buffer is only 1 sector long.
         LogData_s dequeuedData;
         size_t numElements = 1;
-        cb_peek(&logPacketBuffer, &dequeuedData, &numElements);
+        cb_peek(&logPacketBuffer, (unknownPtr_t)&dequeuedData, &numElements);
         while (numElements != 0) {
           cb_dequeue(&logPacketBuffer, 1);
           flashWrite(curWriteAddress, kLogDataSize, (uint8_t *)&dequeuedData);
           // Increment write address to be next address to write to
           curWriteAddress += kLogDataSize;
-          cb_peek(&logPacketBuffer, &dequeuedData, &numElements);
+          cb_peek(&logPacketBuffer, (unknownPtr_t)&dequeuedData, &numElements);
         }
       }
     }

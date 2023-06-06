@@ -54,24 +54,28 @@ static int8_t gravityRef = 1;  // direction of gravity
 
 static double medianArray[kPrevPresMedianCount + kPrevPresCount];
 
-// Sane default
+// Sane default dts -- these dts are changed when filter_init is called
 static AltitudeKalman kalman{0.015};
-static OrientationEstimator orientationEstimator(0.015);
+static OrientationEstimator orientationEstimator(0.015f);
 
-void filter_init(double dt) {
+void filter_init(float dt) {
   kalman.reset();
   kalman.setDt(dt);
   orientationEstimator.reset();
   orientationEstimator.setDt(dt);
   // Initialize circular buffers for running medians/running pressure values
-  cb_init(&runningPresMediansBuffer, runningPresMedians,
+  cb_init(&runningPresMediansBuffer, (unknownPtr_t)runningPresMedians,
           kPrevPresMedianCount + 1, sizeof(double));
-  cb_init(&runningPresBuffer, runningPres, kPrevPresCount + 1, sizeof(double));
-  cb_init(&runningGravityRefBuffer, runningGravityRef, kGravityRefCount + 1,
+  cb_init(&runningPresBuffer, (unknownPtr_t)runningPres, kPrevPresCount + 1,
           sizeof(double));
-  cb_init(&gyroXRefBuffer, gyroXRefBack, kGyroRefCount + 1, sizeof(float));
-  cb_init(&gyroYRefBuffer, gyroYRefBack, kGyroRefCount + 1, sizeof(float));
-  cb_init(&gyroZRefBuffer, gyroZRefBack, kGyroRefCount + 1, sizeof(float));
+  cb_init(&runningGravityRefBuffer, (unknownPtr_t)runningGravityRef,
+          kGravityRefCount + 1, sizeof(double));
+  cb_init(&gyroXRefBuffer, (unknownPtr_t)gyroXRefBack, kGyroRefCount + 1,
+          sizeof(float));
+  cb_init(&gyroYRefBuffer, (unknownPtr_t)gyroYRefBack, kGyroRefCount + 1,
+          sizeof(float));
+  cb_init(&gyroZRefBuffer, (unknownPtr_t)gyroZRefBack, kGyroRefCount + 1,
+          sizeof(float));
   gyroXOffset = 0;
   gyroYOffset = 0;
   gyroZOffset = 0;
@@ -171,13 +175,15 @@ static void filterMags(SensorData_s* curSensorVals) {
   }
 
   uint8_t count = 0;
-  float accum[3] = {0};
-  for (int i = 0; i < NUM_MAG; i++) {
+  double accum[3] = {0};
+  for (int magId = 0; magId < NUM_MAG; magId++) {
     // Only use working magnetometer sensors
-    if (!hardwareStatusMag[i]) continue;
+    if (!hardwareStatusMag[magId]) continue;
 
-    double* readings = magReadings[i];
-    for (int i = 0; i < 3; i++) accum[i] += readings[i];
+    double* readings = magReadings[magId];
+    for (int magAxisId = 0; magAxisId < 3; magAxisId++) {
+      accum[magAxisId] += readings[magAxisId];
+    }
   }
 
   if (count) {
@@ -280,9 +286,9 @@ static void filterGyros(SensorData_s* curSensorVals) {
   filterData.rocket_ang_vel_z =
       filterGyroOneAxis(imuReadings[AXIS_Z]) - gyroZOffset;
 
-  orientationEstimator.update(filterData.rocket_ang_vel_x,
-                              filterData.rocket_ang_vel_y,
-                              filterData.rocket_ang_vel_z);
+  orientationEstimator.update(static_cast<float>(filterData.rocket_ang_vel_x),
+                              static_cast<float>(filterData.rocket_ang_vel_y),
+                              static_cast<float>(filterData.rocket_ang_vel_z));
 
   //  Copy quaternion to filter data
   filterData.qw = orientationEstimator.q(0, 0);
@@ -320,8 +326,8 @@ void updateGyroOffsetOneAxis(CircularBuffer_s* refBuffer, const float& newValue,
   if (cb_full(refBuffer)) {
     cb_dequeue(refBuffer, 1);
   }
-  cb_enqueue(refBuffer, &newValue);
-  cb_peek(refBuffer, referenceBuffer, nullptr);
+  cb_enqueue(refBuffer, (unknownPtr_t)&newValue);
+  cb_peek(refBuffer, (unknownPtr_t)referenceBuffer, nullptr);
 
   for (i = 0; i < cb_count(refBuffer); ++i) {
     gyroSum += referenceBuffer[i];
@@ -332,11 +338,11 @@ void updateGyroOffsetOneAxis(CircularBuffer_s* refBuffer, const float& newValue,
 
 void filter_addGyroRef() {
   static float noOffset;
-  noOffset = filterData.rocket_ang_vel_x + gyroXOffset;
+  noOffset = static_cast<float>(filterData.rocket_ang_vel_x) + gyroXOffset;
   updateGyroOffsetOneAxis(&gyroXRefBuffer, noOffset, &gyroXOffset);
-  noOffset = filterData.rocket_ang_vel_y + gyroYOffset;
+  noOffset = static_cast<float>(filterData.rocket_ang_vel_y) + gyroYOffset;
   updateGyroOffsetOneAxis(&gyroYRefBuffer, noOffset, &gyroYOffset);
-  noOffset = filterData.rocket_ang_vel_z + gyroZOffset;
+  noOffset = static_cast<float>(filterData.rocket_ang_vel_z) + gyroZOffset;
   updateGyroOffsetOneAxis(&gyroZRefBuffer, noOffset, &gyroZOffset);
 }
 
@@ -412,11 +418,12 @@ void filter_addGravityRef() {
   if (cb_full(&runningGravityRefBuffer)) {
     cb_dequeue(&runningGravityRefBuffer, 1);
   }
-  cb_enqueue(&runningGravityRefBuffer, &(filterData.rocket_acc_x));
+  cb_enqueue(&runningGravityRefBuffer,
+             (unknownPtr_t) & (filterData.rocket_acc_x));
 
-  cb_peek(&runningGravityRefBuffer, gravityRefBuffer, nullptr);
+  cb_peek(&runningGravityRefBuffer, (unknownPtr_t)gravityRefBuffer, nullptr);
 
-  uint8_t gravCount = cb_count(&runningGravityRefBuffer);
+  size_t gravCount = cb_count(&runningGravityRefBuffer);
 
   double accelSum = 0;
   for (uint8_t i = 0; i < gravCount; ++i) {
@@ -432,9 +439,10 @@ void filter_addGravityRef() {
 
   // We have a semi-realistic gravity vector, and we know we're in
   // preflight. Reset the orientation estimation to this new gravity vector
-  orientationEstimator.setAccelVector(filterData.rocket_acc_x,
-                                      filterData.rocket_acc_y,
-                                      filterData.rocket_acc_z);
+  orientationEstimator.setAccelVector(
+      static_cast<float>(filterData.rocket_acc_x),
+      static_cast<float>(filterData.rocket_acc_y),
+      static_cast<float>(filterData.rocket_acc_z));
 
   // If the sum is negative, we should flip, switch gravity ref and flush
   // buffer
@@ -460,7 +468,7 @@ void filter_addPressureRef(SensorData_s* curSensorVals) {
   }
 
   // Add current pressure
-  cb_enqueue(&runningPresBuffer, &currentPres);
+  cb_enqueue(&runningPresBuffer, (unknownPtr_t)&currentPres);
 
   ++runningPresCount;
 
@@ -475,16 +483,17 @@ void filter_addPressureRef(SensorData_s* curSensorVals) {
 
     // Add median of most recent values
     size_t numElements = kPrevPresCount;
-    cb_peek(&runningPresBuffer, medianArray, &numElements);
+    cb_peek(&runningPresBuffer, (unknownPtr_t)medianArray, &numElements);
     double currentMedian = median(medianArray, kPrevPresCount);
-    cb_enqueue(&runningPresMediansBuffer, &currentMedian);
+    cb_enqueue(&runningPresMediansBuffer, (unknownPtr_t)&currentMedian);
 
     // Only set pressure ref if we have enough values recorded
     if (runningPresMedianCount == kPrevPresMedianCount) {
       // Now, find median of the last 100 seconds of data and set that to be
       // current ref
       size_t numMedElements = kPrevPresMedianCount;
-      cb_peek(&runningPresMediansBuffer, medianArray, &numMedElements);
+      cb_peek(&runningPresMediansBuffer, (unknownPtr_t)medianArray,
+              &numMedElements);
       presRef = median(medianArray, kPrevPresMedianCount);
     } else {
       // Otherwise (for the first 100 seconds) set current pressure ref to the

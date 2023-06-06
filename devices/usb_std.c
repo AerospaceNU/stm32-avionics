@@ -30,14 +30,15 @@ static int8_t usbReceive(uint8_t *buf, uint32_t *len) {
   USBD_CDC_HandleTypeDef *pClassData =
       (USBD_CDC_HandleTypeDef *)hUsbDeviceFS.pClassData;
   for (uint32_t i = 0; i < pClassData->RxLength; i++) {
-    cb_enqueue(&rxCircBuffer, pClassData->RxBuffer + i);
+    cb_enqueue(&rxCircBuffer, (unknownPtr_t)pClassData->RxBuffer + i);
   }
   return ret;
 }
 
 void usbStd_init() {
   // Initialize circular buffer
-  cb_init(&rxCircBuffer, rxBuffer, APP_RX_DATA_SIZE, sizeof(uint8_t));
+  cb_init(&rxCircBuffer, (unknownPtr_t)rxBuffer, APP_RX_DATA_SIZE,
+          sizeof(uint8_t));
 
   // Re-route CDC receive
   cdcRxReceive = USBD_Interface_fops_FS.Receive;

@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
 
 #include "cli.h"
 #include "cli_tasks.h"
@@ -9,6 +10,11 @@ void CliTasks::triggerFire() {
   if (options.t) {
     char* endPtr;
     int triggerNum = strtol(options.t, &endPtr, 10);
+    // Assert trigger number in valid range
+    if (triggerNum > (std::numeric_limits<uint8_t>::max())) {
+      cli_sendAck(false, "Trigger number greater than max!");
+      return;
+    }
     if (*endPtr != '\0' || triggerNum < 0 || triggerNum >= MAX_TRIGGER) {
       cli_sendAck(false, "Invalid trigger number");
       return;
@@ -26,7 +32,7 @@ void CliTasks::triggerFire() {
     cli_send(msg);
     hm_radioUpdate();
 
-    triggerManager_triggerFire(triggerNum, false);
+    triggerManager_triggerFire((uint8_t)triggerNum, false);
 
     // Send success ack to CLI
     cli_sendAck(true, nullptr);

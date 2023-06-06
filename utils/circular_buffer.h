@@ -11,13 +11,17 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+
+#define unknownPtr_t uint8_t *
 
 typedef struct {
-  void *buffer;      // data buffer
-  void *buffer_end;  // end of data buffer
-  size_t size;       // size of each item in the buffer
-  void *head;        // pointer to head
-  void *tail;
+  // We use
+  unknownPtr_t buffer;      // data buffer
+  unknownPtr_t buffer_end;  // end of data buffer
+  size_t size;              // size of each item in the buffer
+  unknownPtr_t head;        // pointer to head
+  unknownPtr_t tail;
 } CircularBuffer_s;
 
 /**
@@ -31,7 +35,8 @@ typedef struct {
  * Note that circular buffer wraps an existing buffer. Memory of the existing
  * buffer must be allocated externally.
  */
-void cb_init(CircularBuffer_s *cb, void *buffer, size_t capacity, size_t size);
+void cb_init(CircularBuffer_s *cb, unknownPtr_t buffer, size_t capacity,
+             size_t size);
 
 /**
  * @brief Copies a given number of elements from front of circular buffer to the
@@ -42,7 +47,8 @@ void cb_init(CircularBuffer_s *cb, void *buffer, size_t capacity, size_t size);
  * @param numElements: [in] Max number of elements to read, or NULL if all
  * elements should be read. [out] Number of elements actually read
  */
-void cb_peek(CircularBuffer_s *cb, void *outputBuffer, size_t *numElements);
+void cb_peek(CircularBuffer_s *cb, unknownPtr_t outputBuffer,
+             size_t *numElements);
 
 /**
  * @brief Get the number of items currently in the circular buffer
@@ -66,7 +72,7 @@ size_t cb_capacity(CircularBuffer_s *cb);
  * size
  * @return: True if successful, false if buffer full
  */
-bool cb_enqueue(CircularBuffer_s *cb, const void *item);
+bool cb_enqueue(CircularBuffer_s *cb, const unknownPtr_t item);
 
 /**
  * @brief Removes a given number of elements from the front of the circular

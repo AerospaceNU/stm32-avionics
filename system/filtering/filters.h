@@ -12,7 +12,7 @@ extern "C" {
 #include "filterdata_types.h"
 #include "hardware_manager.h"
 
-void filter_init(double dt);
+void filter_init(float dt);
 
 /**
  * @brief Applies filters based on current sensor data

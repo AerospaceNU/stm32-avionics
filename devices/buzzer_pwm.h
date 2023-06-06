@@ -18,7 +18,7 @@ extern "C" {
 typedef struct {
   TIM_HandleTypeDef *htim;
   uint32_t channel;
-  float minFrequency;
+  double minFrequency;
 } BuzzerPwmCtrl_s;
 
 void buzzerPwm_init(BuzzerPwmCtrl_s *buzzer, TIM_HandleTypeDef *htim,

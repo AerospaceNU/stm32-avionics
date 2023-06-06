@@ -12,7 +12,7 @@
 
 class FlightState : public State {
  public:
-  FlightState(int id, uint32_t period_ms, bool hasPassedLaunch,
+  FlightState(uint8_t id, uint32_t period_ms, bool hasPassedLaunch,
               bool hasPassedApogee, bool hasPassedTouchdown)
       : State(id, period_ms),
         m_hasPassedLaunch{hasPassedLaunch},

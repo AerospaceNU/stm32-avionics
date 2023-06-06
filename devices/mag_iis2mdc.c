@@ -4,6 +4,8 @@
 
 #include "mag_iis2mdc.h"
 
+#include "bit_helper.h"
+
 #if HAS_DEV(MAG_IIS2MDC)
 
 static uint8_t readByte(ImuIIS2MDCCtrl_s *sensor, uint8_t addr) {
@@ -76,9 +78,9 @@ void iis2mdc_getData(ImuIIS2MDCCtrl_s *sensor) {
   uint8_t raw[6];
   readArray(sensor, OUTX_L_REG, raw, sizeof(raw));
 
-  sensor->data.raw.x = ((int16_t)raw[1] << 8) | (raw[0]);
-  sensor->data.raw.y = ((int16_t)raw[3] << 8) | (raw[2]);
-  sensor->data.raw.z = ((int16_t)raw[5] << 8) | (raw[4]);
+  sensor->data.raw.x = combine_to_u16(raw[1], raw[0]);
+  sensor->data.raw.y = combine_to_u16(raw[3], raw[2]);
+  sensor->data.raw.z = combine_to_u16(raw[5], raw[4]);
 
   // Sensitivity can only ever be 1.5mGauss / LSB
   sensor->data.realGauss.x = sensor->data.raw.x * 1.5;

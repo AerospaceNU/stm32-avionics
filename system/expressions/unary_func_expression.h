@@ -97,9 +97,9 @@ class UnaryFuncExpression : public Expression {
    * @param opcode Opcode for the function.
    * @param operandID Expression ID of the operand.
    */
-  UnaryFuncExpression(int triggerNum, UnaryFunction_e opcode,
-                      uint16_t operandID)
-      : opcode{opcode}, operandID{operandID} {
+  UnaryFuncExpression(uint16_t triggerNum, UnaryFunction_e _opcode,
+                      uint16_t _operandID)
+      : opcode{_opcode}, operandID{_operandID} {
     this->setTriggerNum(triggerNum);
   }
 

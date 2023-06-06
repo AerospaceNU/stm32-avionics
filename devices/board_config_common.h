@@ -351,6 +351,11 @@ extern uint16_t pyroDigitalPin[NUM_PYRO_DIGITAL];
 
 #define NUM_PYRO_CONT (NUM_PYRO_CONT_HADC + NUM_PYRO_CONT_DESKTOP_FILE)
 
+// We store continuity as a uint8, so more than 8 won't work
+#if NUM_PYRO_CONT > 8
+#error "Must have at most 8 pyros!"
+#endif
+
 #define FIRST_ID_PYRO_CONT_HADC 0
 #define FIRST_ID_PYRO_CONT_DESKTOP_FILE \
   (FIRST_ID_PYRO_CONT_ADC + NUM_PYRO_CONT_ADC)

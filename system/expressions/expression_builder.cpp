@@ -6,8 +6,9 @@
  */
 
 ExpressionValueType_e VarExpressionBuilder::build(
-    const StringSlice &slice, ExpressionStore *expressionStore, int triggerNum,
-    ExpressionVariant_v *parseInto, int destinationID) {
+    const StringSlice &slice, ExpressionStore *expressionStore,
+    uint16_t triggerNum, ExpressionVariant_v *parseInto,
+    uint16_t destinationID) {
   FilterData_e variableType =
       getVariableEnumFromString((char *)slice.startPtr());
   if (variableType != FilterData_e::invalid) {
@@ -24,8 +25,9 @@ ExpressionValueType_e VarExpressionBuilder::build(
  */
 
 ExpressionValueType_e EventExpressionBuilder::build(
-    const StringSlice &slice, ExpressionStore *expressionStore, int triggerNum,
-    ExpressionVariant_v *parseInto, int destinationID) {
+    const StringSlice &slice, ExpressionStore *expressionStore,
+    uint16_t triggerNum, ExpressionVariant_v *parseInto,
+    uint16_t destinationID) {
   for (int i = 0; i < Event_e::NUM_EVENT; ++i) {
     if (slice == eventStrings[i]) {
       *parseInto = EventExpression(triggerNum, (Event_e)i);
@@ -41,15 +43,16 @@ ExpressionValueType_e EventExpressionBuilder::build(
  * constant is found.
  */
 ExpressionValueType_e ConstExpressionBuilder::build(
-    const StringSlice &slice, ExpressionStore *expressionStore, int triggerNum,
-    ExpressionVariant_v *parseInto, int destinationID) {
+    const StringSlice &slice, ExpressionStore *expressionStore,
+    uint16_t triggerNum, ExpressionVariant_v *parseInto,
+    uint16_t destinationID) {
   char *endptr;
-  float value = smallStrtod((char *)slice.startPtr(), &endptr);
+  double value = smallStrtod((char *)slice.startPtr(), &endptr);
 
   if (endptr != slice.endptr()) {
     return ExpressionValueType_e::invalid_type;
   }
-  *parseInto = ConstExpression(triggerNum, value);
+  *parseInto = ConstExpression(triggerNum, (float)value);
   return ExpressionValueType_e::number;
 }
 
@@ -63,8 +66,9 @@ ExpressionValueType_e ConstExpressionBuilder::build(
  */
 
 ExpressionValueType_e UnaryFuncExpressionBuilder::build(
-    const StringSlice &slice, ExpressionStore *expressionStore, int triggerNum,
-    ExpressionVariant_v *parseInto, int destinationID) {
+    const StringSlice &slice, ExpressionStore *expressionStore,
+    uint16_t triggerNum, ExpressionVariant_v *parseInto,
+    uint16_t destinationID) {
   if (slice[0] != '(' || slice[slice.length() - 1] != ')') {
     return ExpressionValueType_e::invalid_type;
   }
@@ -75,7 +79,7 @@ ExpressionValueType_e UnaryFuncExpressionBuilder::build(
   if (argCount != 2) {
     return ExpressionValueType_e::invalid_type;
   }
-  int argDest;
+  uint16_t argDest;
   ExpressionValueType_e argumentType = expressionStore->parseForTrigger(
       &argDest, triggerNum, slices[1], destinationID + 1);
   if (argDest < 0) {
@@ -102,8 +106,9 @@ ExpressionValueType_e UnaryFuncExpressionBuilder::build(
  * (boolean or number) are valid inputs to the function already determined.
  */
 ExpressionValueType_e BinaryFuncExpressionBuilder::build(
-    const StringSlice &slice, ExpressionStore *expressionStore, int triggerNum,
-    ExpressionVariant_v *parseInto, int destinationID) {
+    const StringSlice &slice, ExpressionStore *expressionStore,
+    uint16_t triggerNum, ExpressionVariant_v *parseInto,
+    uint16_t destinationID) {
   StringSlice slices[MAX_SLICE];
   if (slice[0] != '(' || slice[slice.length() - 1] != ')') {
     return ExpressionValueType_e::invalid_type;
@@ -113,13 +118,13 @@ ExpressionValueType_e BinaryFuncExpressionBuilder::build(
   if (argCount != 3) {
     return ExpressionValueType_e::invalid_type;
   }
-  int arg1Dest;
+  uint16_t arg1Dest;
   ExpressionValueType_e argument1Type = expressionStore->parseForTrigger(
       &arg1Dest, triggerNum, slices[0], destinationID + 1);
   if (arg1Dest < 0) {
     return ExpressionValueType_e::invalid_type;
   }
-  int arg2Dest;
+  uint16_t arg2Dest;
   ExpressionValueType_e argument2Type = expressionStore->parseForTrigger(
       &arg2Dest, triggerNum, slices[2],
       expressionStore->getNextExpressionSpot(destinationID + 1));

@@ -24,7 +24,7 @@ class EventExpression : public Expression {
    * @param triggerNum Trigger num that this expression is used for.
    * @param event The event to reference as this expression's value.
    */
-  EventExpression(int triggerNum, Event_e event);
+  EventExpression(uint16_t triggerNum, Event_e event);
 
   void evaluate(FilterData_s *filterData,
                 ExpressionPtrCallback &expressionPtrCallback);

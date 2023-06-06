@@ -92,15 +92,17 @@ void barometerMs5607_getData(BarometerMs5607Ctrl_s *ms5607) {
   HAL_SPI_TransmitReceive(ms5607->hspi, read, tempStore, 4, SPI_TIMEOUT_MS);
   HAL_GPIO_WritePin(ms5607->csPort, ms5607->csPin, GPIO_PIN_SET);
 
-  uint32_t D1 = (presStore[1] << 16 | presStore[2] << 8 | presStore[3]);
-  uint32_t D2 = (tempStore[1] << 16 | tempStore[2] << 8 | tempStore[3]);
+  uint32_t D1 =
+      (uint32_t)(presStore[1] << 16 | presStore[2] << 8 | presStore[3]);
+  uint32_t D2 =
+      (uint32_t)(tempStore[1] << 16 | tempStore[2] << 8 | tempStore[3]);
 
-  int32_t dT = D2 - ((int32_t)(ms5607->promVals[4]) << 8);
-  volatile int64_t Temp = 2000 + (((int64_t)(ms5607->promVals[5]) * dT) >> 23);
-  volatile int64_t OFF = ((int64_t)(ms5607->promVals[1]) << 17) +
-                         (((int64_t)(ms5607->promVals[3]) * dT) >> 6);
-  volatile int64_t SENS = ((int64_t)(ms5607->promVals[0]) << 16) +
-                          (((int64_t)(ms5607->promVals[2]) * dT) >> 7);
+  int32_t dT = D2 - (int32_t)((int32_t)(ms5607->promVals[4]) << 8);
+  int64_t Temp = 2000 + (((int64_t)(ms5607->promVals[5]) * dT) >> 23);
+  int64_t OFF = ((int64_t)(ms5607->promVals[1]) << 17) +
+                (((int64_t)(ms5607->promVals[3]) * dT) >> 6);
+  int64_t SENS = ((int64_t)(ms5607->promVals[0]) << 16) +
+                 (((int64_t)(ms5607->promVals[2]) * dT) >> 7);
 
   // perform higher order corrections
   int64_t T2 = 0, OFF2 = 0, SENS2 = 0;

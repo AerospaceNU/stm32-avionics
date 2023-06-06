@@ -113,7 +113,7 @@ class Matrix {
    * @return New matrix from the division
    */
   Matrix<Rows, Cols> operator/(const float factor) {
-    return this->operator*(1.0 / factor);
+    return this->operator*(1.0f / factor);
   }
 
   /**

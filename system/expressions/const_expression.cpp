@@ -1,18 +1,13 @@
 #include "const_expression.h"
 
-ConstExpression::ConstExpression(int triggerNum, float value) {
+ConstExpression::ConstExpression(uint16_t triggerNum, float value) {
   this->setNumberValue(value);
   this->setTriggerNum(triggerNum);
 }
 
-ConstExpression::ConstExpression(int triggerNum, double value) {
-  this->setNumberValue(value);
-  this->setTriggerNum(triggerNum);
-}
-
-ConstExpression::ConstExpression(int triggerNum, int value) {
-  this->setNumberValue(value);
-  this->setTriggerNum(triggerNum);
+ConstExpression::ConstExpression(uint16_t _triggerNum, int value) {
+  this->setNumberValue(static_cast<float>(value));
+  this->setTriggerNum(_triggerNum);
 }
 
 void ConstExpression::evaluate(FilterData_s *filterData,

@@ -994,7 +994,7 @@ static void hm_simReadSensorData() {
     }
     // If right amount of bytes are seen, grab them as sensor data
     if (buffCount == SENSOR_DATA_SIZE) {
-      cb_peek(simRxBuffer, &sensorData, &SENSOR_DATA_SIZE);
+      cb_peek(simRxBuffer, (unknownPtr_t)&sensorData, &SENSOR_DATA_SIZE);
       cb_flush(simRxBuffer);
     }
   }

@@ -82,9 +82,9 @@ class BinaryFuncExpression : public Expression {
    * @param operand1ID The ID of the expression used as the first operand.
    * @param operand2ID The ID of the expression used as the second operand.
    */
-  BinaryFuncExpression(int triggerNum, BinaryFunction_e opcode,
-                       uint16_t operand1ID, uint16_t operand2ID)
-      : opcode{opcode}, operand1ID{operand1ID}, operand2ID{operand2ID} {
+  BinaryFuncExpression(uint16_t triggerNum, BinaryFunction_e opcode,
+                       uint16_t _operand1ID, uint16_t _operand2ID)
+      : opcode{opcode}, operand1ID{_operand1ID}, operand2ID{_operand2ID} {
     this->setTriggerNum(triggerNum);
   }
 

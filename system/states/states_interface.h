@@ -20,7 +20,7 @@ typedef enum {
 
 class State {
  public:
-  State(int id, uint32_t period_ms) : id_(id), period_ms_(period_ms) {}
+  State(uint8_t id, uint32_t period_ms) : id_(id), period_ms_(period_ms) {}
   virtual ~State() {}
 
   /**
@@ -28,7 +28,7 @@ class State {
    * pointers instead of IDs
    * @return Given ID of state
    */
-  int getID() { return id_; }
+  uint8_t getID() { return id_; }
 
   /**
    * @brief Gets the current value of the run counter
@@ -63,7 +63,7 @@ class State {
    */
   virtual EndCondition_e run(void) = 0;
 
-  int id_;
+  uint8_t id_;
   uint32_t run_counter_ = 0;
 
  protected:

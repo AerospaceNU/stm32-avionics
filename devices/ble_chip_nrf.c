@@ -70,7 +70,8 @@ static void bleChipNrf_rxEventCallback(void *userData, size_t Size) {
       ctrl->circular_buffers[address] != NULL) {
     for (uint16_t i = 1; i < Size;
          i++) {  // Byte 1 is address, so just enqueue [1..end]
-      cb_enqueue(ctrl->circular_buffers[address], ctrl->dma_buff_begin + i);
+      cb_enqueue(ctrl->circular_buffers[address],
+                 (unknownPtr_t)ctrl->dma_buff_begin + i);
     }
   }
 
@@ -111,8 +112,8 @@ static bool bleChipNrf_sendRequest(void *ctrl, uint8_t address,
   arr[0] = address;
 
   // uint16_t to 2 uint8_t's
-  arr[0 + sizeof(address)] = len & 0xff;
-  arr[0 + sizeof(address) + 1] = (len >> 8) & 0xff;
+  arr[0 + sizeof(address)] = (uint8_t)(len & 0xff);
+  arr[0 + sizeof(address) + 1] = (uint8_t)((len >> 8) & 0xff);
 
   // Stuff from headerSize up to sizeof(arr) should be set to the array pointed
   // to by pdata
@@ -123,15 +124,15 @@ static bool bleChipNrf_sendRequest(void *ctrl, uint8_t address,
   return ret == HAL_OK;
 }
 
-static uint16_t bleChipNrf_dequeuePacket(CircularBuffer_s *buffer,
-                                         uint8_t *pdata) {
+static size_t bleChipNrf_dequeuePacket(CircularBuffer_s *buffer,
+                                       uint8_t *pdata) {
   // We should have at least 2 bytes (the len bytes) in our array
   if (cb_count(buffer) < 2) return 0;
 
   // Buffer should have two bytes length, then a bunch of bytes data
   uint16_t len;
   size_t two = 2;
-  cb_peek(buffer, &len, &two);
+  cb_peek(buffer, (unknownPtr_t)&len, &two);
 
   // If we have enough bytes to copy out a whole packet, do so
   if (len + 2 <= cb_count(buffer)) {
@@ -139,7 +140,7 @@ static uint16_t bleChipNrf_dequeuePacket(CircularBuffer_s *buffer,
 
     // Then pop out len-many bytes
     size_t len_ = len;
-    cb_peek(buffer, pdata, &len_);
+    cb_peek(buffer, (unknownPtr_t)pdata, &len_);
 
     cb_dequeue(buffer, len_);
 

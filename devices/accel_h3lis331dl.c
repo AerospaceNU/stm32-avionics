@@ -50,9 +50,9 @@ static void accelH3lis331dl_getDataRaw(AccelH3lis331dlCtrl_s *sensor) {
       spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_Z_H);
 
   // Writes combined h and l byte to struct
-  sensor->val.raw.x = ((int16_t)x_h << 8) | (x_l);
-  sensor->val.raw.y = ((int16_t)y_h << 8) | (y_l);
-  sensor->val.raw.z = ((int16_t)z_h << 8) | (z_l);
+  sensor->val.raw.x = (int16_t)(((int16_t)x_h << 8) | ((int16_t)x_l));
+  sensor->val.raw.y = (int16_t)(((int16_t)y_h << 8) | ((int16_t)y_l));
+  sensor->val.raw.z = (int16_t)(((int16_t)z_h << 8) | ((int16_t)z_l));
 }
 
 static void accelH3lis331dl_getGain(AccelH3lis331dlCtrl_s *sensor) {

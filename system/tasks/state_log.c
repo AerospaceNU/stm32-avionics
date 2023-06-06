@@ -14,8 +14,8 @@
 #include "trigger_manager.h"
 
 #define STATE_START_ADDRESS \
-  0x00000000;  // Starting flash location for the state log, relative to start
-               // of internal flash
+  0x00000000  // Starting flash location for the state log, relative to start
+              // of internal flash
 
 uint32_t writeAddress = STATE_START_ADDRESS;
 uint32_t readAddress = STATE_START_ADDRESS;

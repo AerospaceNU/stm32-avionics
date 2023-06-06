@@ -25,14 +25,14 @@
 
 class OrientationEstimator {
  public:
-  double m_dt;
+  float m_dt;
   Matrix<4, 1> q;
   /**
    * @brief Constructs the OrientationEstimator object with a given dt
    * @param dt: Interval between subsequent angular velocity
    * measurements, in seconds
    */
-  explicit OrientationEstimator(double dt);
+  explicit OrientationEstimator(float dt);
 
   /**
    * @brief Destructor for OrientationEstimator
@@ -49,7 +49,7 @@ class OrientationEstimator {
    * @param dt: Interval between subsequent angular velocity measurements, in
    * seconds
    */
-  void setDt(double dt);
+  void setDt(float dt);
 
   /**
    * @brief Sets the estimated orientation based on x, y, and z accelerations

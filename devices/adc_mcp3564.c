@@ -173,8 +173,10 @@ void mcp356x_txRxCpltCallback(void *pdev) {
   // First byte of rx_read_buf should be the status byte
   // Next byte has the channel id and a sign extension
   // Next 4 bytes are big (?) endian data, per figure 5-8
-  uint32_t raw = dev->rx_read_buf[1] << 24 | dev->rx_read_buf[2] << 16 |
-                 dev->rx_read_buf[3] << 8 | dev->rx_read_buf[4];
+  uint32_t raw = ((uint32_t)dev->rx_read_buf[1] << 24) |
+                 ((uint32_t)dev->rx_read_buf[2] << 16) |
+                 ((uint32_t)dev->rx_read_buf[3] << 8) |
+                 ((uint32_t)dev->rx_read_buf[4]);
 
   // TODO make this respect different DATA_FORMAT modes
   AdcMcp3564_DataFormat_11 *output = ((AdcMcp3564_DataFormat_11 *)&raw);

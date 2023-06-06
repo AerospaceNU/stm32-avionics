@@ -23,7 +23,7 @@ void PreFlightState::init() {
 
   gpsTimestamp = false;
   triggerManager_init();
-  filter_init(this->period_ms_ / 1000.0);
+  filter_init((float)this->period_ms_ / 1000.0f);
   hm_readSensorData();
   filter_setPressureRef(filter_getAveragePressure(hm_getSensorData()));
 

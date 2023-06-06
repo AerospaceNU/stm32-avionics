@@ -17,7 +17,7 @@ void InitializeState::init() {
   hm_hardwareInit();
 
   // This is needed to tell the Kalman filter the nominal dt for prediction
-  filter_init(this->period_ms_ / 1000.0);
+  filter_init((float)this->period_ms_ / 1000.0f);
 
   // Initiliaze radio circular buffers and things
   radioManager_init();

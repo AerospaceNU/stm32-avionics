@@ -43,6 +43,6 @@ void Expression::setBooleanValue(bool bl) {
   }
 }
 
-void Expression::setTriggerNum(int triggerNum) {
+void Expression::setTriggerNum(uint16_t triggerNum) {
   this->triggerNum = triggerNum;
 }

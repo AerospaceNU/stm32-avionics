@@ -54,7 +54,7 @@ uint16_t CRC16::getCRC() {
 void CRC16::_update(uint8_t value) {
   if (!_started) restart();
   if (_reverseIn) value = _reverse8(value);
-  _crc ^= ((uint16_t)value) << 8;
+  _crc ^= (uint16_t)(((uint16_t)value) << 8);
   for (uint8_t i = 8; i; i--) {
     if (_crc & (1UL << 15)) {
       _crc <<= 1;
@@ -67,17 +67,17 @@ void CRC16::_update(uint8_t value) {
 
 uint16_t CRC16::_reverse(uint16_t in) {
   uint16_t x = in;
-  x = (((x & 0XAAAA) >> 1) | ((x & 0X5555) << 1));
-  x = (((x & 0xCCCC) >> 2) | ((x & 0X3333) << 2));
-  x = (((x & 0xF0F0) >> 4) | ((x & 0X0F0F) << 4));
-  x = ((x >> 8) | (x << 8));
+  x = (uint16_t)(((x & 0xAAAA) >> 1) | ((x & 0x5555) << 1));
+  x = (uint16_t)(((x & 0xCCCC) >> 2) | ((x & 0x3333) << 2));
+  x = (uint16_t)(((x & 0xF0F0) >> 4) | ((x & 0x0F0F) << 4));
+  x = (uint16_t)((x >> 8) | (x << 8));
   return x;
 }
 
 uint8_t CRC16::_reverse8(uint8_t in) {
   uint8_t x = in;
-  x = (((x & 0xAA) >> 1) | ((x & 0x55) << 1));
-  x = (((x & 0xCC) >> 2) | ((x & 0x33) << 2));
-  x = ((x >> 4) | (x << 4));
+  x = (uint8_t)(((x & 0xAA) >> 1) | ((x & 0x55) << 1));
+  x = (uint8_t)(((x & 0xCC) >> 2) | ((x & 0x33) << 2));
+  x = (uint8_t)((x >> 4) | (x << 4));
   return x;
 }

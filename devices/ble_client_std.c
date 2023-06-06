@@ -18,15 +18,15 @@ void bleClientStd_init(BleClientStdCtrl_s *ctrl, BleChip_s *bleChip,
                        uint8_t address) {
   ctrl->bleChip = bleChip;
   ctrl->address = address;
-  cb_init(&ctrl->parsedBuffer, ctrl->parsedArray, DATA_BUFFER_SIZE,
-          sizeof(uint8_t));
-  cb_init(&ctrl->dmaBuffer, ctrl->packetArray, DATA_BUFFER_SIZE,
+  cb_init(&ctrl->parsedBuffer, (unknownPtr_t)ctrl->parsedArray,
+          DATA_BUFFER_SIZE, sizeof(uint8_t));
+  cb_init(&ctrl->dmaBuffer, (unknownPtr_t)ctrl->packetArray, DATA_BUFFER_SIZE,
           sizeof(uint8_t));
   ctrl->bleChip->registerAddress(ctrl->bleChip, address, &ctrl->dmaBuffer);
 }
 
 void bleClientStd_tick(BleClientStdCtrl_s *ctrl) {
-  uint16_t dequeuedLen;
+  size_t dequeuedLen;
   uint8_t packetCount = 0;
   do {
     // Enqueue the message into the tempDataBuffer array
@@ -36,7 +36,7 @@ void bleClientStd_tick(BleClientStdCtrl_s *ctrl) {
 
     // Add it to our parsed buffer CB, which will be used by CLI
     for (int i = 0; i < dequeuedLen; i++) {
-      cb_enqueue(&ctrl->parsedBuffer, &tempDataBuffer[i]);
+      cb_enqueue(&ctrl->parsedBuffer, (unknownPtr_t)&tempDataBuffer[i]);
     }
   } while (dequeuedLen > 0 && packetCount < MAX_PACKETS_PER_TICK);
 }

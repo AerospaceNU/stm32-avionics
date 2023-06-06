@@ -29,8 +29,8 @@ void triggerManager_init() {
 
 uint16_t triggerManager_status() {
   uint16_t status = 0;
-  for (int i = 0; i < MAX_TRIGGER; ++i) {
-    status |= triggerFireStatus[i] << i;
+  for (uint16_t i = 0; i < MAX_TRIGGER; ++i) {
+    status |= (uint16_t)(triggerFireStatus[i] << i);
   }
   return status;
 }
@@ -55,7 +55,7 @@ void triggerManager_setTriggerFireStatus(uint16_t status) {
 void triggerManager_update(FilterData_s* filterData) {
   expressionStore.tick(filterData);
 
-  for (int i = 0; i < MAX_TRIGGER; i++) {
+  for (uint8_t i = 0; i < MAX_TRIGGER; i++) {
     TriggerConfig_s* triggerConfig = i + cli_getConfigs()->triggerConfiguration;
     if (expressionStore.getExprBoolValue(triggerConfig->rootExpressionID) &&
         !triggerFireStatus[i]) {
@@ -66,7 +66,7 @@ void triggerManager_update(FilterData_s* filterData) {
 
 bool triggerManager_setTriggerConfig(uint8_t triggerNum,
                                      const char** configString) {
-  int resultID;
+  uint16_t resultID;
   StringSlice slice =
       StringSlice(configString, 0, strnlen(*configString, INT16_MAX));
   expressionStore.removeExpressionsForTrigger(triggerNum);
@@ -98,7 +98,8 @@ void triggerManager_triggerFire(uint8_t triggerNum, bool logFire) {
       triggerNum + cli_getConfigs()->triggerConfiguration;
   if (triggerConfig->mode == TRIGGER_TYPE_PYRO) {
     if (!(triggerConfig->port < NUM_PYRO)) return;
-    hm_pyroFire(triggerConfig->port, triggerConfig->duration);
+    hm_pyroFire(triggerConfig->port,
+                static_cast<uint32_t>(triggerConfig->duration));
 
   } else if (triggerConfig->mode == TRIGGER_TYPE_DIGITAL_ON_PYRO) {
     if (!(triggerConfig->port < NUM_PYRO)) return;
@@ -109,10 +110,11 @@ void triggerManager_triggerFire(uint8_t triggerNum, bool logFire) {
     hm_pyroSet(triggerConfig->port, false);
   } else if (triggerConfig->mode == TRIGGER_TYPE_PWM_PYRO) {
     if (!(triggerConfig->port < NUM_PYRO)) return;
-    hm_pyroSetPwm(triggerConfig->port, triggerConfig->duration, 100,
+    hm_pyroSetPwm(triggerConfig->port,
+                  static_cast<uint32_t>(triggerConfig->duration), 100,
                   triggerConfig->pulseWidth);
-    // Line cutter type
   } else if (triggerConfig->mode == TRIGGER_TYPE_LINE_CUTTER) {
+    // Line cutter type
     hm_lineCuttersSendCut(triggerConfig->port);
   } else {
     // Invalid type

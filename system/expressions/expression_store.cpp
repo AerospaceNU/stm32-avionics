@@ -88,11 +88,11 @@ void ExpressionStore::removeExpressionsForTrigger(int triggerNum) {
   }
 }
 
-int ExpressionStore::getNextExpressionSpot(int startAt) const {
+uint16_t ExpressionStore::getNextExpressionSpot(uint16_t startAt) const {
   if (startAt < 0 || startAt >= MAX_EXPRESSION) {
     return -1;
   }
-  for (int i = startAt; i < MAX_EXPRESSION; ++i) {
+  for (uint16_t i = startAt; i < MAX_EXPRESSION; ++i) {
     if (std::visit([](auto &&var) { return var.isEmpty(); },
                    expressionBuffer[i])) {
       return i;
@@ -101,14 +101,14 @@ int ExpressionStore::getNextExpressionSpot(int startAt) const {
   return -1;
 }
 
-ExpressionValueType_e ExpressionStore::parseForTrigger(int *resultID,
-                                                       int triggerNum,
+ExpressionValueType_e ExpressionStore::parseForTrigger(uint16_t *resultID,
+                                                       uint16_t triggerNum,
                                                        const StringSlice &slice,
-                                                       int startAt = 0) {
+                                                       uint16_t startAt) {
   if (startAt < 0 || startAt >= MAX_EXPRESSION) {
     return ExpressionValueType_e::invalid_type;
   }
-  int nextSpot = getNextExpressionSpot(startAt);
+  uint16_t nextSpot = getNextExpressionSpot(startAt);
   if (nextSpot < 0) {
     return ExpressionValueType_e::invalid_type;
   }

@@ -17,7 +17,7 @@ typedef struct {
                       uint16_t len);
   bool (*isAddressConnected)(void *ctrl, uint8_t address);
   bool (*pollConnectedClients)(void *ctrl);
-  uint16_t (*dequeuePacket)(CircularBuffer_s *buffer, uint8_t *pdata);
+  size_t (*dequeuePacket)(CircularBuffer_s *buffer, uint8_t *pdata);
 } BleChip_s;
 
 #endif  // DEVICES_BLE_CHIP_H_

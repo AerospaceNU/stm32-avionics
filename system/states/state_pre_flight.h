@@ -7,7 +7,7 @@
 
 class PreFlightState : public FlightState {
  public:
-  PreFlightState(int id, uint32_t period_ms)
+  PreFlightState(uint8_t id, uint32_t period_ms)
       : FlightState(id, period_ms, false, false, false) {}
 
   void init(void) override;

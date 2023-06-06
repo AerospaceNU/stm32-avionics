@@ -18,21 +18,14 @@ class ConstExpression : public Expression {
    * @param triggerNum Trigger num that this expression is used for.
    * @param value Float value of this expression.
    */
-  ConstExpression(int triggerNum, float value);
-
-  /**
-   * Construct a ConstExpression.
-   * @param triggerNum Trigger num that this expression is used for.
-   * @param value Double value of this expression (will be converted to float).
-   */
-  ConstExpression(int triggerNum, double value);
+  ConstExpression(uint16_t triggerNum, float value);
 
   /**
    * Construct a ConstExpression.
    * @param triggerNum Trigger num that this expression is used for.
    * @param value Int value of this expression (will be converted to float).
    */
-  ConstExpression(int triggerNum, int value);
+  ConstExpression(uint16_t triggerNum, int value);
 
   void evaluate(FilterData_s *filterData,
                 ExpressionPtrCallback &expressionPtrCallback);

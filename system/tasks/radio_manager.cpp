@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <algorithm>
+
 #include "board_config_common.h"
 #include "cli.h"
 #include "data_log.h"
@@ -51,7 +53,7 @@ void radioManager_tick() {
   for (int i = 0; i < NUM_RADIO; i++) {
     static size_t len = sizeof(packet);
     while (cb_count(&dataRx[i].rxBuffer)) {
-      cb_peek(&dataRx[i].rxBuffer, &packet, &len);
+      cb_peek(&dataRx[i].rxBuffer, (unknownPtr_t)&packet, &len);
       if (len) {
         // Send to all our callbacks
         for (size_t j = 0; j < dataRx[i].numCallbacks; j++) {
@@ -107,20 +109,20 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       1000 / ORIENTATION_RATE) {
     OrientationPacket_s data = {
       state,
-      filterData->qw * 100.0,
-      filterData->qx * 100.0,
-      filterData->qy * 100.0,
-      filterData->qz * 100.0,
-      filterData->rocket_ang_vel_x,
-      filterData->rocket_ang_vel_y,
-      filterData->rocket_ang_vel_z,
-      filterData->world_acc_x,
-      filterData->world_acc_y,
-      filterData->world_acc_z,
+      (int8_t)(filterData->qw * 100.0),
+      (int8_t)(filterData->qx * 100.0),
+      (int8_t)(filterData->qy * 100.0),
+      (int8_t)(filterData->qz * 100.0),
+      (float)filterData->rocket_ang_vel_x,
+      (float)filterData->rocket_ang_vel_y,
+      (float)filterData->rocket_ang_vel_z,
+      (float)filterData->world_acc_x,
+      (float)filterData->world_acc_y,
+      (float)filterData->world_acc_z,
 #if HAS_DEV(MAG)
-      sensorData->magData[0].realGauss.x,
-      sensorData->magData[0].realGauss.y,
-      sensorData->magData[0].realGauss.z,
+      (float)sensorData->magData[0].realGauss.x,
+      (float)sensorData->magData[0].realGauss.y,
+      (float)sensorData->magData[0].realGauss.z,
 #else
       0,
       0,
@@ -130,7 +132,7 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       // 16 bit means 16,000 max
       // we can just multiply by 10 for 0.1 precision
       // and improve more if required later
-      .angle_to_vertical = ROUND_2_INT(filterData->angle_vertical * 10)
+      static_cast<int16_t>(ROUND_2_INT(filterData->angle_vertical * 10))
     };
     transmitPacket[radioId].packetType = 2;
     transmitPacket[radioId].payload.orientation = data;
@@ -143,12 +145,12 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       1000 / POSITION_RATE) {
     PositionPacket_s data = {
 #if HAS_DEV(BAROMETER)
-      sensorData->barometerData[0].temperatureC,
+      (float)sensorData->barometerData[0].temperatureC,
 #else
       0,
 #endif  // HAS_DEV(BAROMETER)
-      filterData->pos_z_agl,
-      filterData->world_vel_z,
+      (float)filterData->pos_z_agl,
+      (float)filterData->world_vel_z,
 #if HAS_DEV(GPS)
       sensorData->gpsData[0].generalData.latitude,
       sensorData->gpsData[0].generalData.longitude,
@@ -159,14 +161,14 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       0,
 #endif  // HAS_DEV(GPS)
 #if HAS_DEV(VBAT)
-      sensorData->vbatData[0],
+      (float)sensorData->vbatData[0],
 #else
       0,
 #endif  // HAS_DEV(VBAT)
       0,
       0,
 #if HAS_DEV(GPS)
-      sensorData->gpsData[0].timeData.timestamp,
+      (uint32_t)sensorData->gpsData[0].timeData.timestamp,
       sensorData->gpsData[0].generalData.satsTracked,
 #else
       0,
@@ -187,11 +189,11 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
   if (currentTime - lastSent[radioId].altInfoLastSent >= 1213) {
     AltInfoPacket_s data;
     for (int i = 0; i < NUM_BAROMETER; i++) {
-      data.pressure[i] = sensorData->barometerData[i].pressureAtm;
+      data.pressure[i] = (float)sensorData->barometerData[i].pressureAtm;
     }
-    data.pressureRef = filter_getPressureRef();
-    data.groundElevation = cli_getConfigs()->groundElevationM;
-    data.groundTemp = cli_getConfigs()->groundTemperatureC;
+    data.pressureRef = (float)filter_getPressureRef();
+    data.groundElevation = (float)cli_getConfigs()->groundElevationM;
+    data.groundTemp = (float)cli_getConfigs()->groundTemperatureC;
 
     transmitPacket[radioId].packetType = TELEMETRY_ID_ALT_INFO;
     transmitPacket[radioId].payload.altitudeInfo = data;
@@ -206,7 +208,7 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       1000 / HARDWARE_STATUS_RATE) {
     uint8_t pyroCont = 0;
     for (int i = 0; i < NUM_PYRO_CONT; i++)
-      pyroCont |= ((sensorData->pyroContData[i] & 0x01) << i);
+      pyroCont |= (uint8_t)((sensorData->pyroContData[i] & 0b1) << i);
     HardwareStatusPacket_s data = {pyroCont, triggerManager_status(),
                                    dataLog_getFlashUsage()};
 
@@ -243,13 +245,11 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 #endif  // HAS_DEV(LINE_CUTTER)
 }
 
-#define min(a, b) (a < b) ? a : b
-
 void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
   static uint8_t lastTxId = 0;
 
   while (len) {
-    uint8_t txLen = min(len, RADIO_MAX_STRING);
+    size_t txLen = std::min(len, (size_t)RADIO_MAX_STRING);
 
     transmitPacket[radioId].timestampMs = hm_millis();
     transmitPacket[radioId].packetType = TELEMETRY_ID_STRING;
@@ -258,7 +258,7 @@ void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
     memset(transmitPacket[radioId].payload.cliString.string, 0,
            RADIO_MAX_STRING);
     memcpy(transmitPacket[radioId].payload.cliString.string, data, txLen);
-    transmitPacket[radioId].payload.cliString.len = txLen;
+    transmitPacket[radioId].payload.cliString.len = (uint8_t)txLen;
     transmitPacket[radioId].payload.cliString.id = lastTxId++;
 
 #ifndef DESKTOP_SIM

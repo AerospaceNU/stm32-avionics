@@ -4,20 +4,21 @@
 
 #include <cmath>
 #include <cstdio>
+#include <limits>
 
 #include "hardware_manager.h"
 
-BinaryFunctionWrapper::BinaryFunctionWrapper(const char *stringRep,
+BinaryFunctionWrapper::BinaryFunctionWrapper(const char *_stringRep,
                                              BinaryFunction *function,
-                                             ExpressionValueType_e op1Type,
-                                             ExpressionValueType_e op2Type,
-                                             ExpressionValueType_e valueType) {
-  strncpy(this->stringRep, stringRep, 10);
-  this->stringLen = strlen(stringRep);
-  this->op1Type = op1Type;
-  this->op2Type = op2Type;
+                                             ExpressionValueType_e _op1Type,
+                                             ExpressionValueType_e _op2Type,
+                                             ExpressionValueType_e _valueType) {
+  strncpy(this->stringRep, _stringRep, 10);
+  this->stringLen = static_cast<decltype(this->stringLen)>(strlen(_stringRep));
+  this->op1Type = _op1Type;
+  this->op2Type = _op2Type;
   this->function = function;
-  this->valueType = valueType;
+  this->valueType = _valueType;
 }
 
 void BinaryFunctionWrapper::evaluate(Expression *expr, FilterData_s *filterData,
@@ -66,24 +67,31 @@ static auto gtFunc = BINARY_FUNCTION_HEADER {
 };
 
 static auto eqFunc = BINARY_FUNCTION_HEADER {
-  expr->setBooleanValue(abs(op1->getNumberValue() - op2->getNumberValue()) <
-                        0.001);
+  expr->setBooleanValue(
+      std::abs(op1->getNumberValue() - op2->getNumberValue()) < 0.001);
 };
 
 static auto afterFunc = BINARY_FUNCTION_HEADER {
-  float conditionalTime = op1->getNumberValue() * 1000;  // Convert to ms
-  int firstTrue = op2->firstTrue;
-  expr->setBooleanValue(firstTrue != -1 &&
-                        (int)((int)hm_millis() - (int)firstTrue) >
-                            conditionalTime);
+  // Convert to ms
+  uint32_t conditionalTime =
+      static_cast<uint32_t>(op1->getNumberValue() * 1000);
+  uint32_t firstTrue = op2->firstTrue;
+  expr->setBooleanValue(firstTrue !=
+                            std::numeric_limits<decltype(firstTrue)>::max() &&
+                        (hm_millis() - firstTrue) > conditionalTime);
 };
 
 static auto forFunc = BINARY_FUNCTION_HEADER {
-  int trueSince = op1->trueSince;
-  float conditionalTime = op2->getNumberValue() * 1000;  // Convert to ms
-  expr->setBooleanValue(trueSince != -1 && op1->getBooleanValue() &&
-                        (int)((int)hm_millis() - (int)trueSince) >
-                            conditionalTime);
+  uint32_t trueSince = op1->trueSince;
+  // Convert to ms
+  uint32_t conditionalTime =
+      static_cast<uint32_t>(op2->getNumberValue() * 1000);
+
+  bool status =
+      (trueSince != std::numeric_limits<decltype(trueSince)>::max() &&
+       op1->getBooleanValue() && ((hm_millis() - trueSince) > conditionalTime));
+
+  expr->setBooleanValue(status);
 };
 
 static auto addFunc = BINARY_FUNCTION_HEADER {

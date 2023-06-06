@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <limits>
 
 #include "board_config_common.h"
 #include "cli.h"
@@ -32,13 +33,17 @@ void CliTasks::config() {
       cli_sendAck(false, "Invalid trigger number");
       return;
     }
+    if (triggerNum > (std::numeric_limits<uint8_t>::max())) {
+      cli_sendAck(false, "Trigger number greater than max!");
+      return;
+    }
 
     TriggerConfig_s* triggerConfig =
         cli_getConfigs()->triggerConfiguration + triggerNum;
 
     if (options.D) {
       triggerConfig->mode = TRIGGER_TYPE_EMPTY;
-      triggerManager_removeTrigger(triggerNum);
+      triggerManager_removeTrigger((uint8_t)triggerNum);
       // Write new cli configs to flash
       dataLog_writeCliConfigs();
       cli_sendAck(true, nullptr);
@@ -58,6 +63,10 @@ void CliTasks::config() {
     int mode = strtol(options.m, &endPtr, 10);
     if (*endPtr != '\0') {
       cli_sendAck(false, "Invalid trigger mode");
+      return;
+    }
+    if (mode > (std::numeric_limits<uint8_t>::max())) {
+      cli_sendAck(false, "Trigger mode greater than max!");
       return;
     }
 
@@ -80,7 +89,8 @@ void CliTasks::config() {
     float duration = 0;
 
     if (mode == TRIGGER_TYPE_PYRO || mode == TRIGGER_TYPE_PWM_PYRO) {
-      duration = smallStrtod(options.d, &endPtr) * 1000;  // Convert to ms
+      duration =
+          (float)smallStrtod(options.d, &endPtr) * 1000;  // Convert to ms
       if (*endPtr != '\0') {
         cli_sendAck(false, "Pyro/PWM must specify a duration");
         return;
@@ -99,19 +109,24 @@ void CliTasks::config() {
 
     triggerConfig->duration = duration;
     triggerConfig->pulseWidth = pulseWidth;
-    triggerConfig->mode = mode;
+    triggerConfig->mode = (uint8_t)mode;
 
     int port = strtol(options.p, &endPtr, 10);
     if (*endPtr != '\0' || port < 0 || port >= maxPort) {
       cli_sendAck(false, "Invalid port number");
       return;
     }
+    if (port > (std::numeric_limits<uint8_t>::max())) {
+      cli_sendAck(false, "Trigger port greater than max!");
+      return;
+    }
 
-    triggerConfig->port = port;
+    triggerConfig->port = (uint8_t)port;
 
     if (options.C) {
       const char* configString = options.C;
-      if (!triggerManager_setTriggerConfig(triggerNum, &configString)) {
+      if (!triggerManager_setTriggerConfig((uint8_t)triggerNum,
+                                           &configString)) {
         cli_sendAck(false, "Invalid config string");
         return;
       }
@@ -184,7 +199,7 @@ void CliTasks::config() {
     // New line
     cli_send("\r\n");
     // Print all triggers
-    for (int i = 0; i < MAX_TRIGGER; i++) {
+    for (uint8_t i = 0; i < MAX_TRIGGER; i++) {
       snprintf(name, sizeof(name), "Trigger %i Configuration:", i);
       TriggerConfig_s* triggerConfig =
           (cli_getConfigs()->triggerConfiguration + i);

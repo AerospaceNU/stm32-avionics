@@ -92,7 +92,7 @@ FilterData_e getVariableEnumFromString(char *input) {
   // Matched no other valid value
   return invalid;
 }
-float getVariableValue(FilterData_s *filterData, FilterData_e valueType) {
+double getVariableValue(FilterData_s *filterData, FilterData_e valueType) {
   switch (valueType) {
     case invalid:
       return 0;
@@ -156,7 +156,7 @@ float getVariableValue(FilterData_s *filterData, FilterData_e valueType) {
       return 0;
   }
 }
-void fillVariableName(char *buffer, int n, FilterData_e valueType) {
+void fillVariableName(char *buffer, size_t n, FilterData_e valueType) {
   switch (valueType) {
     case invalid:
       strncpy(buffer, "invalid", n);

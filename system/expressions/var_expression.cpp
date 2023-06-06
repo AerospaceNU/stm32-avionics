@@ -2,14 +2,15 @@
 
 #include <string.h>
 
-VarExpression::VarExpression(int triggerNum, FilterData_e dataMember) {
+VarExpression::VarExpression(uint16_t triggerNum, FilterData_e dataMember) {
   this->dataMember = dataMember;
   this->setTriggerNum(triggerNum);
 }
 
 void VarExpression::evaluate(FilterData_s *filterData,
                              ExpressionPtrCallback &expressionPtrCallback) {
-  this->setNumberValue(getVariableValue(filterData, this->dataMember));
+  this->setNumberValue(
+      static_cast<float>(getVariableValue(filterData, this->dataMember)));
 }
 
 int VarExpression::toString(

@@ -3,7 +3,7 @@
 const char *eventStrings[] = {"launch", "burnout", "apogee", "touchdown",
                               "unclean_restart"};
 
-EventExpression::EventExpression(int triggerNum, Event_e event) {
+EventExpression::EventExpression(uint16_t triggerNum, Event_e event) {
   this->setTriggerNum(triggerNum);
   this->event = event;
 }

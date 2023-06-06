@@ -98,7 +98,7 @@ bool TcpSocket::readData() {
 
       memcpy(packet.data, &packetOnAir, sizeof(packetOnAir));
 
-      cb_enqueue(rxBuffer, &packet);
+      cb_enqueue(rxBuffer, (unknownPtr_t)&packet);
     } while (len);
   }
 

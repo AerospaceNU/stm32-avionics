@@ -28,12 +28,12 @@ typedef struct {
   double world_acc_x;
   double world_acc_y;
   double world_acc_z;
-  float rocket_ang_vel_x;
-  float rocket_ang_vel_y;
-  float rocket_ang_vel_z;
-  float rocket_magnetic_flux_x;
-  float rocket_magnetic_flux_y;
-  float rocket_magnetic_flux_z;
+  double rocket_ang_vel_x;
+  double rocket_ang_vel_y;
+  double rocket_ang_vel_z;
+  double rocket_magnetic_flux_x;
+  double rocket_magnetic_flux_y;
+  double rocket_magnetic_flux_z;
   double qx;
   double qy;
   double qz;
@@ -77,8 +77,8 @@ typedef enum {
 } FilterData_e;
 
 FilterData_e getVariableEnumFromString(char *input);
-float getVariableValue(FilterData_s *filterData, FilterData_e valueType);
-void fillVariableName(char *buffer, int n, FilterData_e valueType);
+double getVariableValue(FilterData_s *filterData, FilterData_e valueType);
+void fillVariableName(char *buffer, size_t n, FilterData_e valueType);
 #ifdef __cplusplus
 }
 #endif

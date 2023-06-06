@@ -68,7 +68,7 @@ FlightMetadata_s *dataLog_getFlightMetadata();
 /**
  * @brief Load metadata from a flight load into the current packet
  */
-void dataLog_readFlightNumMetadata(uint8_t flightNum);
+void dataLog_readFlightNumMetadata(uint32_t flightNum);
 
 /**
  * @brief Write metadata to flash
