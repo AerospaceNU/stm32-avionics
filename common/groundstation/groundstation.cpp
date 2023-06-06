@@ -54,23 +54,25 @@ void Groundstation::runOnce() {
   radioManager_tick();
 
   // Send barometer ~1x/5sec
-  if ((hm_millis() - start) >= 2000) {
+  if ((HAL_GetTick() - start) >= 2000) {
     start = HAL_GetTick();
 
-    static HeartbeatData_s heartbeat;
-    heartbeat.packetType = 200;
-    heartbeat.latitude = hm_getSensorData()->gpsData->generalData.latitude;
-    heartbeat.longitude = hm_getSensorData()->gpsData->generalData.longitude;
-    heartbeat.gps_alt = hm_getSensorData()->gpsData->generalData.altitude;
-    heartbeat.groundPressure = hm_getSensorData()->barometerData[0].pressureAtm;
-    heartbeat.groundTemp = hm_getSensorData()->barometerData[0].temperatureC;
+    static RadioRecievedPacket_s radioPacket;
+    // say it's true even though it's not from the radio
+    radioPacket.crcFromRadio = true;
+    memset(radioPacket.data, 0, sizeof(radioPacket.data));
+    RadioPacket_s *payload = ((RadioPacket_s *)radioPacket.data);
+    payload->timestampMs = hm_millis();
+    payload->packetType = TELEMETRY_ID_GROUNDSTATION_HEARTBEAT;
+    HeartbeatData_s *heartbeat = &payload->payload.groundstationHeartbeat;
+    heartbeat->latitude = hm_getSensorData()->gpsData->generalData.latitude;
+    heartbeat->longitude = hm_getSensorData()->gpsData->generalData.longitude;
+    heartbeat->gps_alt = hm_getSensorData()->gpsData->generalData.altitude;
+    heartbeat->groundPressure =
+        hm_getSensorData()->barometerData[0].pressureAtm;
+    heartbeat->groundTemp = hm_getSensorData()->barometerData[0].temperatureC;
 
-    // Hack to make all packets the same length when sent over USB
-    static uint8_t heartbeatArr[sizeof(RadioRecievedPacket_s)] = {0};
-    memset(heartbeatArr, 0, sizeof(heartbeatArr));
-    memcpy(heartbeatArr, &heartbeat, sizeof(heartbeat));
-    hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr,
-                   sizeof(heartbeatArr));
+    OnDataRx(&radioPacket);
   }
 
   // A packet must have at least a destination [1 byte] and a len [2 bytes],
