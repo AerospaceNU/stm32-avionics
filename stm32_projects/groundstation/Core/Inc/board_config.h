@@ -30,7 +30,6 @@
 #define NUM_GPS_UBLOX 1
 
 #define NUM_IMU_LSM9DS1 0
-
 #define NUM_LED_DIGITAL 0
 
 #define NUM_LINE_CUTTER_BLE 0
@@ -44,16 +43,14 @@
 
 #define NUM_SERVO_PWM 0
 
-#define NUM_USB_STD 1
+#define NUM_USB_STD 0
+#define USB_IS_COMPOSITE
+#define NUM_USB_CDC_COMPOSITE 2
 
 #define NUM_VBAT_STM_ADC 0
 #define NUM_VBAT_INA226 0
 
 #define NUM_WATCHDOG_INTERNAL 1
-
-#define BLE_CLI_ID 0
-#define RADIO_CLI_ID 0
-#define USB_CLI_ID 0
 
 #define RADIO_TI_TYPE RADIO_TI_TYPE_CC1200
 

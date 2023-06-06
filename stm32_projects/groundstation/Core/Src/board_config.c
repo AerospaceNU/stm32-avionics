@@ -200,3 +200,10 @@ I2C_HandleTypeDef* vbatIna226Hi2c[NUM_VBAT_INA226];
 #if HAS_DEV(WATCHDOG_INTERNAL)
 IWDG_HandleTypeDef* watchdogInternalHiwdg[NUM_WATCHDOG_INTERNAL] = {&hiwdg1};
 #endif  // HAS_DEV(WATCHDOG_INTERNAL)
+
+/* USB description strings */
+#include "usbd_composite.h"
+const char* CDC_ACM_STR_DESC[USBD_CDC_ACM_COUNT] = {
+    "Groundstation Command Line",
+    "Groundstation Telemetry",
+};
