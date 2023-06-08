@@ -119,8 +119,8 @@ int imuAccelFilterPriority[NUM_IMU] = {2, 2};
 #endif  // HAS_DEV(IMU)
 
 const Orientation_s magBoardToLocal[NUM_MAG][3] = {
-	    {{AXIS_X, -1}, {AXIS_Y, 1}, {AXIS_Z, -1}},
-	    {{AXIS_X, -1}, {AXIS_Y, 1}, {AXIS_Z, -1}}};
+    {{AXIS_X, -1}, {AXIS_Y, 1}, {AXIS_Z, -1}},
+    {{AXIS_X, -1}, {AXIS_Y, 1}, {AXIS_Z, -1}}};
 
 /* LEDs */
 
@@ -201,17 +201,16 @@ float servoPwmMaxPulseMs[NUM_SERVO_PWM] = {2.25, 2.25, 2.25, 2.25};
 
 /* Various analog sensors */
 
-ADC_HandleTypeDef* stmHadcInstances[NUM_STM_HADC] = {
-    &hadc1};
+ADC_HandleTypeDef* stmHadcInstances[NUM_STM_HADC] = {&hadc1};
 
 // Maps pyro entry number to [hadc_idx, rank, minValue, maxValue]
 StmHadcEntry_s pyroHadcEntries[NUM_PYRO_CONT_HADC] = {
-	{0, 2, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
-	{0, 5, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
-	{0, 6, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
-	{0, 3, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
-	{0, 1, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
-	{0, 4, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+    {0, 2, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+    {0, 5, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+    {0, 6, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+    {0, 3, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+    {0, 1, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+    {0, 4, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
 };
 
 /* VBat Sensors */
@@ -235,6 +234,5 @@ IWDG_HandleTypeDef* watchdogInternalHiwdg[NUM_WATCHDOG_INTERNAL] = {&hiwdg1};
 
 /* USB description strings */
 #include "usbd_composite.h"
-const char* CDC_ACM_STR_DESC[USBD_CDC_ACM_COUNT] = {
-    "FCB V0 Command Line", "FCB V0 Telemetry", "FCB V0 GPS"
-};
+const char* CDC_ACM_STR_DESC[USBD_CDC_ACM_COUNT] = {"FCB V0 Command Line",
+                                                    "FCB V0 Telemetry"};

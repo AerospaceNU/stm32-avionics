@@ -119,8 +119,8 @@ int imuAccelFilterPriority[NUM_IMU] = {2, 2};
 #endif  // HAS_DEV(IMU)
 
 const Orientation_s magBoardToLocal[NUM_MAG][3] = {
-	    {{AXIS_Y, 1}, {AXIS_X, 1}, {AXIS_Z, -1}},
-	    {{AXIS_Y, 1}, {AXIS_X, 1}, {AXIS_Z, -1}}};
+    {{AXIS_Y, 1}, {AXIS_X, 1}, {AXIS_Z, -1}},
+    {{AXIS_Y, 1}, {AXIS_X, 1}, {AXIS_Z, -1}}};
 
 /* LEDs */
 
@@ -205,22 +205,21 @@ I2C_HandleTypeDef* vbatIna226Hi2c[NUM_VBAT_INA226];
 
 /* Various analog sensors */
 
-ADC_HandleTypeDef* stmHadcInstances[NUM_STM_HADC] = {
-    &hadc1, &hadc2, &hadc3};
+ADC_HandleTypeDef* stmHadcInstances[NUM_STM_HADC] = {&hadc1, &hadc2, &hadc3};
 
 // Maps vbat entry number to [hadc_idx, rank, minValue, maxValue]
 StmHadcEntry_s vbatHadcEntries[NUM_VBAT_STM_ADC] = {
-		{0, 1, 0, 67},
+    {0, 1, 0, 67},
 };
 
 // Maps pyro entry number to [hadc_idx, rank, minValue, maxValue]
 StmHadcEntry_s pyroHadcEntries[NUM_PYRO_CONT_HADC] = {
-	{1, 1, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
-	{1, 4, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
-	{1, 3, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
-	{1, 2, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
-	{2, 3, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
-	{2, 2, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+    {1, 1, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+    {1, 4, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+    {1, 3, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+    {1, 2, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+    {2, 3, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
+    {2, 2, 0, 3.3 * (127.0 / 27.0) * 10 / 3},
 };
 
 /* Watchdogs */
@@ -231,6 +230,5 @@ IWDG_HandleTypeDef* watchdogInternalHiwdg[NUM_WATCHDOG_INTERNAL] = {&hiwdg1};
 
 /* USB description strings */
 #include "usbd_composite.h"
-const char* CDC_ACM_STR_DESC[USBD_CDC_ACM_COUNT] = {
-    "FCB V0 Command Line", "FCB V0 Telemetry", "FCB V0 GPS"
-};
+const char* CDC_ACM_STR_DESC[USBD_CDC_ACM_COUNT] = {"FCB V0 Command Line",
+                                                    "FCB V0 Telemetry"};
