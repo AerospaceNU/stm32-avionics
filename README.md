@@ -61,11 +61,11 @@ To run code in debug mode, click on the bug symbol drop down. Click on `fcb_v0` 
 # Code Overview
 Read this to understand how the code is set up. We will start with important folders with custom code then move to folders with "generated" code.
 
-## Devices
-- Files for communicating with hardware connected to the microcontroller
-- Calls HAL functions located in Driver folder
+## stm32_projects/device_drivers
+- Files for communicating with hardware connected to a stm32 microcontroller, like on our FCBs
+- Calls STM32's HAL functions located in Driver folder
 
-## System
+## common/system
 - All files that don't deal directly with hardware.
 - These files should not call any code from Devices or HAL drivers, except for Hardware Manager.
 - Scheduler: Controls all states, including running current state and transitioning between states.
@@ -73,7 +73,7 @@ Read this to understand how the code is set up. We will start with important fol
 - Hardware Manager: Wrapper for all calls to Devices folder. Allows simplification from system level, such as calling a function to get all sensor data, initialize all sensor data, etc.
 - Others, like Data Log, Data Transmission, Filters: Files that don't need to know about hardware directly because the underlying implementation doesn't matter. For instance, it doesn't matter how the flash or radio are set up to call a function from hardware manager to control them.
 
-## Utils
+## common/utils
 - Files that could be used anywhere in System or Devices
 - These files consist of general helpers and math operations
 
