@@ -23,8 +23,8 @@ TcpSocket::TcpSocket(int port) {
   }
 
   // Forcefully attaching socket to the port 8080
-  if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt,
-                 sizeof(opt))) {
+  if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR,
+                 reinterpret_cast<char *>(&opt), sizeof(opt))) {
     perror("setsockopt");
     exit(EXIT_FAILURE);
   }
@@ -43,6 +43,9 @@ TcpSocket::TcpSocket(int port) {
     exit(EXIT_FAILURE);
   }
 
+#if defined(__WIN32__) && !defined(socketlen_t)
+#define socklen_t int
+#endif
   if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
                            (socklen_t *)&addrlen)) < 0) {
     perror("accept");
@@ -52,12 +55,13 @@ TcpSocket::TcpSocket(int port) {
 
   // Set receive timeout
   struct timeval tv = {0, 10000};
-  setsockopt(client_fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+  setsockopt(client_fd, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char *>(&tv),
+             sizeof(tv));
 }
 
 bool TcpSocket::writeData(uint8_t *data, size_t len) {
   if (this && client_fd) {
-    send(client_fd, data, len, 0);
+    send(client_fd, (char *)data, len, 0);
   }
   return true;
 }

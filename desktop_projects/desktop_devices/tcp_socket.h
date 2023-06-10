@@ -1,8 +1,13 @@
 #ifndef DESKTOP_PROJECTS_DESKTOP_DEVICES_TCP_SOCKET_H_
 #define DESKTOP_PROJECTS_DESKTOP_DEVICES_TCP_SOCKET_H_
 
+#if defined(__WIN32__)
+#include <winsock2.h>
+#else
 #include <netinet/in.h>
 #include <sys/socket.h>
+#endif
+
 #include <unistd.h>
 
 #include <cstdio>
@@ -27,7 +32,11 @@ class TcpSocket {
   struct sockaddr_in address {};
   int addrlen = sizeof(address);
 
+#if defined(__WIN32__)
+  SOCKET server_fd;
+#else
   int server_fd;
+#endif
   volatile int client_fd;
 
   CircularBuffer_s *rxBuffer;

@@ -2,7 +2,7 @@ STM32 avionics board repo
 
 # Getting Started
 
-This guide should get you through your first build of the project.
+This guide should get you through your first build of the project for stm32. For local simulation, read the [desktop readme](README-DESKTOP.md).
 
 ## Installing Software and Configuring the Sources
 

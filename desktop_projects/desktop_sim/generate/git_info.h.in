@@ -1,0 +1,16 @@
+#ifndef UTILS_GIT_INFO_H_
+#define UTILS_GIT_INFO_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+const char* GIT_DESCRIBE = "@GIT_VERSION@";
+const char* GIT_COMMIT_TIME = "@GIT_LOG@";
+const char* GIT_COMMIT_MESSAGE = "@GIT_MSG@";
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  // UTILS_GIT_INFO_H_
