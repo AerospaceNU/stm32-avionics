@@ -113,7 +113,7 @@ void CliTasks::sense() {
 #endif  // HAS_DEV(VBAT)
 #if HAS_DEV(PYRO_CONT)
   snprintf(cliStr, sizeof(cliStr), "Pyro Continuity 1-%" PRIu32 ":",
-           (uint32_t)(NUM_PYRO_CONT));
+           static_cast<uint32_t>(NUM_PYRO_CONT));
   cli_send(cliStr);
   for (int i = 0; i < NUM_PYRO_CONT; i++) {
     snprintf(cliStr, sizeof(cliStr), " %i", data->pyroContData[i]);

@@ -121,8 +121,9 @@ bool internalFlash_write(uint32_t RelFlashAddress, uint8_t *data,
 
     sofar += copyBytes;
 
-    Internal_Flash_Program(writeAddress,
-                           (uint32_t)&flashWriteBuffer);  // Write to the flash
+    Internal_Flash_Program(
+        writeAddress,
+        reinterpret_cast<uint32_t>(&flashWriteBuffer));  // Write to the flash
     writeAddress += FLASH_BYTE_INCREMENT;
   }
   HAL_FLASH_Lock();
@@ -144,7 +145,7 @@ bool internalFlash_read(uint32_t RelFlashAddress, uint8_t *pData,
 
   uint32_t readAddress = INTERNAL_FLASH_START + RelFlashAddress;
 
-  memcpy(pData, (uint8_t *)readAddress, numBytes);
+  memcpy(pData, reinterpret_cast<uint8_t *>(readAddress), numBytes);
 
   return true;
 }

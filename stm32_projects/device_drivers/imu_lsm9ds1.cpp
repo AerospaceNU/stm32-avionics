@@ -65,19 +65,19 @@ static void lsm9ds1_getDataRaw(ImuLsm9ds1Ctrl_s *sensor) {
                                  LSM9DS1_SPI_REG_MASK | OUT_TEMP_H);
 
   // Writes combined h and l byte to struct
-  sensor->agData.accelRaw.x = ((int16_t)x_h_xl << 8) | (x_l_xl);
-  sensor->agData.accelRaw.y = ((int16_t)y_h_xl << 8) | (y_l_xl);
-  sensor->agData.accelRaw.z = ((int16_t)z_h_xl << 8) | (z_l_xl);
+  sensor->agData.accelRaw.x = static_cast<int16_t>((x_h_xl << 8) | x_l_xl);
+  sensor->agData.accelRaw.y = static_cast<int16_t>((y_h_xl << 8) | y_l_xl);
+  sensor->agData.accelRaw.z = static_cast<int16_t>((z_h_xl << 8) | z_l_xl);
 
-  sensor->agData.angVelRaw.x = ((int16_t)x_h_g << 8) | (x_l_g);
-  sensor->agData.angVelRaw.y = ((int16_t)y_h_g << 8) | (y_l_g);
-  sensor->agData.angVelRaw.z = ((int16_t)z_h_g << 8) | (z_l_g);
+  sensor->agData.angVelRaw.x = static_cast<int16_t>((x_h_g << 8) | x_l_g);
+  sensor->agData.angVelRaw.y = static_cast<int16_t>((y_h_g << 8) | y_l_g);
+  sensor->agData.angVelRaw.z = static_cast<int16_t>((z_h_g << 8) | z_l_g);
 
-  sensor->mData.raw.x = ((int16_t)x_h_m << 8) | (x_l_m);
-  sensor->mData.raw.y = ((int16_t)y_h_m << 8) | (y_l_m);
-  sensor->mData.raw.z = ((int16_t)z_h_m << 8) | (z_l_m);
+  sensor->mData.raw.x = static_cast<int16_t>((x_h_m << 8) | x_l_m);
+  sensor->mData.raw.y = static_cast<int16_t>((y_h_m << 8) | y_l_m);
+  sensor->mData.raw.z = static_cast<int16_t>((z_h_m << 8) | z_l_m);
 
-  sensor->ag.tRawVal = ((int16_t)t_h << 8) | (t_l);
+  sensor->ag.tRawVal = static_cast<int16_t>((t_h << 8) | t_l);
 }
 
 void lsm9ds1_getData(ImuLsm9ds1Ctrl_s *sensor) {

@@ -17,7 +17,7 @@ StringSlice::StringSlice() {
 }
 
 bool StringSlice::operator==(const char *other) const {
-  if (strnlen(other, this->len + 1) != (unsigned int)this->len) {
+  if (strnlen(other, this->len + 1) != static_cast<unsigned int>(this->len)) {
     return false;
   }
   return strncmp(other, startPtr(), this->len) == 0;

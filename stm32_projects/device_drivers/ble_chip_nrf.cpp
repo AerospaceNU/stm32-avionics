@@ -29,7 +29,7 @@ static bool bleChipNrf_txBusy(BleChipNrfCtrl_t *ctrl) {
  * sending a transmission.
  */
 static HAL_StatusTypeDef bleChipNrf_txInternal(BleChipNrfCtrl_t *ctrl,
-                                               uint8_t *buf, int bufLen) {
+                                               uint8_t *buf, uint16_t bufLen) {
   uint32_t start = HAL_GetTick();
 
   while (HAL_GetTick() - start <
@@ -57,7 +57,8 @@ static void bleChipNrf_rxEventCallback(void *userData, size_t Size) {
   // Let's just cast it to a pointer to a RecievedPacket and
   // check if the length is right
   uint8_t address = ctrl->dma_buff_begin[0];
-  uint16_t len = ctrl->dma_buff_begin[1] | ctrl->dma_buff_begin[2] << 8;
+  uint16_t len = static_cast<uint16_t>(ctrl->dma_buff_begin[1] |
+                                       ctrl->dma_buff_begin[2] << 8);
   uint8_t *pdata = ctrl->dma_buff_begin + 3;
 
   // Dumb exception for "connected clients" packet
@@ -66,7 +67,7 @@ static void bleChipNrf_rxEventCallback(void *userData, size_t Size) {
   }
 
   // 3 bytes of header, so we should get (Size + 3) bytes
-  if (len + 3 == Size && address < MAX_ADDRESSES &&
+  if (static_cast<size_t>(len + 3) == Size && address < MAX_ADDRESSES &&
       ctrl->circular_buffers[address] != NULL) {
     for (uint16_t i = 1; i < Size;
          i++) {  // Byte 1 is address, so just enqueue [1..end]
@@ -135,7 +136,7 @@ static size_t bleChipNrf_dequeuePacket(CircularBuffer_s *buffer,
   cb_peek(buffer, (unknownPtr_t)&len, &two);
 
   // If we have enough bytes to copy out a whole packet, do so
-  if (len + 2 <= cb_count(buffer)) {
+  if (static_cast<size_t>(len + 2) <= cb_count(buffer)) {
     cb_dequeue(buffer, 2);  // Dequeue length first
 
     // Then pop out len-many bytes
