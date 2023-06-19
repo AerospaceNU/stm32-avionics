@@ -1,12 +1,12 @@
 set(SYSTEM_FILES_LIST
-        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/radio_manager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/scheduler.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/state_log.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/state_log.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/data_log.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/trigger_manager.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/buzzer_heartbeat.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/data_offload.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/buzzer_heartbeat.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/data_offload.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_config.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_help.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_main.cpp
@@ -27,7 +27,7 @@ set(SYSTEM_FILES_LIST
         ${CMAKE_CURRENT_SOURCE_DIR}/filtering/altitude_kalman.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/filtering/filters.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/filtering/orientation_estimator.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/filtering/filterdata_types.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/filtering/filterdata_types.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/expressions/binary_func_expression.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/expressions/expression_store.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/expressions/expression.cpp
