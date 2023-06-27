@@ -87,6 +87,10 @@ static void gps_processData(GpsCtrl_s *gps) {
         if (buff[i] == '\n') {
           gps->line[j + 1] = '\0';
           parseString(gps, gps->line);
+
+          // Print the line, if we're given a callback to do that with
+          if (gps->callback) gps->callback(gps->line);
+
           break;
         }
       }
@@ -292,9 +296,11 @@ void gps_enable4g(GpsCtrl_s *gps) {
                     GPS_UART_TIMEOUT_MS);
 }
 
-void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type) {
+void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type,
+              void (*callback)(char *)) {
   gps->gps_uart = huart;
   gps->type = type;
+  gps->callback = callback;
 
   // Register call backs
   halCallbacks_registerUartRxIdleCallback(gps->gps_uart, gps_rxEventCallback,

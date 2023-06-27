@@ -32,6 +32,10 @@ lint-job:
   script:
     - chmod -R +x ci/run_lint.sh
     - ./ci/run_lint.sh
+  artifacts:
+    paths:
+      - lint-fixes.patch
+
 
 desktop-sim-job:
   stage: desktop-build

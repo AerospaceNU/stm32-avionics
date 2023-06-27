@@ -28,12 +28,18 @@
 		<nature>com.st.stm32cube.ide.mcu.MCURootProjectNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
 	</natures>
 	<linkedResources>
 		<link>
 			<name>device_drivers</name>
 			<type>2</type>
 			<locationURI>PARENT-1-PROJECT_LOC/device_drivers</locationURI>
+		</link>
+		<link>
+			<name>AL94_USB_Composite</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/AL94_USB_Composite</locationURI>
 		</link>
 		<link>
 			<name>common</name>

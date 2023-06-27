@@ -92,6 +92,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macros ------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 static void TIM_DMADelayPulseNCplt(DMA_HandleTypeDef *hdma);

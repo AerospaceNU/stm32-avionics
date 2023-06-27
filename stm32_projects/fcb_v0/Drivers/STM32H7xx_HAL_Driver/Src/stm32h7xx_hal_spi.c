@@ -141,6 +141,7 @@
 #ifdef HAL_SPI_MODULE_ENABLED
 
 /* Private typedef -----------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private defines -----------------------------------------------------------*/
 /** @defgroup SPI_Private_Constants SPI Private Constants
   * @{

@@ -106,7 +106,8 @@
 
 #ifdef HAL_DMA_MODULE_ENABLED
 
-/* Private types -------------------------------------------------------------*/
+/* Private types -------------------------------------------------------------*/ 
+#pragma GCC optimize ("Os")
 typedef struct
 {
   __IO uint32_t ISR;   /*!< DMA interrupt status register */

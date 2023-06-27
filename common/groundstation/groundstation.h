@@ -22,15 +22,6 @@ typedef enum {
   GROUNDSTATION = 0xff
 } MessageDestination_e;
 
-typedef struct __attribute__((__packed__)) {
-  uint8_t packetType;
-  float latitude;
-  float longitude;
-  float gps_alt;
-  double groundPressure;
-  double groundTemp;
-} HeartbeatData_s;
-
 typedef struct __attribute__((packed)) {
   uint8_t destination;
   uint16_t len;

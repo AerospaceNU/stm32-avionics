@@ -54,6 +54,9 @@ void radioManager_transmitString(int radioId, uint8_t* data, size_t len);
 // Default function is same, but sends over CLI
 void radioManager_transmitStringDefault(uint8_t* data, size_t len);
 
+// Send a USB string message out, pretending to be the groundstation
+void radioManager_transmitUsbString(int radioId, uint8_t* data, size_t len);
+
 void radioManager_addMessageCallback(int radioId, RadioCallback_t callback);
 
 #ifdef __cplusplus

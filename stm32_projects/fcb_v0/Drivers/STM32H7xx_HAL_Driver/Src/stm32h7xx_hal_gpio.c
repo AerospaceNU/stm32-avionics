@@ -118,6 +118,7 @@
 #ifdef HAL_GPIO_MODULE_ENABLED
 
 /* Private typedef -----------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private defines ------------------------------------------------------------*/
 /** @addtogroup GPIO_Private_Constants GPIO Private Constants
   * @{

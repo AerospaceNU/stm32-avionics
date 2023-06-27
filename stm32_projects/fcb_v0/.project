@@ -39,6 +39,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/device_drivers</locationURI>
 		</link>
 		<link>
+			<name>AL94_USB_Composite</name>
+			<type>2</type>
+			<location>PARENT-1-PROJECT_LOC/AL94_USB_Composite</location>
+		</link>
+		<link>
 			<name>libs</name>
 			<type>2</type>
 			<locationURI>PARENT-1-PROJECT_LOC/libs</locationURI>

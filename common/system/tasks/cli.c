@@ -65,7 +65,7 @@ static void cli_parseRadio(RadioRecievedPacket_s* packet) {
   // Only accept packets with good CRC
   RadioPacket_s* parsedPacket = (RadioPacket_s*)&packet->data;
   if (parsedPacket->packetType == TELEMETRY_ID_STRING) {
-    if (packet->crc) {
+    if (packet->crcFromRadio) {
       if (parsedPacket->payload.cliString.id == lastStringId) {
         // duplicate string, do nothing
         return;
@@ -314,7 +314,7 @@ void cli_send(const char* msg) {
       radioManager_transmitString(RADIO_CLI_ID, (uint8_t*)msg, strlen(msg));
       break;
     case CLI_USB:
-      hm_usbTransmit(USB_CLI_ID, (uint8_t*)msg, (uint16_t)strlen(msg));
+      hm_usbTransmit(USB_ID_CLI, (uint8_t*)msg, (uint16_t)strlen(msg));
       break;
     default:
       break;
@@ -355,7 +355,7 @@ CircularBuffer_s* cli_getRxBufferFor(CliComms_e source) {
     case CLI_RADIO:
       return &radioRxCircBuffer;
     case CLI_USB:
-      return hm_usbGetRxBuffer(USB_CLI_ID);
+      return hm_usbGetRxBuffer(USB_ID_CLI);
     default:
       return NULL;
   }

@@ -115,6 +115,7 @@
 #ifdef HAL_RTC_MODULE_ENABLED
 
 /* Private typedef -----------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private define ------------------------------------------------------------*/
 #define TAMP_ALL (TAMP_CR1_TAMP1E | TAMP_CR1_TAMP2E | TAMP_CR1_TAMP3E)
 
