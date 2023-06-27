@@ -14,8 +14,23 @@ using std::size_t;
  * the buffer.
  */
 template <typename Type, size_t Capacity>
-class CircularBuffer final {
+class CircularBuffer {
  private:
+  /**
+   * To be interrupt-safe (at least to the extent that the previous CB
+   * implementation is), the current size and element locations must only be
+   * determined by the locations of the head and tail pointers. This is to
+   * remove any dependence on multiple instructions being executed for the
+   * buffer to be valid. For example, if the head pointer is moved to dequeue an
+   * element, but a separate size variable is not changed before jumping to an
+   * interrupt, the state of the buffer would be inconsistent.
+   *
+   * What this means is that, if only the head and tail pointers are used to
+   * calculate current size, a full buffer and an empty buffer would be
+   * identical (head == tail). As such, we need to allocate one extra element
+   * from what the client requests so that a "full" buffer actually has one open
+   * spot to avoid full vs empty issues.
+   */
   Type backingArray[Capacity + 1];
   const Type* endPtr;
   Type* head;
@@ -50,9 +65,9 @@ class CircularBuffer final {
   }
 
   /**
-   * Destructor..
+   * Virtual destructor.
    */
-  ~CircularBuffer() = default;
+  virtual ~CircularBuffer() = default;
 
   /**
    * Empty the buffer, removing all current elements.
@@ -68,7 +83,7 @@ class CircularBuffer final {
    * @return bool: Status, true if peek succeeds, false otherwise (i.e. if
    * destination is null or if the buffer does not have count elements.
    */
-  bool peek(Type* destination, size_t count) {
+  bool peek(Type* destination, size_t count) const {
     if (destination == nullptr) {
       return false;
     }
@@ -125,7 +140,7 @@ class CircularBuffer final {
    *
    * @return size_t: The number of elements currently in the buffer.
    */
-  size_t count() {
+  size_t count() const {
     if (this->head == this->tail) {
       return 0;
     } else if (this->tail > this->head) {
@@ -140,7 +155,7 @@ class CircularBuffer final {
    *
    * @return bool: True if buffer is full, false otherwise.
    */
-  bool full() { return this->count() == Capacity; }
+  bool full() const { return this->count() == Capacity; }
 };
 
 #endif /* COMMON_UTILS_CPP_CIRCULAR_BUFFER_H_ */
