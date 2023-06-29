@@ -27,7 +27,7 @@ jobs:
     - name: Install things
       run: |
         pwd
-        cd ${{github.workflow}}
+        cd ${{github.workspace}}
         python3 --version
         python3 -m venv .venv/
         source .venv/bin/activate
@@ -36,7 +36,7 @@ jobs:
 
     - name: Run lint
       run: |
-        cd ${{github.workflow}}
+        cd ${{github.workspace}}
         source .venv/bin/activate
         chmod -R +x ./ci/run_lint.sh
         ./ci/run_lint.sh
@@ -58,8 +58,8 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Configure CMake
+      working-directory: ${{github.workspace}}
       run: |
-        cd ${{github.workflow}}
         touch CMakeListsPrivate.txt
         chmod -R +x ci/build_desktop.sh
         ./ci/build_desktop.sh
