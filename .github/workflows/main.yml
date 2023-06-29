@@ -1,10 +1,10 @@
-name: CMake
+name: desktop_build
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -16,21 +16,28 @@ jobs:
     name: "Lint job"
 
     steps:
+
+    - uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: clang-format-11 git python3 python3-venv
+        version: 1.0
+
     - uses: actions/checkout@v3
 
     - name: Install things
+      working-directory: ${{github.workspace}}
       run: |
-        apt-get update
-        apt-get install -y clang-format git
-        python --version
-        python -m venv .venv/
+        python3 --version
+        python3 -m venv .venv/
         source .venv/bin/activate
         python -m pip install --upgrade pip
         pip install cpplint
 
     - name: Run lint
+      working-directory: ${{github.workspace}}
       run: |
-        chmod -R +x ci/run_lint.sh
+        source .venv/bin/activate
+        chmod -R +x ./ci/run_lint.sh
         ./ci/run_lint.sh
 
 
@@ -42,17 +49,27 @@ jobs:
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.13
 
-    - name: Install things
-      run: |
-        apt-get install -y --no-install-recommends make cmake g++ gcc
-        chmod -R +x ci/build_desktop.sh
+    - uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: make g++ gcc
+        version: 1.0
+
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    # Fetch tags.
+    - name: Fetch tags
+      run: git fetch --tags --force
 
     - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-
+      working-directory: ${{github.workspace}}
+      run: |
+        touch CMakeListsPrivate.txt
+        chmod -R +x ci/build_desktop.sh
+        
     - name: Build desktop
+      working-directory: ${{github.workspace}}
       run: ./ci/build_desktop.sh
 
     - uses: actions/upload-artifact@master
