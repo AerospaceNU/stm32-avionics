@@ -44,7 +44,7 @@ jobs:
 
     - name: Install things
       run: |
-        apt-get install -y --no-install-recommends make cmake g++ gcc
+        sudo apt-get install -y --no-install-recommends make cmake g++ gcc
         chmod -R +x ci/build_desktop.sh
 
     - name: Configure CMake
