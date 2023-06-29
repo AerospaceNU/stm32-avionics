@@ -59,7 +59,8 @@ jobs:
       run: |
         touch ${{github.workspace}}/CMakeListsPrivate.txt
         chmod -R +x ${{github.workspace}}/ci/build_desktop.sh
-        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        ${{github.workspace}}/ci/build_desktop.sh
+        
 
     - name: Build desktop
       run: ./ci/build_desktop.sh
