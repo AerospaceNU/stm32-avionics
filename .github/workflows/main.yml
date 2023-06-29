@@ -59,10 +59,6 @@ jobs:
       with:
         name: desktop_sim
         path: ${{github.workspace}}/build/desktop_projects/desktop_sim/desktop_sim
-    - uses: actions/upload-artifact@master
-      with:
-        name: desktop_sim tests
-        path: ${{github.workspace}}/build/desktop_projects/desktop_sim/desktop_sim_test
 
   release:
     needs: [build-linux, lint]
