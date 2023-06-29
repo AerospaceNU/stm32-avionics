@@ -44,10 +44,13 @@ jobs:
 
     - uses: actions/checkout@v3
 
+    - uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: make g++ gcc
+        version: 1.0
+
     - name: Install things
       run: |
-        sudo apt-get update
-        sudo apt-get install -y --no-install-recommends make cmake g++ gcc
         chmod -R +x ${{github.workspace}}/ci/build_desktop.sh
 
     - name: Configure CMake
