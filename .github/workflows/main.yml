@@ -67,7 +67,6 @@ jobs:
       run: |
         touch CMakeListsPrivate.txt
         chmod -R +x ci/build_desktop.sh
-        ./ci/build_desktop.sh
         
     - name: Build desktop
       working-directory: ${{github.workspace}}
