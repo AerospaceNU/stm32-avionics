@@ -1,0 +1,90 @@
+name: CMake
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: "Lint job"
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install things
+      run: |
+        apt-get update
+        apt-get install -y clang-format git
+        python --version
+        python -m venv .venv/
+        source .venv/bin/activate
+        python -m pip install --upgrade pip
+        pip install cpplint
+
+    - name: Run lint
+      run: |
+        chmod -R +x ci/run_lint.sh
+        ./ci/run_lint.sh
+
+
+  build-linux:
+    runs-on: ubuntu-latest
+    name: "Build flight software"
+
+    steps:
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.13
+
+    - name: Install things
+      run: |
+        apt-get install -y --no-install-recommends make cmake g++ gcc
+        chmod -R +x ci/build_desktop.sh
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build desktop
+      run: ./ci/build_desktop.sh
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: desktop_sim
+        path: ${{github.workspace}}/build/desktop_projects/desktop_sim/desktop_sim
+
+  release:
+    needs: [build-linux, lint]
+    runs-on: ubuntu-latest
+    steps:
+      # Download literally every single artifact. This also downloads client and docs,
+      # but the filtering below won't pick these up (I hope)
+      - uses: actions/download-artifact@v2
+
+      - run: find
+
+      # Push to dev release on pushes to master
+      - uses: pyTooling/Actions/releaser@r0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: 'Dev'
+          rm: true
+          files: |
+            **/*
+        if: github.event_name == 'push'
+
+      # Push to actual release, if tagged
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            **/*
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
