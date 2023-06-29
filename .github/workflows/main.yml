@@ -16,12 +16,13 @@ jobs:
     name: "Lint job"
 
     steps:
-    - uses: actions/checkout@v3
 
     - uses: awalsh128/cache-apt-pkgs-action@latest
       with:
         packages: clang-format-11 git python3 python3-venv
         version: 1.0
+
+    - uses: actions/checkout@v3
 
     - name: Install things
       run: |
@@ -45,18 +46,18 @@ jobs:
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.13
 
-    - uses: actions/checkout@v3
-
     - uses: awalsh128/cache-apt-pkgs-action@latest
       with:
         packages: make g++ gcc
         version: 1.0
 
+    - uses: actions/checkout@v3
+
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: |
-        cd ${{github.workspace}}
+        touch ${{github.workspace}}/CMakeListsPrivate.txt
         chmod -R +x ${{github.workspace}}/ci/build_desktop.sh
         cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
