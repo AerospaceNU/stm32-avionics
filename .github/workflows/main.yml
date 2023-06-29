@@ -21,7 +21,7 @@ jobs:
     - name: Install things
       run: |
         sudo apt-get update
-        sudo apt-get install -y clang-format git
+        sudo apt-get install -y clang-format-11 git
         python --version
         python -m venv .venv/
         source .venv/bin/activate
@@ -31,7 +31,7 @@ jobs:
     - name: Run lint
       run: |
         chmod -R +x ci/run_lint.sh
-        ./ci/run_lint.sh
+        ${{github.workspace}}/ci/run_lint.sh
 
 
   build-linux:
@@ -46,7 +46,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends make cmake g++ gcc
-        chmod -R +x ci/build_desktop.sh
+        chmod -R +x ${{github.workspace}}/ci/build_desktop.sh
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
