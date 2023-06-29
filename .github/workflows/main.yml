@@ -27,7 +27,7 @@ jobs:
     - name: Install things
       run: |
         pwd
-        find /
+        find ../
         cd ${{github.workflow}}
         python --version
         python -m venv .venv/
