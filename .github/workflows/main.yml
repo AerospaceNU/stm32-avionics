@@ -1,4 +1,4 @@
-name: Desktop Build
+name: desktop_build
 
 on:
   push:
