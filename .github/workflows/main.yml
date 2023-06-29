@@ -20,8 +20,8 @@ jobs:
 
     - name: Install things
       run: |
-        apt-get update
-        apt-get install -y clang-format git
+        sudo apt-get update
+        sudo apt-get install -y clang-format git
         python --version
         python -m venv .venv/
         source .venv/bin/activate
