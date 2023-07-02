@@ -45,7 +45,7 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-latest
-    name: "Build flight software"
+    name: "Build desktop flight software"
 
     steps:
     - name: Setup cmake
@@ -79,8 +79,40 @@ jobs:
         name: desktop_sim
         path: ${{github.workspace}}/build/desktop_projects/desktop_sim/desktop_sim
 
+  build-stm32:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - prj-path: "stm32_projects/fcb_v0"
+            prj-target: "Debug"
+            prj-name: "fcb_v0"
+
+    runs-on: ubuntu-latest
+    name: "Build flight software for ${{ matrix.prj-name }}"
+
+    steps:
+
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    # Fetch tags.
+    - name: Fetch tags
+      run: git fetch --tags --force
+
+    - uses: xanderhendriks/action-build-stm32cubeide@v5.0
+      with:
+        project-path: ${{ matrix.prj-path }}
+        project-target: ${{ matrix.prj-target }}
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: ${{ matrix.prj-name }}
+        path: ${{ matrix.prj-path }}/Debug/*.elf
+
   release:
-    needs: [build-linux, lint]
+    needs: [build-linux, lint, build-stm32]
     runs-on: ubuntu-latest
     steps:
       # Download literally every single artifact. This also downloads client and docs,
