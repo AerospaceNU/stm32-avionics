@@ -80,6 +80,43 @@ jobs:
         name: desktop_sim
         path: ${{github.workspace}}/build/desktop_projects/desktop_sim/desktop_sim
 
+  build-platformio:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - env-name: "feather_m0_lora"
+          - env-name: "feather_m0_lora_groundstation"
+
+    runs-on: ubuntu-latest
+    name: "Build PlatformIO flight software for ${{ matrix.env-name }}"
+
+    steps:
+
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/pip
+          ~/.platformio/.cache
+        key: ${{ runner.os }}-pio
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    - name: Install PlatformIO Core
+      run: pip install --upgrade platformio
+
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Fetch tags
+      working-directory: ${{github.workspace}}
+      run: |
+        git fetch --tags --force
+
+    - name: Build PlatformIO project
+      run: pio run -e ${{ matrix.env-name }}
+
   build-stm32:
     strategy:
       fail-fast: false
@@ -87,12 +124,20 @@ jobs:
         include:
           - prj-rel-path: "stm32_projects/fcb_v0"
             prj-target: "fcb_v0"
+          - prj-rel-path: "stm32_projects/fcb_v1"
+            prj-target: "fcb_v1"
+          - prj-rel-path: "stm32_projects/fcb_v2"
+            prj-target: "fcb_v2"
+          - prj-rel-path: "stm32_projects/groundstation"
+            prj-target: "groundstation"
+          - prj-rel-path: "stm32_projects/prop_adcboard_v2"
+            prj-target: "prop_adcboard_v2"
 
     runs-on: ubuntu-latest
     container:
       image: mcm001/stm-actions:v1.0.1
       options: --user 1001
-    name: "Build flight software for ${{ matrix.prj-target }}"
+    name: "Build STM32 flight software for ${{ matrix.prj-target }}"
 
     steps:
     - name: Check for dockerenv file
