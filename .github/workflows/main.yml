@@ -117,6 +117,13 @@ jobs:
     - name: Build PlatformIO project
       run: pio run -e ${{ matrix.env-name }}
 
+    - uses: actions/upload-artifact@master
+      with:
+        name: ${{ matrix.env-name }}
+        path: 
+          .pio/build/${{ matrix.env-name }}/**/*.elf
+          .pio/build/${{ matrix.env-name }}/**/*.bin
+
   build-stm32:
     strategy:
       fail-fast: false
