@@ -102,11 +102,15 @@ jobs:
         fetch-depth: 0
 
     - name: Re-own git repository
-      run: git config --global --add safe.directory ${{github.workspace}}
+      run: |
+        pwd
+        git config --global --add safe.directory ${{github.workspace}}
 
     - name: Fetch tags
       working-directory: ${{github.workspace}}
-      run: git fetch --tags --force
+      run: |
+        pwd
+        git fetch --tags --force
     
     - name: Run build
       run: /entrypoint.sh ${{github.workspace}}/${{ matrix.prj-rel-path }} ${{ matrix.prj-target }}
