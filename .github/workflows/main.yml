@@ -115,14 +115,16 @@ jobs:
         git fetch --tags --force
 
     - name: Build PlatformIO project
-      run: pio run -e ${{ matrix.env-name }}
+      run: 
+        pio run -e ${{ matrix.env-name }}
+        ls .pio/build
 
     - uses: actions/upload-artifact@master
       with:
         name: ${{ matrix.env-name }}
         path: 
-          .pio/build/${{ matrix.env-name }}/*.elf
-          .pio/build/${{ matrix.env-name }}/*.bin
+          .pio/build/${{ matrix.env-name }}/**/*.elf
+          .pio/build/${{ matrix.env-name }}/**/*.bin
 
   build-stm32:
     strategy:
