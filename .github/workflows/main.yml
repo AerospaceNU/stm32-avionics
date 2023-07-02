@@ -121,8 +121,8 @@ jobs:
       with:
         name: ${{ matrix.env-name }}
         path: 
-          .pio/build/${{ matrix.env-name }}/**/*.elf
-          .pio/build/${{ matrix.env-name }}/**/*.bin
+          .pio/build/${{ matrix.env-name }}/*.elf
+          .pio/build/${{ matrix.env-name }}/*.bin
 
   build-stm32:
     strategy:
