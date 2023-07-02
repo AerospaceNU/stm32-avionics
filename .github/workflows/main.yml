@@ -107,6 +107,9 @@ jobs:
       run: |
         git config --global --add safe.directory /__w/stm32-avionics/stm32-avionics
         git fetch --tags --force
+        ls
+        pwd
+        find
     
     - name: Run build
       run: /entrypoint.sh ${{github.workspace}}/${{ matrix.prj-rel-path }} ${{ matrix.prj-target }}
