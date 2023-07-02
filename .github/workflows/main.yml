@@ -101,15 +101,10 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Re-own git repository
-      run: |
-        pwd
-        git config --global --add safe.directory ${{github.workspace}}
-
     - name: Fetch tags
       working-directory: ${{github.workspace}}
       run: |
-        pwd
+        git config --global --add safe.directory /__w/stm32-avionics/stm32-avionics
         git fetch --tags --force
     
     - name: Run build
