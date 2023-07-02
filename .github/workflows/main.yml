@@ -107,8 +107,6 @@ jobs:
       run: |
         git config --global --add safe.directory /__w/stm32-avionics/stm32-avionics
         git fetch --tags --force
-        ls
-        pwd
     
     - name: Run build
       run: /entrypoint.sh ${{ matrix.prj-rel-path }} ${{ matrix.prj-target }}
@@ -116,7 +114,7 @@ jobs:
     - uses: actions/upload-artifact@master
       with:
         name: ${{ matrix.prj-target }}
-        path: ${{github.workspace}}/${{ matrix.prj-rel-path }}/Debug/*.elf
+        path: ${{ matrix.prj-rel-path }}/**/*.elf
 
   release:
     needs: [build-linux, lint, build-stm32]
