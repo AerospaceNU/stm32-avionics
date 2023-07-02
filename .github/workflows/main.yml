@@ -100,7 +100,12 @@ jobs:
     - name: Fetch tags
       run: git fetch --tags --force
 
-    - uses: xanderhendriks/action-build-stm32cubeide@v5.0
+    # - uses: xanderhendriks/action-build-stm32cubeide@v5.0
+    #   with:
+    #     project-path: ${{github.workspace}}/${{ matrix.prj-rel-path }}
+    #     project-target: ${{ matrix.prj-target }}
+
+    - uses: AerospaceNU/action-build-stm32cubeide@c1b6581505
       with:
         project-path: ${{github.workspace}}/${{ matrix.prj-rel-path }}
         project-target: ${{ matrix.prj-target }}
