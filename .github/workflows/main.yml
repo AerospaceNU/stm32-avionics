@@ -91,6 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: mcm001/stm-actions:v1.0.1
+      options: --user 1001
     name: "Build flight software for ${{ matrix.prj-target }}"
 
     steps:
