@@ -109,10 +109,9 @@ jobs:
         git fetch --tags --force
         ls
         pwd
-        find
     
     - name: Run build
-      run: /entrypoint.sh ${{github.workspace}}/${{ matrix.prj-rel-path }} ${{ matrix.prj-target }}
+      run: /entrypoint.sh ${{ matrix.prj-rel-path }} ${{ matrix.prj-target }}
 
     - uses: actions/upload-artifact@master
       with:
