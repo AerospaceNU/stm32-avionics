@@ -84,7 +84,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - prj-path: "stm32_projects/fcb_v0"
+          - prj-path: "${{github.workspace}}/stm32_projects/fcb_v0"
             prj-target: "Debug"
             prj-name: "fcb_v0"
 
