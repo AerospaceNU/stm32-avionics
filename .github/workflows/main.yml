@@ -115,7 +115,7 @@ jobs:
         git fetch --tags --force
 
     - name: Build PlatformIO project
-      run: 
+      run: |
         pio run -e ${{ matrix.env-name }}
         ls .pio/build
 
