@@ -100,16 +100,11 @@ jobs:
     - name: Fetch tags
       run: git fetch --tags --force
 
-    # - uses: xanderhendriks/action-build-stm32cubeide@v5.0
-    #   with:
-    #     project-path: ${{github.workspace}}/${{ matrix.prj-rel-path }}
-    #     project-target: ${{ matrix.prj-target }}
-
     - uses: AerospaceNU/action-build-stm32cubeide@c1b6581505c74387071de2a4415b93b431fad620
       with:
-        project-path: ${{github.workspace}}/${{ matrix.prj-rel-path }}
+        project-path: ${{ matrix.prj-rel-path }}
         project-target: ${{ matrix.prj-target }}
-        project-root: "idk"
+        project-root: "/github/workspace"
 
     - uses: actions/upload-artifact@master
       with:
