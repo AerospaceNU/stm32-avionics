@@ -98,6 +98,7 @@ jobs:
         path: |
           ~/.cache/pip
           ~/.platformio/.cache
+          .pio/libdeps
         key: ${{ runner.os }}-pio
     - uses: actions/setup-python@v4
       with:
@@ -117,7 +118,7 @@ jobs:
     - name: Build PlatformIO project
       run: |
         pio run -e ${{ matrix.env-name }}
-        ls .pio/build
+        find .pio/build
 
     - uses: actions/upload-artifact@master
       with:
