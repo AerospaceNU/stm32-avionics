@@ -84,12 +84,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - prj-path: "${{github.workspace}}/stm32_projects/fcb_v0"
-            prj-target: "Debug"
-            prj-name: "fcb_v0"
+          - prj-rel-path: "stm32_projects/fcb_v0"
+            prj-target: "fcb_v0"
 
     runs-on: ubuntu-latest
-    name: "Build flight software for ${{ matrix.prj-name }}"
+    name: "Build flight software for ${{ matrix.prj-target }}"
 
     steps:
 
@@ -103,13 +102,13 @@ jobs:
 
     - uses: xanderhendriks/action-build-stm32cubeide@v5.0
       with:
-        project-path: ${{ matrix.prj-path }}
+        project-path: ${{github.workspace}}/${{ matrix.prj-rel-path }}
         project-target: ${{ matrix.prj-target }}
 
     - uses: actions/upload-artifact@master
       with:
-        name: ${{ matrix.prj-name }}
-        path: ${{ matrix.prj-path }}/Debug/*.elf
+        name: ${{ matrix.prj-target }}
+        path: ${{github.workspace}}/${{ matrix.prj-rel-path }}/Debug/*.elf
 
   release:
     needs: [build-linux, lint, build-stm32]
