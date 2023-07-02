@@ -123,7 +123,8 @@ jobs:
     - uses: actions/upload-artifact@master
       with:
         name: ${{ matrix.env-name }}
-        path: 
+        if-no-files-found: error
+        path: |
           .pio/build/${{ matrix.env-name }}/**/*.elf
           .pio/build/${{ matrix.env-name }}/**/*.bin
 
