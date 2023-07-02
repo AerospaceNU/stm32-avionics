@@ -88,9 +88,13 @@ jobs:
             prj-target: "fcb_v0"
 
     runs-on: ubuntu-latest
+    container:
+      image: mcm001/stm-actions:v1.0.0
     name: "Build flight software for ${{ matrix.prj-target }}"
 
     steps:
+    - name: Check for dockerenv file
+      run: (ls /.dockerenv && echo Found dockerenv) || (echo No dockerenv)
 
     - uses: actions/checkout@v3
       with:
@@ -99,12 +103,9 @@ jobs:
     # Fetch tags.
     - name: Fetch tags
       run: git fetch --tags --force
-
-    - uses: AerospaceNU/action-build-stm32cubeide@c1b6581505c74387071de2a4415b93b431fad620
-      with:
-        project-path: ${{ matrix.prj-rel-path }}
-        project-target: ${{ matrix.prj-target }}
-        project-root: "/github/workspace"
+    
+    - name: Run build
+      run: /entrypoint.sh ${{github.workspace}}/${{ matrix.prj-rel-path }} ${{ matrix.prj-target }} ${{ github.workspace }}
 
     - uses: actions/upload-artifact@master
       with:
