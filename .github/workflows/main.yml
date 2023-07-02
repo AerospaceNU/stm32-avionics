@@ -105,10 +105,11 @@ jobs:
     #     project-path: ${{github.workspace}}/${{ matrix.prj-rel-path }}
     #     project-target: ${{ matrix.prj-target }}
 
-    - uses: AerospaceNU/action-build-stm32cubeide@c1b6581505
+    - uses: AerospaceNU/action-build-stm32cubeide@c1b6581505c74387071de2a4415b93b431fad620
       with:
         project-path: ${{github.workspace}}/${{ matrix.prj-rel-path }}
         project-target: ${{ matrix.prj-target }}
+        project-root: "idk"
 
     - uses: actions/upload-artifact@master
       with:
