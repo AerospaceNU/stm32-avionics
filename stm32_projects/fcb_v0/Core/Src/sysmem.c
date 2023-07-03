@@ -50,6 +50,8 @@
 #include <errno.h>
 #include <stdio.h>
 
+#define asm(x) __asm__(x)
+
 /* Variables */
 extern int errno;
 register char * stack_ptr asm("sp");

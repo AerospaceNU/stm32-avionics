@@ -6,63 +6,69 @@
 // Configuration: https://docs.platformio.org/page/projectconf/section_env_debug.html
 
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "platformio-debug",
-      "request": "launch",
-      "name": "PIO Debug",
-      "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/blink/firmware.elf",
-      "projectEnvName": "blink",
-      "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
-      "internalConsoleOptions": "openOnSessionStart",
-      "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
-      "preLaunchTask": {
-        "type": "PlatformIO",
-        "task": "Pre-Debug"
-      }
-    },
-    {
-      "type": "platformio-debug",
-      "request": "launch",
-      "name": "PIO Debug (skip Pre-Debug)",
-      "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/blink/firmware.elf",
-      "projectEnvName": "blink",
-      "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
-      "internalConsoleOptions": "openOnSessionStart",
-      "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd"
-    },
-    {
-      "type": "platformio-debug",
-      "request": "launch",
-      "name": "PIO Debug (without uploading)",
-      "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/blink/firmware.elf",
-      "projectEnvName": "blink",
-      "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
-      "internalConsoleOptions": "openOnSessionStart",
-      "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
-      "loadMode": "manual"
-    },
-    {
-      "type": "cortex-debug",
-      "request": "launch",
-      "name": "Debug amazon-stm32-arduino (OpenOCD)",
-      "servertype": "openocd",
-      "cwd": "${workspaceRoot}",
-      "runToMain": true,
-    //   "runToEntryPoint": "main",
-      "executable": "build/stm32_projects/amazon-stm32-arduino/amazon-stm32-arduino.elf",
-      "device": "STM32L433VC",
-      "configFiles": ["tooling/openocd_f4.cfg"],
-    //   "svdFile": "${workspaceRoot}/tooling/STM32F4x1.svd",
-      "swoConfig": {
-        "enabled": true,
-        "cpuFrequency": 80000000,
-        "swoFrequency": 2000000,
-        "source": "probe",
-        "decoders": [{ "type": "console", "label": "ITM", "port": 0 }]
-      },
-      "preLaunchTask": "Build amazon-stm32-arduino"
-    }
-  ]
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "name": "Debug amazon-stm32-arduino (OpenOCD)",
+            "servertype": "openocd",
+            "cwd": "${workspaceRoot}",
+            "runToMain": true,
+            "executable": "build/stm32_projects/amazon-stm32-arduino/amazon-stm32-arduino.elf",
+            "device": "STM32L433VC",
+            "configFiles": [
+                "tooling/openocd_f4.cfg"
+            ],
+            "swoConfig": {
+                "enabled": true,
+                "cpuFrequency": 80000000,
+                "swoFrequency": 2000000,
+                "source": "probe",
+                "decoders": [
+                    {
+                        "type": "console",
+                        "label": "ITM",
+                        "port": 0
+                    }
+                ]
+            },
+            "preLaunchTask": "Build amazon-stm32-arduino"
+        },
+        {
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug",
+            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/blink/firmware.elf",
+            "projectEnvName": "blink",
+            "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "internalConsoleOptions": "openOnSessionStart",
+            "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
+            "preLaunchTask": {
+                "type": "PlatformIO",
+                "task": "Pre-Debug"
+            }
+        },
+        {
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug (skip Pre-Debug)",
+            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/blink/firmware.elf",
+            "projectEnvName": "blink",
+            "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "internalConsoleOptions": "openOnSessionStart",
+            "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd"
+        },
+        {
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug (without uploading)",
+            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/blink/firmware.elf",
+            "projectEnvName": "blink",
+            "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "internalConsoleOptions": "openOnSessionStart",
+            "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
+            "loadMode": "manual"
+        }
+    ]
 }
