@@ -158,14 +158,12 @@ jobs:
       run: |
         touch CMakeListsPrivate.txt
         cmake . -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake"
-        cmake --build build --target amazon-stm32-arduino -j
-
-
+        cmake --build build --target ${{ matrix.prj-target }} -j
 
     - uses: actions/upload-artifact@master
       with:
         name: ${{ matrix.prj-target }}
-        path: ${{ matrix.prj-rel-path }}/**/*.elf
+        path: build/stm32_projects/${{ matrix.prj-target }}/**/*.elf
 
   build-stm32-cube:
     strategy:
@@ -212,7 +210,7 @@ jobs:
         path: ${{ matrix.prj-rel-path }}/**/*.elf
 
   release:
-    needs: [build-linux, lint, build-stm32]
+    needs: [build-linux, lint, build-stm32-cmake, build-stm32-cube]
     runs-on: ubuntu-latest
     steps:
       # Download literally every single artifact. This also downloads client and docs,
