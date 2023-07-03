@@ -8,9 +8,14 @@ STM32-avionics has support for building unit tests and local simulation for Wind
 Install CMake, gcc and g++ using your favorite package manager, then configure the project:
 
 ```
-cmake -B build -DCMAKE_BUILD_TYPE=desktop
+cmake -B build -DPROJECT_BUILD_TYPE=desktop
 ```
 
+For building flight software, configure with
+
+```
+cmake .. -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake"
+```
 
 ## Building for Windows using WSL
 
