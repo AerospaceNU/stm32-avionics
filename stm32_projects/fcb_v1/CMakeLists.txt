@@ -20,6 +20,7 @@ set(PRJ_SOURCES
 set(EXECUTABLE fcb_v1)
 
 add_executable(${EXECUTABLE} ${PRJ_SOURCES})
+add_dependencies(${EXECUTABLE} stm_version)
 
 target_compile_definitions(${EXECUTABLE} PRIVATE
         -DUSE_HAL_DRIVER
@@ -44,6 +45,8 @@ target_include_directories(${EXECUTABLE} PRIVATE
         ${UTILS_INCLUDE_DIRS}
         ${STM32_DEVICE_DRIVERS_INCLUDE_DIRS}
         ${CMSIS_DSP_INC}
+
+        ${CMAKE_CURRENT_BINARY_DIR}/../generated/
         )
 
 target_compile_options(${EXECUTABLE} PRIVATE
