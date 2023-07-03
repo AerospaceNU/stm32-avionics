@@ -120,6 +120,12 @@ jobs:
         pio run -e ${{ matrix.env-name }}
         find .pio/build
 
+    - name: Rename artifact
+      working-directory: ${{github.workspace}}/.pio/build/${{ matrix.env-name }}
+      run: |
+        mv firmware.bin ${{ matrix.env-name }}-pio.bin
+        mv firmware.elf ${{ matrix.env-name }}-pio.elf
+
     - uses: actions/upload-artifact@master
       with:
         name: ${{ matrix.env-name }}
@@ -143,6 +149,12 @@ jobs:
     - uses: carlosperate/arm-none-eabi-gcc-action@v1
     - uses: jwlawson/actions-setup-cmake@v1.13
 
+    - uses: actions/cache@v3
+      with:
+        path: |
+          build/_deps
+        key: ${{ runner.os }}-cmake_deps
+
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
@@ -159,6 +171,10 @@ jobs:
         touch CMakeListsPrivate.txt
         cmake . -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake"
         cmake --build build --target ${{ matrix.prj-target }} -j
+
+    - name: Rename artifact
+      working-directory: ${{github.workspace}}/build/stm32_projects/${{ matrix.prj-target }}
+      run: mv ${{ matrix.prj-target }}.elf ${{ matrix.prj-target }}-cmake.elf
 
     - uses: actions/upload-artifact@master
       with:
@@ -203,6 +219,11 @@ jobs:
     
     - name: Run build
       run: /entrypoint.sh ${{ matrix.prj-rel-path }} ${{ matrix.prj-target }}
+
+    - name: Rename artifact
+      run: |
+        cd ${{ matrix.prj-rel-path }}
+        for f in **/*.elf; do mv "$f" "$(echo "$f" | sed s/.elf/-cube.elf/)"; done
 
     - uses: actions/upload-artifact@master
       with:
