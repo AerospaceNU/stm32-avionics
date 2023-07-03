@@ -1,14 +1,14 @@
 {
     "tasks": [
         {
-            "label": "build FCB V1",
+            "label": "Build amazon-stm32-arduino",
             "type": "shell",
-            "command": "make",
+            "command": "cmake",
             "args": [
-                "fcb_v1.elf", "-j",
+                "--build", "build", "--target", "amazon-stm32-arduino_always_display_size"
             ],
             "options": {
-                "cwd": "${workspaceFolder}/fcb_v1/Build"
+                "cwd": "${workspaceFolder}/"
             },
             "group": {
                 "kind": "build",

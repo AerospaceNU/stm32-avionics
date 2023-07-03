@@ -26,7 +26,6 @@ function(get_list_hal_drivers out_list_hal_drivers hal_drivers_path hal_driver_t
     # From the files names keep only the driver type part using the regex (stm32xx_hal_(rcc).c or stm32xx_ll_(rcc).c => catches rcc)
     list(TRANSFORM filtered_files REPLACE ${file_pattern} "\\1")
     #Making a return by reference by seting the output variable to PARENT_SCOPE
-    message("Settinggg ${out_list_hal_drivers} using pattern ${file_pattern} to ${filtered_files}")
     set(${out_list_hal_drivers} ${filtered_files} PARENT_SCOPE)
 endfunction()
 
@@ -311,6 +310,36 @@ foreach(COMP ${HAL_FIND_COMPONENTS_FAMILIES})
         endif()
     endforeach()
     
+    foreach(DRV_COMP ${HAL_FIND_COMPONENTS_DRIVERS_EX})
+        string(TOLOWER ${DRV_COMP} DRV_L)
+        string(REGEX REPLACE "^ex_" "" DRV_L ${DRV_L})
+        string(TOUPPER ${DRV_L} DRV)
+        
+        if(NOT (DRV_L IN_LIST HAL_EX_DRIVERS_${FAMILY}))
+            continue()
+        endif()
+        
+        find_file(HAL_${FAMILY}${CORE_U}_${DRV}_EX_SOURCE
+            NAMES stm32${FAMILY_L}xx_ll_${DRV_L}.c
+            PATHS "${HAL_${FAMILY}_PATH}/Src"
+            NO_DEFAULT_PATH
+        )
+        list(APPEND HAL_${FAMILY}${CORE_U}_SOURCES "${HAL_${FAMILY}_${DRV}_EX_SOURCE}")
+        if(NOT HAL_${FAMILY}${CORE_U}_${DRV}_EX_SOURCE)
+            message(WARNING "Cannot find EX_${DRV} driver for ${FAMILY}${CORE_U}")
+            set(HAL_${DRV_COMP}_FOUND FALSE)
+            continue()
+        endif()
+    
+        set(HAL_${DRV_COMP}_FOUND TRUE)
+        if(HAL_${FAMILY}${CORE_U}_${DRV}_EX_SOURCE AND (NOT (TARGET HAL::STM32::${FAMILY}${CORE_C}::EX_${DRV})))
+            message(TRACE "FindHAL: creating library HAL::STM32::${FAMILY}${CORE_C}::EX_${DRV}")
+            add_library(HAL::STM32::${FAMILY}${CORE_C}::EX_${DRV} INTERFACE IMPORTED)
+            target_include_directories(HAL::STM32::${FAMILY}${CORE_C}::EX_${DRV} INTERFACE "${HAL_${FAMILY}${CORE_U}_INCLUDE}")
+            target_sources(HAL::STM32::${FAMILY}${CORE_C}::EX_${DRV} INTERFACE "${HAL_${FAMILY}${CORE_U}_${DRV}_EX_SOURCE}")
+        endif()
+    endforeach()
+    
     set(HAL_${COMP}_FOUND TRUE)
     list(APPEND HAL_INCLUDE_DIRS "${HAL_${FAMILY}${CORE_U}_INCLUDE}")
     list(APPEND HAL_SOURCES "${HAL_${FAMILY}${CORE_U}_SOURCES}")
@@ -318,8 +347,6 @@ endforeach()
 
 list(REMOVE_DUPLICATES HAL_INCLUDE_DIRS)
 list(REMOVE_DUPLICATES HAL_SOURCES)
-
-message("Includes ${HAL_INCLUDE_DIRS} sources ${HAL_SOURCES} components ${HANDLE_COMPONENTS}")
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(HAL

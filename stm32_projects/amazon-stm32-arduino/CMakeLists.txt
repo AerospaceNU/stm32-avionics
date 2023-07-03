@@ -6,7 +6,7 @@ project(amazon-stm32-arduino C ASM)
 stm32_fetch_cmsis(F4)
 stm32_fetch_hal(F4)
 
-find_package(CMSIS COMPONENTS STM32F4 REQUIRED)
+find_package(CMSIS COMPONENTS STM32F401CC REQUIRED)
 find_package(HAL COMPONENTS STM32F4 RCC GPIO UART PCD LL_USB CORTEX EX_PCD REQUIRED)
 
 set(CORE_SRCS
@@ -17,7 +17,6 @@ set(CORE_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/stm32f4xx_it.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/sysmem.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/usart.c
-    # ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/system_stm32f4xx.c
     ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/App/usb_device.c
     ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/App/usbd_cdc_if.c
     ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/App/usbd_desc.c
@@ -40,8 +39,6 @@ set(PROJECT_SOURCES
     ${CORE_SRCS}
 )
 
-message("Found EX drivers ${HAL_EX_DRIVERS_F4}")
-
 add_executable(amazon-stm32-arduino ${PROJECT_SOURCES} Core/Inc/stm32f4xx_hal_conf.h)
 target_include_directories(amazon-stm32-arduino PUBLIC ${CORE_INCS})
 target_link_libraries(amazon-stm32-arduino 
@@ -51,6 +48,7 @@ target_link_libraries(amazon-stm32-arduino
     HAL::STM32::F4::CORTEX
     HAL::STM32::F4::PCD
     HAL::STM32::F4::LL_USB
+    HAL::STM32::F4::EX_PCD
     CMSIS::STM32::F401CC 
     STM32::NoSys
 )

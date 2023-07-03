@@ -112,27 +112,23 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-
-    bool buttonState = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_4);
-    if (buttonState) {
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
-    } else {
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
-    }
-
-
-
+    //    bool buttonState = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_4);
+    //    if (buttonState) {
+    //      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
+    //    } else {
+    //      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
+    //    }
 
     // We want to turn pin PA0 (same as on breadboard) "ON"
     // to turn LED on
     // On == Set, Off = Reset
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
 
     // Wait half a second (or 500ms
     HAL_Delay(500);
 
     // Turn LED back off
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
     // And wait a bit
     HAL_Delay(500);
