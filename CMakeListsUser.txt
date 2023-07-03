@@ -17,6 +17,7 @@ if (CMAKE_BUILD_TYPE MATCHES "desktop")
     # Include the desktop sim stuff
     add_subdirectory(common)
     add_subdirectory(desktop_projects)
+    add_subdirectory(stm32_projects)
 
     set(SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/platformio_dummy.c)
 endif ()
