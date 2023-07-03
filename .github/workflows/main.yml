@@ -139,7 +139,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - prj-target: "amazon-stm32-arduino"
+          - prj-target: "fcb_v0"
+          - prj-target: "fcb_v1"
+          - prj-target: "fcb_v2"
+          - prj-target: "groundstation"
 
     runs-on: ubuntu-latest
     name: "CMake: Build STM32 flight software for ${{ matrix.prj-target }}"
@@ -174,12 +177,16 @@ jobs:
 
     - name: Rename artifact
       working-directory: ${{github.workspace}}/build/stm32_projects/${{ matrix.prj-target }}
-      run: mv ${{ matrix.prj-target }}.elf ${{ matrix.prj-target }}-cmake.elf
+      run: |
+        mv ${{ matrix.prj-target }}.elf ${{ matrix.prj-target }}-cmake.elf
+        mv ${{ matrix.prj-target }}.hex ${{ matrix.prj-target }}-cmake.hex
 
     - uses: actions/upload-artifact@master
       with:
         name: ${{ matrix.prj-target }}
-        path: build/stm32_projects/${{ matrix.prj-target }}/**/*.elf
+        path: |
+          build/stm32_projects/${{ matrix.prj-target }}/**/*.elf
+          build/stm32_projects/${{ matrix.prj-target }}/**/*.hex
 
   build-stm32-cube:
     strategy:

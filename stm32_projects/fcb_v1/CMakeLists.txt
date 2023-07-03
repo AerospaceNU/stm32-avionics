@@ -1,111 +1,101 @@
-cmake_minimum_required(VERSION 3.16)
+project(fcb_v1)
 
-project(fcb_v1 C CXX ASM)
+file(GLOB_RECURSE gen_files "Drivers/*.c" "Core/*.c" "Core/*.cpp" "USB_DEVICE/*.c" "Middlewares/*.c")
 
-stm32_fetch_cmsis(H7)
-stm32_fetch_hal(H7)
-
-find_package(CMSIS COMPONENTS STM32H743ZI_M7 REQUIRED)
-find_package(HAL COMPONENTS 
-    STM32H7_M7 RCC DMA RTC I2C GPIO UART PCD LL_USB CORTEX
-    EX_PCD EX_TIM EX_UART SPI TIM ADC IWDG EX_I2C EX_RCC
-    EX_PWR FLASH PWR EX_ADC
+# Need to tell it that it's a C file, or our linker won't be able to find Reset_Handler
+set_property(SOURCE Core/Startup/startup_stm32h743zitx.s PROPERTY LANGUAGE C)
+set(PRJ_SOURCES
+    ${gen_files}
     
-REQUIRED)
-
-set(CORE_SRCS
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/adc.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/board_config.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/dma.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/gpio.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/i2c.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/iwdg.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/rtc.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/spi.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/stm32h7xx_hal_msp.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/stm32h7xx_it.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/syscalls.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/sysmem.c
-    # ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/system_stm32h7xx.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/tim.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/usart.c
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/App/usb_device.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/App/usbd_cdc_if.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/App/usbd_desc.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/Target/usbd_conf.c
-    Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c
-    Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c
-    Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c
-    Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c
-
-    ${CMAKE_SOURCE_DIR}/build/_deps/stm32-hal-h7-src/Src/stm32h7xx_hal_pwr_ex.c
-)
-
-set(CORE_INCS
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/App
-    ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/Target
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Core/Inc
-)
-
-set(PROJECT_SOURCES
-    ${CORE_SRCS}
     ${SYSTEM_FILES_LIST}
     ${UTILS_FILES_LIST}
     ${STM32_DEVICE_DRIVERS_SRCS}
-    ${STM_HARDWARE_MANAGER}
-)
-
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g3 -Og")
-add_compile_definitions(
-    STM32H743xx
-    timegm=mktime
-    USE_HAL_DRIVER
-    DEBUG
-)
-
-add_executable(fcb_v1 ${PROJECT_SOURCES} Core/Inc/stm32h7xx_hal_conf.h)
-target_include_directories(fcb_v1 PUBLIC 
-    ${CORE_INCS} 
-    ${SYSTEM_INCLUDE_DIRS}
     ${DEVICES_COMMON_INCLUDE_DIRS}
-    ${UTILS_INCLUDE_DIRS}
-    ${STM32_DEVICE_DRIVERS_INCLUDE_DIRS}
-    ${CMSIS_DSP_INC}
+    ${STM_HARDWARE_MANAGER}
+    ${CMSIS_DRIVER_FILES}
+    
+    Core/Startup/startup_stm32h743zitx.s
 )
 
-target_link_libraries(fcb_v1 
-    HAL::STM32::H7::M7::ADC
-    HAL::STM32::H7::M7::CORTEX
-    HAL::STM32::H7::M7::DMA
-    HAL::STM32::H7::M7::FLASH
-    HAL::STM32::H7::M7::GPIO
-    HAL::STM32::H7::M7::I2C
-    HAL::STM32::H7::M7::IWDG
-    HAL::STM32::H7::M7::PCD
-    HAL::STM32::H7::M7::UART
-    HAL::STM32::H7::M7::PWR
-    HAL::STM32::H7::M7::RCC
-    HAL::STM32::H7::M7::RTC
-    HAL::STM32::H7::M7::SPI
-    HAL::STM32::H7::M7::TIM
+set(EXECUTABLE fcb_v1)
 
-    HAL::STM32::H7::M7::EX_ADC
-    HAL::STM32::H7::M7::EX_I2C
-    HAL::STM32::H7::M7::EX_RCC
-    HAL::STM32::H7::M7::EX_PCD
-    HAL::STM32::H7::M7::EX_TIM
-    HAL::STM32::H7::M7::EX_UART
+add_executable(${EXECUTABLE} ${PRJ_SOURCES})
 
-    HAL::STM32::H7::M7::LL_USB
+target_compile_definitions(${EXECUTABLE} PRIVATE
+        -DUSE_HAL_DRIVER
+        -DSTM32H743xx
+        -DDEBUG
+        -Dtimegm=mktime
+        )
 
-    CMSIS::STM32::H743ZI::M7
-    STM32::Nano
+target_include_directories(${EXECUTABLE} PRIVATE
+        Core/Inc
+        Drivers/STM32H7xx_HAL_Driver/Inc
+        Drivers/CMSIS/Device/ST/STM32H7xx/Include
+        Drivers/CMSIS/Include
 
+        ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/App
+        ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/Target
+        ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
+        ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Core/Inc
+
+        ${SYSTEM_INCLUDE_DIRS}
+        ${DEVICES_COMMON_INCLUDE_DIRS}
+        ${UTILS_INCLUDE_DIRS}
+        ${STM32_DEVICE_DRIVERS_INCLUDE_DIRS}
+        ${CMSIS_DSP_INC}
+        )
+
+target_compile_options(${EXECUTABLE} PRIVATE
+        -mcpu=cortex-m7
+        -mthumb
+        -mfpu=fpv5-d16
+        -mfloat-abi=hard
+
+        -fdata-sections
+        -ffunction-sections
+        -fno-exceptions
+        $<$<COMPILE_LANG_AND_ID:CXX,GNU>:-fno-rtti>
+        $<$<COMPILE_LANG_AND_ID:CXX,GNU>:-fno-use-cxa-atexit>
+        -fstack-usage
+
+        -Wall
+        -MMD
+        -MP
+        -specs=nano.specs
+        -specs=nosys.specs
+
+        -Og
+        -g3
+        )
+
+target_link_options(${EXECUTABLE} PRIVATE
+        -T${CMAKE_CURRENT_SOURCE_DIR}/STM32H743ZITX_FLASH.ld
+        -mcpu=cortex-m7
+        -mthumb
+        -mfpu=fpv5-d16
+        -mfloat-abi=hard
+        -specs=nano.specs
+        -specs=nosys.specs
+        -lc
+        -lm
+        -lnosys
+        -Wl,-Map=${PROJECT_NAME}.map,--cref
+        -Wl,--gc-sections
+        -Wl,--print-memory-usage
+        )
+
+target_link_libraries(${EXECUTABLE} PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/../libs/libarm_cortexM7lfsp_math.a
 )
-stm32_add_linker_script(fcb_v1 PRIVATE STM32H743ZITX_FLASH.ld)
-stm32_print_size_of_target(fcb_v1)
+
+# Print executable size
+add_custom_command(TARGET ${EXECUTABLE}
+        POST_BUILD
+        COMMAND arm-none-eabi-size ${EXECUTABLE}.elf)
+
+# Create hex file
+add_custom_command(TARGET ${EXECUTABLE}
+        POST_BUILD
+        COMMAND arm-none-eabi-objcopy -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
+        COMMAND arm-none-eabi-objcopy -O binary ${EXECUTABLE}.elf ${EXECUTABLE}.bin)

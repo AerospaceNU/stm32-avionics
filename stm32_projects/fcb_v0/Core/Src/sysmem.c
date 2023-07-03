@@ -49,8 +49,7 @@
 /* Includes */
 #include <errno.h>
 #include <stdio.h>
-
-#define asm(x) __asm__(x)
+#include <sys/types.h>
 
 /* Variables */
 extern int errno;

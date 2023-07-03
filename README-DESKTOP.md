@@ -11,11 +11,14 @@ Install CMake, gcc and g++ using your favorite package manager, then configure t
 cmake -B build -DPROJECT_BUILD_TYPE=desktop
 ```
 
-For building flight software, configure with
+For building flight software, configure with:
 
 ```
-cmake .. -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake"
+cmake -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake" -DCMAKE_C_COMPILER=/home/matt/Documents/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-no
+ne-eabi/bin/arm-none-eabi-gcc
 ```
+
+We need to pass CMAKE_C_COMPILER since we look for gcc/g++/as/ld in the same folder as the GCC executable passed in. If you have the arm gnu toolchain already installed, by default, /usr/lib will be searched. Note that the toolchain from apt seems to produce larger binaries than the one that ships with Cube.
 
 ## Building for Windows using WSL
 

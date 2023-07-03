@@ -1,8 +1,10 @@
-project(fcb_v0)
+project(groundstation)
+set(EXECUTABLE ${PROJECT_NAME})
 
 file(GLOB_RECURSE gen_files "Drivers/*.c" "Core/*.c" "Core/*.cpp" "USB_DEVICE/*.c" "Middlewares/*.c")
 
-set_property(SOURCE Core/Startup/startup_stm32h750vbtx.s PROPERTY LANGUAGE C)
+# Need to tell it that it's a C file, or our linker won't be able to find Reset_Handler
+set_property(SOURCE Core/Startup/startup_stm32h743vitx.s PROPERTY LANGUAGE C)
 set(PRJ_SOURCES
     ${gen_files}
     
@@ -13,16 +15,14 @@ set(PRJ_SOURCES
     ${STM_HARDWARE_MANAGER}
     ${CMSIS_DRIVER_FILES}
     
-    Core/Startup/startup_stm32h750vbtx.s
+    Core/Startup/startup_stm32h743vitx.s
 )
-
-set(EXECUTABLE fcb_v0)
 
 add_executable(${EXECUTABLE} ${PRJ_SOURCES})
 
 target_compile_definitions(${EXECUTABLE} PRIVATE
         -DUSE_HAL_DRIVER
-        -DSTM32H750xx
+        -DSTM32H743xx
         -DDEBUG
         -Dtimegm=mktime
         )
@@ -69,7 +69,7 @@ target_compile_options(${EXECUTABLE} PRIVATE
         )
 
 target_link_options(${EXECUTABLE} PRIVATE
-        -T${CMAKE_CURRENT_SOURCE_DIR}/STM32H750VBTX_FLASH.ld
+        -T${CMAKE_CURRENT_SOURCE_DIR}/STM32H743VITX_FLASH.ld
         -mcpu=cortex-m7
         -mthumb
         -mfpu=fpv5-d16

@@ -1,8 +1,10 @@
-project(fcb_v0)
+project(fcb_v2)
+set(EXECUTABLE ${PROJECT_NAME})
 
 file(GLOB_RECURSE gen_files "Drivers/*.c" "Core/*.c" "Core/*.cpp" "USB_DEVICE/*.c" "Middlewares/*.c")
 
-set_property(SOURCE Core/Startup/startup_stm32h750vbtx.s PROPERTY LANGUAGE C)
+# Need to tell it that it's a C file, or our linker won't be able to find Reset_Handler
+set_property(SOURCE Core/Startup/startup_stm32l4r5vgtx.s PROPERTY LANGUAGE C)
 set(PRJ_SOURCES
     ${gen_files}
     
@@ -13,24 +15,22 @@ set(PRJ_SOURCES
     ${STM_HARDWARE_MANAGER}
     ${CMSIS_DRIVER_FILES}
     
-    Core/Startup/startup_stm32h750vbtx.s
+    Core/Startup/startup_stm32l4r5vgtx.s
 )
-
-set(EXECUTABLE fcb_v0)
 
 add_executable(${EXECUTABLE} ${PRJ_SOURCES})
 
 target_compile_definitions(${EXECUTABLE} PRIVATE
         -DUSE_HAL_DRIVER
-        -DSTM32H750xx
+        -DSTM32L4R5xx
         -DDEBUG
         -Dtimegm=mktime
         )
 
 target_include_directories(${EXECUTABLE} PRIVATE
         Core/Inc
-        Drivers/STM32H7xx_HAL_Driver/Inc
-        Drivers/CMSIS/Device/ST/STM32H7xx/Include
+        Drivers/STM32L4xx_HAL_Driver/Inc
+        Drivers/CMSIS/Device/ST/STM32L4xx/Include
         Drivers/CMSIS/Include
 
         ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/App
@@ -46,9 +46,9 @@ target_include_directories(${EXECUTABLE} PRIVATE
         )
 
 target_compile_options(${EXECUTABLE} PRIVATE
-        -mcpu=cortex-m7
+        -mcpu=cortex-m4
         -mthumb
-        -mfpu=fpv5-d16
+        -mfpu=fpv4-sp-d16
         -mfloat-abi=hard
 
         -fdata-sections
@@ -69,10 +69,10 @@ target_compile_options(${EXECUTABLE} PRIVATE
         )
 
 target_link_options(${EXECUTABLE} PRIVATE
-        -T${CMAKE_CURRENT_SOURCE_DIR}/STM32H750VBTX_FLASH.ld
-        -mcpu=cortex-m7
+        -T${CMAKE_CURRENT_SOURCE_DIR}/STM32L4R5VGTX_FLASH.ld
+        -mcpu=cortex-m4
         -mthumb
-        -mfpu=fpv5-d16
+        -mfpu=fpv4-sp-d16
         -mfloat-abi=hard
         -specs=nano.specs
         -specs=nosys.specs
@@ -85,7 +85,7 @@ target_link_options(${EXECUTABLE} PRIVATE
         )
 
 target_link_libraries(${EXECUTABLE} PRIVATE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/../libs/libarm_cortexM7lfsp_math.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libs/libarm_cortexM4lf_math.a
 )
 
 # Print executable size
