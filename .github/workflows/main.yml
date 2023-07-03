@@ -128,7 +128,46 @@ jobs:
           .pio/build/${{ matrix.env-name }}/**/*.elf
           .pio/build/${{ matrix.env-name }}/**/*.bin
 
-  build-stm32:
+  build-stm32-cmake:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - prj-target: "amazon-stm32-arduino"
+
+    runs-on: ubuntu-latest
+    name: "Build STM32 flight software for ${{ matrix.prj-target }} (CMake)"
+
+
+    steps:
+    - uses: carlosperate/arm-none-eabi-gcc-action@v1
+    - uses: jwlawson/actions-setup-cmake@v1.13
+
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Fetch tags
+      working-directory: ${{github.workspace}}
+      run: |
+        git config --global --add safe.directory /__w/stm32-avionics/stm32-avionics
+        git fetch --tags --force
+    
+    - name: Configure CMake
+      working-directory: ${{github.workspace}}
+      run: |
+        touch CMakeListsPrivate.txt
+        cmake . -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake"
+        cmake --build build --target amazon-stm32-arduino -j
+
+
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: ${{ matrix.prj-target }}
+        path: ${{ matrix.prj-rel-path }}/**/*.elf
+
+  build-stm32-cube:
     strategy:
       fail-fast: false
       matrix:
@@ -148,7 +187,7 @@ jobs:
     container:
       image: mcm001/stm-actions:v1.0.1
       options: --user 1001
-    name: "Build STM32 flight software for ${{ matrix.prj-target }}"
+    name: "Build STM32 flight software for ${{ matrix.prj-target }} (Cube)"
 
     steps:
     - name: Check for dockerenv file
