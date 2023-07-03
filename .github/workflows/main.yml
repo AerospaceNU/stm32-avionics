@@ -142,7 +142,7 @@ jobs:
           - prj-target: "amazon-stm32-arduino"
 
     runs-on: ubuntu-latest
-    name: "Build STM32 flight software for ${{ matrix.prj-target }} (CMake)"
+    name: "CMake: Build STM32 flight software for ${{ matrix.prj-target }}"
 
 
     steps:
@@ -201,7 +201,7 @@ jobs:
     container:
       image: mcm001/stm-actions:v1.0.1
       options: --user 1001
-    name: "Build STM32 flight software for ${{ matrix.prj-target }} (Cube)"
+    name: "Cube: Build STM32 flight software for ${{ matrix.prj-target }}"
 
     steps:
     - name: Check for dockerenv file

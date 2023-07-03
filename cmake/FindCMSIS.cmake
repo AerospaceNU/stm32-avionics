@@ -88,6 +88,7 @@ function(cmsis_generate_default_linker_script FAMILY DEVICE CORE)
         stm32_get_memory_info(FAMILY ${FAMILY} DEVICE ${DEVICE} CORE ${CORE} HEAP SIZE HEAP_SIZE)
         stm32_get_memory_info(FAMILY ${FAMILY} DEVICE ${DEVICE} CORE ${CORE} STACK SIZE STACK_SIZE)
 
+        message("LD IS ${OUTPUT_LD_FILE}")
         add_custom_command(OUTPUT "${OUTPUT_LD_FILE}"
             COMMAND ${CMAKE_COMMAND} 
                 -DFLASH_ORIGIN="${FLASH_ORIGIN}" 
@@ -265,7 +266,7 @@ foreach(COMP ${CMSIS_FIND_COMPONENTS_FAMILIES})
         
         add_library(CMSIS::STM32::${DEVICE}${CORE_C} INTERFACE IMPORTED)
         target_link_libraries(CMSIS::STM32::${DEVICE}${CORE_C} INTERFACE CMSIS::STM32::${TYPE}${CORE_C})
-        cmsis_generate_default_linker_script(${FAMILY} ${DEVICE} "${CORE}")
+        # cmsis_generate_default_linker_script(${FAMILY} ${DEVICE} "${CORE}")
     endforeach()
 
     if(STM_DEVICES_FOUND)

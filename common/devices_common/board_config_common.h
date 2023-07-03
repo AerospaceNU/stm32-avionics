@@ -10,6 +10,7 @@
 
 #ifdef USE_STM32_HAL_HEADER
 #include HAL_HEADER
+#include "stm32h7xx_hal_conf.h"
 #endif
 
 /* Common Utilities */

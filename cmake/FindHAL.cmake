@@ -105,7 +105,6 @@ foreach(COMP ${HAL_FIND_COMPONENTS_UNHANDLED})
     endif()
 
     string(REGEX REPLACE "^ex_" "" COMP_L3 ${COMP_L})
-    message("ALl EX: ${HAL_EX_DRIVERS} COMP ${COMP_L3}")
     if(${COMP_L3} IN_LIST HAL_EX_DRIVERS)
         list(APPEND HAL_FIND_COMPONENTS_DRIVERS_EX ${COMP})
         message(TRACE "FindHAL: append COMP ${COMP} to HAL_FIND_COMPONENTS_DRIVERS_EX")
