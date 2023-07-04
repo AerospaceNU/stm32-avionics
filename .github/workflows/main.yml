@@ -168,15 +168,15 @@ jobs:
     - name: Configure CMake
       working-directory: ${{github.workspace}}
       run: |
-        ${{ (startsWith(matrix.os, 'windows-latest') && 'echo " "') || 'touch' }} CMakeListsPrivate.txt
+        touch CMakeListsPrivate.txt
         cmake . -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake" ${{ (startsWith(matrix.os, 'windows-latest') && '-DCMAKE_GENERATOR=Ninja') || '' }}
         cmake --build build --target ${{ matrix.prj-target }} -j
 
     - name: Rename artifact
       working-directory: ${{github.workspace}}/build/stm32_projects/${{ matrix.prj-target }}
       run: |
-        mv ${{ matrix.prj-target }}.elf ${{ matrix.prj-target }}-cmake.elf
-        mv ${{ matrix.prj-target }}.hex ${{ matrix.prj-target }}-cmake.hex
+        mv ${{ matrix.prj-target }}.elf ${{ matrix.prj-target }}-cmake-${{ matrix.os }}.elf
+        mv ${{ matrix.prj-target }}.hex ${{ matrix.prj-target }}-cmake-${{ matrix.os }}.hex
 
     - uses: actions/upload-artifact@master
       with:
