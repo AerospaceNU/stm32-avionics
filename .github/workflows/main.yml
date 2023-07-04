@@ -138,15 +138,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - prj-target: "fcb_v0"
-          - prj-target: "fcb_v1"
-          - prj-target: "fcb_v2"
-          - prj-target: "groundstation"
+        os: [ubuntu-latest, windows-latest]
+        prj-target: ["fcb_v0","fcb_v1","fcb_v2","groundstation","amazon-stm32-arduino"]
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     name: "CMake: Build STM32 flight software for ${{ matrix.prj-target }}"
-
 
     steps:
     - uses: carlosperate/arm-none-eabi-gcc-action@v1
@@ -172,7 +168,7 @@ jobs:
       working-directory: ${{github.workspace}}
       run: |
         touch CMakeListsPrivate.txt
-        cmake . -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake" 
+        cmake . -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake" ${{ (startsWith(matrix.os, 'windows-latest') && '-DCMAKE_GENERATOR=Ninja') || '' }}
         cmake --build build --target ${{ matrix.prj-target }} -j
 
     - name: Rename artifact

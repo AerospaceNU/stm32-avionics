@@ -1,6 +1,6 @@
 if (PROJECT_BUILD_TYPE MATCHES "desktop")
     # Undo some platformio stuff
-    message("\nUndoing platformio bs\n")
+    message("\nUndoing platformio bs for desktop\n")
 
     unset(CLION_SVD_FILE_PATH)
     unset(CMAKE_C_COMPILER)
@@ -21,14 +21,12 @@ if (PROJECT_BUILD_TYPE MATCHES "desktop")
 
     set(SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/platformio_dummy.c)
 
-
-    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/cmake/stm32_gcc.cmake)
 elseif (PROJECT_BUILD_TYPE MATCHES "stm32")
     # Undo some platformio stuff
-    message("\nUndoing platformio bs\n")
+    message("\nUndoing platformio bs for stm32\n")
 
     unset(CLION_SVD_FILE_PATH)
-    unset(CMAKE_C_COMPILER)
+    # unset(CMAKE_C_COMPILER)
     unset(CMAKE_CXX_COMPILER)
     unset(CMAKE_CXX_FLAGS)
     unset(CMAKE_C_FLAGS)
@@ -41,10 +39,8 @@ elseif (PROJECT_BUILD_TYPE MATCHES "stm32")
 
     # Include the desktop sim stuff
     add_subdirectory(common)
-    add_subdirectory(desktop_projects)
     add_subdirectory(stm32_projects)
 
     set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
     set(SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/platformio_dummy.c)
-    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/cmake/stm32_gcc.cmake)
 endif ()

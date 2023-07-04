@@ -11,14 +11,25 @@ Install CMake, gcc and g++ using your favorite package manager, then configure t
 cmake -B build -DPROJECT_BUILD_TYPE=desktop
 ```
 
+## Building flight software without Cube
+
 For building flight software, configure with:
 
+Linux:
 ```
-cmake -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake" -DCMAKE_C_COMPILER=/home/matt/Documents/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-no
-ne-eabi/bin/arm-none-eabi-gcc
+cmake -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake" -DCMAKE_C_COMPILER=/home/matt/Documents/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc
+```
+
+On Windows, I had to add `-DCMAKE_GENERATOR=Ninja` to the above, since I have MSVC installed, and its project generator refuses to cooperate with GNU compilers. I bet that mingw makefiles would also work as a generator. Also, I had to manually tell the cortex-debug extension where to find openocd, and I had to use the openocd from the line cutter repo (the one bundled with Cube couldn't find the st-link interface config??). I went into file->preferences->settings, searched for `cortex-debug.openocdPath.windows`, and set it to `D:/Downloads/openocd/OpenOCD-20210407-0.10.0/bin/openocd.exe` (this is probably different for you). Note the forward ticks (or double back slashes) -- Windows paths being backticks is dumb.
+
+Windows:
+```
+cmake -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_C_COMPILER="D:\ST\STM32CubeIDE_1.4.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.200.202301161003\tools\bin\arm-none-eabi-gcc.exe" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake" -DCMAKE_GENERATOR=Ninja
 ```
 
 We need to pass CMAKE_C_COMPILER since we look for gcc/g++/as/ld in the same folder as the GCC executable passed in. If you have the arm gnu toolchain already installed, by default, /usr/lib will be searched. Note that the toolchain from apt seems to produce larger binaries than the one that ships with Cube. I downloaded my toolchain from https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain , but you can also point it to the GCC from Cube.
+
+Now, we can build the code for (say) FCB V0 with `cmake --build build --target fcb_v0`
 
 ## Building for Windows using WSL
 
