@@ -18,7 +18,7 @@ cmake -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_
 ne-eabi/bin/arm-none-eabi-gcc
 ```
 
-We need to pass CMAKE_C_COMPILER since we look for gcc/g++/as/ld in the same folder as the GCC executable passed in. If you have the arm gnu toolchain already installed, by default, /usr/lib will be searched. Note that the toolchain from apt seems to produce larger binaries than the one that ships with Cube. I downloaded my toolchain from https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain
+We need to pass CMAKE_C_COMPILER since we look for gcc/g++/as/ld in the same folder as the GCC executable passed in. If you have the arm gnu toolchain already installed, by default, /usr/lib will be searched. Note that the toolchain from apt seems to produce larger binaries than the one that ships with Cube. I downloaded my toolchain from https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain , but you can also point it to the GCC from Cube.
 
 ## Building for Windows using WSL
 
