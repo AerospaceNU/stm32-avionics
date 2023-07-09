@@ -74,7 +74,10 @@ void radioManager_tick() {
   }
 }
 
+// Forward a radio packet by pretending to be a groundstation.
+// This message generation probably belongs in the groundstation class
 static void radioManager_sendUsbGroundstationMessage(int radioId) {
+#if HAS_DEV(USB_CDC_COMPOSITE)
 #ifndef DESKTOP_SIM
 #ifndef GROUNDSTATION_V1
   if (hm_usbIsConnected(USB_CLI_ID)) {
@@ -109,6 +112,7 @@ static void radioManager_sendUsbGroundstationMessage(int radioId) {
   }
 #endif
 #endif
+#endif // HAS_DEV(USB_CDC_COMPOSITE)
 }
 
 /**
@@ -119,7 +123,6 @@ static void radioManager_sendInternal(const int radioId,
                                       const RadioPacket_s &packet) {
   hm_radioSend(radioId, (uint8_t *)&packet, sizeof(packet));
 
-  // TODO
   radioManager_sendUsbGroundstationMessage(radioId);
 }
 
@@ -307,6 +310,7 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 }
 
 void radioManager_transmitUsbString(int radioId, uint8_t *data, size_t len) {
+#if HAS_DEV(USB_CDC_COMPOSITE)
   static uint8_t lastTxId = 0;
 
   while (len) {
@@ -327,6 +331,9 @@ void radioManager_transmitUsbString(int radioId, uint8_t *data, size_t len) {
     len -= txLen;
     data += txLen;
   }
+#else
+#warning "No composite, not transmitting USB string"
+#endif  // HAS_DEV(USB_CDC_COMPOSITE)
 }
 
 void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {

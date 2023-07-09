@@ -5,8 +5,8 @@
  *      Author: Ben Fox
  */
 
-#ifndef DEVICES_USB_CDC_COMPOSITE_H_
-#define DEVICES_USB_CDC_COMPOSITE_H_
+#ifndef STM32_PROJECTS_DEVICE_DRIVERS_USB_CDC_COMPOSITE_H_
+#define STM32_PROJECTS_DEVICE_DRIVERS_USB_CDC_COMPOSITE_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -14,6 +14,8 @@
 #include "board_config.h"
 #include "board_config_common.h"
 #include "circular_buffer.h"
+
+#if HAS_DEV(USB_CDC_COMPOSITE)
 
 class UsbCDCCtrl {
  public:
@@ -57,4 +59,6 @@ class UsbCDCCtrl {
   uint32_t m_lastTransmit = {0};
 };
 
-#endif  // DEVICES_USB_CDC_COMPOSITE_H_
+#endif  // USB_CDC_COMPOSITE
+
+#endif  // STM32_PROJECTS_DEVICE_DRIVERS_USB_CDC_COMPOSITE_H_

@@ -171,6 +171,10 @@
 #ifndef NUM_VBAT_DESKTOP_FILE
 #define NUM_VBAT_DESKTOP_FILE 0
 #endif  // NUM_VBAT_DESKTOP_FILE
+#ifndef NUM_USB_CDC_COMPOSITE
+#define NUM_USB_CDC_COMPOSITE 0
+#endif // NUM_USB_CDC_COMPOSITE
+
 // default to printf over usb CLI
 #ifndef PRINTF_USB_CHAN
 #define PRINTF_USB_CHAN USB_ID_CLI

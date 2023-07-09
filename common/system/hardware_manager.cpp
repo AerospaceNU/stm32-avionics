@@ -274,6 +274,9 @@ static CircularBuffer_s *simRxBuffer = NULL;
 extern "C" {
 
 static void gpsCallback(char *line) {
+// Only allow GPS forwarding over USB if we have composite
+#if HAS_DEV(USB_CDC_COMPOSITE)
+
   // Return early if not connected
   if (!hm_usbIsConnected(USB_ID_TELEM)) {
     return;
@@ -293,6 +296,7 @@ static void gpsCallback(char *line) {
       "$GPGGA,115739.00,4158.8441367,N,09147.4416929,W,4,13,0.9,255.747,M,-32."
       "00,M,01,0000*6E\r\n";
   radioManager_transmitUsbString(USB_ID_TELEM, (uint8_t *)str3, strlen(str3));
+#endif
 #endif
 }
 
@@ -560,7 +564,7 @@ void hm_hardwareInit() {
 
   /* USB */
 #if HAS_DEV(USB_STD)
-  usbStd_init(USB_ID_CLI);
+  usbStd_init();
   hardwareStatusUsb[FIRST_ID_USB_STD] = true;
 #endif  // HAS_DEV(USB_STD)
 
@@ -846,7 +850,7 @@ bool hm_usbIsConnected(int usbId) {
 bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
 #if HAS_DEV(USB_STD)
   if (IS_DEVICE(usbId, USB_STD)) {
-    return usbStd_transmit(cdc_ch, data, numBytes);
+    return usbStd_transmit(data, numBytes);
   }
 #endif  // HAS_DEV(USB_STD)
 
@@ -870,7 +874,7 @@ bool hm_usbIsBusy(int usbId) {
 CircularBuffer_s *hm_usbGetRxBuffer(int usbId) {
 #if HAS_DEV(USB_STD)
   if (IS_DEVICE(usbId, USB_STD)) {
-    return usbStd_getRxBuffer(cdc_ch);
+    return usbStd_getRxBuffer();
   }
 #endif  // HAS_DEV(USB_STD)
 
@@ -1193,7 +1197,6 @@ bool hm_inSimMode() { return inSim; }
 // Overwrite _write so printf prints to USB
 int _write(int file, char *ptr, int len) {
   //  if (hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED) return 0;
-  if (USBD_OK == hm_usbTransmit(PRINTF_USB_CHAN, (uint8_t *)ptr, len))
-    return len;
+  if (hm_usbTransmit(PRINTF_USB_CHAN, (uint8_t *)ptr, len)) return len;
   return 0;
 }
