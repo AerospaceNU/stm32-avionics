@@ -44,4 +44,4 @@ void bleClientStd_tick(BleClientStdCtrl_s *ctrl);
 }
 #endif
 
-#endif  // DEVICES_BLE_CLIENT_STD_H_
+#endif  // STM32_PROJECTS_DEVICE_DRIVERS_BLE_CLIENT_STD_H_

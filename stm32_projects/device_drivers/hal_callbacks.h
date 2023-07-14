@@ -62,4 +62,4 @@ void halCallbacks_usbCdcRecieve(uint8_t cdc_ch, uint8_t *buf, uint32_t *len);
 }
 #endif
 
-#endif  // DEVICES_HAL_CALLBACKS_H_
+#endif  // STM32_PROJECTS_DEVICE_DRIVERS_HAL_CALLBACKS_H_

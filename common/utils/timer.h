@@ -5,8 +5,8 @@
  *      Author: matt
  */
 
-#ifndef UTILS_TIMER_H_
-#define UTILS_TIMER_H_
+#ifndef COMMON_UTILS_TIMER_H_
+#define COMMON_UTILS_TIMER_H_
 
 #include "hardware_manager.h"
 
@@ -22,4 +22,4 @@ class Timer {
   uint32_t m_start;
 };
 
-#endif  // UTILS_TIMER_H_
+#endif  // COMMON_UTILS_TIMER_H_

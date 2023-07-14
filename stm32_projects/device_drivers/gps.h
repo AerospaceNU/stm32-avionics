@@ -60,4 +60,4 @@ void gps_addUbxChecksum(uint8_t *data, int len);
 }
 #endif
 
-#endif  // DEVICES_GPS_H_
+#endif  // STM32_PROJECTS_DEVICE_DRIVERS_GPS_H_

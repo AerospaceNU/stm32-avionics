@@ -112,7 +112,7 @@ static void radioManager_sendUsbGroundstationMessage(int radioId) {
   }
 #endif
 #endif
-#endif // HAS_DEV(USB_CDC_COMPOSITE)
+#endif  // HAS_DEV(USB_CDC_COMPOSITE)
 }
 
 /**
