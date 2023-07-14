@@ -12,6 +12,7 @@
 #include "circular_buffer.h"
 #include "cli.h"
 #include "hardware_manager.h"
+#include "math_utils.h"
 #include "orientation_estimator.h"
 
 #define RAD_TO_DEG 57.29578     // 180 / PI
@@ -382,10 +383,14 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
   kalman.predict(accz);
 
 #if HAS_DEV(BAROMETER)
-  // Only correct if below max speed (above, baro readings untrustworthy)
-  if (fabs(kalman.getXhat().estimatedVelocity) < BARO_MAX_SPEED) {
-    kalman.correct(baroAltAgl, kalman.DEFAULT_KALMAN_GAIN);
-  }
+  // LERP kalman gain by factor between 1 and 0.3, between 250m/s and 350m/s
+  // above/below, clamp to 1 or 0.3
+  double gainMultiplier = map(
+      clamp(kalman.getXhat().estimatedVelocity, 250, 350), 250, 350, 1, 0.3);
+  double kalmanGain[] = {kalman.DEFAULT_KALMAN_GAIN[0] * gainMultiplier,
+                         kalman.DEFAULT_KALMAN_GAIN[1] * gainMultiplier};
+  kalman.correct(baroAltAgl, kalmanGain);
+
 #endif  // HAS_DEV(BAROMETER)
 
   auto kalmanOutput = kalman.getXhat();
