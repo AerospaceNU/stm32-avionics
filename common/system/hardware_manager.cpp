@@ -1,6 +1,7 @@
 #include "hardware_manager.h"
 
 #include <stdio.h>
+#include <cmath>
 
 #include "hal_callbacks.h"
 #include "radio_packet_types.h"
@@ -1039,7 +1040,7 @@ void hm_pyroUpdate(void *) {
 }
 
 void hm_dcMotorSetPercent(int dcMotorId, double percent) {
-  if (fabs(percent) > 100) return;
+  if (std::abs(percent) > 100) return;
 
 #if HAS_DEV(DC_MOTOR_PWM)
   if (IS_DEVICE(dcMotorId, DC_MOTOR_PWM)) {

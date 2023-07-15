@@ -135,7 +135,7 @@
 #define USB_CLI_ID 0
 #endif  // USB_CLI_ID
 #ifndef RADIO_TI_TYPE
-#define RADIO_TI_TYPE RADIO_TI_TYPE_CC1120
+#define RADIO_TI_TYPE RADIO_TI_TYPE_NONE
 #endif  // RADIO_TI_TYPE
 // Simmed desktop hardware
 #ifndef NUM_ACCEL_DESKTOP_FILE

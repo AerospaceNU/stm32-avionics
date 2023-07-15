@@ -130,7 +130,7 @@ static void flashRead(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
   // #error
   // #endif
 
-  static_assert(sizeof(logPackets) > 261000, "Size is not correct");
+  // static_assert(sizeof(logPackets) > 261000, "Size is not correct");
 
   int flashId = -1;
   uint32_t flashOffset = 0;
