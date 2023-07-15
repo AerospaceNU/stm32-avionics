@@ -135,7 +135,7 @@
 #define USB_CLI_ID 0
 #endif  // USB_CLI_ID
 #ifndef RADIO_TI_TYPE
-#define RADIO_TI_TYPE RADIO_TI_TYPE_CC1120
+#define RADIO_TI_TYPE RADIO_TI_TYPE_NONE
 #endif  // RADIO_TI_TYPE
 // Simmed desktop hardware
 #ifndef NUM_ACCEL_DESKTOP_FILE
@@ -171,6 +171,18 @@
 #ifndef NUM_VBAT_DESKTOP_FILE
 #define NUM_VBAT_DESKTOP_FILE 0
 #endif  // NUM_VBAT_DESKTOP_FILE
+#ifndef NUM_USB_CDC_COMPOSITE
+#define NUM_USB_CDC_COMPOSITE 0
+#endif  // NUM_USB_CDC_COMPOSITE
+
+// default to printf over usb CLI
+#ifndef PRINTF_USB_CHAN
+#define PRINTF_USB_CHAN USB_ID_CLI
+#endif  // PRINTF_USB_CHAN
+
+#ifndef NUM_STM_HADC
+#define NUM_STM_HADC 0
+#endif  // NUM_STM_HADC
 
 // Flash stuff
 #ifndef FLASH_MAX_SECTOR_BYTES
@@ -469,13 +481,21 @@ extern float servoPwmMaxPulseMs[NUM_SERVO_PWM];
 
 /* USB */
 
-#define NUM_USB NUM_USB_STD
+#define NUM_USB (NUM_USB_STD + NUM_USB_CDC_COMPOSITE)
 
 #define FIRST_ID_USB_STD 0
+#define FIRST_ID_USB_CDC_COMPOSITE (FIRST_ID_USB_STD + NUM_USB_STD)
 
-// USB can currently only support a single instance, so throw pre-processor
-// error if more than 1 are defined
-#if NUM_USB > 1
+#ifdef USB_IS_COMPOSITE
+#include "usbd_composite.h"  // for USBD_CDC_ACM_COUNT
+#define NUM_USB_CDC (USBD_CDC_ACM_COUNT)
+#define USB_ID_TELEM 1
+#endif  // USB_IS_COMPOSITE
+#define USB_ID_CLI 0
+
+// Normal USB can currently only support a single instance, so throw
+// pre-processor error if more than 1 are defined
+#if NUM_USB_STD > 1
 #error "Trying to stir up trouble with multiple USBs defined, huh?"
 #endif  // NUM_USB > 1
 

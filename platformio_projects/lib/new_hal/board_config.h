@@ -19,7 +19,7 @@
 #define NUM_OTHER_GPS 1
 #define NUM_OTHER_ACCEL 0
 #define NUM_OTHER_VBAT_ADC 1
-#define NUM_USB_STD 1
+#define NUM_USB_STD 0
 #define NUM_OTHER_LED 1
 
 // Limit the amount of data we cache in RAM

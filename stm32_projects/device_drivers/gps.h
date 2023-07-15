@@ -7,6 +7,10 @@
 #include "data_structures.h"
 #include "minmea.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if (HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX))
 #define GPS_RX_BUF_SIZE 1024
 #define NMEA_LENGTH 129  // +1 for null term
@@ -28,9 +32,13 @@ typedef struct {
 
   bool data_available;
   bool firstBuf;
+
+  // Debug callback for when a line is parsed. Called from main thread
+  void (*callback)(char *);
 } GpsCtrl_s;
 
-void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type);
+void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type,
+              void (*callback)(char *));
 
 bool gps_newData(GpsCtrl_s *gps);
 
@@ -46,6 +54,10 @@ void gps_enable4g(GpsCtrl_s *gps);
 
 void gps_addUbxChecksum(uint8_t *data, int len);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif  // STM32_PROJECTS_DEVICE_DRIVERS_GPS_H_

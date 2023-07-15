@@ -7,6 +7,10 @@
 
 #include "board_config_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef HAL_SPI_MODULE_ENABLED
 void halCallbacks_registerSpiTxCpltCallback(SPI_HandleTypeDef *hspi,
                                             void (*callback)(void *),
@@ -45,5 +49,17 @@ void halCallbacks_registerTimPeriodElapsedCallback(TIM_HandleTypeDef *htim,
                                                    void (*callback)(void *),
                                                    void *userData);
 #endif  // HAL_TIM_MODULE_ENABLED
+
+#ifdef USB_IS_COMPOSITE
+void halCallbacks_registerUsbCdcReceiveCallback(
+    uint8_t cdc_ch, void (*callback)(void *, uint8_t, uint8_t *, uint32_t *),
+    void *userData);
+
+void halCallbacks_usbCdcRecieve(uint8_t cdc_ch, uint8_t *buf, uint32_t *len);
+#endif  // USB_IS_COMPOSITE
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // STM32_PROJECTS_DEVICE_DRIVERS_HAL_CALLBACKS_H_

@@ -1,10 +1,6 @@
 #ifndef COMMON_SYSTEM_HARDWARE_MANAGER_H_
 #define COMMON_SYSTEM_HARDWARE_MANAGER_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -108,6 +104,10 @@ extern bool hardwareStatusUsb[NUM_USB];
 extern bool hardwareStatusAdcs[NUM_ADC];
 #endif  // // HAS_DEV(USB)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void hm_hardwareInit();
 
 /* Microcontroller timer functions */
@@ -143,6 +143,7 @@ void hm_radioSetChannel(int radioNum, int channel);
 bool hm_usbIsConnected(int usbId);
 bool hm_usbTransmit(int usbId, uint8_t* data, uint16_t numBytes);
 CircularBuffer_s* hm_usbGetRxBuffer(int usbId);
+bool hm_usbIsBusy(int);
 
 /* Bluetooth functions */
 bool hm_bleClientConnected(int bleClientId);
@@ -163,7 +164,7 @@ void hm_pyroFire(int pyroId, uint32_t duration);
 void hm_pyroSet(int pyroId, bool enabled);
 void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth,
                    uint32_t duration);
-void hm_pyroUpdate();
+void hm_pyroUpdate(void*);
 void hm_dcMotorSetPercent(int dcMotorId, double percent);
 
 /* Watchdogs */

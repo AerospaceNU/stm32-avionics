@@ -76,7 +76,7 @@ bool TcpSocket::readData() {
     RadioRecievedPacket_s packet;
     packet.radioId = 0;
     packet.rssi = 0;
-    packet.crc = true;
+    packet.crcFromRadio = true;
     packet.lqi = 0;
 
     void *stringPacket = buffer + offsetof(RadioPacket_s, payload);

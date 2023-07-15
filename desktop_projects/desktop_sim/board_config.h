@@ -34,4 +34,8 @@
 
 #define DESKTOP_SIM
 
+#define USB_CLI_ID 0
+#define USB_TELEM_ID 1
+#define USB_GPS_ID 2
+
 #endif  // DESKTOP_PROJECTS_DESKTOP_SIM_BOARD_CONFIG_H_

@@ -123,7 +123,9 @@ void hm_hardwareInit() {
     hardwareStatusVbat[0] = true;
   }
 
+  #if HAS_DEV(USB)
   hardwareStatusUsb[0] = true;
+  #endif
   hardwareStatusLed[0] = true;
 }
 
@@ -174,7 +176,7 @@ void hm_radioUpdate() {
       static RadioRecievedPacket_s packet;
       packet.radioId = 0;
       packet.rssi = radio->getLastRssi();
-      packet.crc = true;
+      packet.crcFromRadio = true;
       packet.lqi = 0;
 
       memset(packet.data, 0, sizeof(packet.data));

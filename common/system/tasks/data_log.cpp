@@ -115,7 +115,23 @@ static void addressToFlashId(uint32_t startLoc, int *flashId,
   }
 }
 
+#define GLUE(a, b) __GLUE(a, b)
+#define __GLUE(a, b) a##b
+
+#define CVERIFY(expr, msg) \
+  typedef char GLUE(compiler_verify_, msg)[(expr) ? (+1) : (-1)]
+
+#define COMPILER_VERIFY(exp) CVERIFY(exp, __LINE__)
+
 static void flashRead(uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
+  //  COMPILER_VERIFY(MAX_LOG_PACKETS == 1);
+
+  // #if (sizeof logPackets != 1)
+  // #error
+  // #endif
+
+  // static_assert(sizeof(logPackets) > 261000, "Size is not correct");
+
   int flashId = -1;
   uint32_t flashOffset = 0;
   addressToFlashId(startLoc, &flashId, &flashOffset);
