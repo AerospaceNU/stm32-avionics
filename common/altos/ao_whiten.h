@@ -1,5 +1,4 @@
-#ifndef FCB_V0_ALTOS_SRC_KERNEL_AO_WHITEN_H_
-#define FCB_V0_ALTOS_SRC_KERNEL_AO_WHITEN_H_
+
 /*   1 */ 0xff,
     /*   2 */ 0xe1,
     /*   3 */ 0x1d,
@@ -128,4 +127,3 @@
     /* 126 */ 0x8b,
     /* 127 */ 0xef,
     /* 128 */ 0xc1,
-#endif  // FCB_V0_ALTOS_SRC_KERNEL_AO_WHITEN_H_

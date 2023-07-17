@@ -35,7 +35,9 @@ void ao_fec_dump_bytes(const uint8_t *bytes, uint16_t len, const char *name) {
 uint16_t ao_fec_crc(const uint8_t *bytes, uint8_t len) {
   uint16_t crc = AO_FEC_CRC_INIT;
 
+  // TODO replace with hardware (or HAL) CRC check?
   while (len--) crc = ao_fec_crc_byte(*bytes++, crc);
+
   return crc;
 }
 

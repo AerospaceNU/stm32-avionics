@@ -54,7 +54,7 @@ const RegisterSetting_s cc1120_433_1_2kbps_cfg[] = {
      CCA_MODE_RSSI_LBT << CCA_MODE_SHIFT},  // Packet Configuration Reg. 2
     {TIRADIO_PKT_CFG1,  // No whiten (Software FEC does this), no address,
                         // default CRC cfg, no byte swap, status appended
-     (1 << 0) | (0b00 << 4) | (0b01 << 2) | (0 << 1) | (1 << 0)},
+     (0 << 6) | (0b00 << 4) | (0b01 << 2) | (0 << 1) | (1 << 0)},
     {TIRADIO_PKT_CFG0, 0x20},    // Packet Configuration Reg. 0
     {TIRADIO_PA_CFG0, 0x7B},     // Power Amplifier Configuration Reg. 0
     {TIRADIO_PKT_LEN, 0xFF},     // Packet Length Configuration
