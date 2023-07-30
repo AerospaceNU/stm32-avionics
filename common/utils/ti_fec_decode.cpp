@@ -7,35 +7,12 @@
 #include <queue>
 #include <random>
 
-//--------------------------------------------------------------------------------
-uint16_t culCalcCRC(uint8_t crcData, uint16_t crcReg) {
-  uint8_t i;
-  for (i = 0; i < 8; i++) {
-    if (((crcReg & 0x8000) >> 8) ^ (crcData & 0x80))
-      crcReg = (crcReg << 1) ^ 0x8005;
-    else
-      crcReg = (crcReg << 1);
-    crcData <<= 1;
-  }
-  return crcReg;
-}
-//--------------------------------------------------------------------------------
-// Variables
-uint16_t fecEncodeTable[] = {0, 3, 1, 2, 3, 0, 2, 1, 3, 0, 2, 1, 0, 3, 1, 2};
-uint8_t input[260];
-uint16_t i, j, val, fecReg, fecOutput;
-uint32_t intOutput;
-uint16_t fec[520];
-uint8_t interleaved[520];
-uint16_t inputNum = 0, fecNum;
-uint16_t checksum;
-uint16_t length;
-
 /**************************************************************************************************************
  * FUNCTION PROTOTYPES
  */
-unsigned short fecDecode(unsigned char *pDecData, unsigned char *pInData,
+unsigned short fecDecode(unsigned char *pOutputArray, unsigned char *pInData,
                          unsigned short RemBytes);
+
 static unsigned char hammWeight(unsigned char a);
 static unsigned char min(unsigned char a, unsigned char b);
 static unsigned short calcCRC(unsigned char crcData, unsigned short crcReg);
@@ -143,20 +120,24 @@ static unsigned short calcCRC(unsigned char crcData, unsigned short crcReg) {
   return crcReg;
 }
 
+typedef struct {
+  
+} FecDecodeState_t;
+
 /**************************************************************************************************************
  * @fn fecDecode
  *
  * @brief De-interleaves and decodes a given input buffer
  *
- * @param pDecData - Pointer to where to put decoded data (NULL when
+ * @param pOutputArray - Pointer to where to put decoded data (NULL when
  * initializing at start of packet)
  * @param pInData - Pointer to received data
  * @param nRemBytes remaining (decoded) bytes to decode
  *
  *
- * @return Number of bytes of decoded data stored at pDecData
+ * @return Number of bytes of decoded data stored at pOutputArray
  */
-unsigned short fecDecode(unsigned char *pDecData, unsigned char *pInData,
+unsigned short fecDecode(unsigned char *pOutputArray, unsigned char *pInData,
                          unsigned short nRemBytes) {
   // Two sets of buffers (last, current) for each destination state for holding:
   static unsigned char nCost[2][8];  // Accumulated path cost
@@ -173,7 +154,7 @@ unsigned short fecDecode(unsigned char *pDecData, unsigned char *pInData,
   unsigned char nMinCost;
   signed char iBit = 8 - 2;
   // Initialize variables at start of packet (and return without doing any more)
-  if (pDecData == NULL) {
+  if (pOutputArray == NULL) {
     unsigned char n;
     memset(nCost, 0, sizeof(nCost));
     for (n = 1; n < 8; n++) nCost[0][n] = 100;
@@ -182,14 +163,6 @@ unsigned short fecDecode(unsigned char *pDecData, unsigned char *pInData,
     nPathBits = 0;
     return 0;
   }
-
-  printf("%u remaining post-fec. Input:\n", nRemBytes);
-  for (i = 0; i < min(4, nRemBytes * 2); i++)
-    printf("%02X, %s", pInData[i],
-           (i % 16 == 15) ? "\n"
-           : (i % 4 == 3) ? ""
-                          : "");
-  printf("\n\n");
 
   unsigned char aDeintData[4];
   {
@@ -205,14 +178,6 @@ unsigned short fecDecode(unsigned char *pDecData, unsigned char *pInData,
     }
     pInData = aDeintData;
   }
-
-  printf("De-interleaved:\n");
-  for (i = 0; i < sizeof(aDeintData); i++)
-    printf("%02X, %s", aDeintData[i],
-           (i % 16 == 15) ? "\n"
-           : (i % 4 == 3) ? ""
-                          : "");
-  printf("\n\n");
 
   // Process up to 4 bytes of de-interleaved input data, processing one encoder
   // symbol (2b) at a time
@@ -262,7 +227,7 @@ unsigned short fecDecode(unsigned char *pDecData, unsigned char *pInData,
     nPathBits++;
     // If trellis history is sufficiently long, output a byte of decoded data
     if (nPathBits == 32) {
-      *pDecData++ = (aPath[iCurrBuf][0] >> 24) & 0xFF;
+      *pOutputArray++ = (aPath[iCurrBuf][0] >> 24) & 0xFF;
       nOutputBytes++;
       nPathBits -= 8;
       nRemBytes--;
@@ -271,7 +236,7 @@ unsigned short fecDecode(unsigned char *pDecData, unsigned char *pInData,
     // data
     if ((nRemBytes <= 3) && (nPathBits == ((8 * nRemBytes) + 3))) {
       while (nPathBits >= 8) {
-        *pDecData++ = (aPath[iCurrBuf][0] >> (nPathBits - 8)) & 0xFF;
+        *pOutputArray++ = (aPath[iCurrBuf][0] >> (nPathBits - 8)) & 0xFF;
         nOutputBytes++;
         nPathBits -= 8;
       }
@@ -289,175 +254,4 @@ unsigned short fecDecode(unsigned char *pDecData, unsigned char *pInData,
   }
 
   return nOutputBytes;
-}
-
-int main() {
-  //--------------------------------------------------------------------------------
-  // Example code
-  uint8_t packet_str[] = {1, 2,  3,  4,  5,  6,  7,  8,
-                          9, 10, 11, 12, 13, 14};
-  // input[0] = length;
-  // input[1] = 1;
-  // input[2] = 2;
-  // input[3] = 3;
-  // inputNum = length + 1;
-  inputNum = sizeof(packet_str);
-  memcpy(input, packet_str, inputNum);
-
-  printf("Input: [%5d bytes]\n", inputNum);
-  for (i = 0; i < inputNum; i++)
-    printf("%02X%s", input[i], (i % 8 == 7) ? "\n" : (i % 2 == 1) ? " " : " ");
-  printf("\n\n");
-
-  // Generate CRC
-  if (true) {
-    checksum = 0xFFFF;  // Init value for CRC calculation
-    for (i = 0; i <= inputNum; i++) {
-      checksum = culCalcCRC(input[i], checksum);
-    }
-    input[inputNum++] = checksum >> 8;      // CRC1
-    input[inputNum++] = checksum & 0x00FF;  // CRC0
-  }
-
-  printf("Appended CRC: [%5d bytes]\n", inputNum);
-  for (i = 0; i < inputNum; i++) {
-    printf("%02X%s", input[i], (i % 8 == 7) ? "\n" : (i % 2 == 1) ? " " : " ");
-  }
-  printf("\n\n");
-
-  // Append Trellis Terminator
-  input[inputNum] = 0x0B;
-  input[inputNum + 1] = 0x0B;
-  fecNum = 2 * ((inputNum / 2) + 1);
-  printf("Appended Trellis terminator: [%5d bytes]\n", fecNum);
-  for (i = 0; i < fecNum; i++) {
-    printf("%02X%s", input[i], (i % 8 == 7) ? "\n" : (i % 2 == 1) ? " " : " ");
-  }
-  printf("\n\n");
-
-  // FEC encode
-  fecReg = 0;
-  for (i = 0; i < fecNum; i++) {
-    fecReg = (fecReg & 0x700) | (input[i] & 0xFF);
-    fecOutput = 0;
-    for (j = 0; j < 8; j++) {
-      fecOutput = (fecOutput << 2) | fecEncodeTable[fecReg >> 7];
-      fecReg = (fecReg << 1) & 0x7FF;
-    }
-    fec[i * 2] = fecOutput >> 8;
-    fec[i * 2 + 1] = fecOutput & 0xFF;
-  }
-
-  printf("FEC encoder output: [%5d bytes]\n", fecNum * 2);
-  for (i = 0; i < fecNum * 2; i++)
-    printf("%02X%s", fec[i], (i % 16 == 15) ? "\n" : (i % 4 == 3) ? " " : " ");
-  printf("\n\n");
-
-  // Perform interleaving
-  for (i = 0; i < fecNum * 2; i += 4) {
-    intOutput = 0;
-    for (j = 0; j < 4 * 4; j++)
-      intOutput = (intOutput << 2) |
-                  ((fec[i + (~j & 0x03)] >> (2 * ((j & 0x0C) >> 2))) & 0x03);
-    interleaved[i] = (intOutput >> 24) & 0xFF;
-    interleaved[i + 1] = (intOutput >> 16) & 0xFF;
-    interleaved[i + 2] = (intOutput >> 8) & 0xFF;
-    interleaved[i + 3] = (intOutput >> 0) & 0xFF;
-  }
-  printf("Interleaver output: [%5d bytes]\n", fecNum * 2);
-  for (i = 0; i < fecNum * 2; i++)
-    printf("%02X, %s", interleaved[i],
-           (i % 16 == 15) ? "\n"
-           : (i % 4 == 3) ? ""
-                          : "");
-  printf("\n\n");
-
-  // ==== And some noise ====
-  {
-    std::random_device rd;   // obtain a random number from hardware
-    std::mt19937 gen(rd());  // seed the generator
-    std::uniform_int_distribution<> distr(0,
-                                          fecNum * 2 - 1);  // define the range
-    std::uniform_int_distribution<> num_dist(0, 0xff);      // define the range
-
-    constexpr const int NUM_ERRS = 1;
-    for (int i = 0; i < NUM_ERRS; i++) interleaved[distr(gen)] = num_dist(gen);
-  }
-
-  printf("Noisy: [%5d bytes]\n", fecNum * 2);
-  for (i = 0; i < fecNum * 2; i++)
-    printf("%02X, %s", interleaved[i],
-           (i % 16 == 15) ? "\n"
-           : (i % 4 == 3) ? ""
-                          : "");
-  printf("\n\n");
-
-  // ====== fec decode =====
-  fecDecode(NULL, NULL, 0);  // reset before every packet
-
-  uint8_t pdatain[255];
-  memcpy(pdatain, interleaved, fecNum * 2);
-
-  // uint8_t pdataout_arr[255] = {0};
-  // uint8_t *pdataout = pdataout_arr;
-  std::vector<uint8_t> decoded_data;
-  std::queue<uint8_t> fec_data_in;
-  for (size_t i = 0; i < fecNum * 2; i++) {
-    fec_data_in.push(interleaved[i]);
-  }
-
-  size_t nBytes = inputNum;
-  uint8_t *whitenedPacketPtr = interleaved;
-  uint8_t nBytesParsed = 0;
-  size_t offset = 0;
-  while (nBytes > 0) {
-    printf("decoding at off %lu, %lu to go\n", offset, nBytes);
-
-    uint8_t quad_in[4];
-    for (int i = 0; i < 4; i++) {
-      quad_in[i] = fec_data_in.front();
-      fec_data_in.pop();
-    }
-    uint8_t temp[4];
-
-    unsigned short nBytesOut;
-    nBytesOut = fecDecode(temp, quad_in, nBytes);
-    nBytes -= nBytesOut;
-
-    for (int i = 0; i < nBytesOut; i++) {
-      decoded_data.push_back(temp[i]);
-    }
-
-    printf("decoded %u bytes!\n", nBytesOut);
-
-    auto delta = std::min<size_t>(nBytes, 4);
-    offset += delta;
-  }
-
-  // auto nBytesOut = fecDecode(pdataout, pdatain, inputNum-2);
-
-  printf("Decoded packet: [%5d bytes]\n", decoded_data.size());
-  for (i = 0; i < decoded_data.size(); i++)
-    printf("%02u%s", decoded_data[i],
-           (i % 8 == 7)   ? "\n"
-           : (i % 2 == 1) ? " "
-                          : " ");
-  printf("\n\n");
-
-  // Perform CRC check (Optional)
-  {
-    unsigned short i;
-    auto nBytes = inputNum;
-    checksum = 0xFFFF;  // Init value for CRC calculation
-    for (i = 0; i < nBytes; i++) checksum = calcCRC(decoded_data[i], checksum);
-    
-    auto txChecksum = (input[inputNum - 2] << 8) || (input[inputNum - 1]);
-
-    if (checksum != txChecksum) {
-      // Do something to indicate that the CRC is OK
-      printf("Crc OK!\n");
-    } else {
-      printf("Local checksum %lu != remote checksum %lu\n", checksum, txChecksum);
-    }
-  }
 }
