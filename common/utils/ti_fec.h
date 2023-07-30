@@ -1,29 +1,31 @@
 #pragma once
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 template <size_t MessageLen>
 class FecEncoder {
-
-public:
+ public:
   FecEncoder() = default;
 
   // Encode a message. CRC is assumed to have already been added.
   uint8_t* Encode(uint8_t* input);
 
-  static constexpr const size_t outputSize = 4 * (MessageLen/2+1);
+  static constexpr const size_t outputSize = 4 * (MessageLen / 2 + 1);
 
-private:
-  uint8_t input[MessageLen+2]; // input buffer + Trellis Terminator
-  uint8_t fec[4 * (MessageLen/2+1)];
+ private:
+  uint8_t input[MessageLen + 2];  // input buffer + Trellis Terminator
+  uint8_t fec[4 * (MessageLen / 2 + 1)];
   uint8_t interleaved[outputSize];
-  static constexpr const uint16_t fecEncodeTable[] = {0, 3, 1, 2, 3, 0, 2, 1, 3, 0, 2, 1, 0, 3, 1, 2};
+  static constexpr const uint16_t fecEncodeTable[] = {0, 3, 1, 2, 3, 0, 2, 1,
+                                                      3, 0, 2, 1, 0, 3, 1, 2};
 };
 
 class FecDecoder {
  public:
   FecDecoder() { Reset(); }
+
+  ~FecDecoder() = default;
 
   void Reset();
 
@@ -62,13 +64,13 @@ class FecDecoder {
   // messages ====
 
   // Two sets of buffers (last, current) for each destination state for holding:
-  unsigned char nCost[2][8];  // Accumulated path cost
-  unsigned long aPath[2][8];  // Encoder input data (32b window)
+  unsigned char nCost[2][8] = {0};  // Accumulated path cost
+  unsigned long aPath[2][8] = {0};  // Encoder input data (32b window)
   // Indices of (last, current) buffer for each iteration
-  unsigned char iLastBuf;
-  unsigned char iCurrBuf;
+  unsigned char iLastBuf = 0;
+  unsigned char iCurrBuf = 0;
   // Number of bits in each path buffer
-  unsigned char nPathBits;
+  unsigned char nPathBits = 0;
 };
 
 #include "ti_fec_encode.hpp"

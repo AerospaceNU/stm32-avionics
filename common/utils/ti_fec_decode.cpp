@@ -6,6 +6,7 @@
 #include <cstring>
 #include <queue>
 #include <random>
+
 #include "ti_fec.h"
 
 /**************************************************************************************************************
@@ -23,7 +24,6 @@ static unsigned char hammWeight(unsigned char a) {
   a = ((a & 0xF0) >> 4) + (a & 0x0F);
   return a;
 }
-
 
 // Look-up source state index when:
 // Destination state --\ /-- Each of two possible source states
@@ -55,8 +55,6 @@ static constexpr const unsigned char aTrellisTransitionInput[8] = {
     0, 1, 0, 1, 0, 1, 0, 1,
 };
 
-
-
 void FecDecoder::Reset() {
   memset(nCost, 0, sizeof(nCost));
   for (size_t n = 1; n < 8; n++) {
@@ -72,15 +70,11 @@ void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
   Reset();
 
   while (decodedMessageLen) {
-    printf("%u to go. Input quartet: %X %X %X %X\n", 
-      decodedMessageLen,
-      pInputMessage[0],
-      pInputMessage[1],
-      pInputMessage[2],
-      pInputMessage[3]
-    );
+    printf("%u to go. Input quartet: %X %X %X %X\n", decodedMessageLen,
+           pInputMessage[0], pInputMessage[1], pInputMessage[2],
+           pInputMessage[3]);
 
-    auto numBytesDecoded =
+    size_t numBytesDecoded =
         FecDecode4(pOutputBuffer, pInputMessage, decodedMessageLen);
 
     printf("\n");
@@ -126,12 +120,8 @@ unsigned short FecDecoder::FecDecode4(unsigned char* pOutputArray,
     pInData = aDeintData;
   }
 
-    printf("Un-interleaved: %02X %02X %02X %02X\n", 
-      pInData[0],
-      pInData[1],
-      pInData[2],
-      pInData[3]
-    );
+  printf("Un-interleaved: %02X %02X %02X %02X\n", pInData[0], pInData[1],
+         pInData[2], pInData[3]);
 
   // Process up to 4 bytes of de-interleaved input data, processing one encoder
   // symbol (2b) at a time

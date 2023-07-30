@@ -21,14 +21,13 @@ static uint16_t calculateCRC(uint8_t crcData, uint16_t crcReg) {
   return crcReg;
 }
 
-
 typedef struct __attribute__((packed)) {
   uint8_t data[4];
   uint8_t crcHi;
   uint8_t crcLo;
 } TestPacket_s;
 
-int main() {
+int main_2() {
   TestPacket_s packet;
 
   uint8_t packet_str[] = {3, 1, 2, 3};
@@ -94,7 +93,8 @@ int main() {
     }
 
     uint16_t txChecksum = (((uint16_t)rxPacket.crcHi) << 8) | rxPacket.crcLo;
-    printf("hi %u low %u total %lu\n", rxPacket.crcHi, rxPacket.crcLo, txChecksum);
+    printf("hi %u low %u total %lu\n", rxPacket.crcHi, rxPacket.crcLo,
+           txChecksum);
 
     printf("Local checksum %lu, remote checksum %lu\n", checksum, txChecksum);
     if (checksum == txChecksum) {
