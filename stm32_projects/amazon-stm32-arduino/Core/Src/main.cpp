@@ -76,7 +76,7 @@ static uint16_t calculateCRC(uint8_t crcData, uint16_t crcReg) {
 }
 
 typedef struct __attribute__((packed)) {
-  uint8_t data[4];
+  uint8_t data[48] = {0};
   uint8_t crcHi;
   uint8_t crcLo;
 } TestPacket_s;
@@ -125,10 +125,10 @@ int main(void) {
   while (1) {
     HAL_Delay(1000);
 
-    uint8_t fec_output[16];
+    uint8_t fec_output[104];
 
     {
-      uint32_t t1 = DWT->CYCCNT;
+      uint32_t t1 = HAL_GetTick();
 
       // =============
 
@@ -156,12 +156,12 @@ int main(void) {
 
       // =============
 
-      uint32_t t2 = DWT->CYCCNT;
-      printf("Tx dt: %lu ms\n", (uint32_t)((t2 - t1) * 1e6 / SystemCoreClock));
+      uint32_t t2 = HAL_GetTick();
+      printf("Tx dt: %lu ms\n", t2 - t1);
     }
 
     {
-      uint32_t t1 = DWT->CYCCNT;
+      uint32_t t1 = HAL_GetTick();
 
       // =============
 
@@ -170,6 +170,8 @@ int main(void) {
       TestPacket_s rxPacket;
       decoder.FecDecode(fec_output, reinterpret_cast<uint8_t *>(&rxPacket),
                         sizeof(rxPacket));
+
+      uint32_t t2 = HAL_GetTick();
 
       printf("Decoded packet: [%5d bytes]\n", sizeof(rxPacket));
       for (int i = 0; i < sizeof(rxPacket); i++)
@@ -202,8 +204,8 @@ int main(void) {
       }
 
       // =============
-      uint32_t t2 = DWT->CYCCNT;
-      printf("Rx dt: %lu ms\n", (uint32_t)((t2 - t1) * 1e6 / SystemCoreClock));
+
+      printf("Rx dt: %lu ms\n", t2 - t1);
     }
 
     /* USER CODE END WHILE */
@@ -233,9 +235,9 @@ void SystemClock_Config(void) {
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 25;
-  RCC_OscInitStruct.PLL.PLLN = 192;
+  RCC_OscInitStruct.PLL.PLLN = 336;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
-  RCC_OscInitStruct.PLL.PLLQ = 4;
+  RCC_OscInitStruct.PLL.PLLQ = 7;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     Error_Handler();
   }
@@ -248,7 +250,7 @@ void SystemClock_Config(void) {
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK) {
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
     Error_Handler();
   }
 }

@@ -10,6 +10,8 @@
 #include <random>
 #include "ti_fec.h"
 
+#define DEBUG_PRINTF(a...) ;
+
 template <size_t MessageLen>
 uint8_t* FecEncoder<MessageLen>::Encode(uint8_t* inputPtr) {
   memcpy(input, inputPtr, MessageLen);
@@ -20,11 +22,11 @@ uint8_t* FecEncoder<MessageLen>::Encode(uint8_t* inputPtr) {
   input[inputNum + 1] = 0x0B;
   size_t fecNum = 2 * ((inputNum / 2) + 1);
 
-  printf("Added Trellis: [%5d bytes]\n", sizeof(input));
+  DEBUG_PRINTF("Added Trellis: [%5d bytes]\n", sizeof(input));
   for (int i = 0; i < sizeof(input); i++) {
-    printf("%02X%s", input[i], (i % 8 == 7) ? "\n" : (i % 2 == 1) ? " " : " ");
+    DEBUG_PRINTF("%02X%s", input[i], (i % 8 == 7) ? "\n" : (i % 2 == 1) ? " " : " ");
   }
-  printf("\n\n");
+  DEBUG_PRINTF("\n\n");
 
   // FEC encode
   uint16_t fecReg = 0;
@@ -39,11 +41,11 @@ uint8_t* FecEncoder<MessageLen>::Encode(uint8_t* inputPtr) {
     fec[i * 2 + 1] = fecOutput & 0xFF;
   }
 
-  printf("FEC: [%5d bytes]\n", sizeof(fec));
+  DEBUG_PRINTF("FEC: [%5d bytes]\n", sizeof(fec));
   for (int i = 0; i < sizeof(fec); i++) {
-    printf("%02X%s", fec[i], (i % 8 == 7) ? "\n" : (i % 2 == 1) ? " " : " ");
+    DEBUG_PRINTF("%02X%s", fec[i], (i % 8 == 7) ? "\n" : (i % 2 == 1) ? " " : " ");
   }
-  printf("\n\n");
+  DEBUG_PRINTF("\n\n");
 
   // Perform interleaving
   for (size_t i = 0; i < fecNum * 2; i += 4) {
@@ -57,11 +59,11 @@ uint8_t* FecEncoder<MessageLen>::Encode(uint8_t* inputPtr) {
     interleaved[i + 3] = (intOutput >> 0) & 0xFF;
   }
 
-  printf("Interleaved: [%5d bytes]\n", fecNum * 2);
+  DEBUG_PRINTF("Interleaved: [%5d bytes]\n", fecNum * 2);
   for (int i = 0; i < sizeof(fec); i++) {
-    printf("%02X%s", interleaved[i], (i % 8 == 7) ? "\n" : (i % 2 == 1) ? " " : " ");
+    DEBUG_PRINTF("%02X%s", interleaved[i], (i % 8 == 7) ? "\n" : (i % 2 == 1) ? " " : " ");
   }
-  printf("\n\n");
+  DEBUG_PRINTF("\n\n");
 
   return interleaved;
 }

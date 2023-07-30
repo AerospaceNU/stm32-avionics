@@ -1,0 +1,5 @@
+main.cpp:66:17:uint16_t calculateCRC(uint8_t, uint16_t)	3
+main.cpp:222:6:void SystemClock_Config()	3
+main.cpp:266:6:void Error_Handler()	1
+ti_fec_encode.hpp:16:10:uint8_t* FecEncoder<MessageLen>::Encode(uint8_t*) [with unsigned int MessageLen = 50]	6
+main.cpp:90:5:int main()	5

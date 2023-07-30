@@ -9,6 +9,10 @@
 
 #include "ti_fec.h"
 
+#pragma GCC optimize("-Ofast")
+
+#define DEBUG_DEBUG_PRINTF(a...) ;
+
 /**************************************************************************************************************
  * @fn hammWeight
  *
@@ -70,14 +74,14 @@ void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
   Reset();
 
   while (decodedMessageLen) {
-    printf("%u to go. Input quartet: %X %X %X %X\n", decodedMessageLen,
-           pInputMessage[0], pInputMessage[1], pInputMessage[2],
-           pInputMessage[3]);
+    DEBUG_PRINTF("%u to go. Input quartet: %X %X %X %X\n", decodedMessageLen,
+                 pInputMessage[0], pInputMessage[1], pInputMessage[2],
+                 pInputMessage[3]);
 
     size_t numBytesDecoded =
         FecDecode4(pOutputBuffer, pInputMessage, decodedMessageLen);
 
-    printf("\n");
+    DEBUG_PRINTF("\n");
 
     // Keep track of remaining message length
     decodedMessageLen -= numBytesDecoded;
@@ -120,8 +124,8 @@ unsigned short FecDecoder::FecDecode4(unsigned char* pOutputArray,
     pInData = aDeintData;
   }
 
-  printf("Un-interleaved: %02X %02X %02X %02X\n", pInData[0], pInData[1],
-         pInData[2], pInData[3]);
+  DEBUG_PRINTF("Un-interleaved: %02X %02X %02X %02X\n", pInData[0], pInData[1],
+               pInData[2], pInData[3]);
 
   // Process up to 4 bytes of de-interleaved input data, processing one encoder
   // symbol (2b) at a time
