@@ -70,12 +70,26 @@ void FecDecoder::Reset() {
 void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
                            size_t decodedMessageLen) {
   Reset();
+
   while (decodedMessageLen) {
+    printf("%u to go. Input quartet: %X %X %X %X\n", 
+      decodedMessageLen,
+      pInputMessage[0],
+      pInputMessage[1],
+      pInputMessage[2],
+      pInputMessage[3]
+    );
+
     auto numBytesDecoded =
         FecDecode4(pOutputBuffer, pInputMessage, decodedMessageLen);
 
+    printf("\n");
+
     // Keep track of remaining message length
     decodedMessageLen -= numBytesDecoded;
+
+    // Advance output buffer
+    pOutputBuffer += numBytesDecoded;
 
     // Advance input by 4 bytes (always 4)
     pInputMessage += 4;
@@ -111,6 +125,13 @@ unsigned short FecDecoder::FecDecode4(unsigned char* pOutputArray,
     }
     pInData = aDeintData;
   }
+
+    printf("Un-interleaved: %02X %02X %02X %02X\n", 
+      pInData[0],
+      pInData[1],
+      pInData[2],
+      pInData[3]
+    );
 
   // Process up to 4 bytes of de-interleaved input data, processing one encoder
   // symbol (2b) at a time
