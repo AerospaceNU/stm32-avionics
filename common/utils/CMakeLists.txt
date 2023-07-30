@@ -10,5 +10,8 @@ set(UTILS_FILES_LIST
 set(UTILS_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "")
 
 add_executable(
-    fec_test ti_fec.cpp
+    fec_test 
+    ti_fec.cpp
+    ti_fec_encode.hpp
+    ti_fec_decode.cpp
 )
