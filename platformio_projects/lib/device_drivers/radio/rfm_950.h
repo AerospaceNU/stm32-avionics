@@ -5,7 +5,7 @@
 #ifndef PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_
 #define PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_
 
-#include <RH_RF95.h>
+#include <RadioLib.h>
 #include <SPI.h>
 
 #include <new>
@@ -25,8 +25,7 @@ class Rfm950 : public Radio {
   bool readData(uint8_t *buffer, size_t buffer_length) override;
 
  protected:
-  uint8_t driver_memory[sizeof(RH_RF95)]{};
-  RH_RF95 *rf95{};
+  RFM95 *rf95{};
 };
 
 #endif  // PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_
