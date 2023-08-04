@@ -8,14 +8,16 @@
 #include <cstring>
 #include <queue>
 #include <random>
+
 #include "ti_fec.h"
 
 #define DEBUG_PRINTF(a...) ;
+#pragma GCC optimize("-Os")
 
 template <size_t MessageLen>
-uint8_t* FecEncoder<MessageLen>::Encode(uint8_t* inputPtr) {
-  memcpy(input, inputPtr, MessageLen);
-  uint16_t inputNum = MessageLen;
+uint8_t* FecEncoder<MessageLen>::Encode(uint8_t* inputPtr, size_t inLen) {
+  memcpy(input, inputPtr, inLen);
+  uint16_t inputNum = inLen;
 
   // Append Trellis Terminator
   input[inputNum] = 0x0B;
@@ -23,8 +25,11 @@ uint8_t* FecEncoder<MessageLen>::Encode(uint8_t* inputPtr) {
   size_t fecNum = 2 * ((inputNum / 2) + 1);
 
   DEBUG_PRINTF("Added Trellis: [%5d bytes]\n", sizeof(input));
-  for (int i = 0; i < sizeof(input); i++) {
-    DEBUG_PRINTF("%02X%s", input[i], (i % 8 == 7) ? "\n" : (i % 2 == 1) ? " " : " ");
+  for (unsigned int i = 0; i < sizeof(input); i++) {
+    DEBUG_PRINTF("%02X%s", input[i],
+                 (i % 8 == 7)   ? "\n"
+                 : (i % 2 == 1) ? " "
+                                : " ");
   }
   DEBUG_PRINTF("\n\n");
 
@@ -42,8 +47,11 @@ uint8_t* FecEncoder<MessageLen>::Encode(uint8_t* inputPtr) {
   }
 
   DEBUG_PRINTF("FEC: [%5d bytes]\n", sizeof(fec));
-  for (int i = 0; i < sizeof(fec); i++) {
-    DEBUG_PRINTF("%02X%s", fec[i], (i % 8 == 7) ? "\n" : (i % 2 == 1) ? " " : " ");
+  for (unsigned int i = 0; i < sizeof(fec); i++) {
+    DEBUG_PRINTF("%02X%s", fec[i],
+                 (i % 8 == 7)   ? "\n"
+                 : (i % 2 == 1) ? " "
+                                : " ");
   }
   DEBUG_PRINTF("\n\n");
 
@@ -60,8 +68,11 @@ uint8_t* FecEncoder<MessageLen>::Encode(uint8_t* inputPtr) {
   }
 
   DEBUG_PRINTF("Interleaved: [%5d bytes]\n", fecNum * 2);
-  for (int i = 0; i < sizeof(fec); i++) {
-    DEBUG_PRINTF("%02X%s", interleaved[i], (i % 8 == 7) ? "\n" : (i % 2 == 1) ? " " : " ");
+  for (unsigned int i = 0; i < sizeof(fec); i++) {
+    DEBUG_PRINTF("%02X%s", interleaved[i],
+                 (i % 8 == 7)   ? "\n"
+                 : (i % 2 == 1) ? " "
+                                : " ");
   }
   DEBUG_PRINTF("\n\n");
 

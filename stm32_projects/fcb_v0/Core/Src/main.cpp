@@ -61,6 +61,10 @@ void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
 /* USER CODE BEGIN PFP */
 
+//#include <type_traits>
+// template <class T>
+// concept integral = std::is_integral_v<T>;
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/

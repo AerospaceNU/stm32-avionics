@@ -19,10 +19,10 @@ extern "C" {
 
 #if (HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915))
 
+#include "cc1120_cc1200_defs.h"
 #include "circular_buffer.h"
 #include "data_structures.h"
 #include "smartrf_registersettings.h"
-#include "cc1120_cc1200_defs.h"
 
 #include HAL_HEADER
 
@@ -123,10 +123,11 @@ typedef struct {
   size_t settingsSize;
   bool doSoftwareFEC;
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
+  uint8_t crcWorkspace[(MAX_PACKET_SIZE + 2)];
   uint8_t fecWorkspace[(MAX_PACKET_SIZE + 4) * 2];
 #endif
 
-      bool initialized;
+  bool initialized;
 } TiRadioCtrl_s;
 
 bool tiRadio_init(TiRadioCtrl_s *radio);

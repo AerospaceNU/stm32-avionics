@@ -9,14 +9,12 @@ class FecEncoder {
   FecEncoder() = default;
 
   // Encode a message. CRC is assumed to have already been added.
-  uint8_t* Encode(uint8_t* input);
-
-  static constexpr const size_t outputSize = 4 * (MessageLen / 2 + 1);
+  uint8_t* Encode(uint8_t* input, size_t inLen);
 
  private:
   uint8_t input[MessageLen + 2];  // input buffer + Trellis Terminator
   uint8_t fec[4 * (MessageLen / 2 + 1)];
-  uint8_t interleaved[outputSize];
+  uint8_t interleaved[4 * (MessageLen / 2 + 1)];
   static constexpr const uint16_t fecEncodeTable[] = {0, 3, 1, 2, 3, 0, 2, 1,
                                                       3, 0, 2, 1, 0, 3, 1, 2};
 };
@@ -72,5 +70,7 @@ class FecDecoder {
   // Number of bits in each path buffer
   unsigned char nPathBits = 0;
 };
+
+uint16_t calculateCRC(uint8_t crcData, uint16_t crcReg);
 
 #include "ti_fec_encode.hpp"
