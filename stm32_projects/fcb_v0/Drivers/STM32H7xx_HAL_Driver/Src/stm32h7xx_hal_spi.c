@@ -152,6 +152,7 @@
   */
 
 /* Private macros ------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /** @defgroup SPI_Private_Functions SPI Private Functions

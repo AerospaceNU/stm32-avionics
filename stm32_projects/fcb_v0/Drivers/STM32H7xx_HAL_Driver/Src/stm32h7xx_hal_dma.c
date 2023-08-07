@@ -164,6 +164,7 @@ typedef struct
   * @}
   */
 /* Private macros ------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private functions ---------------------------------------------------------*/
 /** @addtogroup DMA_Private_Functions
   * @{
