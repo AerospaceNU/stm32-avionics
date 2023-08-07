@@ -147,6 +147,8 @@ jobs:
 
     steps:
     - uses: carlosperate/arm-none-eabi-gcc-action@v1
+      with:
+        release: 12.3.Rel1
     - uses: jwlawson/actions-setup-cmake@v1.13
 
     - uses: actions/cache@v3

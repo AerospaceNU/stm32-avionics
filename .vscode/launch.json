@@ -18,7 +18,7 @@
             "executable": "${workspaceFolder}/build/stm32_projects/fcb_v0/fcb_v0.elf",
             "device": "STM32H750",
             "configFiles": [
-                "tooling/openocd_h7.cfg"
+                "${workspaceFolder}/tooling/openocd_h7.cfg"
             ],
             "swoConfig": {
                 "enabled": true,
@@ -42,10 +42,10 @@
             "servertype": "openocd",
             "cwd": "${workspaceFolder}",
             "runToMain": true,
-            "executable": "{workspaceFolder}/build/stm32_projects/fcb_v1/fcb_v1.elf",
+            "executable": "${workspaceFolder}/build/stm32_projects/fcb_v1/fcb_v1.elf",
             "device": "STM32H743",
             "configFiles": [
-                "tooling/openocd_h7.cfg"
+                "${workspaceFolder}/tooling/openocd_h7.cfg"
             ],
             "swoConfig": {
                 "enabled": true,
@@ -69,10 +69,10 @@
             "servertype": "openocd",
             "cwd": "${workspaceFolder}",
             "runToMain": true,
-            "executable": "{workspaceFolder}/build/stm32_projects/fcb_v2/fcb_v2.elf",
+            "executable": "${workspaceFolder}/build/stm32_projects/fcb_v2/fcb_v2.elf",
             "device": "STM32L4R5",
             "configFiles": [
-                "tooling/openocd_l4.cfg"
+                "${workspaceFolder}/tooling/openocd_l4.cfg"
             ],
             "swoConfig": {
                 "enabled": true,
@@ -96,10 +96,10 @@
             "servertype": "openocd",
             "cwd": "${workspaceFolder}",
             "runToMain": true,
-            "executable": "{workspaceFolder}/build/stm32_projects/groundstation/groundstation.elf",
+            "executable": "${workspaceFolder}/build/stm32_projects/groundstation/groundstation.elf",
             "device": "STM32H743",
             "configFiles": [
-                "tooling/openocd_h7.cfg"
+                "${workspaceFolder}/tooling/openocd_h7.cfg"
             ],
             "swoConfig": {
                 "enabled": true,
@@ -123,10 +123,10 @@
             "servertype": "openocd",
             "cwd": "${workspaceFolder}",
             "runToMain": true,
-            "executable": "{workspaceFolder}/build/stm32_projects/amazon-stm32-arduino/amazon-stm32-arduino.elf",
+            "executable": "${workspaceFolder}/build/stm32_projects/amazon-stm32-arduino/amazon-stm32-arduino.elf",
             "device": "STM32F401",
             "configFiles": [
-                "tooling/openocd_f4.cfg"
+                "${workspaceFolder}/tooling/openocd_f4.cfg"
             ],
             "swoConfig": {
                 "enabled": true,
