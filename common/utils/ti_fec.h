@@ -15,8 +15,6 @@ class FecEncoder {
   uint8_t input[MessageLen + 2];  // input buffer + Trellis Terminator
   uint8_t fec[4 * (MessageLen / 2 + 1)];
   uint8_t interleaved[4 * (MessageLen / 2 + 1)];
-  static constexpr const uint16_t fecEncodeTable[] = {0, 3, 1, 2, 3, 0, 2, 1,
-                                                      3, 0, 2, 1, 0, 3, 1, 2};
 };
 
 class FecDecoder {

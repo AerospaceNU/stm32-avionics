@@ -14,6 +14,9 @@
 #define DEBUG_PRINTF(a...) ;
 #pragma GCC optimize("-Os")
 
+static constexpr const uint16_t fecEncodeTable[] = {0, 3, 1, 2, 3, 0, 2, 1,
+                                                    3, 0, 2, 1, 0, 3, 1, 2};
+
 template <size_t MessageLen>
 uint8_t* FecEncoder<MessageLen>::Encode(uint8_t* inputPtr, size_t inLen) {
   memcpy(input, inputPtr, inLen);
