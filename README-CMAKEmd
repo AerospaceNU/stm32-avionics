@@ -11,7 +11,7 @@ The valid targets that can be built are:
 - groundstation
 - amazon-stm32-arduino
 
-## Building from Linux
+## Linux setup
 
 - Download the [Arm GNU Toolchain](https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain) that's right for your machine. I'm using a Linux x86_64 computer, so I'll download the arm-none-eabi version for a x86_64 Linux host.
 - Extract the file to somewhere safe. I've put mine in `/home/matt/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi`.
@@ -21,11 +21,31 @@ The valid targets that can be built are:
 - Open up a new terminal inside of stm32-avionics, and run:
 ```
 cmake  \
-  -B build \ # Put build files into the build directory
-  -DPROJECT_BUILD_TYPE="stm32" \ # Build stm32 projects only
-  -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake" \
+  # Put build files into the build directory
+  -B build \        
+  # Build stm32 projects only
+  -DPROJECT_BUILD_TYPE="stm32" \ 
+  # Magic sauce to actually cross-compile
+  -DCMAKE_TOOLCHAIN_FILE="cmake/stm32-cmake/cmake/stm32_gcc.cmake" \ 
+  # Telling stm32-cmake where our C compiler is lets it find all the other tools (gcc, g++, strip, ld, etc)
   -DCMAKE_C_COMPILER=/PATH/TO/arm-gnu-toolchain-VERSION-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc
 ```
+
+## Windows setup
+
+- Download the [Arm GNU Toolchain](https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain) that's right for your machine. I'm using a Windows computer, so I'll download the arm-none-eabi version for a Windows host.
+- Extract the file to somewhere safe. I've put mine in `C:\Users\matth\Documents\arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi`.
+- Install [CMake](https://cmake.org/install/) and [Ninja](https://github.com/ninja-build/ninja/releases). Make sure both end up on your PATH.
+
+On Windows, I had to add `-DCMAKE_GENERATOR=Ninja` to the above, since I have MSVC installed, and its project generator refuses to cooperate with GNU compilers. I bet that mingw makefiles would also work as a generator. Also, I had to manually tell the cortex-debug extension where to find openocd, and I had to use the openocd from the line cutter repo (the one bundled with Cube couldn't find the st-link interface config??). I went into file->preferences->settings, searched for `cortex-debug.openocdPath.windows`, and set it to `D:/Downloads/openocd/OpenOCD-20210407-0.10.0/bin/openocd.exe` (this is probably different for you). Note the forward ticks (or double back slashes) -- Windows paths being backticks is dumb.
+
+Windows:
+```
+cmake -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_C_COMPILER="C:\\Program Files (x86)\\Arm GNU Toolchain arm-none-eabi\\12.3 rel1\\bin" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32-cmake/cmake/stm32_gcc.cmake" -DCMAKE_GENERATOR=Ninja
+```
+
+## Building code for a FCB
+
 - Try building the `fcb_v0` code using:
 ```
 cmake --build build --target fcb_v0 -- -j -l
@@ -49,58 +69,3 @@ We need to pass CMAKE_C_COMPILER since we look for gcc/g++/as/ld in the same fol
 
 Now, we can build the code for (say) FCB V0 with `cmake --build build --target fcb_v0`
 
-## Building for Windows using WSL
-
-Install Ubuntu on your computer using WSL, and then build normally using the Linux instructions above. WSL 2 users may need to change the Groundstation GUI to point to WSL's IP instead of localhost.
-
-I'm going to be following [this guide](https://learn.microsoft.com/en-us/windows/wsl/install):
-
-```
-# Required to install WSL and Ubuntu. Exact distribution doesn't matter
-wsl --install
-wsl --install -d Ubuntu-22.04
-# Enter a username and password when prompted, and reboot if prompted after install is finished
-
-# Optional, only if you want to run GUI applications from Linux
-wsl --set-default-version 2 
-wsl -l -v                    # should report 2
-```
-
-After rebooting, run `wsl` from the start menu or from a command prompt to launch WSL. Now let's clone and setup the repo. Create your SSH key with `ssh-keygen` accepting all defaults, then copy the output of `cat ~/.ssh/id_rsa.pub` to [your gitlab ssh keys](https://gitlab.com/-/profile/keys).
-
-```
-sudo apt install gcc g++ cmake make
-
-git clone git@gitlab.com:aeronu/dollar-per-foot/stm32-avionics.git
-
-cd stm32-avionics
-./ci/build_desktop
-```
-
-If the build succeeds, then you've successfully got the code to build! You can use VSCode to edit code by running `code ~/stm32-avionics`, and accepting all prompts to install extensions and use the actual Windows vscode instead of rendering in Linux. 
-
-
-## Building for Windows (Native)
-
-Windows uses MSYS2 to provide most of the same linux-looking libraries. Note that only gtest tests will actually build, the socket code doesn't work right now
-
-- Install msys2
-- Follow https://code.visualstudio.com/docs/cpp/config-mingw
-- In the msys2 terminal, run `pacman -S --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja` on step 5 of that guide
-- Make sure that when you run cmake, it points to the msys install of cmake!
-- Make sure to add msys2 to the path
-- Try a full msys upgrade with pacman -Suy if you have weird issues
-
-After doing the above, run the following in Powershell
-
-```
-# configure
-$gxx_loc = (where.exe g++).Replace("\","/")
-$gcc_loc = (where.exe gcc).Replace("\","/")
-cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=desktop -Wno-dev -DCMAKE_CXX_COMPILER="$gxx_loc" -DCMAKE_C_COMPILER="$gcc_loc"
-
-# for gtest
-cmake --build build --target desktop_sim_test
-# for local sim
-cmake --build build --target desktop_sim
-```

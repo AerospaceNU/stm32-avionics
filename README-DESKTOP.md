@@ -33,7 +33,7 @@ After rebooting, run `wsl` from the start menu or from a command prompt to launc
 ```
 sudo apt install gcc g++ cmake make
 
-git clone git@gitlab.com:aeronu/dollar-per-foot/stm32-avionics.git
+git clone  --recurse-submodules git@gitlab.com:aeronu/dollar-per-foot/stm32-avionics.git
 
 cd stm32-avionics
 ./ci/build_desktop
