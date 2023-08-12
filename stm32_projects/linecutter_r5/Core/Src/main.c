@@ -22,6 +22,7 @@
 #include "ipcc.h"
 #include "iwdg.h"
 #include "rf.h"
+#include "rtc.h"
 #include "spi.h"
 #include "tim.h"
 #include "usb_device.h"
@@ -78,6 +79,8 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
+  /* Config code for STM32_WPAN (HSE Tuning must be done before system clock configuration) */
+  MX_APPE_Config();
 
   /* USER CODE BEGIN Init */
 
@@ -105,15 +108,20 @@ int main(void)
   MX_USB_Device_Init();
   MX_TIM2_Init();
   MX_IWDG_Init();
+  MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
+
+  /* Init code for STM32_WPAN */
+  MX_APPE_Init();
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
+    MX_APPE_Process();
 
     /* USER CODE BEGIN 3 */
   }

@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
+  * @file    App/app_ble.h
+  * @author  MCD Application Team
+  * @brief   Header for ble application
   ******************************************************************************
   * @attention
   *
@@ -19,19 +19,15 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef APP_BLE_H
+#define APP_BLE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32wbxx_hal.h"
-
-#include "app_conf.h"
-#include "app_entry.h"
-#include "app_common.h"
+#include "hci_tl.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -39,6 +35,45 @@ extern "C" {
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
+
+typedef enum
+{
+  APP_BLE_IDLE,
+  APP_BLE_FAST_ADV,
+  APP_BLE_LP_ADV,
+  APP_BLE_SCAN,
+  APP_BLE_CONNECTING,
+  APP_BLE_CONNECTED,
+
+  APP_BLE_DISCOVER_SERVICES,
+  APP_BLE_DISCOVER_CHARACS,
+  APP_BLE_DISCOVER_LED_CHAR_DESC,
+  APP_BLE_DISCOVER_BUTTON_CHAR_DESC,
+  APP_BLE_DISCOVER_NOTIFICATION_CHAR_DESC,
+  APP_BLE_ENABLE_NOTIFICATION_BUTTON_DESC,
+  APP_BLE_DISABLE_NOTIFICATION_TX_DESC
+} APP_BLE_ConnStatus_t;
+
+typedef enum
+{
+  P2P_START_TIMER_EVT,
+  P2P_STOP_TIMER_EVT,
+  P2P_BUTTON_INFO_RECEIVED_EVT,
+} P2P_Client_Opcode_Notification_evt_t;
+
+typedef struct
+{
+  uint8_t *pPayload;
+  uint8_t Length;
+}P2P_Client_Data_t;
+
+typedef struct
+{
+  P2P_Client_Opcode_Notification_evt_t  P2P_Client_Evt_Opcode;
+  P2P_Client_Data_t DataTransfered;
+  uint8_t   ServiceInstance;
+}P2P_Client_App_Notification_evt_t;
+
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
@@ -48,45 +83,27 @@ extern "C" {
 
 /* USER CODE END EC */
 
+/* External variables --------------------------------------------------------*/
+/* USER CODE BEGIN EV */
+
+/* USER CODE END EV */
+
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
 
-/* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
+/* Exported functions ---------------------------------------------*/
+void APP_BLE_Init(void);
 
-/* USER CODE BEGIN EFP */
+APP_BLE_ConnStatus_t APP_BLE_Get_Client_Connection_Status( uint16_t Connection_Handle );
 
-/* USER CODE END EFP */
+/* USER CODE BEGIN EF */
 
-/* Private defines -----------------------------------------------------------*/
-#define FLASH_CS_Pin GPIO_PIN_8
-#define FLASH_CS_GPIO_Port GPIOB
-#define USER_LED_Pin GPIO_PIN_9
-#define USER_LED_GPIO_Port GPIOB
-#define PYRO_SENSE_1_Pin GPIO_PIN_0
-#define PYRO_SENSE_1_GPIO_Port GPIOA
-#define PYRO_SENSE_2_Pin GPIO_PIN_1
-#define PYRO_SENSE_2_GPIO_Port GPIOA
-#define BATT_SENSE_IN_Pin GPIO_PIN_2
-#define BATT_SENSE_IN_GPIO_Port GPIOA
-#define BARO1_CS_Pin GPIO_PIN_3
-#define BARO1_CS_GPIO_Port GPIOA
-#define IMU1_CS_Pin GPIO_PIN_4
-#define IMU1_CS_GPIO_Port GPIOA
-#define LIGHT_SENSE_IN_Pin GPIO_PIN_8
-#define LIGHT_SENSE_IN_GPIO_Port GPIOA
-#define FIRE1_PWM_Pin GPIO_PIN_10
-#define FIRE1_PWM_GPIO_Port GPIOA
-#define FIRE2_PWM_Pin GPIO_PIN_15
-#define FIRE2_PWM_GPIO_Port GPIOA
-/* USER CODE BEGIN Private defines */
-
-/* USER CODE END Private defines */
+/* USER CODE END EF */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __MAIN_H */
+#endif /*APP_BLE_H */
