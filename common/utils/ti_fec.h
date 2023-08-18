@@ -3,7 +3,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
-template <size_t MessageLen>
+#ifndef MaxMessageLen
+#define MaxMessageLen 128
+#endif
+
 class FecEncoder {
  public:
   FecEncoder() = default;
@@ -12,9 +15,9 @@ class FecEncoder {
   uint8_t* Encode(uint8_t* input, size_t inLen);
 
  private:
-  uint8_t input[MessageLen + 2];  // input buffer + Trellis Terminator
-  uint8_t fec[4 * (MessageLen / 2 + 1)];
-  uint8_t interleaved[4 * (MessageLen / 2 + 1)];
+  uint8_t input[MaxMessageLen + 2];  // input buffer + Trellis Terminator
+  uint8_t fec[4 * (MaxMessageLen / 2 + 1)];
+  uint8_t interleaved[4 * (MaxMessageLen / 2 + 1)];
 };
 
 class FecDecoder {
