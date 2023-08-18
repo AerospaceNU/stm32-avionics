@@ -10,7 +10,6 @@
 #include "ti_fec.h"
 
 #pragma GCC optimize("-Ofast")
-#define DEBUG_DEBUG_PRINTF(a...) ;
 
 /**************************************************************************************************************
  * @fn hammWeight

@@ -1,5 +1,3 @@
-#pragma once
-
 #include <stdint.h>
 
 #include <algorithm>
@@ -17,7 +15,7 @@
 static constexpr const uint16_t fecEncodeTable[] = {0, 3, 1, 2, 3, 0, 2, 1,
                                                     3, 0, 2, 1, 0, 3, 1, 2};
 
-uint8_t* FecEncoder::Encode(uint8_t* inputPtr, size_t inLen) {
+void FecEncoder::Encode(uint8_t* inputPtr, size_t inLen) {
   memcpy(input, inputPtr, inLen);
   uint16_t inputNum = inLen;
 
@@ -78,5 +76,5 @@ uint8_t* FecEncoder::Encode(uint8_t* inputPtr, size_t inLen) {
   }
   DEBUG_PRINTF("\n\n");
 
-  return interleaved;
+  // return interleaved;
 }

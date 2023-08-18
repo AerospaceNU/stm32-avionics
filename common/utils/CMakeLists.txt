@@ -5,13 +5,10 @@ set(UTILS_FILES_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/dtoa.c
     ${CMAKE_CURRENT_SOURCE_DIR}/small_strtod.c
     ${CMAKE_CURRENT_SOURCE_DIR}/string_slice.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/string_slice.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ti_fec.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ti_fec_encode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ti_fec_decode.cpp
     CACHE INTERNAL "")
 
 set(UTILS_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "")
-
-add_executable(
-    fec_test 
-    ti_fec.cpp
-    ti_fec_encode.hpp
-    ti_fec_decode.cpp
-)

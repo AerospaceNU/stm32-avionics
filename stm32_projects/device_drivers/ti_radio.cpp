@@ -356,7 +356,7 @@ bool tiRadio_addTxPacket(TiRadioCtrl_s *radio, uint8_t *packet, uint8_t len) {
     memcpy(radio->crcWorkspace + len, &checksum, 2);
     static FecEncoder<128> encoder;
     // borrowed pointer to internal array
-    uint8_t* output = encoder.Encode(packet, len);
+    uint8_t *output = encoder.Encode(packet, len);
 
     txPtr = output;
   } else {
@@ -720,8 +720,9 @@ uint8_t trx8BitRegAccess(TiRadioCtrl_s *radio, uint8_t accessType,
   HAL_SPI_TransmitReceive(radio->radhspi, &txBuf, &readValue, 0x01,
                           TIRADIO_MAX_DELAY);
   tiRadio_txRxReadWriteBurstSingle(radio, (accessType | addrByte), pData,
-                                   len);                  // write the data
-  HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, GPIO_PIN_SET);  // Pull CS High
+                                   len);  // write the data
+  HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin,
+                    GPIO_PIN_SET);  // Pull CS High
 
   return (readValue);
 }

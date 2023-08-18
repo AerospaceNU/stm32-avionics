@@ -7,12 +7,17 @@
 #define MaxMessageLen 128
 #endif
 
+#define DEBUG_PRINTF(a...) ;
+
 class FecEncoder {
  public:
   FecEncoder() = default;
 
   // Encode a message. CRC is assumed to have already been added.
-  uint8_t* Encode(uint8_t* input, size_t inLen);
+  void Encode(uint8_t* input, size_t inLen);
+
+  inline const size_t OutputSize(size_t inLen) { return 4 * (inLen / 2 + 1); }
+  inline uint8_t* OutputArray() { return interleaved; }
 
  private:
   uint8_t input[MaxMessageLen + 2];  // input buffer + Trellis Terminator
@@ -72,6 +77,6 @@ class FecDecoder {
   unsigned char nPathBits = 0;
 };
 
+namespace ti_fec {
 uint16_t calculateCRC(uint8_t crcData, uint16_t crcReg);
-
-#include "ti_fec_encode.hpp"
+}

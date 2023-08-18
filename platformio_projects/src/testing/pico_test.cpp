@@ -5,8 +5,8 @@
  * then off for one second, repeatedly.
  */
 
-#include "ti_fec.h"
 #include "Arduino.h"
+#include "ti_fec.h"
 
 typedef struct __attribute__((packed)) {
   uint8_t data[48] = {0};
@@ -15,15 +15,15 @@ typedef struct __attribute__((packed)) {
 } TestPacket_s;
 uint8_t fec_output[104];
 
-void setup() {
-  Serial.begin(115200);
-}
+void setup() { Serial.begin(115200); }
 
 // Overwrite _write so printf prints to USB
 // int _write(int file, char *ptr, int len) { Serial.write(ptr, (size_t)len); }
 // int sput(char c, __attribute__((unused)) FILE* f) {return !Serial.write(c);}
 
 char buff[1024];
+
+using namespace ti_fec;
 
 #pragma GCC optimize("-Ofast")
 void loop() {
