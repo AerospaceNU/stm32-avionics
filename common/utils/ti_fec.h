@@ -60,15 +60,14 @@ class FecDecoder {
    *
    * @return Number of bytes of decoded data stored at pOutputArray
    */
-  uint16_t FecDecode4(unsigned char* pOutputArray,
-                            unsigned char* pInputArray,
-                            unsigned short nRemBytes);
+  uint16_t FecDecode4(unsigned char* pOutputArray, unsigned char* pInputArray,
+                      unsigned short nRemBytes);
 
   // ==== Private varibles to keep track of state, reset with Reset() between
   // messages ====
 
   // Two sets of buffers (last, current) for each destination state for holding:
-  uint8_t nCost[2][8] = {0};  // Accumulated path cost
+  uint8_t nCost[2][8] = {0};   // Accumulated path cost
   uint32_t aPath[2][8] = {0};  // Encoder input data (32b window)
   // Indices of (last, current) buffer for each iteration
   uint8_t iLastBuf = 0;
