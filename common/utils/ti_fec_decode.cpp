@@ -7,6 +7,9 @@
 #include <queue>
 #include <random>
 
+// #include <chrono>
+// #include <iostream>
+
 #include "ti_fec.h"
 
 #pragma GCC optimize("-Ofast")
@@ -20,7 +23,7 @@
  *
  * @return Hamming weight (# of bits set in a)
  */
-static unsigned char hammWeight(unsigned char a) {
+static uint8_t hammWeight(uint8_t a) {
   a = ((a & 0xAA) >> 1) + (a & 0x55);
   a = ((a & 0xCC) >> 2) + (a & 0x33);
   a = ((a & 0xF0) >> 4) + (a & 0x0F);
@@ -29,7 +32,7 @@ static unsigned char hammWeight(unsigned char a) {
 
 // Look-up source state index when:
 // Destination state --\ /-- Each of two possible source states
-static constexpr const unsigned char aTrellisSourceStateLut[8][2] = {
+static constexpr const uint8_t aTrellisSourceStateLut[8][2] = {
     {0, 4},  // State {0,4} -> State 0
     {0, 4},  // State {0,4} -> State 1
     {1, 5},  // State {1,5} -> State 2
@@ -39,9 +42,10 @@ static constexpr const unsigned char aTrellisSourceStateLut[8][2] = {
     {3, 7},  // State {3,7} -> State 6
     {3, 7},  // State {3,7} -> State 7
 };
+
 // Look-up expected output when:
 // Destination state --\ /-- Each of two possible source states
-static constexpr const unsigned char aTrellisTransitionOutput[8][2] = {
+static constexpr const uint8_t aTrellisTransitionOutput[8][2] = {
     {0, 3},  // State {0,4} -> State 0 produces {"00", "11"}
     {3, 0},  // State {0,4} -> State 1 produces {"11", "00"}
     {1, 2},  // State {1,5} -> State 2 produces {"01", "10"}
@@ -51,11 +55,14 @@ static constexpr const unsigned char aTrellisTransitionOutput[8][2] = {
     {2, 1},  // State {3,7} -> State 6 produces {"10", "01"}
     {1, 2},  // State {3,7} -> State 7 produces {"01", "10"}
 };
+
 // Look-up input bit at encoder when:
 // Destination state --
-static constexpr const unsigned char aTrellisTransitionInput[8] = {
+static constexpr const uint8_t aTrellisTransitionInput[8] = {
     0, 1, 0, 1, 0, 1, 0, 1,
 };
+
+#define MIN(a, b) ((b < a) ? b : a)
 
 void FecDecoder::Reset() {
   memset(nCost, 0, sizeof(nCost));
@@ -72,6 +79,9 @@ void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
   Reset();
 
   while (decodedMessageLen) {
+    // std::cout << "==============\n";
+    // auto start = std::chrono::high_resolution_clock::now();
+
     DEBUG_PRINTF("%u to go. Input quartet: %X %X %X %X\n", decodedMessageLen,
                  pInputMessage[0], pInputMessage[1], pInputMessage[2],
                  pInputMessage[3]);
@@ -89,32 +99,46 @@ void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
 
     // Advance input by 4 bytes (always 4)
     pInputMessage += 4;
+
+    // auto finish = std::chrono::high_resolution_clock::now();
+    // std::cout << "Decode4 took " << std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() << "ns\n";
   }
 }
 
-unsigned short FecDecoder::FecDecode4(unsigned char* pOutputArray,
-                                      unsigned char* pInData,
+unsigned short FecDecoder::FecDecode4(uint8_t* pOutputArray,
+                                      uint8_t* pInData,
                                       unsigned short nRemBytes) {
   // Variables used to hold # Viterbi iterations to run, # bytes output,
   // minimum cost for any destination state, bit index of input symbol
-  unsigned char nIterations;
+  uint8_t nIterations;
   unsigned short nOutputBytes = 0;
-  unsigned char nMinCost;
-  signed char iBit = 8 - 2;
+  uint8_t nMinCost;
+  int8_t iBit = 8 - 2;
+
+  // Declare variables up front
+  uint8_t nCost0;
+  uint8_t nCost1;
+  uint8_t iSrcState0;
+  uint8_t iSrcState1;
+  uint8_t nInputBit;
+
   // Initialize variables at start of packet (and return without doing any more)
   if (pOutputArray == NULL) {
     Reset();
     return 0;
   }
 
-  unsigned char aDeintData[4];
+
+  // auto start = std::chrono::high_resolution_clock::now();
+
+  uint8_t aDeintData[4];
   {
-    signed char iOut;
-    signed char iIn;
+    int8_t iOut;
+    int8_t iIn;
     // De-interleave received data (and change pInData to point to
     // de-interleaved data)
     for (iOut = 0; iOut < 4; iOut++) {
-      unsigned char dataByte = 0;
+      uint8_t dataByte = 0;
       for (iIn = 3; iIn >= 0; iIn--)
         dataByte = (dataByte << 2) | ((pInData[iIn] >> (2 * iOut)) & 0x03);
       aDeintData[iOut] = dataByte;
@@ -122,14 +146,19 @@ unsigned short FecDecoder::FecDecode4(unsigned char* pOutputArray,
     pInData = aDeintData;
   }
 
+
+  // auto finish = std::chrono::high_resolution_clock::now();
+  // std::cout << "De-interleave\t" << std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() << "ns\n";
+  // start = std::chrono::high_resolution_clock::now();
+
   DEBUG_PRINTF("Un-interleaved: %02X %02X %02X %02X\n", pInData[0], pInData[1],
                pInData[2], pInData[3]);
 
   // Process up to 4 bytes of de-interleaved input data, processing one encoder
   // symbol (2b) at a time
   for (nIterations = 16; nIterations > 0; nIterations--) {
-    unsigned char iDestState;
-    unsigned char symbol = ((*pInData) >> iBit) & 0x03;
+    uint8_t iDestState;
+    uint8_t symbol = ((*pInData) >> iBit) & 0x03;
     // Find minimum cost so that we can normalize costs (only last iteration
     // used)
     nMinCost = 0xFF;
@@ -138,14 +167,10 @@ unsigned short FecDecoder::FecDecode4(unsigned char* pOutputArray,
       iBit = 6;
       pInData++;  // Update pointer to the next byte of received data
     }
+
     // For each destination state in the trellis, calculate hamming costs for
     // both possible paths into state and select the one with lowest cost.
     for (iDestState = 0; iDestState < 8; iDestState++) {
-      unsigned char nCost0;
-      unsigned char nCost1;
-      unsigned char iSrcState0;
-      unsigned char iSrcState1;
-      unsigned char nInputBit;
       nInputBit = aTrellisTransitionInput[iDestState];
       // Calculate cost of transition from each of the two source states (cost
       // is Hamming difference between received 2b symbol and expected symbol
@@ -160,17 +185,19 @@ unsigned short FecDecoder::FecDecode4(unsigned char* pOutputArray,
       // that source state's path and add new decoded bit
       if (nCost0 <= nCost1) {
         nCost[iCurrBuf][iDestState] = nCost0;
-        nMinCost = std::min(nMinCost, nCost0);
+        nMinCost = MIN(nMinCost, nCost0);
         aPath[iCurrBuf][iDestState] =
             (aPath[iLastBuf][iSrcState0] << 1) | nInputBit;
       } else {
         nCost[iCurrBuf][iDestState] = nCost1;
-        nMinCost = std::min(nMinCost, nCost1);
+        nMinCost = MIN(nMinCost, nCost1);
         aPath[iCurrBuf][iDestState] =
             (aPath[iLastBuf][iSrcState1] << 1) | nInputBit;
       }
     }
+
     nPathBits++;
+
     // If trellis history is sufficiently long, output a byte of decoded data
     if (nPathBits == 32) {
       *pOutputArray++ = (aPath[iCurrBuf][0] >> 24) & 0xFF;
@@ -178,6 +205,7 @@ unsigned short FecDecoder::FecDecode4(unsigned char* pOutputArray,
       nPathBits -= 8;
       nRemBytes--;
     }
+
     // After having processed 3-symbol trellis terminator, flush out remaining
     // data
     if ((nRemBytes <= 3) && (nPathBits == ((8 * nRemBytes) + 3))) {
@@ -186,6 +214,10 @@ unsigned short FecDecoder::FecDecode4(unsigned char* pOutputArray,
         nOutputBytes++;
         nPathBits -= 8;
       }
+
+      // finish = std::chrono::high_resolution_clock::now();
+      // std::cout << "Early, trellis\t" << std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() << "ns\n";
+
       return nOutputBytes;
     }
     // Swap current and last buffers for next iteration
@@ -193,11 +225,19 @@ unsigned short FecDecoder::FecDecode4(unsigned char* pOutputArray,
     iCurrBuf = (iCurrBuf + 1) % 2;
   }
 
+
+  // finish = std::chrono::high_resolution_clock::now();
+  // std::cout << "Decode:  \t" << std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() << "ns\n";
+  // start = std::chrono::high_resolution_clock::now();
+
   // Normalize costs so that minimum cost becomes 0
   {
-    unsigned char iState;
+    uint8_t iState;
     for (iState = 0; iState < 8; iState++) nCost[iLastBuf][iState] -= nMinCost;
   }
+
+  // finish = std::chrono::high_resolution_clock::now();
+  // std::cout << "Normalize\t" << std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() << "ns\n";
 
   return nOutputBytes;
 }

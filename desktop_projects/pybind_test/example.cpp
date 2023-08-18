@@ -1,7 +1,8 @@
 #include <array>
 #include <cstdio>
 #include <cstring>
-
+#include <chrono>
+#include <iostream>
 #include "ti_fec.h"
 
 #ifdef __cplusplus
@@ -21,14 +22,17 @@ int main() {
   for (int i = 0; i < in.size(); i++) {
     printf("%u ", in[i]);
   }
+  printf("\n");
 
   {
     std::array<uint8_t, in.size()> out;
     FecDecoder decoder;
+    auto start = std::chrono::high_resolution_clock::now();
     decoder.FecDecode(encoder.OutputArray(), out.data(), out.size());
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::cout << "Total FEC time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() << "ns\n";
   }
 
-  printf("\n");
 
   for (int i = 0; i < encoder.OutputSize(in.size()); i++) {
     printf("%u ", encoder.OutputArray()[i]);
