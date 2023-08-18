@@ -150,9 +150,10 @@ int main(void) {
         packet.crcLo = checksum & 0xff;
       }
 
-      FecEncoder<sizeof(packet)> encoder;
+      FecEncoder encoder;
       // borrowed pointer to internal array
-      memcpy(fec_output, encoder.Encode(input), sizeof(fec_output));
+      encoder.Encode(input, sizeof(packet));
+      memcpy(fec_output, encoder.OutputArray(), sizeof(fec_output));
 
       // =============
 
@@ -162,6 +163,7 @@ int main(void) {
 
     {
       uint32_t t1 = HAL_GetTick();
+      uint32_t t1_us = DWT->CYCCNT;
 
       // =============
 
@@ -172,6 +174,7 @@ int main(void) {
                         sizeof(rxPacket));
 
       uint32_t t2 = HAL_GetTick();
+      uint32_t t2_us = DWT->CYCCNT;
 
       printf("Decoded packet: [%5d bytes]\n", sizeof(rxPacket));
       for (int i = 0; i < sizeof(rxPacket); i++)
@@ -205,7 +208,8 @@ int main(void) {
 
       // =============
 
-      printf("Rx dt: %lu ms\n", t2 - t1);
+      printf("Rx dt: %lu ms %lu us\n", t2 - t1,
+             (int)((double)(t2_us - t1_us) / SystemCoreClock * 1e6));
     }
 
     /* USER CODE END WHILE */
