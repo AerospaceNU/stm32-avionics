@@ -7,7 +7,8 @@
 #define MaxMessageLen 128
 #endif
 
-#define DEBUG_PRINTF(a...) ;
+#define DEBUG_PRINTF(a...) \
+  {}
 // #define DEBUG_PRINTF(...) printf(__VA_ARGS__);
 
 class FecEncoder {
@@ -67,7 +68,7 @@ class FecDecoder {
    * @return Number of bytes of decoded data stored at pOutputArray
    */
   uint16_t FecDecode4(unsigned char* pOutputArray, unsigned char* pInputArray,
-                      unsigned short nRemBytes);
+                      uint16_t nRemBytes);
 
   // ==== Private varibles to keep track of state, reset with Reset() between
   // messages ====
@@ -85,8 +86,8 @@ class FecDecoder {
   uint8_t nPathBits = 0;
 
   //! Lookup table -- indexed into as [iDestState[2:0], symbol[1:0],
-  //! path[0]]. Records cost step for a packet tuple of state/symbol/path (a vs b)
-  //! Total width is 6 bits
+  //! path[0]]. Records cost step for a packet tuple of state/symbol/path (a vs
+  //! b) Total width is 6 bits
   uint8_t costStepLUT[1 << 6];
 };
 

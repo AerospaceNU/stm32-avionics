@@ -134,12 +134,12 @@ void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
   }
 }
 
-unsigned short FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
-                                      unsigned short nRemBytes) {
+uint16_t FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
+                                uint16_t nRemBytes) {
   // Variables used to hold # Viterbi iterations to run, # bytes output,
   // minimum cost for any destination state, bit index of input symbol
   uint8_t nIterations;
-  unsigned short nOutputBytes = 0;
+  uint16_t nOutputBytes = 0;
   uint8_t nMinCost;
   int8_t iBit = 8 - 2;
 
@@ -204,9 +204,9 @@ unsigned short FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
 #define DO_STATE(iDestState)                                                  \
   {                                                                           \
     nInputBit = (iDestState % 2);                                             \
-    /* Calculate cost of transition from each of the two source states (cost  \
-     * is Hamming difference between received 2b symbol and expected symbol   \
-     * for transition) */                                                     \
+    /* Calculate cost of transition from each of the two source states */     \
+    /* (cost is Hamming difference between received 2b symbol and expected */ \
+    /* symbol for transition) */                                              \
     iSrcState0 = aTrellisSourceStateLut[iDestState][0];                       \
     iSrcState1 = aTrellisSourceStateLut[iDestState][1];                       \
     nCost0 = nCost[iLastBuf][iSrcState0];                                     \

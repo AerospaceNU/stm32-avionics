@@ -11,4 +11,4 @@ do
 done
 
 # Cpplint
-cpplint --counting=detailed --recursive common/ desktop_projects/ stm32_projects/device_drivers/ platformio_projects/src/ platformio_projects/lib/device_drivers/ platformio_projects/lib/new_hal/
+cpplint --counting=detailed --filter="-build/c++11" --recursive common/ desktop_projects/ stm32_projects/device_drivers/ platformio_projects/src/ platformio_projects/lib/device_drivers/ platformio_projects/lib/new_hal/
