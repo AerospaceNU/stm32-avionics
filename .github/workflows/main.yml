@@ -143,7 +143,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-12]
-        prj-target: ["fcb_v0","fcb_v1","fcb_v2","groundstation","amazon-stm32-arduino"]
+        prj-target: ["fcb_v0","fcb_v1","fcb_v2","groundstation","amazon-stm32-arduino", "prop_adcboard_v2"]
 
     runs-on: ${{ matrix.os }}
 

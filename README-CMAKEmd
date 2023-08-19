@@ -17,7 +17,7 @@ The valid targets that can be built are:
 - Extract the file to somewhere safe. I've put mine in `/home/matt/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi`.
 - Install cmake and a build tool like make with `sudo apt install cmake make`
 - If you haven't yet, clone this repository as described in the [readme](/README.md)
-- If the build directory within `stm32-avionics` already exists, delete its contents
+- If the build directory within `stm32-avionics` already exists, delete its contents. If you forget to do this, the wrong compiler may be used.
 - Open up a new terminal inside of stm32-avionics, and run:
 ```
 cmake  \
@@ -69,3 +69,108 @@ We need to pass CMAKE_C_COMPILER since we look for gcc/g++/as/ld in the same fol
 
 Now, we can build the code for (say) FCB V0 with `cmake --build build --target fcb_v0`
 
+# Adding a new board
+
+Let's try adding CMake build to the "prop_adcboard_v2" project. We'll copy the `CMakeLists.txt` from the `amazon-stm32-arduino` project folder, and add the prop_adcboard_v2 directory to `stm32_projects/CMakeLists.txt`.
+Now let's edit `stm32_projects/prop_adcboard_v2/CMakeLists.txt`. We'll change all the instances of `amazon-stm32-arduino` over to `prop_adcboard_v2`.
+
+We need to include device_drivers, so let's add the includes/source files for those. I'll reference the fcb_v0 CMakeLists.txt for this. Let's add `` to `PRJ_SOURCES`:
+```
+${STM32_DEVICE_DRIVERS_SRCS}
+${UTILS_FILES_LIST}
+```
+
+And to the `target_include_directories()` call:
+```
+${STM32_DEVICE_DRIVERS_INCLUDE_DIRS}
+${DEVICES_COMMON_INCLUDE_DIRS}
+${UTILS_INCLUDE_DIRS}
+```
+
+Let's also make sure that the compile flags for `target_compile_definitions` and `target_compile_options` are correct. We can figure out what flags Cube is using by building the project once, then inspecting the makefiles it generates in `stm32_projects/prop_adcboard_v2/Debug/Core/Src/subdir.mk`. The `-I` flags are including directories. 
+
+```make
+// snip
+Core/Src/%.o Core/Src/%.su Core/Src/%.cyclo: ../Core/Src/%.cpp Core/Src/subdir.mk
+	arm-none-eabi-g++ "$<" -mcpu=cortex-m4 -std=gnu++14 -g3 -DDEBUG -Dtimegm=mktime -DUSE_HAL_DRIVER -DSTM32F401xC -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../USB_DEVICE/App -I../USB_DEVICE/Target -I../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc -I"D:/Documents/GitHub/stm32-avionics/common/utils" -I"D:/Documents/GitHub/stm32-avionics/stm32_projects/device_drivers" -I"D:/Documents/GitHub/stm32-avionics/common/devices_common" -O0 -ffunction-sections -fdata-sections -fno-exceptions -fno-rtti -fno-use-cxa-atexit -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
+```
+
+Let's find all the define flags, which start with `-D`; They're `-DDEBUG -Dtimegm=mktime -DUSE_HAL_DRIVER -DSTM32F401xC`. Let's replace the stuff in `target_compile_definitions` with these, then:
+
+```
+target_compile_definitions(${EXECUTABLE} PRIVATE
+        -DDEBUG
+        -Dtimegm=mktime
+        -DUSE_HAL_DRIVER
+        -DSTM32F401xC
+        )
+```
+
+Now, down in `target_compile_options`, let's copy all the `-m -M -f` and such flags over. The cpu and fpu flags are pretty important. That should give us:
+
+```
+target_compile_options(${EXECUTABLE} PRIVATE
+        -mcpu=cortex-m4
+        -mthumb
+        -mfpu=fpv4-sp-d16
+        -mfloat-abi=hard
+
+        -fdata-sections
+        -ffunction-sections
+        -fno-exceptions
+        $<$<COMPILE_LANG_AND_ID:CXX,GNU>:-fno-rtti>
+        $<$<COMPILE_LANG_AND_ID:CXX,GNU>:-fno-use-cxa-atexit>
+        -fstack-usage
+
+        -Wl,--gc-sections
+        -static
+
+        -MMD
+        -MP
+        -specs=nano.specs
+        -specs=nosys.specs
+
+        -u _printf_float
+
+        -Og
+        -g3
+        )
+```
+
+To figure out linker flags, look in `stm32_projects/prop_adcboard_v2/Debug/makefile`. We'll use a similar process to above. I've copy pasted the important line here:
+
+```make
+# Tool invocations
+prop_adcboard_v2.elf prop_adcboard_v2.map: $(OBJS) $(USER_OBJS) D:\Documents\GitHub\stm32-avionics\stm32_projects\prop_adcboard_v2\STM32F401CCUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "prop_adcboard_v2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\Documents\GitHub\stm32-avionics\stm32_projects\prop_adcboard_v2\STM32F401CCUX_FLASH.ld" -Wl,-Map="prop_adcboard_v2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+  ```
+
+Now let's make sure the important ones end up in `target_link_options` (Mostly the path to the `ld` file, and the CPU and FPU names). I'll then copy them into `target_link_options`:
+
+```
+target_link_options(${EXECUTABLE} PRIVATE
+        -T${CMAKE_CURRENT_SOURCE_DIR}/STM32F401CCUX_FLASH.ld
+        -mcpu=cortex-m4
+        -mthumb
+        -mfpu=fpv4-sp-d16
+        -mfloat-abi=hard
+        -specs=nano.specs
+        -lnosys
+        -lc
+        -lm
+        -Wl,-Map=${PROJECT_NAME}.map,--cref
+        -Wl,--gc-sections
+        -Wl,--print-memory-usage
+        )
+```
+
+That's it! Now we should be able to do `cmake --build build --target prop_adcboard_v2 -- -j -l` from the root project directory. You should see something like this, which tells you how much RAM and flash memory your project is using. (Cube gives you a per-function breakdown, too).
+
+```
+Memory region         Used Size  Region Size  %age Used
+             RAM:        8168 B        64 KB     12.46%
+           FLASH:       31080 B       256 KB     11.86%
+   text    data     bss     dec     hex filename
+  30724     352    7824   38900    97f4 prop_adcboard_v2.elf
+[100%] Built target prop_adcboard_v2
+```
