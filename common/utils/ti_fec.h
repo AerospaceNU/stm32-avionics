@@ -16,7 +16,9 @@ class FecEncoder {
   // Encode a message. CRC is assumed to have already been added.
   void Encode(uint8_t* input, size_t inLen);
 
-  inline constexpr const size_t OutputSize(const size_t inLen) { return 4 * (inLen / 2 + 1); }
+  inline constexpr const size_t OutputSize(const size_t inLen) {
+    return 4 * (inLen / 2 + 1);
+  }
   inline uint8_t* OutputArray() { return interleaved; }
 
  private:
@@ -27,7 +29,10 @@ class FecEncoder {
 
 class FecDecoder {
  public:
-  FecDecoder() { Reset(); }
+  FecDecoder() {
+    Reset();
+    FillLUT();
+  }
 
   ~FecDecoder() = default;
 
@@ -66,6 +71,9 @@ class FecDecoder {
   // ==== Private varibles to keep track of state, reset with Reset() between
   // messages ====
 
+ private:
+  void FillLUT();
+
   // Two sets of buffers (last, current) for each destination state for holding:
   uint8_t nCost[2][8] = {0};   // Accumulated path cost
   uint32_t aPath[2][8] = {0};  // Encoder input data (32b window)
@@ -74,6 +82,11 @@ class FecDecoder {
   uint8_t iCurrBuf = 0;
   // Number of bits in each path buffer
   uint8_t nPathBits = 0;
+
+  //! Lookup table -- indexed into as [iDestState[2:0], symbol[1:0],
+  //! path[0]]. Records cost step for a packet tuple of state/symbol/path (a vs b)
+  //! Total width is 6 bits
+  uint8_t costStepLUT[1 << 6];
 };
 
 namespace ti_fec {

@@ -78,6 +78,27 @@ void FecDecoder::Reset() {
   nPathBits = 0;
 }
 
+// The lookup table is indexed into as [iDestState[2:0], symbol[1:0], path]
+// In at least one test, using addition instead of bitwise OR nets us ~3% speedup
+#define destStateLUTIndex(iDestState, symbol, path) ((iDestState << 3) + (symbol << 1) + (path))
+
+void FecDecoder::FillLUT() {
+  for (uint8_t iDestState = 0; iDestState < 8; iDestState++) {
+    for (uint8_t symbol = 0; symbol < 8; symbol++) {
+      // Figure out how much the cost will increase for a given pair of
+      // (destination, current symbol)
+      uint8_t costStep0 =
+          hammWeight(symbol ^ aTrellisTransitionOutput[iDestState][0]);
+      uint8_t costStep1 =
+          hammWeight(symbol ^ aTrellisTransitionOutput[iDestState][1]);
+
+      // And write it down
+      costStepLUT[destStateLUTIndex(iDestState, symbol, 0)] = costStep0;
+      costStepLUT[destStateLUTIndex(iDestState, symbol, 1)] = costStep1;
+    }
+  }
+}
+
 void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
                            size_t decodedMessageLen) {
   Reset();
@@ -160,8 +181,9 @@ unsigned short FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
 
   // Process up to 4 bytes of de-interleaved input data, processing one encoder
   // symbol (2b) at a time
+  uint8_t iDestState;
+  uint8_t index;
   for (nIterations = 16; nIterations > 0; nIterations--) {
-    uint8_t iDestState;
     uint8_t symbol = ((*pInData) >> iBit) & 0x03;
     // Find minimum cost so that we can normalize costs (only last iteration
     // used)
@@ -215,17 +237,28 @@ unsigned short FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
 
 #else
 
+    // might be a minimal speedup but u could cut down on all the calls to
+    // hammweight / multiple lookups / comparisons if you used an lut with
+    // iDestState (3bits), symbol (2bits), ilastbuf (1bit); i believe you can
+    // condense most of this into a 64-input lookup table..? might be missing
+    // sth iDestState (3) + symbol (2) + iLastBuf (1)
+
     for (iDestState = 0; iDestState < 8; iDestState++) {
       nInputBit = aTrellisTransitionInput[iDestState];
+
       // Calculate cost of transition from each of the two source states (cost
       // is Hamming difference between received 2b symbol and expected symbol
       // for transition)
       iSrcState0 = aTrellisSourceStateLut[iDestState][0];
-      nCost0 = nCost[iLastBuf][iSrcState0];
-      nCost0 += hammWeight(symbol ^ aTrellisTransitionOutput[iDestState][0]);
       iSrcState1 = aTrellisSourceStateLut[iDestState][1];
+      nCost0 = nCost[iLastBuf][iSrcState0];
       nCost1 = nCost[iLastBuf][iSrcState1];
-      nCost1 += hammWeight(symbol ^ aTrellisTransitionOutput[iDestState][1]);
+
+      // Being smart and writing down the index once nets us another 7.5%
+      index = destStateLUTIndex(iDestState, symbol, 0);
+      nCost0 += costStepLUT[index];
+      nCost1 += costStepLUT[index + 1];
+
       // Select transition that gives lowest cost in destination state, copy
       // that source state's path and add new decoded bit
       if (nCost0 <= nCost1) {
