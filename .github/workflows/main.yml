@@ -176,7 +176,7 @@ jobs:
       working-directory: ${{github.workspace}}
       run: |
         touch CMakeListsPrivate.txt
-        cmake . -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32_gcc.cmake" ${{ (startsWith(matrix.os, 'windows-latest') && '-DCMAKE_GENERATOR=Ninja') || '' }}
+        cmake . -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32-cmake/cmake/stm32_gcc.cmake" ${{ (startsWith(matrix.os, 'windows-latest') && '-DCMAKE_GENERATOR=Ninja') || '' }}
         cmake --build build --target ${{ matrix.prj-target }} -j
 
     - name: Rename artifact
