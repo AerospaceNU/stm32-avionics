@@ -171,11 +171,10 @@ unsigned short FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
     // For each destination state in the trellis, calculate hamming costs for
     // both possible paths into state and select the one with lowest cost.
 
-    // for (iDestState = 0; iDestState < 8; iDestState++) {
-
-#define DO_STATE(iDestState)                                                  \
+  // Unrolling this loop seems to net us 5% speed improvement
+  #define DO_STATE(iDestState)                                                \
   {                                                                           \
-    nInputBit = aTrellisTransitionInput[iDestState];                          \
+    nInputBit = (iDestState % 2);                                             \
     /* Calculate cost of transition from each of the two source states (cost  \
      * is Hamming difference between received 2b symbol and expected symbol   \
      * for transition) */                                                     \

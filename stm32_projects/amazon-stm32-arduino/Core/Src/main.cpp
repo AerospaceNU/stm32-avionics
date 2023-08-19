@@ -139,6 +139,10 @@ int main(void) {
       size_t inputNum = sizeof(TestPacket_s);
       uint8_t *input = (uint8_t *)&packet;
 
+      FecEncoder encoder;
+
+      uint32_t t1_us = DWT->CYCCNT;
+
       // Generate CRC
       {
         uint16_t checksum = 0xFFFF;  // Init value for CRC calculation
@@ -150,15 +154,18 @@ int main(void) {
         packet.crcLo = checksum & 0xff;
       }
 
-      FecEncoder encoder;
       // borrowed pointer to internal array
       encoder.Encode(input, sizeof(packet));
       memcpy(fec_output, encoder.OutputArray(), sizeof(fec_output));
 
+      uint32_t t2_us = DWT->CYCCNT;
+
       // =============
 
       uint32_t t2 = HAL_GetTick();
-      printf("Tx dt: %lu ms\n", t2 - t1);
+
+      printf("Tx dt: %lu ms %lu us\n", t2 - t1,
+             (int)((double)(t2_us - t1_us) / SystemCoreClock * 1e6));
     }
 
     {
