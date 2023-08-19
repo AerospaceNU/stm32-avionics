@@ -63,6 +63,10 @@ static constexpr const uint8_t aTrellisTransitionInput[8] = {
 };
 
 #define MIN(a, b) ((b < a) ? b : a)
+// template <class T>
+// inline T MIN(T a, T b) {
+//   return (a>b) ? a : b;
+// }
 
 void FecDecoder::Reset() {
   memset(nCost, 0, sizeof(nCost));
@@ -171,8 +175,9 @@ unsigned short FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
     // For each destination state in the trellis, calculate hamming costs for
     // both possible paths into state and select the one with lowest cost.
 
-  // Unrolling this loop seems to net us 5% speed improvement
-  #define DO_STATE(iDestState)                                                \
+#if 0
+// Unrolling this loop seems to net us 5% speed improvement
+#define DO_STATE(iDestState)                                                  \
   {                                                                           \
     nInputBit = (iDestState % 2);                                             \
     /* Calculate cost of transition from each of the two source states (cost  \
@@ -207,6 +212,36 @@ unsigned short FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
     DO_STATE(5);
     DO_STATE(6);
     DO_STATE(7);
+
+#else
+
+    for (iDestState = 0; iDestState < 8; iDestState++) {
+      nInputBit = aTrellisTransitionInput[iDestState];
+      // Calculate cost of transition from each of the two source states (cost
+      // is Hamming difference between received 2b symbol and expected symbol
+      // for transition)
+      iSrcState0 = aTrellisSourceStateLut[iDestState][0];
+      nCost0 = nCost[iLastBuf][iSrcState0];
+      nCost0 += hammWeight(symbol ^ aTrellisTransitionOutput[iDestState][0]);
+      iSrcState1 = aTrellisSourceStateLut[iDestState][1];
+      nCost1 = nCost[iLastBuf][iSrcState1];
+      nCost1 += hammWeight(symbol ^ aTrellisTransitionOutput[iDestState][1]);
+      // Select transition that gives lowest cost in destination state, copy
+      // that source state's path and add new decoded bit
+      if (nCost0 <= nCost1) {
+        nCost[iCurrBuf][iDestState] = nCost0;
+        nMinCost = MIN(nMinCost, nCost0);
+        aPath[iCurrBuf][iDestState] =
+            (aPath[iLastBuf][iSrcState0] << 1) | nInputBit;
+      } else {
+        nCost[iCurrBuf][iDestState] = nCost1;
+        nMinCost = MIN(nMinCost, nCost1);
+        aPath[iCurrBuf][iDestState] =
+            (aPath[iLastBuf][iSrcState1] << 1) | nInputBit;
+      }
+    }
+
+#endif
 
     nPathBits++;
 

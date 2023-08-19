@@ -16,7 +16,7 @@ class FecEncoder {
   // Encode a message. CRC is assumed to have already been added.
   void Encode(uint8_t* input, size_t inLen);
 
-  inline constexpr const size_t OutputSize(constexpr const size_t inLen) { return 4 * (inLen / 2 + 1); }
+  inline constexpr const size_t OutputSize(const size_t inLen) { return 4 * (inLen / 2 + 1); }
   inline uint8_t* OutputArray() { return interleaved; }
 
  private:
