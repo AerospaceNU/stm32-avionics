@@ -25,6 +25,8 @@ jobs:
         version: 1.0
 
     - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
 
     - name: Install things
       working-directory: ${{github.workspace}}
@@ -59,6 +61,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
+        submodules: 'recursive'
 
     # Fetch tags.
     - name: Fetch tags
@@ -109,6 +112,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
+        submodules: 'recursive'
 
     - name: Fetch tags
       working-directory: ${{github.workspace}}
@@ -160,6 +164,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
+        submodules: 'recursive'
 
     - name: Fetch tags
       working-directory: ${{github.workspace}}
@@ -216,6 +221,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
+        submodules: 'recursive'
 
     - name: Fetch tags
       working-directory: ${{github.workspace}}
