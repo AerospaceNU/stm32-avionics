@@ -8,7 +8,7 @@ This guide should get you through your first build of the project for stm32. For
 
 First, pull this git repository using the following command from a directory of your liking.
 
-`git clone https://gitlab.com/aeronu/dollar-per-foot/stm32-avionics`
+`git clone --recurse-submodules git@github.com:AerospaceNU/stm32-avionics.git`
 
 **Note:** you must have git installed. You can install git for windows [here](https://gitforwindows.org/).
 
