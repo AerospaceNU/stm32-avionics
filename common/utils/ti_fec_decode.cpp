@@ -79,8 +79,10 @@ void FecDecoder::Reset() {
 }
 
 // The lookup table is indexed into as [iDestState[2:0], symbol[1:0], path]
-// In at least one test, using addition instead of bitwise OR nets us ~3% speedup
-#define destStateLUTIndex(iDestState, symbol, path) ((iDestState << 3) + (symbol << 1) + (path))
+// In at least one test, using addition instead of bitwise OR nets us ~3%
+// speedup
+#define destStateLUTIndex(iDestState, symbol, path) \
+  ((iDestState << 3) + (symbol << 1) + (path))
 
 void FecDecoder::FillLUT() {
   for (uint8_t iDestState = 0; iDestState < 8; iDestState++) {
@@ -197,8 +199,8 @@ unsigned short FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
     // For each destination state in the trellis, calculate hamming costs for
     // both possible paths into state and select the one with lowest cost.
 
-#if 0
-// Unrolling this loop seems to net us 5% speed improvement
+#if 1
+// Unrolling this loop seems to net us 5-7% speed improvement
 #define DO_STATE(iDestState)                                                  \
   {                                                                           \
     nInputBit = (iDestState % 2);                                             \
@@ -206,11 +208,14 @@ unsigned short FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
      * is Hamming difference between received 2b symbol and expected symbol   \
      * for transition) */                                                     \
     iSrcState0 = aTrellisSourceStateLut[iDestState][0];                       \
-    nCost0 = nCost[iLastBuf][iSrcState0];                                     \
-    nCost0 += hammWeight(symbol ^ aTrellisTransitionOutput[iDestState][0]);   \
     iSrcState1 = aTrellisSourceStateLut[iDestState][1];                       \
+    nCost0 = nCost[iLastBuf][iSrcState0];                                     \
     nCost1 = nCost[iLastBuf][iSrcState1];                                     \
-    nCost1 += hammWeight(symbol ^ aTrellisTransitionOutput[iDestState][1]);   \
+    /* Being smart and writing down the index once nets us another 7.5% */    \
+    /* But being cleaver and removing this increment doesn't change it */     \
+    index = destStateLUTIndex(iDestState, symbol, 0);                         \
+    nCost0 += costStepLUT[index];                                             \
+    nCost1 += costStepLUT[index + 1];                                         \
     /* Select transition that gives lowest cost in destination state, copy */ \
     /* that source state's path and add new decoded bit*/                     \
     if (nCost0 <= nCost1) {                                                   \
@@ -245,7 +250,6 @@ unsigned short FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
 
     for (iDestState = 0; iDestState < 8; iDestState++) {
       nInputBit = aTrellisTransitionInput[iDestState];
-
       // Calculate cost of transition from each of the two source states (cost
       // is Hamming difference between received 2b symbol and expected symbol
       // for transition)
@@ -253,12 +257,10 @@ unsigned short FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
       iSrcState1 = aTrellisSourceStateLut[iDestState][1];
       nCost0 = nCost[iLastBuf][iSrcState0];
       nCost1 = nCost[iLastBuf][iSrcState1];
-
       // Being smart and writing down the index once nets us another 7.5%
       index = destStateLUTIndex(iDestState, symbol, 0);
       nCost0 += costStepLUT[index];
       nCost1 += costStepLUT[index + 1];
-
       // Select transition that gives lowest cost in destination state, copy
       // that source state's path and add new decoded bit
       if (nCost0 <= nCost1) {
