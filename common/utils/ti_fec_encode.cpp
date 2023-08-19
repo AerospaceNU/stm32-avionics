@@ -9,7 +9,6 @@
 
 #include "ti_fec.h"
 
-#define DEBUG_PRINTF(a...) ;
 #pragma GCC optimize("-Os")
 
 static constexpr const uint16_t fecEncodeTable[] = {0, 3, 1, 2, 3, 0, 2, 1,
@@ -68,7 +67,7 @@ void FecEncoder::Encode(uint8_t* inputPtr, size_t inLen) {
   }
 
   DEBUG_PRINTF("Interleaved: [%5d bytes]\n", fecNum * 2);
-  for (unsigned int i = 0; i < sizeof(fec); i++) {
+  for (unsigned int i = 0; i < fecNum * 2; i++) {
     DEBUG_PRINTF("%02X%s", interleaved[i],
                  (i % 8 == 7)   ? "\n"
                  : (i % 2 == 1) ? " "

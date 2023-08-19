@@ -8,6 +8,7 @@
 #endif
 
 #define DEBUG_PRINTF(a...) ;
+// #define DEBUG_PRINTF(...) printf(__VA_ARGS__);
 
 class FecEncoder {
  public:
