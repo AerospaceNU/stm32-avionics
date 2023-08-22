@@ -339,6 +339,52 @@ bool ceSerial::WriteChar(char ch) {
 	return Write(s);
 }
 
+size_t ceSerial::Read(char* outArr, size_t len) {
+	if (!IsOpened()) {return 0;}
+
+	DWORD dwRead = 0;
+	BYTE* data = (BYTE*)(&rxchar);
+	//the creation of the overlapped read operation
+	if (!fWaitingOnRead) {
+		// Issue read operation.
+		if (!ReadFile(hComm, outArr, len, &dwRead, &osReader)) {
+			if (GetLastError() != ERROR_IO_PENDING) { /*Error*/}
+			else { fWaitingOnRead = TRUE; /*Waiting*/}
+		}
+		else {
+            //success
+            // if(dwRead==len) success = true;
+        }
+	}
+
+	//detection of the completion of an overlapped read operation
+	DWORD dwRes;
+	if (fWaitingOnRead) {
+		dwRes = WaitForSingleObject(osReader.hEvent, READ_TIMEOUT);
+		switch (dwRes)
+		{
+		// Read completed.
+		case WAIT_OBJECT_0:
+			if (!GetOverlappedResult(hComm, &osReader, &dwRead, FALSE)) {/*Error*/ }
+			else {
+				// if (dwRead == len) success = true;
+				fWaitingOnRead = FALSE;
+            // Reset flag so that another opertion can be issued.
+			}// Read completed successfully.
+			break;
+
+		case WAIT_TIMEOUT:
+			// Operation isn't complete yet.
+			break;
+
+		default:
+			// Error in the WaitForSingleObject;
+			break;
+		}
+	}
+	return dwRead;
+}
+
 char ceSerial::ReadChar(bool& success) {
 	success = false;
 	if (!IsOpened()) {return 0;}
