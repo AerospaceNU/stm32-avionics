@@ -113,3 +113,15 @@ set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_features(imgui PUBLIC cxx_std_17)
 
 target_link_libraries(imgui PRIVATE system)
+
+# -- Now we can create our executable and link to dear-imgui --
+
+find_package(Threads REQUIRED)
+find_package(OpenGL REQUIRED)
+
+add_executable(
+    desktop_gui gui_main.cpp
+)
+target_link_libraries(desktop_gui PRIVATE system devices imgui Threads::Threads ${OPENGL_LIBRARIES})
+target_include_directories(desktop_gui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ../desktop_ui/src/)
+
