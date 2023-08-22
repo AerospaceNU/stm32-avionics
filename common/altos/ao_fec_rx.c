@@ -38,17 +38,17 @@ uint32_t ao_fec_decode_start, ao_fec_decode_end;
  *
  * So, the over all order is:
  *
- *	3,1/0 	2,1/0	1,1/0	0,1/0
- *	3,3/2 	2,3/2	1,3/2	0,3/2
- *	3,5/4	2,5/4	1,5/4	0,5/4
- *	3,7/6	2,7/6	1,7/6	0,7/6
+ *  3,1/0   2,1/0  1,1/0  0,1/0
+ *  3,3/2   2,3/2  1,3/2  0,3/2
+ *  3,5/4  2,5/4  1,5/4  0,5/4
+ *  3,7/6  2,7/6  1,7/6  0,7/6
  *
  * The raw bit order is thus
  *
- *	1e/1f   16/17   0e/0f   06/07
- *	1c/1d	14/15	0c/0d	04/05
- *	1a/1b	12/13	0a/0b	02/03
- *	18/19	10/11	08/09	00/01
+ *  1e/1f   16/17   0e/0f   06/07
+ *  1c/1d  14/15  0c/0d  04/05
+ *  1a/1b  12/13  0a/0b  02/03
+ *  18/19  10/11  08/09  00/01
  */
 
 static const uint8_t ao_interleave_order[] = {
@@ -179,7 +179,7 @@ uint8_t ao_fec_decode(const uint8_t *in, uint16_t len, uint8_t *out,
      * received bit are flipped between these two previous
      * states:
      *
-     * 	bitcost(state+4) = 510 - bitcost(state)
+     *   bitcost(state+4) = 510 - bitcost(state)
      *
      * With those two total costs in hand, we then pick
      * the lower as the cost of the 'state<<1', and compute
@@ -193,8 +193,8 @@ uint8_t ao_fec_decode(const uint8_t *in, uint16_t len, uint8_t *out,
      * expected transmitted bits with some tricky
      * arithmetic which is equivalent to:
      *
-     *	m0 = cost[p][state] + (510 - bitcost);
-     *	m1 = cost[p][state+4] + bitcost
+     *  m0 = cost[p][state] + (510 - bitcost);
+     *  m1 = cost[p][state+4] + bitcost
      *
      * Then, the lowest cost and bit trace of the new state
      * is saved.
@@ -231,11 +231,11 @@ uint8_t ao_fec_decode(const uint8_t *in, uint16_t len, uint8_t *out,
     DO_STATE(3);
 
 #if 0
-		printf ("bit %3d symbol %2x %2x:", i/2, s0, s1);
-		for (state = 0; state < NUM_STATE; state++) {
-			printf (" %8u(%08x)", cost[n][state], bits[n][state]);
-		}
-		printf ("\n");
+    printf("bit %3d symbol %2x %2x:", i/2, s0, s1);
+    for (state = 0; state < NUM_STATE; state++) {
+      printf(" %8u(%08x)", cost[n][state], bits[n][state]);
+    }
+    printf("\n");
 #endif
     p = n;
 
@@ -279,8 +279,11 @@ uint8_t ao_fec_decode(const uint8_t *in, uint16_t len, uint8_t *out,
       }
 
 #if 0
-			printf ("\tbit %3d min_cost %5d old bit %3d old_state %x bits %02x whiten %0x\n",
-				i/2, min_cost, o + 8, min_state, (bits[p][min_state] >> dist) & 0xff, *whiten);
+      printf(
+          "\tbit %3d min_cost %5d old bit %3d old_state %x bits %02x whiten "
+          "%0x\n",
+          i / 2, min_cost, o + 8, min_state,
+          (bits[p][min_state] >> dist) & 0xff, *whiten);
 #endif
       byte = (bits[p][min_state] >> dist) ^ *whiten++;
       *out++ = byte;

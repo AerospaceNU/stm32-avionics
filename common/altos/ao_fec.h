@@ -16,8 +16,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#ifndef _AO_FEC_H_
-#define _AO_FEC_H_
+#ifndef COMMON_ALTOS_AO_FEC_H_
+#define COMMON_ALTOS_AO_FEC_H_
 
 #include <stdint.h>
 
@@ -77,4 +77,4 @@ uint8_t ao_fec_decode(const uint8_t *in, uint16_t in_len, uint8_t *out,
  */
 uint16_t ao_fec_interleave_bytes(uint8_t *in, uint16_t len, uint8_t *out);
 
-#endif /* _AO_FEC_H_ */
+#endif  // COMMON_ALTOS_AO_FEC_H_

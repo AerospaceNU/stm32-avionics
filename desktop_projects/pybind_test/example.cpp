@@ -25,7 +25,7 @@ int main() {
   }
   printf("\n");
 
-  long long int total = 0;
+  uint64_t total = 0;
   std::array<uint8_t, in.size()> out;
   for (int i = 0; i < 100; i++) {
     FecDecoder decoder;

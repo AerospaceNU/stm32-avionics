@@ -76,7 +76,7 @@ const uint8_t ao_fec_whiten_table[] = {
 };
 
 static const uint8_t ao_fec_encode_table[16] = {
-    /* next 0  1	  state */
+    /* next 0  1    state */
     0, 3, /* 000 */
     1, 2, /* 001 */
     3, 0, /* 010 */

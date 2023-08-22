@@ -23,7 +23,7 @@ void setup() { Serial.begin(115200); }
 
 char buff[1024];
 
-using namespace ti_fec;
+using ti_fec::calculateCRC;
 
 #pragma GCC optimize("-Ofast")
 void loop() {
