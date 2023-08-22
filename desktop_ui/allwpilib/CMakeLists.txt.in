@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(allwpilib-download NONE)
+
+include(ExternalProject)
+ExternalProject_Add(allwpilib
+  GIT_REPOSITORY    https://github.com/wpilibsuite/allwpilib.git
+  GIT_TAG           81c5b41ce1ef1dacda3d0b3b81fb38ad0c67138c
+  SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/allwpilib-src"
+  BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/allwpilib-build"
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND     ""
+  INSTALL_COMMAND   ""
+  TEST_COMMAND      ""
+)
