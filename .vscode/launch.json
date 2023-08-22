@@ -12,22 +12,22 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/feather_m0_lora/firmware.elf",
-            "projectEnvName": "feather_m0_lora",
+            "executable": "/home/matt/stm32-avionics/.pio/build/blink/firmware.elf",
+            "projectEnvName": "blink",
             "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
             "preLaunchTask": {
                 "type": "PlatformIO",
-                "task": "Pre-Debug (feather_m0_lora)"
+                "task": "Pre-Debug"
             }
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/feather_m0_lora/firmware.elf",
-            "projectEnvName": "feather_m0_lora",
+            "executable": "/home/matt/stm32-avionics/.pio/build/blink/firmware.elf",
+            "projectEnvName": "blink",
             "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd"
@@ -36,8 +36,8 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
-            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/feather_m0_lora/firmware.elf",
-            "projectEnvName": "feather_m0_lora",
+            "executable": "/home/matt/stm32-avionics/.pio/build/blink/firmware.elf",
+            "projectEnvName": "blink",
             "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
