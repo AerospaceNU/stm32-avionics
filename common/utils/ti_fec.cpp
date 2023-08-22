@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#pragma GCC optimize("-Ofast")
+
 namespace ti_fec {
 uint16_t calculateCRC(uint8_t crcData, uint16_t crcReg) {
   uint8_t i;

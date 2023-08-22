@@ -10,7 +10,7 @@
 #include "ti_fec.h"
 
 #define DEBUG_PRINTF(a...) ;
-#pragma GCC optimize("-Os")
+#pragma GCC optimize("-Ofast")
 
 static constexpr const uint16_t fecEncodeTable[] = {0, 3, 1, 2, 3, 0, 2, 1,
                                                     3, 0, 2, 1, 0, 3, 1, 2};
