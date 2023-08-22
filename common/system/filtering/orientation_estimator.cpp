@@ -18,7 +18,9 @@ OrientationEstimator::OrientationEstimator(float dt) : m_dt(dt) {}
 
 OrientationEstimator::~OrientationEstimator() {}
 
-void OrientationEstimator::reset() { this->q = Matrix<4, 1>({1.0, 0, 0, 0}); }
+void OrientationEstimator::reset() { 
+  // this->q = Matrix<4, 1>({1.0, 0, 0, 0});
+}
 
 void OrientationEstimator::setDt(float dt) { this->m_dt = dt; }
 
@@ -49,6 +51,7 @@ void OrientationEstimator::update(float rocket_ang_vel_x,
        rocket_ang_vel_x, 0.0, rocket_ang_vel_z, -rocket_ang_vel_y,
        rocket_ang_vel_y, -rocket_ang_vel_z, 0.0, rocket_ang_vel_x,
        rocket_ang_vel_z, rocket_ang_vel_y, -rocket_ang_vel_x, 0.0});
+
   Matrix<3, 1> gyro({rocket_ang_vel_x, rocket_ang_vel_y, rocket_ang_vel_z});
 
   float w = gyro.norm();
