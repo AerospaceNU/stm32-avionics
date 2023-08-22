@@ -59,7 +59,9 @@ void Application::runGUI() {
 	if (window == NULL)
 		return;
 	glfwWindowHint(GLFW_SAMPLES, 4);
-	glEnable(GL_MULTISAMPLE);  
+#ifdef GL_MULTISAMPLE
+	glEnable(GL_MULTISAMPLE);
+#endif
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1); // Enable vsync
 
