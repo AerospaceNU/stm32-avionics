@@ -1,16 +1,66 @@
 #include "Application.h"	
 #include "FrameUpdate.h"
+#include <fmt/format.h>
 
 static void glfw_error_callback(int error, const char* description)
 {
 	fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
+struct GlobalContext {
+	GLFWwindow* window;
+	int fontScale = 2; 
+	int userScale = 2;
+	std::vector<ImFont*> fonts;
+	bool reloadFonts;
+};
+static GlobalContext gContext;
+
+// From https://github.com/wpilibsuite/allwpilib/blob/89e738262c7dd80daa3702432250e49fa57d7f55/wpigui/src/main/native/cpp/wpigui.cpp#L152C1-L172C2
+static void UpdateFontScale() {
+  // Scale based on OS window content scaling
+  float windowScale = 1.0;
+#ifndef __APPLE__
+  glfwGetWindowContentScale(gContext.window, &windowScale, nullptr);
+#endif
+  // map to closest font size: 0 = 0.5x, 1 = 0.75x, 2 = 1.0x, 3 = 1.25x,
+  // 4 = 1.5x, 5 = 1.75x, 6 = 2x
+  int fontScale =
+      gContext.userScale + static_cast<int>((windowScale - 1.0) * 4);
+  if (fontScale < 0) {
+    fontScale = 0;
+  }
+  if (gContext.fontScale != fontScale) {
+    gContext.reloadFonts = true;
+    gContext.fontScale = fontScale;
+  }
+}
+// the range is based on 13px being the "nominal" 100% size and going from
+// ~0.5x (7px) to ~2.0x (25px)
+static void ReloadFonts() {
+  auto& io = ImGui::GetIO();
+  io.Fonts->Clear();
+  gContext.fonts.clear();
+  float size = 7.0f + gContext.fontScale * 3.0f;
+  bool first = true;
+  for (auto&& makeFont : gContext.makeFonts) {
+    if (makeFont.second) {
+      ImFontConfig cfg;
+      std::snprintf(cfg.Name, sizeof(cfg.Name), "%s", makeFont.first);
+      ImFont* font = makeFont.second(io, size, &cfg);
+      if (first) {
+        ImGui::GetIO().FontDefault = font;
+        first = false;
+      }
+      gContext.fonts.emplace_back(font);
+    }
+  }
+}
+
 void Application::tickApplication() {
     if (ImGui::BeginMainMenuBar())
     {
-        if (ImGui::BeginMenu("Edit"))
-        {
+        if (ImGui::BeginMenu("Edit")) {
             if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
             if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
             ImGui::Separator();
@@ -19,6 +69,23 @@ void Application::tickApplication() {
             if (ImGui::MenuItem("Paste", "CTRL+V")) {}
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("View")) {
+			if (ImGui::BeginMenu("Zoom")) {
+
+				for (int i = 50; i<=300; i+=50) {
+					if (ImGui::MenuItem(fmt::format("{}%", i).c_str())) {
+						// ImGui::
+						// ImGui::GetStyle().ScaleAllSizes(i / 100.0);
+						// ReloadFonts();
+					}
+				}
+				
+            ImGui::EndMenu();
+			}
+            ImGui::EndMenu();
+        }
+
+
         ImGui::EndMainMenuBar();
     }
 
@@ -68,14 +135,14 @@ void Application::runGUI() {
 
 	// Create window with graphics context
 
-	GLFWwindow* window = glfwCreateWindow(1280, 720, "FCB Sim GUI", NULL, NULL);
+	gContext.window = glfwCreateWindow(1280, 720, "FCB Sim GUI", NULL, NULL);
 	if (window == NULL)
 		return;
 	glfwWindowHint(GLFW_SAMPLES, 4);
 #ifdef GL_MULTISAMPLE
 	glEnable(GL_MULTISAMPLE);
 #endif
-	glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(gContext.window);
 	glfwSwapInterval(1); // Enable vsync
 
 	// Setup Dear ImGui context
@@ -84,13 +151,17 @@ void Application::runGUI() {
 
 	ImPlot::CreateContext();
 
-	// font sizing
-	// https://github.com/ocornut/imgui/blob/master/docs/FONTS.md see this link to change the font
-	float font_scale = 1.3;
-	ImFontConfig cfg;
-	cfg.SizePixels = 13 * font_scale;
-	cfg.GlyphOffset.y = font_scale;
-	ImGui::GetIO().Fonts->AddFontDefault(&cfg);
+	// // font sizing
+	// // https://github.com/ocornut/imgui/blob/master/docs/FONTS.md see this link to change the font
+	// float font_scale = 1.3;
+	// ImFontConfig cfg;
+	// cfg.SizePixels = 13 * font_scale;
+	// cfg.GlyphOffset.y = font_scale;
+	// ImGui::GetIO().Fonts->AddFontDefault(&cfg);
+
+	// Load Fonts
+	UpdateFontScale();
+	ReloadFonts();
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
