@@ -23,6 +23,7 @@
 
 cmake-build-debug
 build
+build_desktop
 git_info.h
 *.hex
 *.dat

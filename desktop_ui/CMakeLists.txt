@@ -1,3 +1,8 @@
+cmake_minimum_required(VERSION 3.18)
+project(desktop_ui)
+
+set(BUILD_SHARED_LIBS OFF)
+
 INCLUDE(FetchContent)
 
 FetchContent_Declare(
@@ -91,7 +96,7 @@ else()
         set_target_properties(imgui PROPERTIES LINK_FLAGS "-framework Metal -framework QuartzCore")
         target_sources(imgui PRIVATE ${imgui_SOURCE_DIR}/backends/imgui_impl_metal.mm)
     else()
-        #target_sources(imgui PRIVATE ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp)
+        target_sources(imgui PRIVATE ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp)
     endif()
 endif()
 target_link_libraries(imgui PUBLIC glfw)
@@ -112,16 +117,16 @@ target_include_directories(imgui
 set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_features(imgui PUBLIC cxx_std_17)
 
-target_link_libraries(imgui PRIVATE system)
-
 # -- Now we can create our executable and link to dear-imgui --
 
 find_package(Threads REQUIRED)
+#set(CMAKE_FIND_DEBUG_MODE ON)
 find_package(OpenGL REQUIRED)
 
 add_executable(
-    desktop_gui gui_main.cpp
+    desktop_gui src/gui_main.cpp
 )
-target_link_libraries(desktop_gui PRIVATE system devices imgui Threads::Threads ${OPENGL_LIBRARIES})
-target_include_directories(desktop_gui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ../desktop_ui/src/)
+target_link_libraries(desktop_gui PRIVATE imgui Threads::Threads ${OPENGL_LIBRARIES})
 
+message("Hi: ${CMAKE_SYSTEM_INCLUDE_PATH}")
+message("Hi 2: ${CMAKE_INCLUDE_PATH}")
