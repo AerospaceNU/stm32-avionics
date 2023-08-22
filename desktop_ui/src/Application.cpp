@@ -7,7 +7,20 @@ static void glfw_error_callback(int error, const char* description)
 }
 
 void Application::tickApplication() {
-	// std::vector<nlohmann::json> data_frame = socket->dump_messages();
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("Edit"))
+        {
+            if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+            if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+            ImGui::Separator();
+            if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+            if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+            if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
 
 	// timestamp maybe
 	FrameUpdate frame_update;
@@ -25,7 +38,7 @@ void Application::addWidget(std::unique_ptr<Widget>& w) {
 // a lot of this is boilerplate, nothing *too* interesting here
 // only change this if you want to change fonts, scaling, or some config stuff
 void Application::runGUI() {
-			// Setup window
+	// Setup window
 	glfwSetErrorCallback(glfw_error_callback);
 	if (!glfwInit())
 		return;
@@ -71,15 +84,13 @@ void Application::runGUI() {
 
 	ImPlot::CreateContext();
 
-	// // font sizing
-	// // https://github.com/ocornut/imgui/blob/master/docs/FONTS.md see this link to change the font
-	// ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-	// float font_scale = 1.3;
-	// ImFontConfig cfg;
-	// cfg.SizePixels = 13 * font_scale;
-	// cfg.GlyphOffset.y = font_scale;
-	// ImGui::GetIO().Fonts->AddFontDefault(&cfg);
+	// font sizing
+	// https://github.com/ocornut/imgui/blob/master/docs/FONTS.md see this link to change the font
+	float font_scale = 1.3;
+	ImFontConfig cfg;
+	cfg.SizePixels = 13 * font_scale;
+	cfg.GlyphOffset.y = font_scale;
+	ImGui::GetIO().Fonts->AddFontDefault(&cfg);
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
@@ -128,30 +139,7 @@ void Application::runGUI() {
 
 }
 
-// // runs forever until destructor is called
-// // keeps trying to reconnect
-// void Application::runNetworker() {
-// 	while (true) {
-// 		std::cout << "Trying to reconnect to " + hdl << std::endl;
-// 		// didn't work without making a new one not sure what's the deal here but this shouldn't memory leak 
-// 		// pray
-// 		socket = std::make_unique<NetworkClient>();
-// 		try {
-// 			socket->run(hdl);
-// 		} catch (...) {
-// 			// do nothing because this is fine and shouldn't happen either?
-// 		}
-// 		// // IF WE GET HERE THE SOCKET IS CLOSED
-// 		if (destruct) break;
-// 		usleep(1000000); // 1s delay
-// 	}
-
-// }
-
 void Application::run() {
-
-	// socket_thread = std::thread(&Application::runNetworker, this);
-
 	this->runGUI();
 }
 

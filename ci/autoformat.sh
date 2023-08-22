@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Clang-format
-for file in $(find common desktop_projects stm32_projects/device_drivers platformio_projects/src platformio_projects/lib/device_drivers platformio_projects/lib/new_hal -type f -iregex '.*\.\(h\|c\|cpp\)')
+for file in $(find common desktop_projects desktop_ui stm32_projects/device_drivers platformio_projects/src platformio_projects/lib/device_drivers platformio_projects/lib/new_hal -type f -iregex '.*\.\(h\|c\|cpp\)')
 do
 	clang-format-11 -i $file
         if [ $? -ne 0 ];
@@ -11,4 +11,4 @@ do
 done
 
 # Cpplint
-cpplint --counting=detailed --recursive common/ desktop_projects/ stm32_projects/device_drivers/ platformio_projects/src/ platformio_projects/lib/device_drivers/ platformio_projects/lib/new_hal/
+cpplint --counting=detailed --recursive common/ desktop_projects/ desktop_ui/ stm32_projects/device_drivers/ platformio_projects/src/ platformio_projects/lib/device_drivers/ platformio_projects/lib/new_hal/
