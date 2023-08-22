@@ -3,6 +3,8 @@ project(desktop_ui)
 
 set(BUILD_SHARED_LIBS OFF)
 
+message("Hi 1")
+
 INCLUDE(FetchContent)
 
 FetchContent_Declare(
@@ -35,6 +37,7 @@ FetchContent_Declare(
     GIT_REPOSITORY  https://github.com/nothings/stb.git
     GIT_TAG         c9064e317699d2e495f36ba4f9ac037e88ee371a
 )
+message("Hi 2")
 
 FetchContent_MakeAvailable(
     imgui
@@ -42,6 +45,7 @@ FetchContent_MakeAvailable(
     fonts
     stb
 )
+message("Hi 3")
 
 # Add glfw directly to our build.
 FetchContent_GetProperties(glfw3)
@@ -53,7 +57,10 @@ if(NOT glfw3_POPULATED)
     add_subdirectory(${glfw3_SOURCE_DIR} ${glfw3_BINARY_DIR} EXCLUDE_FROM_ALL)
     set_property(TARGET glfw PROPERTY POSITION_INDEPENDENT_CODE ON)
     set(BUILD_SHARED_LIBS ${SAVE_BUILD_SHARED_LIBS})
+    set(glfw3_POPULATED TRUE CACHE INTERNAL "")
 endif()
+message("Hi 4")
+
 
 # Don't use gl3w CMakeLists.txt due to https://github.com/skaslev/gl3w/issues/66
 FetchContent_GetProperties(gl3w)
@@ -67,6 +74,7 @@ if(NOT EXISTS "${gl3w_BINARY_DIR}/src/gl3w.c")
         WORKING_DIRECTORY ${gl3w_BINARY_DIR}
     )
 endif()
+message("Hi 5")
 
 # Add imgui directly to our build.
 file(GLOB imgui_sources ${imgui_SOURCE_DIR}/*.cpp ${imgui_SOURCE_DIR}/misc/cpp/*.cpp)
@@ -113,6 +121,7 @@ target_include_directories(imgui
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/fmtlib/include>"
 )
+message("Hi 6")
 
 set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_features(imgui PUBLIC cxx_std_17)
@@ -120,13 +129,9 @@ target_compile_features(imgui PUBLIC cxx_std_17)
 # -- Now we can create our executable and link to dear-imgui --
 
 find_package(Threads REQUIRED)
-#set(CMAKE_FIND_DEBUG_MODE ON)
 find_package(OpenGL REQUIRED)
 
 add_executable(
     desktop_gui src/gui_main.cpp
 )
 target_link_libraries(desktop_gui PRIVATE imgui Threads::Threads ${OPENGL_LIBRARIES})
-
-message("Hi: ${CMAKE_SYSTEM_INCLUDE_PATH}")
-message("Hi 2: ${CMAKE_INCLUDE_PATH}")

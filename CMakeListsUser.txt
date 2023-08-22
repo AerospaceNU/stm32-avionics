@@ -1,4 +1,7 @@
-if (CMAKE_BUILD_TYPE MATCHES "desktop")
+option(WITH_DESKTOP "Include desktop flight software" ON)
+option(WITH_GUI "Include GUI build" ON)
+
+if (WITH_GUI OR WITH_DESKTOP)
     message("\nBuilding WITHOUT platformIO\n")
 
     # Set versions ourselves
@@ -6,10 +9,21 @@ if (CMAKE_BUILD_TYPE MATCHES "desktop")
     set(CMAKE_CXX_STANDARD 20)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+    # suppress fetch-content warnings
+    # Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
+	if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+		cmake_policy(SET CMP0135 NEW)
+	endif()
+
     # Include desktop projects
     add_subdirectory(common)
+    
+    if (WITH_DESKTOP)
     add_subdirectory(desktop_projects)
+    endif()
+    if (WITH_GUI)
     add_subdirectory(desktop_ui)
+    endif()
 
     set(SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/platformio_dummy.c)
 else()
