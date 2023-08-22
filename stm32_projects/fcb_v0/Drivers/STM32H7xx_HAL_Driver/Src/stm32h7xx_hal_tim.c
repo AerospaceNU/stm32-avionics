@@ -200,6 +200,7 @@ all interrupt callbacks are set to the corresponding weak functions:
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macros ------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /** @addtogroup TIM_Private_Functions

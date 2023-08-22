@@ -98,6 +98,7 @@
   * @}
   */
 /* Private macro -------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /** @defgroup FLASHEx_Private_Functions FLASHEx Private Functions

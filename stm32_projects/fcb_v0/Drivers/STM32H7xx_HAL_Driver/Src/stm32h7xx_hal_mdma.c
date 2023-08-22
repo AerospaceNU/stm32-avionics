@@ -172,6 +172,7 @@
   * @}
   */
 /* Private macro -------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /** @addtogroup MDMA_Private_Functions_Prototypes

@@ -8,13 +8,12 @@ STM32-avionics has support for building unit tests and local simulation for Wind
 Install CMake, gcc and g++ using your favorite package manager, then configure the project:
 
 ```
-cmake -B build -DCMAKE_BUILD_TYPE=desktop
+cmake -B build -DPROJECT_BUILD_TYPE=desktop
 ```
 
+## Building desktop on Windows using Windows Subsystem for Linux
 
-## Building for Windows using WSL
-
-Install Ubuntu on your computer using WSL, and then build normally using the Linux instructions above. WSL 2 users may need to change the Groundstation GUI to point to WSL's IP instead of localhost.
+Install Ubuntu on your computer using WSL, and then build normally using the Linux instructions above. WSL 2 users may need to change the Groundstation GUI to point to WSL's IP instead of localhost (you probably won't, VSCode at least automatically forwards ports, but worth considering).
 
 I'm going to be following [this guide](https://learn.microsoft.com/en-us/windows/wsl/install):
 
@@ -34,7 +33,7 @@ After rebooting, run `wsl` from the start menu or from a command prompt to launc
 ```
 sudo apt install gcc g++ cmake make
 
-git clone git@gitlab.com:aeronu/dollar-per-foot/stm32-avionics.git
+git clone --recurse-submodules git@github.com:AerospaceNU/stm32-avionics.git
 
 cd stm32-avionics
 ./ci/build_desktop
@@ -45,7 +44,7 @@ If the build succeeds, then you've successfully got the code to build! You can u
 
 ## Building for Windows (Native)
 
-Windows uses MSYS2 to provide most of the same linux-looking libraries. Note that only gtest tests will actually build, the socket code doesn't work right now
+Windows uses MSYS2 to provide most of the same linux-looking libraries. Note that only gtest tests will actually build, the socket code we use for desktop sim doesn't work right now
 
 - Install msys2
 - Follow https://code.visualstudio.com/docs/cpp/config-mingw
