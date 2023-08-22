@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 #define CE_SERIAL_IMPLEMENTATION
-#define CE_WINDOWS
 #include "ceSerial.h"
 using namespace std;
 
@@ -15,7 +14,7 @@ int main()
 #ifdef CE_WINDOWS
 	ceSerial com("\\\\.\\COM14",9600,8,'N',1); // Windows
 #else
-	ceSerial com("/dev/ttyS0",9600,8,'N',1); // Linux
+	ceSerial com("/dev/ttyACM0",9600,8,'N',1); // Linux
 #endif
 
 	printf("Opening port %s.\n",com.GetPort().c_str());
@@ -38,6 +37,7 @@ int main()
 
 	printf("Reading.\n");
 	for (int i = 0; i < 1000; i++) {
+		ceSerial::Delay(5); // delay to wait for a character
         char outArr[2000] = {0};
         com.Read(outArr, sizeof(outArr) - 1);
         printf(outArr); // assume null-terminated

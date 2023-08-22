@@ -617,7 +617,6 @@ long ceSerial::GetBaudRate() {
 }
 
 size_t ceSerial::Read(char* outArr, size_t outLen) {
-	success=false;
 	if (!IsOpened()) {return 0;	}
 	return read(fd, outArr, outLen);
 }
