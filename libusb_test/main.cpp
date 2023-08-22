@@ -1,4 +1,4 @@
-#if 0
+#if 1
 /**
  * @file /example1/main.cpp
  * @author Philippe Lucidarme
@@ -68,7 +68,8 @@ int main( /*int argc, char *argv[]*/)
 
     // Read the string
     while (true) {
-        serial.readString(buffer, '\n', 200, 2000);
+        int rc = serial.readString(buffer, '\n', 200, 2000);
+        if (rc < 0) break;
         printf("String read: %s\n", buffer);
     }
 
@@ -79,7 +80,7 @@ int main( /*int argc, char *argv[]*/)
 }
 #endif
 
-#if 1
+#if 0
 
 // File: test.cpp
 // Description: Serial (Com port) console program for Windows and Linux
