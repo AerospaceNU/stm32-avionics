@@ -14,6 +14,8 @@
 #include <string.h>
 #include <time.h>
 
+#pragma GCC optimize ("O2")
+
 #define boolstr(s) ((s) ? "true" : "false")
 
 static int hex2int(char c) {

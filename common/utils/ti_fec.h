@@ -2,31 +2,33 @@
 
 #include <stddef.h>
 #include <stdint.h>
-
-#ifndef MaxMessageLen
-#define MaxMessageLen 128
-#endif
+#include "board_config_common.h"
 
 #define DEBUG_PRINTF(a...) \
   {}
 // #define DEBUG_PRINTF(...) printf(__VA_ARGS__);
 
+#define TI_FEC_CRC_LEN_BYTES 2
+
 class FecEncoder {
  public:
   FecEncoder() = default;
 
-  // Encode a message. CRC is assumed to have already been added.
+  /* 
+   * Encode a message. CRC will be appended, then FEC applied, then whitening happens. The result can be retrieved via FecEncoder::OutputArray
+  */ 
   void Encode(uint8_t* input, size_t inLen);
 
   inline constexpr const size_t OutputSize(const size_t inLen) {
-    return 4 * (inLen / 2 + 1);
+    return 4 * ((inLen + TI_FEC_CRC_LEN_BYTES) / 2 + 1);
   }
   inline uint8_t* OutputArray() { return interleaved; }
 
  private:
-  uint8_t input[MaxMessageLen + 2];  // input buffer + Trellis Terminator
-  uint8_t fec[4 * (MaxMessageLen / 2 + 1)];
-  uint8_t interleaved[4 * (MaxMessageLen / 2 + 1)];
+  uint8_t input[MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES + 2];  // input buffer + Trellis Terminator + CRC
+  // I probably only need one of these arrays, but an extra 300 bytes shouldn't be a huge deal?
+  uint8_t fec[4 * ((MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES) / 2 + 1)];
+  uint8_t interleaved[4 * ((MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES) / 2 + 1)];
 };
 
 class FecDecoder {

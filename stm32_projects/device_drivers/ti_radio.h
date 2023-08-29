@@ -26,8 +26,6 @@ extern "C" {
 
 #include HAL_HEADER
 
-#define TI_RADIO_STATUS_MASK 0xF0
-
 #define MAX_COMSUMER 5
 
 #define PACKET_TX_SIZE 512  // 10ish packets seems reasonable
@@ -122,10 +120,6 @@ typedef struct {
   const RegisterSetting_s *settingsPtr;
   size_t settingsSize;
   bool doSoftwareFEC;
-#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
-  uint8_t crcWorkspace[(MAX_PACKET_SIZE + 2)];
-  uint8_t fecWorkspace[(MAX_PACKET_SIZE + 4) * 2];
-#endif
 
   bool initialized;
 } TiRadioCtrl_s;
@@ -148,7 +142,7 @@ void tiRadio_configGpio(TiRadioCtrl_s *radio, uint16_t gpio_register,
                         uint8_t gpio_config, bool outputInverted);
 bool tiRadio_calibrate(TiRadioCtrl_s *radio);
 
-#endif
+#endif // (HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915))
 
 #ifdef __cplusplus
 }

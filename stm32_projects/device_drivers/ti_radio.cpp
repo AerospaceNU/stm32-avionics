@@ -22,6 +22,16 @@
 #include "cc1120_cc1200_defs.h"
 #include "ti_fec.h"
 
+#define TI_RADIO_STATUS_MASK 0xF0
+
+// Static fec encode/decode helpers
+// This assumes no multi-threading weirdness
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
+#include "ti_fec.h"
+FecEncoder encoder;
+FecDecoder decoder;
+#endif
+
 // Forward declarations for all internal register read/writes
 static uint8_t tiRadio_spiReadReg(TiRadioCtrl_s *radio, uint16_t addr,
                                   uint8_t *data, uint8_t len);
@@ -347,18 +357,8 @@ bool tiRadio_addTxPacket(TiRadioCtrl_s *radio, uint8_t *packet, uint8_t len) {
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
   // If we need to encode with FEC, do so now
   if (radio->doSoftwareFEC) {
-    // Calculate checksum
-    uint16_t checksum = 0xFFFF;  // Init value for CRC calculation
-    for (int i = 0; i < radio->payloadSize; i++) {
-      checksum = calculateCRC(packet[i], checksum);
-    }
-    memcpy(radio->crcWorkspace, packet, len);
-    memcpy(radio->crcWorkspace + len, &checksum, 2);
-    static FecEncoder<128> encoder;
-    // borrowed pointer to internal array
-    uint8_t *output = encoder.Encode(packet, len);
-
-    txPtr = output;
+    encoder.Encode(packet, len);
+    txPtr = encoder.OutputArray();
   } else {
     // No software FEC, directly enqueue packet
     txPtr = packet;
