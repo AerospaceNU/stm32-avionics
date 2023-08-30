@@ -439,6 +439,7 @@ bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
       bool crc_good;
       // Decoded payload + 2 bytes CRC
       static uint8_t rxBuffer_decoded[MAX_PACKET_SIZE] = {0};
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
       if (radio->doSoftwareFEC) {
         decoder.FecDecode(rxBuffer, rxBuffer_decoded, payloadLenWithoutCRC + 2);
 
@@ -451,6 +452,9 @@ bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
         pOutputBuffer = rxBuffer_decoded;
         crc_good = (packetArrayCRC == decodedPacketCRC);
       } else {
+      #else
+      {
+      #endif
         pOutputBuffer = rxBuffer;
         crc_good = crc_lqi & TIRADIO_LQI_CRC_OK_BM;
       }
