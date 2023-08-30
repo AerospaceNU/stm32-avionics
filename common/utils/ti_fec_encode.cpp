@@ -27,9 +27,11 @@ void FecEncoder::Encode(uint8_t* inputPtr, size_t inLen) {
     input[inputNum] = inByte;
   }
 
-  // Append 2-byte CRC
-  input[inputNum++] = (checksum >> 8);
-  input[inputNum++] = checksum & 0xff;
+  if (m_appendCRC) {
+    // Append 2-byte CRC
+    input[inputNum++] = (checksum >> 8);
+    input[inputNum++] = checksum & 0xff;
+  }
 
   // Append Trellis Terminator
   input[inputNum++] = 0x0B;
