@@ -452,9 +452,9 @@ bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
         pOutputBuffer = rxBuffer_decoded;
         crc_good = (packetArrayCRC == decodedPacketCRC);
       } else {
-      #else
+#else
       {
-      #endif
+#endif
         pOutputBuffer = rxBuffer;
         crc_good = crc_lqi & TIRADIO_LQI_CRC_OK_BM;
       }
