@@ -95,4 +95,5 @@ class FecDecoder {
 
 namespace ti_fec {
 uint16_t calculateCRC(uint8_t crcData, uint16_t crcReg);
+uint16_t calculateCRC_array(uint8_t* data, size_t len);
 }

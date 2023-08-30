@@ -106,9 +106,6 @@ void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
   Reset();
 
   while (decodedMessageLen) {
-    // std::cout << "==============\n";
-    // auto start = std::chrono::high_resolution_clock::now();
-
     DEBUG_PRINTF("%u to go. Input quartet: %X %X %X %X\n", decodedMessageLen,
                  pInputMessage[0], pInputMessage[1], pInputMessage[2],
                  pInputMessage[3]);
@@ -116,7 +113,6 @@ void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
     size_t numBytesDecoded =
         FecDecode4(pOutputBuffer, pInputMessage, decodedMessageLen);
 
-    DEBUG_PRINTF("\n");
 
     // Keep track of remaining message length
     decodedMessageLen -= numBytesDecoded;
@@ -127,10 +123,7 @@ void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
     // Advance input by 4 bytes (always 4)
     pInputMessage += 4;
 
-    // auto finish = std::chrono::high_resolution_clock::now();
-    // std::cout << "Decode4 took " <<
-    // std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count()
-    // << "ns\n";
+    
   }
 }
 
