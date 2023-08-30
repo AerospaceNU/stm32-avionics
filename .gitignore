@@ -31,3 +31,4 @@ git_info.h
 .pio/
 cmake-build*
 CMakeListsPrivate.txt
+build_stm/*
