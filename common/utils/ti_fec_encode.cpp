@@ -26,7 +26,7 @@ void FecEncoder::Encode(uint8_t* inputPtr, size_t inLen) {
     checksum = ti_fec::calculateCRC(inByte, checksum);
     input[inputNum] = inByte;
   }
-  
+
   // Append 2-byte CRC
   input[inputNum++] = (checksum >> 8);
   input[inputNum++] = checksum & 0xff;

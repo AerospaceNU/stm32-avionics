@@ -142,7 +142,7 @@ void tiRadio_configGpio(TiRadioCtrl_s *radio, uint16_t gpio_register,
                         uint8_t gpio_config, bool outputInverted);
 bool tiRadio_calibrate(TiRadioCtrl_s *radio);
 
-#endif // (HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915))
+#endif  // (HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915))
 
 #ifdef __cplusplus
 }

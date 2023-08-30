@@ -113,7 +113,6 @@ void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
     size_t numBytesDecoded =
         FecDecode4(pOutputBuffer, pInputMessage, decodedMessageLen);
 
-
     // Keep track of remaining message length
     decodedMessageLen -= numBytesDecoded;
 
@@ -122,8 +121,6 @@ void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
 
     // Advance input by 4 bytes (always 4)
     pInputMessage += 4;
-
-    
   }
 }
 

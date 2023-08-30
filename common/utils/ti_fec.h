@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+
 #include "board_config_common.h"
 
 #define DEBUG_PRINTF(a...) \
@@ -14,9 +15,10 @@ class FecEncoder {
  public:
   FecEncoder() = default;
 
-  /* 
-   * Encode a message. CRC will be appended, then FEC applied, then whitening happens. The result can be retrieved via FecEncoder::OutputArray
-  */ 
+  /*
+   * Encode a message. CRC will be appended, then FEC applied, then whitening
+   * happens. The result can be retrieved via FecEncoder::OutputArray
+   */
   void Encode(uint8_t* input, size_t inLen);
 
   inline constexpr const size_t OutputSize(const size_t inLen) {
@@ -25,8 +27,10 @@ class FecEncoder {
   inline uint8_t* OutputArray() { return interleaved; }
 
  private:
-  uint8_t input[MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES + 2];  // input buffer + Trellis Terminator + CRC
-  // I probably only need one of these arrays, but an extra 300 bytes shouldn't be a huge deal?
+  //! input buffer + Trellis Terminator + CRC
+  //! I probably only need one of these arrays, but an extra 300 bytes shouldn't
+  //! be a huge deal?
+  uint8_t input[MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES + 2];
   uint8_t fec[4 * ((MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES) / 2 + 1)];
   uint8_t interleaved[4 * ((MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES) / 2 + 1)];
 };
@@ -96,4 +100,4 @@ class FecDecoder {
 namespace ti_fec {
 uint16_t calculateCRC(uint8_t crcData, uint16_t crcReg);
 uint16_t calculateCRC_array(uint8_t* data, size_t len);
-}
+}  // namespace ti_fec

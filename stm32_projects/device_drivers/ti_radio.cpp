@@ -29,7 +29,6 @@
 // Static fec encode/decode helpers
 // This assumes no multi-threading weirdness
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
-#include "ti_fec.h"
 FecEncoder encoder;
 FecDecoder decoder;
 #endif
@@ -424,14 +423,14 @@ bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
     } else {
       // Fixed means we have payloadSize many data bytes, then RSSI and CRC_LQI
       // appended
-        size_t payloadLenWithoutCRC = radio->payloadSize;
+      size_t payloadLenWithoutCRC = radio->payloadSize;
 
-       uint8_t pkt_len;
-    	if (radio->doSoftwareFEC) {
-          pkt_len = 4 * ((payloadLenWithoutCRC + TI_FEC_CRC_LEN_BYTES) / 2 + 1);
-        } else {
-          pkt_len = payloadLenWithoutCRC;
-        }
+      uint8_t pkt_len;
+      if (radio->doSoftwareFEC) {
+        pkt_len = 4 * ((payloadLenWithoutCRC + TI_FEC_CRC_LEN_BYTES) / 2 + 1);
+      } else {
+        pkt_len = payloadLenWithoutCRC;
+      }
 
       tiRadio_spiReadRxFifo(radio, rxBuffer, pkt_len);
       tiRadio_spiReadRxFifo(radio, (uint8_t *)&radio->RSSI, 1);
@@ -445,20 +444,22 @@ bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
       // Decoded payload + 2 bytes CRC
       static uint8_t rxBuffer_decoded[MAX_PACKET_SIZE] = {0};
       if (radio->doSoftwareFEC) {
-          decoder.FecDecode(rxBuffer, rxBuffer_decoded, payloadLenWithoutCRC + 2);
+        decoder.FecDecode(rxBuffer, rxBuffer_decoded, payloadLenWithoutCRC + 2);
 
-          auto packetArrayCRC = ti_fec::calculateCRC_array(rxBuffer_decoded, payloadLenWithoutCRC);
-          auto decodedPacketCRC = (rxBuffer_decoded[payloadLenWithoutCRC + 0] << 8) | (rxBuffer_decoded[payloadLenWithoutCRC + 1] << 8);
+        auto packetArrayCRC =
+            ti_fec::calculateCRC_array(rxBuffer_decoded, payloadLenWithoutCRC);
+        auto decodedPacketCRC =
+            (rxBuffer_decoded[payloadLenWithoutCRC + 0] << 8) |
+            (rxBuffer_decoded[payloadLenWithoutCRC + 1] << 8);
 
-          pOutputBuffer = rxBuffer_decoded;
-          crc_good = (packetArrayCRC == decodedPacketCRC);
+        pOutputBuffer = rxBuffer_decoded;
+        crc_good = (packetArrayCRC == decodedPacketCRC);
       } else {
-    	  pOutputBuffer = rxBuffer;
-    	  crc_good = crc_lqi & TIRADIO_LQI_CRC_OK_BM;
-       }
+        pOutputBuffer = rxBuffer;
+        crc_good = crc_lqi & TIRADIO_LQI_CRC_OK_BM;
+      }
 
-      cc1120EnqueuePacket(radio, pOutputBuffer, radio->payloadSize,
-                          crc_good);
+      cc1120EnqueuePacket(radio, pOutputBuffer, radio->payloadSize, crc_good);
     }
 
     return true;
