@@ -134,7 +134,6 @@ int main(void) {
       TestPacket_s packet;
       uint8_t packet_str[] = {3, 1, 2, 3};
       memcpy(packet.data, packet_str, sizeof(packet_str));
-      size_t inputNum = sizeof(TestPacket_s);
       uint8_t *input = (uint8_t *)&packet;
 
       FecEncoder encoder;
@@ -144,7 +143,7 @@ int main(void) {
       // Generate CRC
       {
         uint16_t checksum = 0xFFFF;  // Init value for CRC calculation
-        for (int i = 0; i < sizeof(packet.data); i++) {
+        for (unsigned int i = 0; i < sizeof(packet.data); i++) {
           checksum = calculateCRC(packet.data[i], checksum);
         }
 
@@ -163,7 +162,7 @@ int main(void) {
       uint32_t t2 = HAL_GetTick();
 
       printf("Tx dt: %lu ms %lu us\n", t2 - t1,
-             (int)((double)(t2_us - t1_us) / SystemCoreClock * 1e6));
+             (long unsigned int)((double)(t2_us - t1_us) / SystemCoreClock * 1e6));
     }
 
     {
@@ -182,7 +181,7 @@ int main(void) {
       uint32_t t2_us = DWT->CYCCNT;
 
       printf("Decoded packet: [%5d bytes]\n", sizeof(rxPacket));
-      for (int i = 0; i < sizeof(rxPacket); i++)
+      for (size_t i = 0; i < sizeof(rxPacket); i++)
         printf("%02X%s", ((uint8_t *)&rxPacket)[i],
                (i % 8 == 7)   ? "\n"
                : (i % 2 == 1) ? " "
@@ -192,16 +191,16 @@ int main(void) {
       // Perform CRC check (Optional)
       {
         uint16_t checksum = 0xFFFF;  // Init value for CRC calculation
-        for (int i = 0; i < sizeof(rxPacket.data); i++) {
+        for (size_t i = 0; i < sizeof(rxPacket.data); i++) {
           checksum = calculateCRC(rxPacket.data[i], checksum);
         }
 
         uint16_t txChecksum =
             (((uint16_t)rxPacket.crcHi) << 8) | rxPacket.crcLo;
-        printf("hi %u low %u total %lu\n", rxPacket.crcHi, rxPacket.crcLo,
+        printf("hi %u low %u total %u\n", rxPacket.crcHi, rxPacket.crcLo,
                txChecksum);
 
-        printf("Local checksum %lu, remote checksum %lu\n", checksum,
+        printf("Local checksum %u, remote checksum %u\n", checksum,
                txChecksum);
         if (checksum == txChecksum) {
           // Do something to indicate that the CRC is OK
@@ -214,7 +213,7 @@ int main(void) {
       // =============
 
       printf("Rx dt: %lu ms %lu us\n", t2 - t1,
-             (int)((double)(t2_us - t1_us) / SystemCoreClock * 1e6));
+             (long unsigned int)((double)(t2_us - t1_us) / SystemCoreClock * 1e6));
     }
 
     /* USER CODE END WHILE */

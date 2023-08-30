@@ -6,6 +6,7 @@ set_property(SOURCE Core/Startup/startup_stm32f401ccux.s PROPERTY LANGUAGE C)
 set(PRJ_SOURCES
     ${gen_files}
     Core/Startup/startup_stm32f401ccux.s
+    ${UTILS_FILES_LIST}
 )
 
 set(EXECUTABLE amazon-stm32-arduino)
@@ -32,6 +33,9 @@ target_include_directories(${EXECUTABLE} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Core/Inc
 
         ${CMAKE_CURRENT_BINARY_DIR}/../generated/
+
+        ${UTILS_INCLUDE_DIRS}
+        ${DEVICES_COMMON_INCLUDE_DIRS}
         )
 
 target_compile_options(${EXECUTABLE} PRIVATE
