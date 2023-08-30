@@ -173,7 +173,6 @@ uint16_t FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
 
   // Process up to 4 bytes of de-interleaved input data, processing one encoder
   // symbol (2b) at a time
-  uint8_t iDestState;
   uint8_t index;
   for (nIterations = 16; nIterations > 0; nIterations--) {
     uint8_t symbol = ((*pInData) >> iBit) & 0x03;
@@ -237,7 +236,7 @@ uint16_t FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
     // iDestState (3bits), symbol (2bits), ilastbuf (1bit); i believe you can
     // condense most of this into a 64-input lookup table..? might be missing
     // sth iDestState (3) + symbol (2) + iLastBuf (1)
-
+    uint8_t iDestState;
     for (iDestState = 0; iDestState < 8; iDestState++) {
       nInputBit = aTrellisTransitionInput[iDestState];
       // Calculate cost of transition from each of the two source states (cost
