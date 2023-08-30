@@ -33,6 +33,9 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
+// FCB V0 is out of flash lol lmao
+#pragma GCC optimize ("Os")
+
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY

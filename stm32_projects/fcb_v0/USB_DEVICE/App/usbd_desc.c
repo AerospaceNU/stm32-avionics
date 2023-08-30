@@ -33,6 +33,10 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+// FCB V0 is out of flash lol lmao
+#pragma GCC optimize ("Os")
+
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE END PV */

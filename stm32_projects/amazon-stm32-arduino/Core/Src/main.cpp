@@ -28,8 +28,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
-
-#include "ao_fec.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

@@ -1,0 +1,1 @@
+Random files from me playing around with the Python FFI. TLDR is that if you make your functions "extern C" they should be able to be called really easily from Python, which is pretty cool.

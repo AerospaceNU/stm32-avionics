@@ -1,8 +1,3 @@
-[submodule "extern/pybind11"]
-	path = extern/pybind11
-	url = ../../pybind/pybind11
-	branch = stable
-[submodule "desktop_projects/pybind_test/pybind11"]
-	path = desktop_projects/pybind_test/pybind11
-	url = ../../pybind/pybind11
-	branch = stable
+[submodule "cmake/stm32-cmake"]
+	path = cmake/stm32-cmake
+	url = https://github.com/ObKo/stm32-cmake/

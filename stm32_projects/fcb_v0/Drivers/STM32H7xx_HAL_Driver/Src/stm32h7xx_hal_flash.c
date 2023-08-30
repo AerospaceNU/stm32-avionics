@@ -109,6 +109,7 @@
   * @}
   */
 /* Private macro -------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private variables ---------------------------------------------------------*/
 FLASH_ProcessTypeDef pFlash;
 /* Private function prototypes -----------------------------------------------*/

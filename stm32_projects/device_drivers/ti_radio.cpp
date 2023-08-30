@@ -7,10 +7,6 @@
 
 #include "ti_radio.h"
 
-#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
-#include "ao_fec.h"
-#endif
-
 #if HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915)
 
 #include <math.h>
