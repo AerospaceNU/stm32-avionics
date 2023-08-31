@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    App/app_ble.h
+  * @file    App/p2p_server_app.h
   * @author  MCD Application Team
-  * @brief   Header for ble application
+  * @brief   Header for p2p_server_app.c module
   ******************************************************************************
   * @attention
   *
@@ -19,15 +19,14 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef APP_BLE_H
-#define APP_BLE_H
+#ifndef P2P_SERVER_APP_H
+#define P2P_SERVER_APP_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "hci_tl.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -35,18 +34,17 @@ extern "C" {
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
-
 typedef enum
 {
-  APP_BLE_IDLE,
-  APP_BLE_FAST_ADV,
-  APP_BLE_LP_ADV,
-  APP_BLE_SCAN,
-  APP_BLE_LP_CONNECTING,
-  APP_BLE_CONNECTED_SERVER,
-  APP_BLE_CONNECTED_CLIENT
-} APP_BLE_ConnStatus_t;
+  PEER_CONN_HANDLE_EVT,
+  PEER_DISCON_HANDLE_EVT,
+} P2PS_APP__Opcode_Notification_evt_t;
 
+typedef struct
+{
+  P2PS_APP__Opcode_Notification_evt_t   P2P_Evt_Opcode;
+  uint16_t                              ConnectionHandle;
+}P2PS_APP_ConnHandle_Not_evt_t;
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
@@ -61,16 +59,14 @@ typedef enum
 
 /* USER CODE END EV */
 
-/* Exported macro ------------------------------------------------------------*/
+/* Exported macros ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
 
 /* Exported functions ---------------------------------------------*/
-void APP_BLE_Init(void);
-
-APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void);
-
+  void P2PS_APP_Init( void );
+  void P2PS_APP_Notification( P2PS_APP_ConnHandle_Not_evt_t *pNotification );
 /* USER CODE BEGIN EF */
 
 /* USER CODE END EF */
@@ -79,4 +75,4 @@ APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void);
 }
 #endif
 
-#endif /*APP_BLE_H */
+#endif /*P2P_SERVER_APP_H */
