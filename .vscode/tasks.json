@@ -1,35 +1,118 @@
 {
-    "tasks": [
-        {
-            "label": "build FCB V1",
-            "type": "shell",
-            "command": "make",
-            "args": [
-                "fcb_v1.elf", "-j",
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}/fcb_v1/Build"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-        },
-        {
-            "label": "build live sim",
-            "type": "shell",
-            "command": "ninja",
-            "args": [
-                "",
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}/build"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-        },
-    ],
-    "version": "2.0.0"
+  "tasks": [
+    {
+      "label": "Build fcb_v0",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "build",
+        "--target",
+        "fcb_v0"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Build fcb_v1",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "build",
+        "--target",
+        "fcb_v1",
+        "-j"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Build fcb_v2",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "build",
+        "--target",
+        "fcb_v2",
+        "-j"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Build groundstation",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "build",
+        "--target",
+        "groundstation",
+        "-j"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Build amazon-stm32-arduino",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "build",
+        "--target",
+        "amazon-stm32-arduino",
+        "-j"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Build desktop live sim",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "build",
+        "--target",
+        "desktop_sim",
+        "-j"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ],
+  "version": "2.0.0"
 }

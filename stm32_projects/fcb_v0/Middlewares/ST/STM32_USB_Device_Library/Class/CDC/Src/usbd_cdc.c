@@ -55,6 +55,9 @@
 - "stm32xxxxx_{eval}{discovery}_io.c"
 EndBSPDependencies */
 
+// FCB V0 is out of flash lol lmao
+#pragma GCC optimize ("Os")
+
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc.h"
 #include "usbd_ctlreq.h"

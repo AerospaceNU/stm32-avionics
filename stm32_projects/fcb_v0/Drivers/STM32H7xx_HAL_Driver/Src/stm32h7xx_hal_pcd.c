@@ -74,6 +74,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* Private constants ---------------------------------------------------------*/
 /* Private macros ------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /** @defgroup PCD_Private_Macros PCD Private Macros
   * @{
   */

@@ -1,0 +1,176 @@
+# Building Flight Software with CMake
+
+CMake is a tool that allows us to generate build scripts in a nice, cross-platform way. We'll be using the compilers from [Arm GNU Toolchain](https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain), the same compiler that STM32CubeIDE uses, to compile code for our flight comtrol boards. Our processors are an AArch32 bare-metal (no operating system) target, so we want arm-none-eabi
+
+Technical note: STM32 microcontrollers use a 32-bit Arm Cortex-based processor, while your computer is probably a 64-bit x86-based computer. That means we need to use a special compiler to build code for an Arm target from your laptop.
+
+The valid targets that can be built are:
+- fcb_v0
+- fcb_v1
+- fcb_v2
+- groundstation
+- amazon-stm32-arduino
+
+## Linux setup
+
+- Download the [Arm GNU Toolchain](https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain) that's right for your machine. I'm using a Linux x86_64 computer, so I'll download the arm-none-eabi version for a x86_64 Linux host.
+- Extract the file to somewhere safe. I've put mine in `/home/matt/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi`.
+- Install cmake and a build tool like make with `sudo apt install cmake make`
+- If you haven't yet, clone this repository as described in the [readme](/README.md)
+- If the build directory within `stm32-avionics` already exists, delete its contents. If you forget to do this, the wrong compiler may be used.
+- Open up a new terminal inside of stm32-avionics, and run:
+```
+cmake  \
+  # Put build files into the build directory
+  -B build \        
+  # Build stm32 projects only
+  -DPROJECT_BUILD_TYPE="stm32" \ 
+  # Magic sauce to actually cross-compile
+  -DCMAKE_TOOLCHAIN_FILE="cmake/stm32-cmake/cmake/stm32_gcc.cmake" \ 
+  # Telling stm32-cmake where our C compiler is lets it find all the other tools (gcc, g++, strip, ld, etc)
+  -DCMAKE_C_COMPILER=/PATH/TO/arm-gnu-toolchain-VERSION-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc
+```
+
+## Windows setup
+
+- Download the [Arm GNU Toolchain](https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain) that's right for your machine. I'm using a Windows computer, so I'll download the arm-none-eabi version for a Windows host.
+- Extract the file to somewhere safe. I've put mine in `C:\Users\matth\Documents\arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi`.
+- Install [CMake](https://cmake.org/install/) and [Ninja](https://github.com/ninja-build/ninja/releases). Make sure both end up on your PATH.
+
+On Windows, I had to add `-DCMAKE_GENERATOR=Ninja` to the above, since I have MSVC installed, and its project generator refuses to cooperate with GNU compilers. I bet that mingw makefiles would also work as a generator. Also, I had to manually tell the cortex-debug extension where to find openocd, and I had to use the openocd from the line cutter repo (the one bundled with Cube couldn't find the st-link interface config??). I went into file->preferences->settings, searched for `cortex-debug.openocdPath.windows`, and set it to `D:/Downloads/openocd/OpenOCD-20210407-0.10.0/bin/openocd.exe` (this is probably different for you). Note the forward ticks (or double back slashes) -- Windows paths being backticks is dumb.
+
+Windows:
+```
+cmake -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_C_COMPILER="C:\\Program Files (x86)\\Arm GNU Toolchain arm-none-eabi\\12.3 rel1\\bin" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32-cmake/cmake/stm32_gcc.cmake" -DCMAKE_GENERATOR=Ninja
+```
+
+## Building code for a FCB
+
+- Try building the `fcb_v0` code using:
+```
+cmake --build build --target fcb_v0 -- -j -l
+```
+
+We need to pass CMAKE_C_COMPILER since we look for gcc/g++/as/ld in the same folder as the GCC executable passed in. If you have the arm gnu toolchain already installed, by default, /usr/lib will be searched. Note that the toolchain from apt seems to produce larger binaries than the one that ships with Cube. I downloaded my toolchain from https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain , but you can also point it to the GCC from Cube.
+
+Linux:
+```
+cmake -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32-cmake/cmake/stm32_gcc.cmake" -DCMAKE_C_COMPILER=/home/matt/Documents/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc
+```
+
+On Windows, I had to add `-DCMAKE_GENERATOR=Ninja` to the above, since I have MSVC installed, and its project generator refuses to cooperate with GNU compilers. I bet that mingw makefiles would also work as a generator. Also, I had to manually tell the cortex-debug extension where to find openocd, and I had to use the openocd from the line cutter repo (the one bundled with Cube couldn't find the st-link interface config??). I went into file->preferences->settings, searched for `cortex-debug.openocdPath.windows`, and set it to `D:/Downloads/openocd/OpenOCD-20210407-0.10.0/bin/openocd.exe` (this is probably different for you). Note the forward ticks (or double back slashes) -- Windows paths being backticks is dumb.
+
+Windows:
+```
+cmake -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_C_COMPILER="D:\ST\STM32CubeIDE_1.4.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.200.202301161003\tools\bin\arm-none-eabi-gcc.exe" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32-cmake/cmake/stm32_gcc.cmake" -DCMAKE_GENERATOR=Ninja
+```
+
+We need to pass CMAKE_C_COMPILER since we look for gcc/g++/as/ld in the same folder as the GCC executable passed in. If you have the arm gnu toolchain already installed, by default, /usr/lib will be searched. Note that the toolchain from apt seems to produce larger binaries than the one that ships with Cube. I downloaded my toolchain from https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain , but you can also point it to the GCC from Cube.
+
+Now, we can build the code for (say) FCB V0 with `cmake --build build --target fcb_v0`
+
+# Adding a new board
+
+Let's try adding CMake build to the "prop_adcboard_v2" project. We'll copy the `CMakeLists.txt` from the `amazon-stm32-arduino` project folder, and add the prop_adcboard_v2 directory to `stm32_projects/CMakeLists.txt`.
+Now let's edit `stm32_projects/prop_adcboard_v2/CMakeLists.txt`. We'll change all the instances of `amazon-stm32-arduino` over to `prop_adcboard_v2`.
+
+We need to include device_drivers, so let's add the includes/source files for those. I'll reference the fcb_v0 CMakeLists.txt for this. Let's add `` to `PRJ_SOURCES`:
+```
+${STM32_DEVICE_DRIVERS_SRCS}
+${UTILS_FILES_LIST}
+```
+
+And to the `target_include_directories()` call:
+```
+${STM32_DEVICE_DRIVERS_INCLUDE_DIRS}
+${DEVICES_COMMON_INCLUDE_DIRS}
+${UTILS_INCLUDE_DIRS}
+```
+
+Let's also make sure that the compile flags for `target_compile_definitions` and `target_compile_options` are correct. We can figure out what flags Cube is using by building the project once, then inspecting the makefiles it generates in `stm32_projects/prop_adcboard_v2/Debug/Core/Src/subdir.mk`. The `-I` flags are including directories. 
+
+```make
+// snip
+Core/Src/%.o Core/Src/%.su Core/Src/%.cyclo: ../Core/Src/%.cpp Core/Src/subdir.mk
+	arm-none-eabi-g++ "$<" -mcpu=cortex-m4 -std=gnu++14 -g3 -DDEBUG -Dtimegm=mktime -DUSE_HAL_DRIVER -DSTM32F401xC -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../USB_DEVICE/App -I../USB_DEVICE/Target -I../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc -I"D:/Documents/GitHub/stm32-avionics/common/utils" -I"D:/Documents/GitHub/stm32-avionics/stm32_projects/device_drivers" -I"D:/Documents/GitHub/stm32-avionics/common/devices_common" -O0 -ffunction-sections -fdata-sections -fno-exceptions -fno-rtti -fno-use-cxa-atexit -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
+```
+
+Let's find all the define flags, which start with `-D`; They're `-DDEBUG -Dtimegm=mktime -DUSE_HAL_DRIVER -DSTM32F401xC`. Let's replace the stuff in `target_compile_definitions` with these, then:
+
+```
+target_compile_definitions(${EXECUTABLE} PRIVATE
+        -DDEBUG
+        -Dtimegm=mktime
+        -DUSE_HAL_DRIVER
+        -DSTM32F401xC
+        )
+```
+
+Now, down in `target_compile_options`, let's copy all the `-m -M -f` and such flags over. The cpu and fpu flags are pretty important. That should give us:
+
+```
+target_compile_options(${EXECUTABLE} PRIVATE
+        -mcpu=cortex-m4
+        -mthumb
+        -mfpu=fpv4-sp-d16
+        -mfloat-abi=hard
+
+        -fdata-sections
+        -ffunction-sections
+        -fno-exceptions
+        $<$<COMPILE_LANG_AND_ID:CXX,GNU>:-fno-rtti>
+        $<$<COMPILE_LANG_AND_ID:CXX,GNU>:-fno-use-cxa-atexit>
+        -fstack-usage
+
+        -Wl,--gc-sections
+        -static
+
+        -MMD
+        -MP
+        -specs=nano.specs
+        -specs=nosys.specs
+
+        -u _printf_float
+
+        -Og
+        -g3
+        )
+```
+
+To figure out linker flags, look in `stm32_projects/prop_adcboard_v2/Debug/makefile`. We'll use a similar process to above. I've copy pasted the important line here:
+
+```make
+# Tool invocations
+prop_adcboard_v2.elf prop_adcboard_v2.map: $(OBJS) $(USER_OBJS) D:\Documents\GitHub\stm32-avionics\stm32_projects\prop_adcboard_v2\STM32F401CCUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "prop_adcboard_v2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\Documents\GitHub\stm32-avionics\stm32_projects\prop_adcboard_v2\STM32F401CCUX_FLASH.ld" -Wl,-Map="prop_adcboard_v2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+  ```
+
+Now let's make sure the important ones end up in `target_link_options` (Mostly the path to the `ld` file, and the CPU and FPU names). I'll then copy them into `target_link_options`:
+
+```
+target_link_options(${EXECUTABLE} PRIVATE
+        -T${CMAKE_CURRENT_SOURCE_DIR}/STM32F401CCUX_FLASH.ld
+        -mcpu=cortex-m4
+        -mthumb
+        -mfpu=fpv4-sp-d16
+        -mfloat-abi=hard
+        -specs=nano.specs
+        -lnosys
+        -lc
+        -lm
+        -Wl,-Map=${PROJECT_NAME}.map,--cref
+        -Wl,--gc-sections
+        -Wl,--print-memory-usage
+        )
+```
+
+That's it! Now we should be able to do `cmake --build build --target prop_adcboard_v2 -- -j -l` from the root project directory. You should see something like this, which tells you how much RAM and flash memory your project is using. (Cube gives you a per-function breakdown, too).
+
+```
+Memory region         Used Size  Region Size  %age Used
+             RAM:        8168 B        64 KB     12.46%
+           FLASH:       31080 B       256 KB     11.86%
+   text    data     bss     dec     hex filename
+  30724     352    7824   38900    97f4 prop_adcboard_v2.elf
+[100%] Built target prop_adcboard_v2
+```

@@ -6,7 +6,7 @@ touch CMakeListsPrivate.txt
 pushd .
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=desktop
+cmake .. -DPROJECT_BUILD_TYPE=desktop
 
 cmake --build . --target desktop_sim desktop_sim_test -- -j -l
 if [ $? -ne 0 ];
