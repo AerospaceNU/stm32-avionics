@@ -7,7 +7,7 @@
 
 #include "usb_std.h"
 
-#if HAS_DEV(USB_STD)
+#if HAS_DEV(USB_STD) || 1
 
 #include <stdbool.h>
 

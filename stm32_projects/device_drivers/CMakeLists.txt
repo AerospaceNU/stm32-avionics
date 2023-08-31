@@ -24,7 +24,7 @@ set(STM32_DEVICE_DRIVERS_SRCS
         ${CMAKE_CURRENT_SOURCE_DIR}/servo_pwm.c
         ${CMAKE_CURRENT_SOURCE_DIR}/spi_driver.c
         ${CMAKE_CURRENT_SOURCE_DIR}/temp_max31855.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/ti_radio.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/ti_radio.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/usb_std.c
         ${CMAKE_CURRENT_SOURCE_DIR}/vbat_ina226.c
         CACHE INTERNAL "")

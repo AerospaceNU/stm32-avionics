@@ -444,6 +444,7 @@ void hm_hardwareInit() {
     radioTi433[i].id = 0;
     radioTi433[i].packetCfg = TIRADIO_PKTLEN_FIXED;
     radioTi433[i].initialized = false;
+    radioTi433[i].doSoftwareFEC = true;
 
     // All 433 chips do NOT have a 1190 -- how can they?
     radioTi433[i].has_cc1190 = false;
@@ -958,7 +959,7 @@ void hm_pyroSetPwm(int pyroId, uint32_t duration, uint32_t frequency,
 #endif  // HAS_DEV(PYRO_DIGITAL)
 }
 
-void hm_pyroUpdate() {
+void hm_pyroUpdate(void *pUserData) {
 #if HAS_DEV(PYRO_DIGITAL)
   for (int i = 0; i < NUM_PYRO_DIGITAL; i++) {
     pyroDigital_tick(&pyroDigital[i]);
@@ -1117,7 +1118,7 @@ void hm_enableSimMode(CircularBuffer_s *rxBuffer) {
   simRxBuffer = rxBuffer;
 }
 
-void hm_disableSimMode(CircularBuffer_s *rxBuffer) { inSim = false; }
+void hm_disableSimMode() { inSim = false; }
 
 bool hm_inSimMode() { return inSim; }
 

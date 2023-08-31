@@ -345,7 +345,7 @@ void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth,
 #endif  // HAS_DEV(PYRO_DESKTOP_PRINT)
 }
 
-void hm_pyroUpdate() {
+void hm_pyroUpdate(void *pUserData) {
 #if HAS_DEV(PYRO_DESKTOP_PRINT)
   for (int i = 0; i < NUM_PYRO_DESKTOP_PRINT; i++) {
     printPyro_tick(&printPyro[i]);

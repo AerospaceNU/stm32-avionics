@@ -2,6 +2,8 @@ if (PROJECT_BUILD_TYPE MATCHES "desktop")
     # Undo some platformio stuff
     message("\nUndoing platformio bs for desktop\n")
 
+    SET_PROPERTY(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS true) 
+
     unset(CLION_SVD_FILE_PATH)
     unset(CMAKE_C_COMPILER)
     unset(CMAKE_CXX_COMPILER)

@@ -19,13 +19,12 @@ extern "C" {
 
 #if (HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915))
 
+#include "cc1120_cc1200_defs.h"
 #include "circular_buffer.h"
 #include "data_structures.h"
 #include "smartrf_registersettings.h"
 
 #include HAL_HEADER
-
-#define TI_RADIO_STATUS_MASK 0xF0
 
 #define MAX_COMSUMER 5
 
@@ -57,6 +56,13 @@ typedef enum {
   TIRADIO_RX0TX1_CFG = 26,  // 0 in idle or rx, 1 in transmit
 
   TIRADIO_HIGHZ = 48  // High-impedance, if we need this to not do anything
+
+  // Static fec encode/decode helpers
+  // This assumes no multi-threading weirdness
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
+  FecEncoder encoder;
+  FecDecoder decoder;
+#endif
 } TiRadioGpioCfg_e;
 
 typedef enum {
@@ -120,6 +126,7 @@ typedef struct {
   // Set from smartRF config
   const RegisterSetting_s *settingsPtr;
   size_t settingsSize;
+  bool doSoftwareFEC;
 
   bool initialized;
 } TiRadioCtrl_s;
@@ -142,7 +149,7 @@ void tiRadio_configGpio(TiRadioCtrl_s *radio, uint16_t gpio_register,
                         uint8_t gpio_config, bool outputInverted);
 bool tiRadio_calibrate(TiRadioCtrl_s *radio);
 
-#endif
+#endif  // (HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915))
 
 #ifdef __cplusplus
 }
