@@ -24,3 +24,6 @@
 cmake-build-debug
 build
 git_info.h
+build_stm/*
+*.hex
+**/*.hex
