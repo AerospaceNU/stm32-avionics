@@ -7,17 +7,12 @@
 #include <queue>
 #include <random>
 
-// #include <chrono>
-// #include <iostream>
-
 #include "ti_fec.h"
 
 #pragma GCC optimize("-Ofast")
 
-/**************************************************************************************************************
- * @fn hammWeight
- *
- * @brief Calculates Hamming weight of byte (# bits set)
+/**
+ * Calculates Hamming weight of byte (# bits set)
  *
  * @param a - Byte to find the Hamming weight for
  *

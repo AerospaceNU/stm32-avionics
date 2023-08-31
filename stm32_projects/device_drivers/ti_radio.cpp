@@ -22,13 +22,6 @@
 
 #pragma GCC optimize("-O2")
 
-// Static fec encode/decode helpers
-// This assumes no multi-threading weirdness
-#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
-FecEncoder encoder;
-FecDecoder decoder;
-#endif
-
 // Forward declarations for all internal register read/writes
 static uint8_t tiRadio_spiReadReg(TiRadioCtrl_s *radio, uint16_t addr,
                                   uint8_t *data, uint8_t len);

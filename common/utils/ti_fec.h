@@ -63,10 +63,8 @@ class FecDecoder {
                  size_t decodedMessageLen);
 
  private:
-  /**************************************************************************************************************
-   * @fn fecDecode
-   *
-   * @brief De-interleaves and decodes a given input buffer. The input must be
+  /**
+   * De-interleaves and decodes a given input buffer. The input must be
    * exactly 4 bytes long. Up to 4? bytes may be stored in the output array.
    *
    * @param pOutputArray - Pointer to where to put decoded data (NULL when

@@ -56,6 +56,13 @@ typedef enum {
   TIRADIO_RX0TX1_CFG = 26,  // 0 in idle or rx, 1 in transmit
 
   TIRADIO_HIGHZ = 48  // High-impedance, if we need this to not do anything
+
+  // Static fec encode/decode helpers
+  // This assumes no multi-threading weirdness
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
+  FecEncoder encoder;
+  FecDecoder decoder;
+#endif
 } TiRadioGpioCfg_e;
 
 typedef enum {

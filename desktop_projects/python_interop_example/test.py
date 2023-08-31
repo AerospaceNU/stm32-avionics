@@ -1,5 +1,5 @@
 from ctypes import *
-so_file = "/home/matt/stm32-avionics/build/desktop_projects/pybind_test/libstm32-avionics-py.so"
+so_file = "/home/matt/stm32-avionics/build/desktop_projects/pybind_test/libpython_interop_example.so"
 my_functions = CDLL(so_file)
 print((my_functions))
 
