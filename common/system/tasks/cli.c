@@ -317,14 +317,15 @@ CliCommand_e cli_parse(CliComms_e commsType) {
     }
 
     if (invalidOptCommand) {
-              const char* invalidCommand = longOptions[primaryCommand].name;
-              char errMsg[128];
-              snprintf(errMsg, sizeof errMsg,
-                       "Invalid option: \"-%c\" is not a valid option for %s", opt,
-                       invalidCommand);
-              cli_sendAck(false, errMsg);
-
-      }
+      int i = primaryCommand - 1;
+      if (i < 0) break;
+      const char* invalidCommand = longOptions[i].name;
+      char errMsg[128];
+      snprintf(errMsg, sizeof errMsg,
+               "Invalid option: \"-%c\" is not a valid option for %s", opt,
+               invalidCommand);
+      cli_sendAck(false, errMsg);
+    }
   }
 
   // Set last comms type (at the end, so we only change to a comm type that gave
@@ -340,7 +341,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
   }
   if (invalidOptCommand) primaryCommand = NONE;
 
-    // Return primary command entered by user
+  // Return primary command entered by user
   return (CliCommand_e)primaryCommand;
 }
 
