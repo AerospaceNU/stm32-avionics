@@ -182,7 +182,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
     }
   }
 
-  char *invalidOptCommand = NULL;
+  bool invalidOptCommand = false;
   // Parse buffer in loop with getopt
   int opt = 0;
   int optionIndex = 0;
@@ -213,84 +213,84 @@ CliCommand_e cli_parse(CliComms_e commsType) {
         if (primaryCommand == OFFLOAD) {
           cliOptionVals.f = optarg;
         } else {
-          invalidOptCommand = "offload";
+          invalidOptCommand = true;
         }
         break;
       case 't':
         if (primaryCommand == CONFIG || primaryCommand == TRIGGERFIRE) {
           cliOptionVals.t = optarg;
         } else {
-          invalidOptCommand = "config and triggerfire";
+          invalidOptCommand = true;
         }
         break;
       case 'm':
         if (primaryCommand == CONFIG) {
           cliOptionVals.m = optarg;
         } else {
-          invalidOptCommand = "config";
+          invalidOptCommand = true;
         }
         break;
       case 'p':
         if (primaryCommand == CONFIG) {
           cliOptionVals.p = optarg;
         } else {
-          invalidOptCommand = "config";
+          invalidOptCommand = true;
         }
         break;
       case 'd':
         if (primaryCommand == CONFIG) {
           cliOptionVals.d = optarg;
         } else {
-          invalidOptCommand = "config";
+          invalidOptCommand = true;
         }
         break;
       case 'w':
         if (primaryCommand == CONFIG) {
           cliOptionVals.w = optarg;
         } else {
-          invalidOptCommand = "config";
+          invalidOptCommand = true;
         }
         break;
       case 'C':
         if (primaryCommand == CONFIG) {
           cliOptionVals.C = optarg;
         } else {
-          invalidOptCommand = "config";
+          invalidOptCommand = true;
         }
         break;
       case 'D':
         if (primaryCommand == CONFIG) {
           cliOptionVals.D = true;
         } else {
-          invalidOptCommand = "config";
+          invalidOptCommand = true;
         }
         break;
       case 'N':
         if (primaryCommand == CONFIG) {
           cliOptionVals.N = true;
         } else {
-          invalidOptCommand = "config";
+          invalidOptCommand = true;
         }
         break;
       case 'h':
         if (primaryCommand == OFFLOAD || primaryCommand == CONFIG) {
           cliOptionVals.h = true;
         } else {
-          invalidOptCommand = "offload and config";
+          invalidOptCommand = true;
         }
         break;
       case 'e':
         if (primaryCommand == CONFIG) {
           cliOptionVals.e = optarg;
         } else {
-          invalidOptCommand = "config";
+          invalidOptCommand = true;
         }
         break;
       case 'r':
         if (primaryCommand == CONFIG) {
           cliOptionVals.r = optarg;
         } else {
-          invalidOptCommand = "config";
+          invalidOptCommand = true;
         }
         break;
       case 'c':
@@ -300,7 +300,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
         } else if (primaryCommand == LINECUTTER) {
           cliOptionVals.lcCmd = optarg;
         } else {
-          invalidOptCommand = "config and linecutter";
+          invalidOptCommand = true;
         }
         break;
       // Line cutter ID
@@ -308,7 +308,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
         if (primaryCommand == LINECUTTER) {
           cliOptionVals.lcId = optarg;
         } else {
-          invalidOptCommand = "linecutter";
+          invalidOptCommand = true;
         }
         break;
 
@@ -316,11 +316,12 @@ CliCommand_e cli_parse(CliComms_e commsType) {
         break;
     }
 
-    if (invalidOptCommand != NULL) {
+    if (invalidOptCommand) {
+      const char* invalidCommand = longOptions[primaryCommand].name;
       char errMsg[128];
       snprintf(errMsg, sizeof errMsg,
-               "Invalid option: \"-%c\" only works on %s",
-               opt, invalidOptCommand);
+               "Invalid option: \"-%c\" only works on %s", opt,
+               invalidCommand);
       cli_sendAck(false, errMsg);
       return NONE;
     }
