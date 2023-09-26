@@ -293,7 +293,11 @@ void hm_readSensorData() {
 
   // Read battery monitor ADCs
   for (uint i = 0; i < deviceManager.getNumberBatteryMonitorAdcs(); i++) {
+<<<<<<< Updated upstream
     sensorData.vbatData[FIRST_ID_VBAT_EXTRA + i] =
+=======
+    sensorData.vbatData[i] =
+>>>>>>> Stashed changes
         deviceManager.readBatteryVoltage(i);
   }
 
