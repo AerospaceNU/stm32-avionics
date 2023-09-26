@@ -162,7 +162,7 @@ jobs:
         key: ${{ runner.os }}-cmake_deps
 
     # We need to use Ninja on Windows for builds -- install it here
-    - name: Configure CMake
+    - name: Install Ninja
       if: startsWith(matrix.os, 'windows-latest')
       run: |
         choco install ninja
