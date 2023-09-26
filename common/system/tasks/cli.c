@@ -316,15 +316,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
         break;
     }
 
-    if (invalidOptCommand) {
-      const char* invalidCommand = longOptions[primaryCommand].name;
-      char errMsg[128];
-      snprintf(errMsg, sizeof errMsg,
-               "Invalid option: \"-%c\" only works on %s", opt,
-               invalidCommand);
-      cli_sendAck(false, errMsg);
-      return NONE;
-    }
+
   }
 
   // Set last comms type (at the end, so we only change to a comm type that gave
@@ -338,8 +330,16 @@ CliCommand_e cli_parse(CliComms_e commsType) {
   if (primaryCommand == NONE) {
     cli_sendAck(false, "Command not recognized");
   }
+  if (invalidOptCommand) {
+          const char* invalidCommand = longOptions[primaryCommand].name;
+          char errMsg[128];
+          snprintf(errMsg, sizeof errMsg,
+                   "Invalid option: \"-%c\" only works on %s", opt,
+                   invalidCommand);
+          cli_sendAck(false, errMsg);
+  }
 
-  // Return primary command entered by user
+    // Return primary command entered by user
   return (CliCommand_e)primaryCommand;
 }
 
