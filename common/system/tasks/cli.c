@@ -7,6 +7,7 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "board_config_common.h"
@@ -181,6 +182,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
     }
   }
 
+  char *invalidOptCommand = NULL;
   // Parse buffer in loop with getopt
   int opt = 0;
   int optionIndex = 0;
@@ -210,62 +212,85 @@ CliCommand_e cli_parse(CliComms_e commsType) {
       case 'f':
         if (primaryCommand == OFFLOAD) {
           cliOptionVals.f = optarg;
+        } else {
+          invalidOptCommand = "offload";
         }
         break;
       case 't':
         if (primaryCommand == CONFIG || primaryCommand == TRIGGERFIRE) {
           cliOptionVals.t = optarg;
+        } else {
+          invalidOptCommand = "config and triggerfire";
         }
         break;
       case 'm':
         if (primaryCommand == CONFIG) {
           cliOptionVals.m = optarg;
+        } else {
+          invalidOptCommand = "config";
         }
         break;
       case 'p':
         if (primaryCommand == CONFIG) {
           cliOptionVals.p = optarg;
+        } else {
+          invalidOptCommand = "config";
         }
         break;
       case 'd':
         if (primaryCommand == CONFIG) {
           cliOptionVals.d = optarg;
+        } else {
+          invalidOptCommand = "config";
         }
         break;
       case 'w':
         if (primaryCommand == CONFIG) {
           cliOptionVals.w = optarg;
+        } else {
+          invalidOptCommand = "config";
         }
         break;
       case 'C':
         if (primaryCommand == CONFIG) {
           cliOptionVals.C = optarg;
+        } else {
+          invalidOptCommand = "config";
         }
         break;
       case 'D':
         if (primaryCommand == CONFIG) {
           cliOptionVals.D = true;
+        } else {
+          invalidOptCommand = "config";
         }
         break;
       case 'N':
         if (primaryCommand == CONFIG) {
           cliOptionVals.N = true;
+        } else {
+          invalidOptCommand = "config";
         }
         break;
       case 'h':
         if (primaryCommand == OFFLOAD || primaryCommand == CONFIG) {
           cliOptionVals.h = true;
+        } else {
+          invalidOptCommand = "offload and config";
         }
         break;
-
       case 'e':
         if (primaryCommand == CONFIG) {
           cliOptionVals.e = optarg;
+        } else {
+          invalidOptCommand = "config";
         }
         break;
       case 'r':
         if (primaryCommand == CONFIG) {
           cliOptionVals.r = optarg;
+        } else {
+          invalidOptCommand = "config";
         }
         break;
       case 'c':
@@ -274,18 +299,30 @@ CliCommand_e cli_parse(CliComms_e commsType) {
           cliOptionVals.c = optarg;
         } else if (primaryCommand == LINECUTTER) {
           cliOptionVals.lcCmd = optarg;
+        } else {
+          invalidOptCommand = "config and linecutter";
         }
         break;
-
       // Line cutter ID
       case 'i':
         if (primaryCommand == LINECUTTER) {
           cliOptionVals.lcId = optarg;
+        } else {
+          invalidOptCommand = "linecutter";
         }
         break;
 
       default:
         break;
+    }
+
+    if (invalidOptCommand != NULL) {
+      char errMsg[128];
+      snprintf(errMsg, sizeof errMsg,
+               "Invalid option: \"-%c\" only works on %s",
+               opt, invalidOptCommand);
+      cli_sendAck(false, errMsg);
+      return NONE;
     }
   }
 
