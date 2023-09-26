@@ -161,6 +161,13 @@ jobs:
           build/_deps
         key: ${{ runner.os }}-cmake_deps
 
+    # We need to use Ninja on Windows for builds -- install it here
+    - name: Setup Ninja
+      uses: ashutoshvarma/setup-ninja@master
+      with:
+        # ninja version to download. Default: 1.10.0
+        version: 1.10.0
+
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
