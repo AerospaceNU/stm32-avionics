@@ -163,6 +163,7 @@ jobs:
 
     # We need to use Ninja on Windows for builds -- install it here
     - name: Configure CMake
+      if: startsWith(matrix.os, 'windows-latest')
       run: |
         choco install ninja
 
