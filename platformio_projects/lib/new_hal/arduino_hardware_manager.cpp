@@ -14,9 +14,9 @@
 #define USB_SERIAL_BUFFER_SIZE 500
 
 void stdArrayToAxis3d(Axis3dReal_s *s, std::array<double, 3> array) {
-  s->x = array[0];
-  s->y = array[1];
-  s->z = array[2];
+    s->x = array[0];
+    s->y = array[1];
+    s->z = array[2];
 }
 
 // Device manager object to provide a different (better?) abstraction for
@@ -93,61 +93,67 @@ static CircularBuffer_s serialCircularBuffer;
 CircularBuffer_s *radioCircularBuffer;
 
 void hm_hardwareInit() {
-  pinMode(LED_BUILTIN, OUTPUT);
-  cb_init(&serialCircularBuffer, serialBuffer, USB_SERIAL_BUFFER_SIZE,
-          sizeof(uint8_t));
+    pinMode(LED_BUILTIN, OUTPUT);
+    cb_init(&serialCircularBuffer, serialBuffer, USB_SERIAL_BUFFER_SIZE,
+            sizeof(uint8_t));
 
-  deviceManager.init();
+    deviceManager.init();
 
-  if (deviceManager.getBarometer(0)) {
-    hardwareStatusBarometer[0] =
-        deviceManager.getBarometer(0)->getSensorStatus();
-  }
+    if (deviceManager.getBarometer(0)) {
+        hardwareStatusBarometer[0] =
+                deviceManager.getBarometer(0)->getSensorStatus();
+    }
 
-  if (deviceManager.getGps(0)) {
-    hardwareStatusGps[0] = deviceManager.getGps(0)->getSensorStatus();
-  }
+    if (deviceManager.getGps(0)) {
+        hardwareStatusGps[0] = deviceManager.getGps(0)->getSensorStatus();
+    }
 
-  // TODO: Maybe this can be better?
-  if (deviceManager.getAccelerometer(0)) {
-    hardwareStatusImu[0] = deviceManager.getAccelerometer(0)->getSensorStatus();
-    sensorProperties.imuAccelFs[0] =
-        deviceManager.getAccelerometer(0)->getAccelerometerFullScale();
-  }
+    // TODO: Maybe this can be better?
+    if (deviceManager.getAccelerometer(0)) {
+        hardwareStatusImu[0] = deviceManager.getAccelerometer(0)->getSensorStatus();
+        sensorProperties.imuAccelFs[0] =
+                deviceManager.getAccelerometer(0)->getAccelerometerFullScale();
+    }
 
-  if (deviceManager.getMagnetometer(0)) {
-    hardwareStatusMag[0] = deviceManager.getMagnetometer(0)->getSensorStatus();
-  }
+    if (deviceManager.getMagnetometer(0)) {
+        hardwareStatusMag[0] = deviceManager.getMagnetometer(0)->getSensorStatus();
+    }
 
-  if (deviceManager.getNumberBatteryMonitorAdcs() > 0) {
-    hardwareStatusVbat[0] = true;
-  }
+    if (deviceManager.getNumberBatteryMonitorAdcs() > 0) {
+        hardwareStatusVbat[0] = true;
+    }
 
-  hardwareStatusUsb[0] = true;
-  hardwareStatusLed[0] = true;
+    hardwareStatusUsb[0] = true;
+    hardwareStatusLed[0] = true;
 }
 
 uint32_t hm_millis() { return millis(); }
 
 bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
                        uint8_t *pData) {
-  memset(pData, 0xff, numBytes);
-  return false;
+    memset(pData, 0xff, numBytes);
+    return false;
 }
 
 bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
                         uint8_t *data) {
-  return false;
+    return false;
 }
 
 bool hm_flashEraseSectorStart(int flashId, uint32_t sectorNum) { return false; }
+
 bool hm_flashEraseChipStart(int flashId) { return false; }
+
 bool hm_flashIsReadComplete(int flashId) { return true; }
+
 bool hm_flashIsWriteComplete(int flashId) { return true; }
+
 bool hm_flashIsEraseComplete(int flashId) { return true; }
 
 void hm_buzzerSetFrequency(int buzzerId, float fHz) {}
+
 void hm_buzzerStart(int buzzerId) {}
+
 void hm_buzzerStop(int buzzerId) {}
 
 void hm_servoSetAngle(int servoId, float degrees) {}
@@ -155,154 +161,157 @@ void hm_servoSetAngle(int servoId, float degrees) {}
 bool led_on = false;
 
 void hm_ledSet(int ledId, bool set) {}
+
 void hm_ledToggle(int ledId) {
-  digitalWrite(LED_BUILTIN, led_on);
-  led_on = !led_on;
+    digitalWrite(LED_BUILTIN, led_on);
+    led_on = !led_on;
 }
 
 bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
-  if (deviceManager.getRadio(0)) {
-    return deviceManager.getRadio(0)->sendData(data, numBytes);
-  }
+    if (deviceManager.getRadio(0)) {
+        return deviceManager.getRadio(0)->sendData(data, numBytes);
+    }
 
-  return false;
+    return false;
 }
 
 void hm_radioUpdate() {
-  for (auto &radio : deviceManager.radios) {
-    if (radio->isDataAvailable()) {
-      static RadioRecievedPacket_s packet;
-      packet.radioId = 0;
-      packet.rssi = radio->getLastRssi();
-      packet.crc = true;
-      packet.lqi = 0;
+    for (auto &radio : deviceManager.radios) {
+        if (radio->isDataAvailable()) {
+            static RadioRecievedPacket_s packet;
+            packet.radioId = 0;
+            packet.rssi = radio->getLastRssi();
+            packet.crc = true;
+            packet.lqi = 0;
 
-      memset(packet.data, 0, sizeof(packet.data));
+            memset(packet.data, 0, sizeof(packet.data));
 
-      uint8_t len = sizeof(packet.data);
-      radio->readData(packet.data, len);
+            uint8_t len = sizeof(packet.data);
+            radio->readData(packet.data, len);
 
-      cb_enqueue(radioCircularBuffer, (unknownPtr_t)&packet);
+            cb_enqueue(radioCircularBuffer, (unknownPtr_t) &packet);
+        }
     }
-  }
 }
 
 void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {
-  radioCircularBuffer = rxBuffer;
+    radioCircularBuffer = rxBuffer;
 }
 
 void hm_radioSetChannel(int radioNum, int channel) {}
 
 bool hm_usbIsConnected(int usbId) { return false; }
-bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
-  for (int i = 0; i < numBytes; i++) {
-    Serial.print((char)data[i]);
-  }
 
-  return true;
+bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
+    for (int i = 0; i < numBytes; i++) {
+        Serial.print((char) data[i]);
+    }
+
+    return true;
 }
+
 CircularBuffer_s *hm_usbGetRxBuffer(int usbId) { return &serialCircularBuffer; }
 
 bool hm_bleClientConnected(int bleClientId) { return false; }
+
 bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
-  return false;
+    return false;
 }
+
 CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) { return nullptr; }
+
 void hm_bleTick() {}
 
 LineCutterData_s *hm_getLineCutterData(int lineCutterId) { return nullptr; }
 
 LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
-  return nullptr;
+    return nullptr;
 }
+
 bool hm_lineCutterSendString(int lineCutterNumber, char *string) {
-  printf("[Sent to LC %i] %s\n", lineCutterNumber, string);
-  return true;
+    printf("[Sent to LC %i] %s\n", lineCutterNumber, string);
+    return true;
 }
+
 bool hm_lineCuttersSendCut(int chan) {
-  printf("Line cutter chan %i cut sent!\n", chan);
-  return true;
+    printf("Line cutter chan %i cut sent!\n", chan);
+    return true;
 }
 
 void hm_watchdogRefresh() {}
 
 void hm_pyroFire(int pyroId, uint32_t duration) {
-  // TODO: Actually fire pyro
+    // TODO: Actually fire pyro
 }
 
 void hm_pyroSet(int pyroId, bool enable) {
-  // TODO: Implement
+    // TODO: Implement
 }
 
 void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth,
                    uint32_t duration) {
-  // TODO: Analogwrite()?
+    // TODO: Analogwrite()?
 }
 
 void hm_pyroUpdate() {
-  // TODO: Actually do this
+    // TODO: Actually do this
 }
 
 void hm_dcMotorSetPercent(int dcMotorId, double percent) {}
 
 void hm_readSensorData() {
-  // Read from serial port
-  while (Serial.available()) {
-    uint8_t data_byte = Serial.read();
-    cb_enqueue(&serialCircularBuffer, &data_byte);
-  }
+    // Read from serial port
+    while (Serial.available()) {
+        uint8_t data_byte = Serial.read();
+        cb_enqueue(&serialCircularBuffer, &data_byte);
+    }
 
-  // Read sensors
-  deviceManager.readSensors();
+    // Read sensors
+    deviceManager.readSensors();
 
-  // Get data from barometer
-  if (deviceManager.getBarometer(0)) {
-    auto barometer = deviceManager.getBarometer(0);
+    // Get data from barometer
+    if (deviceManager.getBarometer(0)) {
+        auto barometer = deviceManager.getBarometer(0);
 
-    BarometerData_s baro_data;
-    baro_data.pressureAtm = barometer->getPressureAtm();
-    baro_data.temperatureC = barometer->getTemperatureC();
-    sensorData.barometerData[0] = baro_data;
-  }
+        BarometerData_s baro_data;
+        baro_data.pressureAtm = barometer->getPressureAtm();
+        baro_data.temperatureC = barometer->getTemperatureC();
+        sensorData.barometerData[0] = baro_data;
+    }
 
-  // Get data from GPS
-  if (deviceManager.getGps(0)) {
-    auto gps = deviceManager.getGps(0);
-    sensorData.gpsData[0] = *gps->getLastFix();
-  }
+    // Get data from GPS
+    if (deviceManager.getGps(0)) {
+        auto gps = deviceManager.getGps(0);
+        sensorData.gpsData[0] = *gps->getLastFix();
+    }
 
-  // Get data from Gyro and Accelerometer
-  if (deviceManager.getAccelerometer(0) && deviceManager.getGyroscope(0)) {
-    auto accel = deviceManager.getAccelerometer(0);
-    auto gyro = deviceManager.getGyroscope(0);
+    // Get data from Gyro and Accelerometer
+    if (deviceManager.getAccelerometer(0) && deviceManager.getGyroscope(0)) {
+        auto accel = deviceManager.getAccelerometer(0);
+        auto gyro = deviceManager.getGyroscope(0);
 
-    ImuData_s imu_data;
-    stdArrayToAxis3d(&(imu_data.accelRealMps2), accel->getAccelerometerData());
-    stdArrayToAxis3d(&(imu_data.angVelRealRadps), gyro->getGyroscopeData());
-    sensorData.imuData[0] = imu_data;
-  }
+        ImuData_s imu_data;
+        stdArrayToAxis3d(&(imu_data.accelRealMps2), accel->getAccelerometerData());
+        stdArrayToAxis3d(&(imu_data.angVelRealRadps), gyro->getGyroscopeData());
+        sensorData.imuData[0] = imu_data;
+    }
 
-  // Get data from magnetometer
-  if (deviceManager.getMagnetometer(0)) {
-    auto mag = deviceManager.getMagnetometer(0);
+    // Get data from magnetometer
+    if (deviceManager.getMagnetometer(0)) {
+        auto mag = deviceManager.getMagnetometer(0);
 
-    MagData_s mag_data;
-    stdArrayToAxis3d(&mag_data.realGauss, mag->getMagnetometerData());
-    sensorData.magData[0] = mag_data;
-  }
+        MagData_s mag_data;
+        stdArrayToAxis3d(&mag_data.realGauss, mag->getMagnetometerData());
+        sensorData.magData[0] = mag_data;
+    }
 
-  // Read battery monitor ADCs
-  for (uint i = 0; i < deviceManager.getNumberBatteryMonitorAdcs(); i++) {
-<<<<<<< Updated upstream
-    sensorData.vbatData[FIRST_ID_VBAT_EXTRA + i] =
-=======
-    sensorData.vbatData[i] =
->>>>>>> Stashed changes
-        deviceManager.readBatteryVoltage(i);
-  }
+    // Read battery monitor ADCs
+    for (uint i = 0; i < deviceManager.getNumberBatteryMonitorAdcs(); i++) {
+        sensorData.vbatData[i] = deviceManager.readBatteryVoltage(i);
+    }
 
-  // Set data timestamp
-  sensorData.timestampMs = hm_millis();
+    // Set data timestamp
+    sensorData.timestampMs = hm_millis();
 }
 
 SensorData_s *hm_getSensorData() { return &sensorData; }
