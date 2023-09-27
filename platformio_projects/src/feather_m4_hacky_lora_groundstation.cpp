@@ -22,16 +22,17 @@ Groundstation groundstation;
 Rfm950 rfm950;
 
 void setup() {
-    // Init drivers
-    rfm950.init(RFM95_RST, RFM95_CS, RFM95_INT);
+  // Init drivers
+  rfm950.init(RFM95_RST, RFM95_CS, RFM95_INT);
 
-    // Add them to device manager
-    auto deviceManager = getDeviceManager();
-//    deviceManager->addBatteryMonitorAdc(A7, 2.0 / FEATHER_M0_ADC_RESOLUTION);  // Voltage divider divides by 2
-    deviceManager->addRadio(&rfm950);
+  // Add them to device manager
+  auto deviceManager = getDeviceManager();
+  //    deviceManager->addBatteryMonitorAdc(A7, 2.0 /
+  //    FEATHER_M0_ADC_RESOLUTION);  // Voltage divider divides by 2
+  deviceManager->addRadio(&rfm950);
 
-    // Run FCB code
-    groundstation.init();
+  // Run FCB code
+  groundstation.init();
 }
 
 void loop() { groundstation.runOnce(); }
