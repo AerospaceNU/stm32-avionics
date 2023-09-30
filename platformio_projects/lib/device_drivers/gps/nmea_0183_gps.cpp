@@ -6,7 +6,7 @@
 
 Nmea0183Gps::Nmea0183Gps() = default;
 
-void Nmea0183Gps::init(Uart *serial_port, int baud_rate) {
+void Nmea0183Gps::init(HardwareSerial *serial_port, int baud_rate) {
   serialPort = serial_port;
 
   serialPort->begin(baud_rate);

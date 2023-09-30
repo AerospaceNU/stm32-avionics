@@ -9,26 +9,30 @@
 #include <arduino_hardware_manager.h>
 #include <scheduler.h>
 
+#include <gps/nmea_0183_gps.h>
+
 // Pin definitions
 
 // FCB Code
 Scheduler s;
 
 // Drivers
+Nmea0183Gps nmeaGps;
 
 void setup() {
   // Init drivers
-
+  nmeaGps.init(&Serial, 9600);
 
   // Add them to device manager
   auto deviceManager = getDeviceManager();
+  deviceManager->addGps(&nmeaGps);
 
   // Run FCB code
-  s.run();
+  // s.run();
 }
 
 void loop() {
   // We should never get here because the FCB code runs forever
-  delay(10000);
+  delay(1000);
   Serial.println("Why are we here");
 }
