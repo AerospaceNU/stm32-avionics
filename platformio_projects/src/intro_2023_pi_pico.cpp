@@ -20,7 +20,7 @@ Nmea0183Gps nmeaGps;
 
 void setup() {
   // Init drivers
-  nmeaGps.init(&Serial, 9600);
+  nmeaGps.init(&Serial1, 9600);
 
   // Add them to device manager
   auto deviceManager = getDeviceManager();
