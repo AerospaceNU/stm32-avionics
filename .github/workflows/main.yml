@@ -90,6 +90,8 @@ jobs:
         include:
           - env-name: "feather_m0_lora"
           - env-name: "feather_m0_lora_groundstation"
+          - env-name: "pico_blink"
+          - env-name: "intro_2023"
 
     runs-on: ubuntu-latest
     name: "Build PlatformIO flight software for ${{ matrix.env-name }}"
