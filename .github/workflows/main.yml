@@ -102,7 +102,7 @@ jobs:
       with:
         path: |
           ~/.cache/pip
-          ~/.platformio/.cache
+          ~/.platformio
           .pio/libdeps
         key: ${{ runner.os }}-pio
     - uses: actions/setup-python@v4

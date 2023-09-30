@@ -6,10 +6,6 @@
 
 Lsm6ds3::Lsm6ds3() = default;
 
-void Lsm6ds3::init() {
+void Lsm6ds3::init() {}
 
-}
-
-void Lsm6ds3::tick() {
-
-}
+void Lsm6ds3::tick() {}

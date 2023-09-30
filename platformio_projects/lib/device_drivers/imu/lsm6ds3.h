@@ -8,14 +8,12 @@
 #include "imu.h"
 
 class Lsm6ds3 : public Imu {
-public:
-    Lsm6ds3();
+ public:
+  Lsm6ds3();
 
-    void init();
+  void init();
 
-    void tick() override;
-
+  void tick() override;
 };
 
-
-#endif //STM32_AVIONICS_LSM6DS3_H
+#endif  // STM32_AVIONICS_LSM6DS3_H

@@ -7,9 +7,8 @@
 
 #include <Arduino.h>
 #include <arduino_hardware_manager.h>
-#include <scheduler.h>
-
 #include <gps/nmea_0183_gps.h>
+#include <scheduler.h>
 
 // Pin definitions
 
