@@ -14,12 +14,12 @@ class Nmea0183Gps : public Gps {
  public:
   Nmea0183Gps();
 
-  void init(Uart *serial_port, int baud_rate);
+  void init(HardwareSerial *serial_port, int baud_rate);
 
   void tick() override;
 
  protected:
-  Uart *serialPort = nullptr;
+  HardwareSerial *serialPort = nullptr;
 
   TinyGPSPlus tinyGpsPlus;
 };
