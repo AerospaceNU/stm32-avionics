@@ -28,7 +28,7 @@ void setup() {
   deviceManager->addGps(&nmeaGps);
 
   // Run FCB code
-  // s.run();
+  s.run();
 }
 
 void loop() {
