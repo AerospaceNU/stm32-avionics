@@ -293,7 +293,8 @@ void hm_readSensorData() {
 
   // Read battery monitor ADCs
   for (uint i = 0; i < deviceManager.getNumberBatteryMonitorAdcs(); i++) {
-    sensorData.vbatData[i] = deviceManager.readBatteryVoltage(i);
+    sensorData.vbatData[FIRST_ID_VBAT_EXTRA + i] =
+        deviceManager.readBatteryVoltage(i);
   }
 
   // Set data timestamp

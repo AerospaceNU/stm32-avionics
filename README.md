@@ -8,13 +8,13 @@ This guide should get you through your first build of the project for stm32. For
 
 First, pull this git repository using the following command from a directory of your liking.
 
-`git clone https://gitlab.com/aeronu/dollar-per-foot/stm32-avionics`
+`git clone --recurse-submodules git@github.com:AerospaceNU/stm32-avionics.git`
 
 **Note:** you must have git installed. You can install git for windows [here](https://gitforwindows.org/).
 
 Next, open STM32 Cube IDE. If you do not have Cube you can install it from this [link](https://www.st.com/en/development-tools/stm32cubeide.html). Please download version 1.12.0 for compatibility with our code.
 
-When opening the IDE, you can use the default workspace. Using the cloned directory may cause problems.
+When opening the IDE, you can use the default workspace. Using the cloned directory may cause problems. 
 
 Once the IDE is open, you can import the project. Navigate to `File -> Import -> General -> Existing Projects into Workspace`. Browse for the `stm32-avionics` folder. Make sure `Search for nested projects` is checked and that none of the other options are checked, then import all projects. All projects should build at this point by clicking on the hammer icon when one of their files is open.
 

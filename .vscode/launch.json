@@ -9,25 +9,160 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "cortex-debug",
+            "request": "launch",
+            "name": "Debug fcb_v0 (OpenOCD)",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "runToMain": true,
+            "executable": "${workspaceFolder}/build/stm32_projects/fcb_v0/fcb_v0.elf",
+            "device": "STM32H750",
+            "configFiles": [
+                "${workspaceFolder}/tooling/openocd_h7.cfg"
+            ],
+            "swoConfig": {
+                "enabled": true,
+                "cpuFrequency": 80000000,
+                "swoFrequency": 2000000,
+                "source": "probe",
+                "decoders": [
+                    {
+                        "type": "console",
+                        "label": "ITM",
+                        "port": 0
+                    }
+                ]
+            },
+            "preLaunchTask": "Build fcb_v0"
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "name": "Debug fcb_v1 (OpenOCD)",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "runToMain": true,
+            "executable": "${workspaceFolder}/build/stm32_projects/fcb_v1/fcb_v1.elf",
+            "device": "STM32H743",
+            "configFiles": [
+                "${workspaceFolder}/tooling/openocd_h7.cfg"
+            ],
+            "swoConfig": {
+                "enabled": true,
+                "cpuFrequency": 80000000,
+                "swoFrequency": 2000000,
+                "source": "probe",
+                "decoders": [
+                    {
+                        "type": "console",
+                        "label": "ITM",
+                        "port": 0
+                    }
+                ]
+            },
+            "preLaunchTask": "Build fcb_v1"
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "name": "Debug fcb_v2 (OpenOCD)",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "runToMain": true,
+            "executable": "${workspaceFolder}/build/stm32_projects/fcb_v2/fcb_v2.elf",
+            "device": "STM32L4R5",
+            "configFiles": [
+                "${workspaceFolder}/tooling/openocd_l4.cfg"
+            ],
+            "swoConfig": {
+                "enabled": true,
+                "cpuFrequency": 80000000,
+                "swoFrequency": 2000000,
+                "source": "probe",
+                "decoders": [
+                    {
+                        "type": "console",
+                        "label": "ITM",
+                        "port": 0
+                    }
+                ]
+            },
+            "preLaunchTask": "Build fcb_v2"
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "name": "Debug groundstation (OpenOCD)",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "runToMain": true,
+            "executable": "${workspaceFolder}/build/stm32_projects/groundstation/groundstation.elf",
+            "device": "STM32H743",
+            "configFiles": [
+                "${workspaceFolder}/tooling/openocd_h7.cfg"
+            ],
+            "swoConfig": {
+                "enabled": true,
+                "cpuFrequency": 80000000,
+                "swoFrequency": 2000000,
+                "source": "probe",
+                "decoders": [
+                    {
+                        "type": "console",
+                        "label": "ITM",
+                        "port": 0
+                    }
+                ]
+            },
+            "preLaunchTask": "Build groundstation"
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "name": "Debug amazon-stm32-arduino (OpenOCD)",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "runToMain": true,
+            "executable": "${workspaceFolder}/build/stm32_projects/amazon-stm32-arduino/amazon-stm32-arduino.elf",
+            "device": "STM32F401",
+            "configFiles": [
+                "${workspaceFolder}/tooling/openocd_f4.cfg"
+            ],
+            "swoConfig": {
+                "enabled": true,
+                "cpuFrequency": 80000000,
+                "swoFrequency": 2000000,
+                "source": "probe",
+                "decoders": [
+                    {
+                        "type": "console",
+                        "label": "ITM",
+                        "port": 0
+                    }
+                ]
+            },
+            "preLaunchTask": "Build amazon-stm32-arduino"
+        },
+        {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/feather_m0_lora/firmware.elf",
-            "projectEnvName": "feather_m0_lora",
+            "executable": "/home/matt/stm32-avionics/.pio/build/blink/firmware.elf",
+            "projectEnvName": "blink",
             "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
             "preLaunchTask": {
                 "type": "PlatformIO",
-                "task": "Pre-Debug (feather_m0_lora)"
+                "task": "Pre-Debug"
             }
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/feather_m0_lora/firmware.elf",
-            "projectEnvName": "feather_m0_lora",
+            "executable": "/home/matt/stm32-avionics/.pio/build/blink/firmware.elf",
+            "projectEnvName": "blink",
             "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd"
@@ -36,8 +171,8 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
-            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/feather_m0_lora/firmware.elf",
-            "projectEnvName": "feather_m0_lora",
+            "executable": "/home/matt/stm32-avionics/.pio/build/blink/firmware.elf",
+            "projectEnvName": "blink",
             "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",

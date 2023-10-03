@@ -62,6 +62,7 @@
 #define VREFBUF_TIMEOUT_VALUE     (uint32_t)10   /* 10 ms  */
 
 /* Private macro -------------------------------------------------------------*/
+#pragma GCC optimize ("Os")
 /* Private variables ---------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 

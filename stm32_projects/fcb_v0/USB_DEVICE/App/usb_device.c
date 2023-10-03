@@ -29,6 +29,9 @@
 
 /* USER CODE BEGIN Includes */
 
+// FCB V0 is out of flash lol lmao
+#pragma GCC optimize ("Os")
+
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN PV */

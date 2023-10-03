@@ -56,6 +56,7 @@
 #include <sys/time.h>
 #include <sys/times.h>
 
+#define asm(x) __asm__(x)
 
 /* Variables */
 //#undef errno

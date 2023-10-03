@@ -37,6 +37,9 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
+// FCB V0 is out of flash lol lmao
+#pragma GCC optimize ("Os")
+
 /* USER CODE END PV */
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
