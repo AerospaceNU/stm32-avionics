@@ -73,7 +73,7 @@ jobs:
       run: |
         touch CMakeListsPrivate.txt
         chmod -R +x ci/build_desktop.sh
-        
+
     - name: Build desktop
       working-directory: ${{github.workspace}}
       run: ./ci/build_desktop.sh
@@ -90,6 +90,7 @@ jobs:
         include:
           - env-name: "feather_m0_lora"
           - env-name: "feather_m0_lora_groundstation"
+          - env-name: "feather_m4_hacky_lora_groundstationA"
 
     runs-on: ubuntu-latest
     name: "Build PlatformIO flight software for ${{ matrix.env-name }}"
@@ -171,7 +172,7 @@ jobs:
       run: |
         git config --global --add safe.directory /__w/stm32-avionics/stm32-avionics
         git fetch --tags --force
-    
+
     - name: Configure CMake
       working-directory: ${{github.workspace}}
       run: |
@@ -228,7 +229,7 @@ jobs:
       run: |
         git config --global --add safe.directory /__w/stm32-avionics/stm32-avionics
         git fetch --tags --force
-    
+
     - name: Run build
       run: /entrypoint.sh ${{ matrix.prj-rel-path }} ${{ matrix.prj-target }}
 
