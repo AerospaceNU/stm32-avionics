@@ -50,6 +50,7 @@ set(TEST_FILES
   tests/test_file_flash.cpp
   tests/test_cli_parse.cpp
   tests/test_expressions.cpp
+  tests/test_circular_buffer.cpp
   desktop_hardware_manager.cpp board_config.c
   ${DEVICES_FILES_LIST}
   ${UTILS_FILES_LIST}

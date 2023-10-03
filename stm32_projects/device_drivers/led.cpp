@@ -10,7 +10,7 @@ void led_init(LedCtrl_s *led) {
 
 void led_set(LedCtrl_s *led, bool set) {
   if (led->port) {
-    HAL_GPIO_WritePin(led->port, led->pin, set);
+    HAL_GPIO_WritePin(led->port, led->pin, set ? GPIO_PIN_SET : GPIO_PIN_RESET);
   }
 }
 
