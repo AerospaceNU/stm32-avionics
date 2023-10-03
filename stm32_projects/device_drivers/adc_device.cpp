@@ -15,7 +15,7 @@
 #define MAX_RAW_VAL_8B 1 << 8
 
 static void adcDev_conversionCpltCallback(void *adc) {
-  ((AdcDevCtrl_s *)adc)->bConvCplt = true;
+  (static_cast<AdcDevCtrl_s *>(adc))->bConvCplt = true;
 }
 
 bool adcDev_init(AdcDevCtrl_s *adc, ADC_HandleTypeDef *hadc,
@@ -97,7 +97,7 @@ bool adcDev_getValue(AdcDevCtrl_s *adc, uint8_t rank, float *pval, float minVal,
     float scaler = adc->maxRawVal / (maxVal - minVal);
 
     // Get value from buffer and convert into meaningful number
-    *pval = ((float)adc->rawVals[rank - 1]) / scaler + offset;
+    *pval = (static_cast<float>(adc->rawVals[rank - 1])) / scaler + offset;
 
     // Stop interrupt. If this fails, don't care because stopping is just best
     // practice, not critical.

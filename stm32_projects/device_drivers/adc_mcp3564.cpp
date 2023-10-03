@@ -67,14 +67,14 @@ static const uint8_t DEV_ADDR = 0x1;
  * @param val the value to set into the register
  * @return an error code, if any
  */
-static int mcp356x_modifyReg8(AdcMcp3564Ctrl_s *dev, int reg_addr, int mask,
-                              int val) {
+static int mcp356x_modifyReg8(AdcMcp3564Ctrl_s *dev, uint16_t reg_addr,
+                              uint8_t mask, int val) {
   // 1: Read data from register
   uint8_t tx_read[2] = {0};
 
   // Static read (Table 6-2)
-  tx_read[0] =
-      DEV_ADDR << 6 | reg_addr << 2 | (MCP356X_CMD_TYPE_STATIC_READ & 0x3);
+  tx_read[0] = static_cast<uint8_t>(DEV_ADDR << 6 | reg_addr << 2 |
+                                    (MCP356X_CMD_TYPE_STATIC_READ & 0x3));
 
   uint8_t rx_read[2] = {0};
 
@@ -87,15 +87,16 @@ static int mcp356x_modifyReg8(AdcMcp3564Ctrl_s *dev, int reg_addr, int mask,
     return ec_read_reg;
   }
 
-  rx_read[1] &= ~mask;
+  rx_read[1] &= static_cast<uint8_t>(~mask);
 
   // 2: Configure the register
   // Use incremental write command (Table 6-2)
   // idx 0 = command byte (Table 6-1)
   // idx 1 = data
   uint8_t tx_write[2] = {
-      DEV_ADDR << 6 | reg_addr << 2 | (MCP356X_CMD_TYPE_INCR_WRITE & 0x3),
-      rx_read[1] | val};
+      static_cast<uint8_t>(DEV_ADDR << 6 | reg_addr << 2 |
+                           (MCP356X_CMD_TYPE_INCR_WRITE & 0x3)),
+      static_cast<uint8_t>(rx_read[1] | val)};
 
   CHIP_SELECT
   int ec_write_reg = HAL_SPI_Transmit(dev->hspi, tx_write, 2, SPI_TIMEOUT_MS);
@@ -123,8 +124,8 @@ static int mcp356x_modifyReg24(AdcMcp3564Ctrl_s *dev, int reg_addr, int mask,
   uint8_t tx_read[4];
 
   // Static read (Table 6-2)
-  tx_read[0] =
-      DEV_ADDR << 6 | reg_addr << 2 | (MCP356X_CMD_TYPE_STATIC_READ & 0x3);
+  tx_read[0] = static_cast<uint8_t>(DEV_ADDR << 6 | reg_addr << 2 |
+                                    (MCP356X_CMD_TYPE_STATIC_READ & 0x3));
 
   uint8_t rx_read[4] = {0};
 
@@ -146,8 +147,10 @@ static int mcp356x_modifyReg24(AdcMcp3564Ctrl_s *dev, int reg_addr, int mask,
   // idx 0 = command byte (Table 6-1)
   // idx 1 = data
   uint8_t tx_write[4] = {
-      DEV_ADDR << 6 | reg_addr << 2 | (MCP356X_CMD_TYPE_INCR_WRITE & 0x3),
-      reg >> 16, reg >> 8, reg & 0xFF};
+      static_cast<uint8_t>(DEV_ADDR << 6 | reg_addr << 2 |
+                           (MCP356X_CMD_TYPE_INCR_WRITE & 0x3)),
+      static_cast<uint8_t>(reg >> 16), static_cast<uint8_t>(reg >> 8),
+      static_cast<uint8_t>(reg & 0xFF)};
 
   CHIP_SELECT
   int ec_write_reg = HAL_SPI_Transmit(dev->hspi, tx_write, 4, SPI_TIMEOUT_MS);
@@ -162,7 +165,7 @@ static int mcp356x_modifyReg24(AdcMcp3564Ctrl_s *dev, int reg_addr, int mask,
 
 void mcp356x_txRxCpltCallback(void *pdev) {
   // When the DMA transaction is done, deassert CS and process the data
-  AdcMcp3564Ctrl_s *dev = (AdcMcp3564Ctrl_s *)pdev;
+  AdcMcp3564Ctrl_s *dev = static_cast<AdcMcp3564Ctrl_s *>(pdev);
 
   CHIP_DESELECT
   // third byte from bottom, DR_STATUS
@@ -173,19 +176,20 @@ void mcp356x_txRxCpltCallback(void *pdev) {
   // First byte of rx_read_buf should be the status byte
   // Next byte has the channel id and a sign extension
   // Next 4 bytes are big (?) endian data, per figure 5-8
-  uint32_t raw = ((uint32_t)dev->rx_read_buf[1] << 24) |
-                 ((uint32_t)dev->rx_read_buf[2] << 16) |
-                 ((uint32_t)dev->rx_read_buf[3] << 8) |
-                 ((uint32_t)dev->rx_read_buf[4]);
+  uint32_t raw = (static_cast<uint32_t>(dev->rx_read_buf[1] << 24)) |
+                 (static_cast<uint32_t>(dev->rx_read_buf[2] << 16)) |
+                 (static_cast<uint32_t>(dev->rx_read_buf[3] << 8)) |
+                 (static_cast<uint32_t>(dev->rx_read_buf[4]));
 
   // TODO make this respect different DATA_FORMAT modes
-  AdcMcp3564_DataFormat_11 *output = ((AdcMcp3564_DataFormat_11 *)&raw);
+  AdcMcp3564_DataFormat_11 *output =
+      reinterpret_cast<AdcMcp3564_DataFormat_11 *>(&raw);
   uint8_t channelID = output->channel_id;
   dev->result[channelID] = output->data;
 }
 
 void mcp356x_read(void *pdev) {
-  AdcMcp3564Ctrl_s *dev = (AdcMcp3564Ctrl_s *)pdev;
+  AdcMcp3564Ctrl_s *dev = static_cast<AdcMcp3564Ctrl_s *>(pdev);
   // Static read (Table 6-2)
   dev->tx_read_buf[0] = DEV_ADDR << 6 | MCP356X_REG_ADCDATA << 2 |
                         (MCP356X_CMD_TYPE_STATIC_READ & 0x3);

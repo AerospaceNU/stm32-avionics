@@ -35,9 +35,9 @@ void flashS25flx_init(FlashS25flxCtrl_s *s25flx, SPI_HandleTypeDef *hspi,
                       GPIO_TypeDef *csPort, uint16_t csPin,
                       uint32_t flashSizeBytes);
 bool flashS25flx_readStart(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
-                           uint32_t numBytes, uint8_t *pData);
+                           uint16_t numBytes, uint8_t *pData);
 bool flashS25flx_writeStart(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
-                            uint32_t numBytes, uint8_t *data);
+                            uint16_t numBytes, uint8_t *data);
 bool flashS25flx_eraseSectorStart(FlashS25flxCtrl_s *s25flx,
                                   uint32_t sectorNum);
 bool flashS25flx_eraseChipStart(FlashS25flxCtrl_s *s25flx);

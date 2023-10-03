@@ -28,10 +28,10 @@ typedef struct IIS2MDCCtrl_s {
 bool iis2mdc_init(ImuIIS2MDCCtrl_s *sensor, uint8_t address7bit);
 void iis2mdc_getData(ImuIIS2MDCCtrl_s *sensor);
 
+#endif  // HAL_I2C_MODULE_ENABLED
+
 #ifdef __cplusplus
 }
 #endif
-
-#endif  // HAL_I2C_MODULE_ENABLED
 
 #endif  // STM32_PROJECTS_DEVICE_DRIVERS_MAG_IIS2MDC_H_

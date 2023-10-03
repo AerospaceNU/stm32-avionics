@@ -57,8 +57,10 @@ void pyroDigital_pwmStart(PyroDigitalCtrl_s *pyro, uint32_t duration,
   if (pyro->port) {
     pyro->pwm = true;
     pyro->expireTime = HAL_GetTick() + duration;
-    pyro->counterMax = ((float)CLOCK_FREQUENCY_HZ / (float)frequency);
-    pyro->counterThreshold = (((float)pulseWidth / 100.0) * pyro->counterMax);
+    pyro->counterMax = static_cast<uint32_t>(
+        static_cast<float>(CLOCK_FREQUENCY_HZ) / static_cast<float>(frequency));
+    pyro->counterThreshold = static_cast<uint32_t>(
+        (static_cast<float>(pulseWidth) / 100.0) * pyro->counterMax);
     HAL_GPIO_WritePin(pyro->port, pyro->pin, GPIO_PIN_SET);
   }
 }

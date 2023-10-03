@@ -119,7 +119,7 @@ void flashS25flx_init(FlashS25flxCtrl_s *s25flx, SPI_HandleTypeDef *hspi,
 }
 
 bool flashS25flx_readStart(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
-                           uint32_t numBytes, uint8_t *pData) {
+                           uint16_t numBytes, uint8_t *pData) {
   // Check for valid parameters
   if (startLoc + numBytes > s25flx->flashSizeBytes || pData == NULL ||
       s25flx->bWIP
@@ -131,10 +131,11 @@ bool flashS25flx_readStart(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
 
   // Transmit read command and location
   csPull(s25flx, GPIO_PIN_RESET);
-  uint8_t txBuf1[5] = {READ_DATA_CMD, (uint8_t)(startLoc >> 24) & 0xff,
-                       (uint8_t)(startLoc >> 16) & 0xff,
-                       (uint8_t)(startLoc >> 8 & 0xff),
-                       (uint8_t)(startLoc & 0xff)};
+  uint8_t txBuf1[5] = {READ_DATA_CMD,
+                       static_cast<uint8_t>((startLoc >> 24) & 0xff),
+                       static_cast<uint8_t>((startLoc >> 16) & 0xff),
+                       static_cast<uint8_t>(startLoc >> 8 & 0xff),
+                       static_cast<uint8_t>(startLoc & 0xff)};
   // No need to transmit 5-byte read command with DMA since it should occur in
   // very short period of time
   if (HAL_SPI_Transmit(s25flx->hspi, txBuf1, 5, SPI_TX_RX_TIMEOUT_MS) !=
@@ -171,7 +172,7 @@ bool flashS25flx_readStart(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
 }
 
 bool flashS25flx_writeStart(FlashS25flxCtrl_s *s25flx, uint32_t startLoc,
-                            uint32_t numBytes, uint8_t *data) {
+                            uint16_t numBytes, uint8_t *data) {
   // Only allows writing to 1 page at a time
 
   // Check for valid parameters
