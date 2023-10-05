@@ -156,6 +156,60 @@ class CircularBuffer {
    * @return bool: True if buffer is full, false otherwise.
    */
   bool full() const { return this->count() == Capacity; }
+
+  /**
+   * Get the average of all elements in the buffer.
+   * 
+   * @return Type: The average of all elements in the buffer.
+   */
+  Type average() {
+    Type sum = this->sum();
+    return sum / this->count();
+  }
+
+  /**
+   * Get the median of all elements in the buffer.
+   * 
+   * @return Type: The median of all elements in the buffer.
+   */
+  Type median() {
+    size_t size = this->count();
+    std::vector<Type> linearData(size);
+
+    for (size_t i = 0; i < size; i++) {
+      linearData[i] = getNthValue(i);
+    }
+
+    std::sort(linearData.begin(), linearData.end());
+    return linearData[size / 2];
+  }
+
+  /**
+   * Get the n'th elements in the buffer.
+   * 
+   * @return Type: The n'th element in the buffer.
+   */
+  Type getNthValue(int n) {
+    if (this->head + n <= endPtr) {
+      return *(this->head + n);
+    } else {
+      return *(this->backingArray + n - (1 + this->endPtr - this->head));
+    }
+  }
+
+  /**
+   * Get the sum of all elements in the buffer.
+   * 
+   * @return Type: The sum of all elements in the buffer.
+   */
+  Type sum() {
+    Type sum = 0;
+    for (size_t i = 0; i < this->count(); i++) {
+      Type item = this->getNthValue(i);
+      sum += item;
+    }
+    return sum;
+  }
 };
 
 #endif /* COMMON_UTILS_CPP_CIRCULAR_BUFFER_H_ */
