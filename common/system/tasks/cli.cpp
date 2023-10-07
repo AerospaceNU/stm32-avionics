@@ -7,6 +7,7 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "board_config_common.h"
@@ -181,6 +182,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
     }
   }
 
+  bool invalidOptCommand = false;
   // Parse buffer in loop with getopt
   int opt = 0;
   int optionIndex = 0;
@@ -210,62 +212,85 @@ CliCommand_e cli_parse(CliComms_e commsType) {
       case 'f':
         if (primaryCommand == OFFLOAD) {
           cliOptionVals.f = optarg;
+        } else {
+          invalidOptCommand = true;
         }
         break;
       case 't':
         if (primaryCommand == CONFIG || primaryCommand == TRIGGERFIRE) {
           cliOptionVals.t = optarg;
+        } else {
+          invalidOptCommand = true;
         }
         break;
       case 'm':
         if (primaryCommand == CONFIG) {
           cliOptionVals.m = optarg;
+        } else {
+          invalidOptCommand = true;
         }
         break;
       case 'p':
         if (primaryCommand == CONFIG) {
           cliOptionVals.p = optarg;
+        } else {
+          invalidOptCommand = true;
         }
         break;
       case 'd':
         if (primaryCommand == CONFIG) {
           cliOptionVals.d = optarg;
+        } else {
+          invalidOptCommand = true;
         }
         break;
       case 'w':
         if (primaryCommand == CONFIG) {
           cliOptionVals.w = optarg;
+        } else {
+          invalidOptCommand = true;
         }
         break;
       case 'C':
         if (primaryCommand == CONFIG) {
           cliOptionVals.C = optarg;
+        } else {
+          invalidOptCommand = true;
         }
         break;
       case 'D':
         if (primaryCommand == CONFIG) {
           cliOptionVals.D = true;
+        } else {
+          invalidOptCommand = true;
         }
         break;
       case 'N':
         if (primaryCommand == CONFIG) {
           cliOptionVals.N = true;
+        } else {
+          invalidOptCommand = true;
         }
         break;
       case 'h':
         if (primaryCommand == OFFLOAD || primaryCommand == CONFIG) {
           cliOptionVals.h = true;
+        } else {
+          invalidOptCommand = true;
         }
         break;
-
       case 'e':
         if (primaryCommand == CONFIG) {
           cliOptionVals.e = optarg;
+        } else {
+          invalidOptCommand = true;
         }
         break;
       case 'r':
         if (primaryCommand == CONFIG) {
           cliOptionVals.r = optarg;
+        } else {
+          invalidOptCommand = true;
         }
         break;
       case 'c':
@@ -274,18 +299,32 @@ CliCommand_e cli_parse(CliComms_e commsType) {
           cliOptionVals.c = optarg;
         } else if (primaryCommand == LINECUTTER) {
           cliOptionVals.lcCmd = optarg;
+        } else {
+          invalidOptCommand = true;
         }
         break;
-
       // Line cutter ID
       case 'i':
         if (primaryCommand == LINECUTTER) {
           cliOptionVals.lcId = optarg;
+        } else {
+          invalidOptCommand = true;
         }
         break;
 
       default:
         break;
+    }
+
+    if (invalidOptCommand) {
+      int i = primaryCommand - 1;
+      if (i < 0) break;
+      const char* invalidCommand = longOptions[i].name;
+      char errMsg[128];
+      snprintf(errMsg, sizeof errMsg,
+               "Invalid option: \"-%c\" is not a valid option for %s", opt,
+               invalidCommand);
+      cli_sendAck(false, errMsg);
     }
   }
 
@@ -300,6 +339,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
   if (primaryCommand == NONE) {
     cli_sendAck(false, "Command not recognized");
   }
+  if (invalidOptCommand) primaryCommand = NONE;
 
   // Return primary command entered by user
   return (CliCommand_e)primaryCommand;
