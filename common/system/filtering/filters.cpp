@@ -14,6 +14,7 @@
 #include "hardware_manager.h"
 #include "math_utils.h"
 #include "orientation_estimator.h"
+#include "data_log.h"
 
 #define RAD_TO_DEG 57.29578     // 180 / PI
 #define MATH_PI 3.141592653589  // PI
@@ -348,6 +349,9 @@ void filter_addGyroRef() {
   updateGyroOffsetOneAxis(&gyroYRefBuffer, noOffset, &gyroYOffset);
   noOffset = static_cast<float>(filterData.rocket_ang_vel_z) + gyroZOffset;
   updateGyroOffsetOneAxis(&gyroZRefBuffer, noOffset, &gyroZOffset);
+  dataLog_getFlightMetadata()->gyroOffsets[0] = gyroXOffset;
+  dataLog_getFlightMetadata()->gyroOffsets[1] = gyroYOffset;
+  dataLog_getFlightMetadata()->gyroOffsets[2] = gyroZOffset;
 }
 
 static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {

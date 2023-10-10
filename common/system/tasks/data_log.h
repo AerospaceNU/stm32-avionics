@@ -23,6 +23,7 @@ typedef struct __attribute__((__packed__)) {
   uint64_t gpsTimestamp;
   uint32_t apogeeTimestamp;
   uint16_t triggerFireStatus;
+  float gyroOffsets [3];
 } FlightMetadata_s;
 
 /**
