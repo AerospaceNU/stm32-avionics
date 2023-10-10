@@ -149,7 +149,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
   // Split input buffer by spaces into array to get argc and argv
   // First argument is application name, so must start with argc = 1
   char* argv[MAX_ARGS] = {0};
-  argv[0] = "F";  // Fake application name
+  argv[0] = (char*)"F";  // Fake application name
   int argc = 1;
 
   char* token = strtok(inputBuffer, " ");

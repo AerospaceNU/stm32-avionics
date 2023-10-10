@@ -61,7 +61,7 @@ void vbatIna226_configure(VbatIna226Ctrl_s* ina226) {
 }
 
 void vbatIna226_calibrate(VbatIna226Ctrl_s* ina226) {
-  float current_lsb = current_lsb = (ina226->iMaxExpected) / 32768;
+  float current_lsb = (ina226->iMaxExpected) / 32768;
 
   ina226->currentLSB = current_lsb;
   // The ratio between power lsb and current lsb is fixed at 25
