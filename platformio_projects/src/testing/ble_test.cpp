@@ -23,6 +23,19 @@ const uint8_t BLEUART_UUID_CHR_TXD[] =
     0x93, 0xF3, 0xA3, 0xB5, 0x03, 0x00, 0x40, 0x6E
 };
 
+/*
+const uint8_t BLEUART_UUID_SERVICE[] = 
+9E  CA  DC  24  0E  E5  A9  E0 93  F3  A3  B5  01  00  40  6E
+
+const uint8_t BLEUART_UUID_CHR_RXD[] =
+9E  CA  DC  24  0E  E5  A9  E0 93  F3  A3  B5  02  00  40  6E
+
+const uint8_t BLEUART_UUID_CHR_TXD[] =
+9E  CA  DC  24  0E  E5  A9  E0 93  F3  A3  B5  03  00  40  6E
+*/
+
+
+
 BLEService bleuart_service(BLEUuid::uuidToString(BLEUART_UUID_SERVICE, sizeof(BLEUART_UUID_SERVICE)));
 BLECharacteristic bleuart_rxd_char(BLEUuid::uuidToString(BLEUART_UUID_CHR_RXD, sizeof(BLEUART_UUID_CHR_RXD)), BLEWrite | BLEWriteWithoutResponse, 32);
 BLECharacteristic bleuart_txd_char(BLEUuid::uuidToString(BLEUART_UUID_CHR_TXD, sizeof(BLEUART_UUID_CHR_TXD)), BLERead | BLENotify, 32);
