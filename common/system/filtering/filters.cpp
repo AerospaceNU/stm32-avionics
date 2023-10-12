@@ -558,3 +558,9 @@ void filter_applyData(SensorData_s* curSensorVals,
 }
 
 FilterData_s* filter_getData() { return &filterData; }
+
+void filter_setGyroOffsets(float xOffset, float yOffset, float zOffset) {
+  gyroXOffset = xOffset;
+  gyroYOffset = yOffset;
+  gyroZOffset = zOffset;
+}

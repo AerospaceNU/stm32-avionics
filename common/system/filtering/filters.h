@@ -79,6 +79,14 @@ int8_t filter_getGravityRef();
  */
 FilterData_s* filter_getData();
 
+/**
+ * @brief Sets gyro offsets
+ * @param xOffset: x-axis gyro offset
+ * @param yOffset: y-axis gyro offset
+ * @param zOffset: z-axis gyro offset
+ */
+void filter_setGyroOffsets(float xOffset, float yOffset, float zOffset);
+
 #ifdef __cplusplus
 }
 #endif
