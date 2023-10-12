@@ -12,6 +12,23 @@ class CircularBufferUtility {
   CircularBuffer<Type, Capacity>* cb;
 
   /**
+   * Insert a new element into the buffer and remove the oldest element if the
+   * buffer is full.
+   *
+   * @param item: The element to insert into the buffer.
+   * @return bool: Status, true if dequeue and enqueue succeeds, false if either
+   * fails.
+   */
+  * / bool addElement(Type item) {
+    if (this->cb->full()) {
+      if (!this->cb->dequeue(1)) {
+        return false;
+      }
+    }
+    return this->cb->enqueue(item);
+  }
+
+  /**
    * Get the average of all elements in the buffer.
    *
    * @return Type: The average of all elements in the buffer.
