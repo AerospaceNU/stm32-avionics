@@ -147,35 +147,32 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/blink/firmware.elf",
-            "projectEnvName": "blink",
+            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/nucleo_wb15cc/firmware.elf",
+            "projectEnvName": "nucleo_wb15cc",
             "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
-            "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
             "preLaunchTask": {
                 "type": "PlatformIO",
-                "task": "Pre-Debug"
+                "task": "Pre-Debug (nucleo_wb15cc)"
             }
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/blink/firmware.elf",
-            "projectEnvName": "blink",
+            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/nucleo_wb15cc/firmware.elf",
+            "projectEnvName": "nucleo_wb15cc",
             "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
-            "internalConsoleOptions": "openOnSessionStart",
-            "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd"
+            "internalConsoleOptions": "openOnSessionStart"
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
-            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/blink/firmware.elf",
-            "projectEnvName": "blink",
+            "executable": "/home/matt/Documents/GitHub/stm32-avionics/.pio/build/nucleo_wb15cc/firmware.elf",
+            "projectEnvName": "nucleo_wb15cc",
             "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
-            "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
             "loadMode": "manual"
         }
     ]
