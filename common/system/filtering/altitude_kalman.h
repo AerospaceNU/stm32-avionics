@@ -162,6 +162,10 @@ class AltitudeKalman {
   const AltitudeKalmanOutput_s getXhat() const;
 
   void setDt(const double dt);
+  
+  void calculateDt();
+
+  void pushTimeStamps(const uint32_t ts);
 
   void reset();
 
@@ -180,6 +184,9 @@ class AltitudeKalman {
 
   // TODO should we calculate this every loop?
   double m_dt = 0.015;
+
+  uint32_t current_ts;
+  uint32_t last_ts = 0;
 };
 
 #endif  // COMMON_SYSTEM_FILTERING_ALTITUDE_KALMAN_H_

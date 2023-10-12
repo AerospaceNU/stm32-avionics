@@ -387,6 +387,10 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
   // TODO check what order these "should" run in. Worst case we're off by one
   // iteration We don't update accelerations till after this, so the z
   // acceleration should still be from the last timestep
+
+  kalman.pushTimeStamps(curSensorVals->timestampMs);
+  kalman.calculateDt();
+
   kalman.predict(accz);
 
 #if HAS_DEV(BAROMETER)
