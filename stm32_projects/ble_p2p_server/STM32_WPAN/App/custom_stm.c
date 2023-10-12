@@ -94,7 +94,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *pckt);
 
 /* Private functions ----------------------------------------------------------*/
 
-#define COPY_UUID_128(uuid_struct, uuid_15, uuid_14, uuid_13, uuid_12, uuid_11, uuid_10, uuid_9, uuid_8, uuid_7, uuid_6, uuid_5, uuid_4, uuid_3, uuid_2, uuid_1, uuid_0) \
+#define COPY_UUID_128(uuid_struct, uuid_0, uuid_1, uuid_2, uuid_3, uuid_4, uuid_5, uuid_6, uuid_7, uuid_8, uuid_9, uuid_10, uuid_11, uuid_12, uuid_13, uuid_14, uuid_15) \
 do {\
     uuid_struct[0] = uuid_0; uuid_struct[1] = uuid_1; uuid_struct[2] = uuid_2; uuid_struct[3] = uuid_3; \
     uuid_struct[4] = uuid_4; uuid_struct[5] = uuid_5; uuid_struct[6] = uuid_6; uuid_struct[7] = uuid_7; \
