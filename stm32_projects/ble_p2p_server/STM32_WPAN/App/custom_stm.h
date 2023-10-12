@@ -34,15 +34,19 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 typedef enum
 {
-  /* srvlng */
-  CUSTOM_STM_LED_C,
+  /* bleuart */
+  CUSTOM_STM_RX,
+  CUSTOM_STM_TX,
 } Custom_STM_Char_Opcode_t;
 
 typedef enum
 {
-  /* My_LED_Char */
-  CUSTOM_STM_LED_C_READ_EVT,
-  CUSTOM_STM_LED_C_WRITE_NO_RESP_EVT,
+  /* bleuart_rxd */
+  CUSTOM_STM_RX_WRITE_NO_RESP_EVT,
+  /* bleuart_txd */
+  CUSTOM_STM_TX_READ_EVT,
+  CUSTOM_STM_TX_NOTIFY_ENABLED_EVT,
+  CUSTOM_STM_TX_NOTIFY_DISABLED_EVT,
 
   CUSTOM_STM_BOOT_REQUEST_EVT
 } Custom_STM_Opcode_evt_t;
@@ -66,7 +70,8 @@ typedef struct
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
-extern uint8_t SizeLed_C;
+extern uint8_t SizeRx;
+extern uint8_t SizeTx;
 
 /* USER CODE BEGIN EC */
 

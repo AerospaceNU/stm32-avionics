@@ -35,7 +35,8 @@
 /* Private typedef -----------------------------------------------------------*/
 typedef struct
 {
-  /* srvlng */
+  /* bleuart */
+  uint8_t               Tx_Notification_Status;
   /* USER CODE BEGIN CUSTOM_APP_Context_t */
 
   /* USER CODE END CUSTOM_APP_Context_t */
@@ -76,7 +77,9 @@ uint8_t NotifyCharData[247];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-/* srvlng */
+/* bleuart */
+static void Custom_Tx_Update_Char(void);
+static void Custom_Tx_Send_Notification(void);
 
 /* USER CODE BEGIN PFP */
 
@@ -94,17 +97,29 @@ void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotificatio
 
     /* USER CODE END CUSTOM_STM_App_Notification_Custom_Evt_Opcode */
 
-    /* srvlng */
-    case CUSTOM_STM_LED_C_READ_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_LED_C_READ_EVT */
+    /* bleuart */
+    case CUSTOM_STM_RX_WRITE_NO_RESP_EVT:
+      /* USER CODE BEGIN CUSTOM_STM_RX_WRITE_NO_RESP_EVT */
 
-      /* USER CODE END CUSTOM_STM_LED_C_READ_EVT */
+      /* USER CODE END CUSTOM_STM_RX_WRITE_NO_RESP_EVT */
       break;
 
-    case CUSTOM_STM_LED_C_WRITE_NO_RESP_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_LED_C_WRITE_NO_RESP_EVT */
+    case CUSTOM_STM_TX_READ_EVT:
+      /* USER CODE BEGIN CUSTOM_STM_TX_READ_EVT */
 
-      /* USER CODE END CUSTOM_STM_LED_C_WRITE_NO_RESP_EVT */
+      /* USER CODE END CUSTOM_STM_TX_READ_EVT */
+      break;
+
+    case CUSTOM_STM_TX_NOTIFY_ENABLED_EVT:
+      /* USER CODE BEGIN CUSTOM_STM_TX_NOTIFY_ENABLED_EVT */
+
+      /* USER CODE END CUSTOM_STM_TX_NOTIFY_ENABLED_EVT */
+      break;
+
+    case CUSTOM_STM_TX_NOTIFY_DISABLED_EVT:
+      /* USER CODE BEGIN CUSTOM_STM_TX_NOTIFY_DISABLED_EVT */
+
+      /* USER CODE END CUSTOM_STM_TX_NOTIFY_DISABLED_EVT */
       break;
 
     default:
@@ -174,7 +189,45 @@ void Custom_APP_Init(void)
  *
  *************************************************************/
 
-/* srvlng */
+/* bleuart */
+void Custom_Tx_Update_Char(void) /* Property Read */
+{
+  uint8_t updateflag = 0;
+
+  /* USER CODE BEGIN Tx_UC_1*/
+
+  /* USER CODE END Tx_UC_1*/
+
+  if (updateflag != 0)
+  {
+    Custom_STM_App_Update_Char(CUSTOM_STM_TX, (uint8_t *)UpdateCharData);
+  }
+
+  /* USER CODE BEGIN Tx_UC_Last*/
+
+  /* USER CODE END Tx_UC_Last*/
+  return;
+}
+
+void Custom_Tx_Send_Notification(void) /* Property Notification */
+{
+  uint8_t updateflag = 0;
+
+  /* USER CODE BEGIN Tx_NS_1*/
+
+  /* USER CODE END Tx_NS_1*/
+
+  if (updateflag != 0)
+  {
+    Custom_STM_App_Update_Char(CUSTOM_STM_TX, (uint8_t *)NotifyCharData);
+  }
+
+  /* USER CODE BEGIN Tx_NS_Last*/
+
+  /* USER CODE END Tx_NS_Last*/
+
+  return;
+}
 
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS*/
 
