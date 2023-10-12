@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "ble_events.h"
 #include "custom_stm.h"
 /* USER CODE END Includes */
 
@@ -131,7 +132,7 @@ int main(void) {
       char* string = "hullowo\n";
       Custom_STM_App_Update_Char_EX(CUSTOM_STM_TX, (uint8_t*)string,
                                     strlen(string));
-      HAL_UART_Transmit(&huart1, string, strlen(string), HAL_MAX_DELAY);
+      //HAL_UART_Transmit(&huart1, string, strlen(string), HAL_MAX_DELAY);
     }
   }
 
@@ -374,7 +375,7 @@ void MX_GPIO_Init(void) {
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
   /* USER CODE END MX_GPIO_Init_2 */
