@@ -92,7 +92,6 @@ void cli_init() {
   cb_init(&radioRxCircBuffer, (unknownPtr_t)radioRxBuffer,
           sizeof(radioRxBuffer), 1);
   radioManager_addMessageCallback(RADIO_CLI_ID, cli_parseRadio);
-  
   // Generate fake application name
   strncpy(applicationName, "F", 2);
 }
