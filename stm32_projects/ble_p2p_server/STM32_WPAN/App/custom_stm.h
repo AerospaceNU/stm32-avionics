@@ -29,6 +29,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdint.h>
+
 #include "ble_types.h"
 /* USER CODE END Includes */
 
@@ -91,7 +92,8 @@ void Custom_STM_App_Notification(
 tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode,
                                       uint8_t *pPayload);
 /* USER CODE BEGIN EF */
-
+tBleStatus Custom_STM_App_Update_Char_EX(Custom_STM_Char_Opcode_t CharOpcode,
+                                         uint8_t *pPayload, size_t len);
 /* USER CODE END EF */
 
 #ifdef __cplusplus

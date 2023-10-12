@@ -91,6 +91,78 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *pckt);
 /* Functions Definition ------------------------------------------------------*/
 /* USER CODE BEGIN PFD */
 
+// stick this here, i guess? Custom function since I want to pass in a custom
+// length
+/**
+ * @brief  Characteristic update.
+ * @param  CharOpcode: Characteristic identifier
+ * @param  Service_Instance: Instance of the service to which the characteristic
+ * belongs
+ *
+ */
+tBleStatus Custom_STM_App_Update_Char_EX(Custom_STM_Char_Opcode_t CharOpcode,
+                                         uint8_t *pPayload, size_t len) {
+  tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
+  /* USER CODE BEGIN Custom_STM_App_Update_Char_1 */
+
+  /* USER CODE END Custom_STM_App_Update_Char_1 */
+
+  switch (CharOpcode) {
+    case CUSTOM_STM_RX:
+      if (len > SizeRx) {
+        return BLE_STATUS_INVALID_PARAMS;
+      }
+      ret = aci_gatt_update_char_value(CustomContext.CustomBlrtHdle,
+                                       CustomContext.CustomRxHdle,
+                                       0,   /* charValOffset */
+                                       len, /* charValueLen */
+                                       (uint8_t *)pPayload);
+      if (ret != BLE_STATUS_SUCCESS) {
+        APP_DBG_MSG(
+            "  Fail   : aci_gatt_update_char_value RX command, result : 0x%x "
+            "\n\r",
+            ret);
+      } else {
+        APP_DBG_MSG("  Success: aci_gatt_update_char_value RX command\n\r");
+      }
+      /* USER CODE BEGIN CUSTOM_STM_App_Update_Service_1_Char_1*/
+
+      /* USER CODE END CUSTOM_STM_App_Update_Service_1_Char_1*/
+      break;
+
+    case CUSTOM_STM_TX:
+      if (len > SizeTx) {
+        return BLE_STATUS_INVALID_PARAMS;
+      }
+      ret = aci_gatt_update_char_value(CustomContext.CustomBlrtHdle,
+                                       CustomContext.CustomTxHdle,
+                                       0,   /* charValOffset */
+                                       len, /* charValueLen */
+                                       (uint8_t *)pPayload);
+      if (ret != BLE_STATUS_SUCCESS) {
+        APP_DBG_MSG(
+            "  Fail   : aci_gatt_update_char_value TX command, result : 0x%x "
+            "\n\r",
+            ret);
+      } else {
+        APP_DBG_MSG("  Success: aci_gatt_update_char_value TX command\n\r");
+      }
+      /* USER CODE BEGIN CUSTOM_STM_App_Update_Service_1_Char_2*/
+
+      /* USER CODE END CUSTOM_STM_App_Update_Service_1_Char_2*/
+      break;
+
+    default:
+      break;
+  }
+
+  /* USER CODE BEGIN Custom_STM_App_Update_Char_2 */
+
+  /* USER CODE END Custom_STM_App_Update_Char_2 */
+
+  return ret;
+}
+
 /* USER CODE END PFD */
 
 /* Private functions
@@ -286,13 +358,6 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event) {
             /*USER CODE BEGIN
              * CUSTOM_STM_Service_1_Char_1_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE
              */
-
-            uint8_t *rx_data = write_perm_req->Data;
-            size_t rx_len = write_perm_req->Data_Length;
-            static uint8_t payload[32] = {0};
-            memcpy(payload, rx_data, rx_len);
-            rx_data[rx_len] = '\0';  // manual null term
-            Custom_STM_App_Update_Char(CUSTOM_STM_TX, payload);
 
             /*USER CODE END
              * CUSTOM_STM_Service_1_Char_1_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE*/
