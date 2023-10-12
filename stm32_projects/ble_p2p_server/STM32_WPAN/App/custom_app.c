@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    App/custom_app.c
-  * @author  MCD Application Team
-  * @brief   Custom Example Application (Server)
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    App/custom_app.c
+ * @author  MCD Application Team
+ * @brief   Custom Example Application (Server)
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -98,14 +98,16 @@ void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotificatio
     /* USER CODE END CUSTOM_STM_App_Notification_Custom_Evt_Opcode */
 
     /* bleuart */
-    case CUSTOM_STM_RX_WRITE_NO_RESP_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_RX_WRITE_NO_RESP_EVT */
+    case CUSTOM_STM_RX_WRITE_EVT:
+      /* USER CODE BEGIN CUSTOM_STM_RX_WRITE_EVT */
 
-      /* USER CODE END CUSTOM_STM_RX_WRITE_NO_RESP_EVT */
+      /* USER CODE END CUSTOM_STM_RX_WRITE_EVT */
       break;
 
     case CUSTOM_STM_TX_READ_EVT:
       /* USER CODE BEGIN CUSTOM_STM_TX_READ_EVT */
+
+      APP_DBG_MSG("CUSTOM_STM_TX_READ_EVT");
 
       /* USER CODE END CUSTOM_STM_TX_READ_EVT */
       break;

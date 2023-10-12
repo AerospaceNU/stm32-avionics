@@ -42,7 +42,7 @@ typedef enum
 typedef enum
 {
   /* bleuart_rxd */
-  CUSTOM_STM_RX_WRITE_NO_RESP_EVT,
+  CUSTOM_STM_RX_WRITE_EVT,
   /* bleuart_txd */
   CUSTOM_STM_TX_READ_EVT,
   CUSTOM_STM_TX_NOTIFY_ENABLED_EVT,
