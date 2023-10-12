@@ -184,8 +184,9 @@ class AltitudeKalman {
 
   // TODO should we calculate this every loop?
   double m_dt = 0.015;
-
-  uint32_t current_ts;
+  
+  //Current and previous timestamps from the sensor data
+  uint32_t current_ts = 0;
   uint32_t last_ts = 0;
 };
 
