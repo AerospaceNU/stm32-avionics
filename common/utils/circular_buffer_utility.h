@@ -45,13 +45,13 @@ class CircularBufferUtility {
    */
   Type median() {
     size_t size = this->cb->count();
-    std::vector<Type> linearData(size);
+    Type linearData[Capacity];
 
     for (size_t i = 0; i < size; i++) {
       linearData[i] = getNthValue(i);
     }
 
-    std::sort(linearData.begin(), linearData.end());
+    std::sort(linearData, linearData + size);
     return linearData[size / 2];
   }
 
