@@ -159,7 +159,7 @@ class CircularBuffer {
 
   /**
    * Get the average of all elements in the buffer.
-   * 
+   *
    * @return Type: The average of all elements in the buffer.
    */
   Type average() {
@@ -169,7 +169,7 @@ class CircularBuffer {
 
   /**
    * Get the median of all elements in the buffer.
-   * 
+   *
    * @return Type: The median of all elements in the buffer.
    */
   Type median() {
@@ -185,21 +185,32 @@ class CircularBuffer {
   }
 
   /**
-   * Get the n'th elements in the buffer.
-   * 
-   * @return Type: The n'th element in the buffer.
+   * Get the Nth Value object
+   *
+   * @param destination
+   * @param n
+   * @return bool: Status, true if getting the n'th value succeeds, false
+   * otherwise
    */
-  Type getNthValue(int n) {
+  bool getNthValue(Type* destination, int n) {
+    if (n >= this->count() || n < 0) {
+      return false;
+    }
+
     if (this->head + n <= endPtr) {
-      return *(this->head + n);
+      memcpy(destination, this->head + n, sizeof(Type));
+      return true;
     } else {
-      return *(this->backingArray + n - (1 + this->endPtr - this->head));
+      memcpy(destination,
+             this->backingArray + n - (1 + this->endPtr - this->head),
+             sizeof(Type));
+      return true;
     }
   }
 
   /**
    * Get the sum of all elements in the buffer.
-   * 
+   *
    * @return Type: The sum of all elements in the buffer.
    */
   Type sum() {
