@@ -24,6 +24,8 @@ static char
 static uint8_t radioRxBuffer[INPUT_BUFFER_SIZE];
 static CircularBuffer_s radioRxCircBuffer;
 
+static char applicationName[2];
+
 static CliOptionVals_s cliOptionVals = {
     .f = NULL,      // flight number
     .t = NULL,      // trigger number
@@ -90,6 +92,8 @@ void cli_init() {
   cb_init(&radioRxCircBuffer, (unknownPtr_t)radioRxBuffer,
           sizeof(radioRxBuffer), 1);
   radioManager_addMessageCallback(RADIO_CLI_ID, cli_parseRadio);
+  // Generate fake application name
+  strncpy(applicationName, "F", 2);
 }
 
 CliConfigs_s* cli_getConfigs() { return &cliConfigs; }
@@ -149,7 +153,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
   // Split input buffer by spaces into array to get argc and argv
   // First argument is application name, so must start with argc = 1
   char* argv[MAX_ARGS] = {0};
-  argv[0] = "F";  // Fake application name
+  argv[0] = applicationName;
   int argc = 1;
 
   char* token = strtok(inputBuffer, " ");
