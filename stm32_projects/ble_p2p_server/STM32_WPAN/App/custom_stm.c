@@ -168,26 +168,26 @@ tBleStatus Custom_STM_App_Update_Char_EX(Custom_STM_Char_Opcode_t CharOpcode,
 /* Private functions
  * ----------------------------------------------------------*/
 
-#define COPY_UUID_128(uuid_struct, uuid_0, uuid_1, uuid_2, uuid_3, uuid_4, \
-                      uuid_5, uuid_6, uuid_7, uuid_8, uuid_9, uuid_10,     \
-                      uuid_11, uuid_12, uuid_13, uuid_14, uuid_15)         \
-  do {                                                                     \
-    uuid_struct[0] = uuid_0;                                               \
-    uuid_struct[1] = uuid_1;                                               \
-    uuid_struct[2] = uuid_2;                                               \
-    uuid_struct[3] = uuid_3;                                               \
-    uuid_struct[4] = uuid_4;                                               \
-    uuid_struct[5] = uuid_5;                                               \
-    uuid_struct[6] = uuid_6;                                               \
-    uuid_struct[7] = uuid_7;                                               \
-    uuid_struct[8] = uuid_8;                                               \
-    uuid_struct[9] = uuid_9;                                               \
-    uuid_struct[10] = uuid_10;                                             \
-    uuid_struct[11] = uuid_11;                                             \
-    uuid_struct[12] = uuid_12;                                             \
-    uuid_struct[13] = uuid_13;                                             \
-    uuid_struct[14] = uuid_14;                                             \
-    uuid_struct[15] = uuid_15;                                             \
+#define COPY_UUID_128(uuid_struct, uuid_15, uuid_14, uuid_13, uuid_12,  \
+                      uuid_11, uuid_10, uuid_9, uuid_8, uuid_7, uuid_6, \
+                      uuid_5, uuid_4, uuid_3, uuid_2, uuid_1, uuid_0)   \
+  do {                                                                  \
+    uuid_struct[0] = uuid_0;                                            \
+    uuid_struct[1] = uuid_1;                                            \
+    uuid_struct[2] = uuid_2;                                            \
+    uuid_struct[3] = uuid_3;                                            \
+    uuid_struct[4] = uuid_4;                                            \
+    uuid_struct[5] = uuid_5;                                            \
+    uuid_struct[6] = uuid_6;                                            \
+    uuid_struct[7] = uuid_7;                                            \
+    uuid_struct[8] = uuid_8;                                            \
+    uuid_struct[9] = uuid_9;                                            \
+    uuid_struct[10] = uuid_10;                                          \
+    uuid_struct[11] = uuid_11;                                          \
+    uuid_struct[12] = uuid_12;                                          \
+    uuid_struct[13] = uuid_13;                                          \
+    uuid_struct[14] = uuid_14;                                          \
+    uuid_struct[15] = uuid_15;                                          \
   } while (0)
 
 /* Hardware Characteristics Service */
@@ -199,14 +199,14 @@ tBleStatus Custom_STM_App_Update_Char_EX(Custom_STM_Char_Opcode_t CharOpcode,
  D973F2E2-B19E-11E2-9E96-0800200C9A66: Characteristic_2 128bits UUID
  */
 #define COPY_BLEUART_UUID(uuid_struct)                                       \
-  COPY_UUID_128(uuid_struct, 0x9e, 0xca, 0xdc, 0x24, 0x0e, 0xe5, 0xa9, 0xe0, \
-                0x93, 0xf3, 0xa3, 0xb5, 0x01, 0x00, 0x40, 0x6e)
+  COPY_UUID_128(uuid_struct, 0x6e, 0x40, 0x00, 0x01, 0xb5, 0xa3, 0xf3, 0x93, \
+                0xe0, 0xa9, 0xe5, 0x0e, 0x24, 0xdc, 0xca, 0x9e)
 #define COPY_BLEUART_RXD_UUID(uuid_struct)                                   \
-  COPY_UUID_128(uuid_struct, 0x9e, 0xca, 0xdc, 0x24, 0x0e, 0xe5, 0xa9, 0xe0, \
-                0x93, 0xf3, 0xa3, 0xb5, 0x02, 0x00, 0x40, 0x6e)
+  COPY_UUID_128(uuid_struct, 0x6e, 0x40, 0x00, 0x02, 0xb5, 0xa3, 0xf3, 0x93, \
+                0xe0, 0xa9, 0xe5, 0x0e, 0x24, 0xdc, 0xca, 0x9e)
 #define COPY_BLEUART_TXD_UUID(uuid_struct)                                   \
-  COPY_UUID_128(uuid_struct, 0x9e, 0xca, 0xdc, 0x24, 0x0e, 0xe5, 0xa9, 0xe0, \
-                0x93, 0xf3, 0xa3, 0xb5, 0x03, 0x00, 0x40, 0x6e)
+  COPY_UUID_128(uuid_struct, 0x6e, 0x40, 0x00, 0x03, 0xb5, 0xa3, 0xf3, 0x93, \
+                0xe0, 0xa9, 0xe5, 0x0e, 0x24, 0xdc, 0xca, 0x9e)
 
 /* USER CODE BEGIN PF */
 
@@ -358,20 +358,6 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event) {
             /*USER CODE BEGIN
              * CUSTOM_STM_Service_1_Char_1_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE
              */
-
-            extern UART_HandleTypeDef huart1;
-            HAL_UART_Transmit(&huart1, "Got:->", 6, HAL_MAX_DELAY);
-            HAL_UART_Transmit(&huart1, write_perm_req->Data,
-                              write_perm_req->Data_Length, HAL_MAX_DELAY);
-            char *str = "\n=======================\n";
-            HAL_UART_Transmit(&huart1, str, strlen(str), HAL_MAX_DELAY);
-
-            aci_gatt_write_resp(write_perm_req->Connection_Handle,
-                                write_perm_req->Attribute_Handle,
-                                0x00, /* write_status = 0 (no error))*/
-                                0x00, /* err_code */
-                                write_perm_req->Data_Length,
-                                (uint8_t *)&(write_perm_req->Data[0]));
 
             /*USER CODE END
              * CUSTOM_STM_Service_1_Char_1_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE*/

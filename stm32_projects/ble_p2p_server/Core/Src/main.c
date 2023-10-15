@@ -126,13 +126,13 @@ int main(void) {
 
     /* USER CODE BEGIN 3 */
     uint32_t now = HAL_GetTick();
-    if ((now - last) > 2000) {
+    if ((now - last) > 1000) {
       last = now;
 
       char* string = "hullowo\n";
       Custom_STM_App_Update_Char_EX(CUSTOM_STM_TX, (uint8_t*)string,
                                     strlen(string));
-      //HAL_UART_Transmit(&huart1, string, strlen(string), HAL_MAX_DELAY);
+      // HAL_UART_Transmit(&huart1, string, strlen(string), HAL_MAX_DELAY);
     }
   }
 
