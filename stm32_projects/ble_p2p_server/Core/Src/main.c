@@ -21,6 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <string.h>
+
 #include "ble_events.h"
 #include "custom_stm.h"
 /* USER CODE END Includes */
@@ -60,7 +62,11 @@ void PeriphCommonClock_Config(void);
 static void MX_RNG_Init(void);
 static void MX_MEMORYMAP_Init(void);
 /* USER CODE BEGIN PFP */
-
+// Overwrite _write so printf prints to USB
+int _write(int file, char* ptr, int len) {
+  HAL_UART_Transmit(&huart1, ptr, len, HAL_MAX_DELAY);
+  return len;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -120,18 +126,45 @@ int main(void) {
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint32_t last = HAL_GetTick();
+  uint32_t last2 = HAL_GetTick();
+
+  volatile int swap;
+
   while (1) {
     /* USER CODE END WHILE */
     MX_APPE_Process();
 
     /* USER CODE BEGIN 3 */
     uint32_t now = HAL_GetTick();
-    if ((now - last) > 1000) {
+
+    if (swap) {
+      printf("Swapping PHYs");
+      PHY_Configuration();
+      swap = 0;
+    }
+
+    if ((now - last) > 65) {
       last = now;
 
-      char* string = "hullowo\n";
-      Custom_STM_App_Update_Char_EX(CUSTOM_STM_TX, (uint8_t*)string,
-                                    strlen(string));
+      for (int i = 0; i < 100; i++) {
+        int retcode = BLE_STATUS_INVALID_HANDLE;  // arbitrary bad code
+        int retry_count = 0;
+        do {
+          char str[240];                  // 15 per row in bluefruit app
+          memset(str, 'o', sizeof(str));  // pad out with 'o'
+          int len = snprintf(str, sizeof(str), "Hello at %lu:%i", now, i);
+          str[len] = '_';
+          retcode = Custom_STM_App_Update_Char_EX(CUSTOM_STM_TX, (uint8_t*)str,
+                                                  sizeof(str));
+          // printf(str);
+
+          if (retcode != BLE_STATUS_SUCCESS) {
+            // printf("Link saturated? retrying later\n");
+            // HAL_Delay(1);
+          }
+        } while (retcode != BLE_STATUS_SUCCESS && (retry_count++) < 10);
+      }
+
       // HAL_UART_Transmit(&huart1, string, strlen(string), HAL_MAX_DELAY);
     }
   }

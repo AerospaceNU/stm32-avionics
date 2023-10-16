@@ -595,12 +595,12 @@ typedef enum
 /**
  * When set to 1, the traces are enabled in the BLE services
  */
-#define CFG_DEBUG_BLE_TRACE     1
+#define CFG_DEBUG_BLE_TRACE     0
 
 /**
  * Enable or Disable traces in application
  */
-#define CFG_DEBUG_APP_TRACE     1
+#define CFG_DEBUG_APP_TRACE     0
 
 #if (CFG_DEBUG_APP_TRACE != 0)
 #define APP_DBG_MSG                 PRINT_MESG_DBG
@@ -626,7 +626,7 @@ typedef enum
  * When both are set to 0, no trace are output
  * When both are set to 1,  CFG_DEBUG_TRACE_FULL is selected
  */
-#define CFG_DEBUG_TRACE_LIGHT     1
+#define CFG_DEBUG_TRACE_LIGHT     0
 #define CFG_DEBUG_TRACE_FULL      0
 
 #if (( CFG_DEBUG_TRACE != 0 ) && ( CFG_DEBUG_TRACE_LIGHT == 0 ) && (CFG_DEBUG_TRACE_FULL == 0))
@@ -646,7 +646,7 @@ typedef enum
 /**
  * When not set, the traces is looping on sending the trace over UART
  */
-#define DBG_TRACE_USE_CIRCULAR_QUEUE 1
+#define DBG_TRACE_USE_CIRCULAR_QUEUE 0
 
 /**
  * max buffer Size to queue data traces and max data trace allowed.
@@ -679,7 +679,7 @@ typedef enum
 #endif
   CFG_TASK_HCI_ASYNCH_EVT_ID,
   /* USER CODE BEGIN CFG_Task_Id_With_HCI_Cmd_t */
-
+  CFG_TASK_LINK_CONFIG_ID, // [JT]
   /* USER CODE END CFG_Task_Id_With_HCI_Cmd_t */
   CFG_LAST_TASK_ID_WITH_HCICMD,                                               /**< Shall be LAST in the list */
 } CFG_Task_Id_With_HCI_Cmd_t;

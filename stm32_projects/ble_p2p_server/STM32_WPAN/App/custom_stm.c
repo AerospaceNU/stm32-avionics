@@ -65,8 +65,8 @@ typedef struct {
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-uint8_t SizeRx = 32;
-uint8_t SizeTx = 32;
+uint8_t SizeRx = 200;
+uint8_t SizeTx = 240;
 
 /**
  * START of Section BLE_DRIVER_CONTEXT
@@ -134,11 +134,33 @@ tBleStatus Custom_STM_App_Update_Char_EX(Custom_STM_Char_Opcode_t CharOpcode,
       if (len > SizeTx) {
         return BLE_STATUS_INVALID_PARAMS;
       }
-      ret = aci_gatt_update_char_value(CustomContext.CustomBlrtHdle,
-                                       CustomContext.CustomTxHdle,
-                                       0,   /* charValOffset */
-                                       len, /* charValueLen */
-                                       (uint8_t *)pPayload);
+
+      //      tBleStatus aci_gatt_update_char_value( uint16_t Service_Handle,
+      //                                             uint16_t Char_Handle,
+      //                                             uint8_t Val_Offset,
+      //                                             uint8_t Char_Value_Length,
+      //                                             const uint8_t* Char_Value )
+
+      //      tBleStatus aci_gatt_update_char_value_ext( uint16_t
+      //      Conn_Handle_To_Notify,
+      //                                                 uint16_t
+      //                                                 Service_Handle,
+      //                                                 uint16_t Char_Handle,
+      //                                                 uint8_t Update_Type,
+      //                                                 uint16_t Char_Length,
+      //                                                 uint16_t Value_Offset,
+      //                                                 uint8_t Value_Length,
+      //                                                 const uint8_t* Value )
+
+      ret = aci_gatt_update_char_value_ext(
+          0,  // all clients
+          CustomContext.CustomBlrtHdle, CustomContext.CustomTxHdle,
+          0x1,  // update type -- allow notifications
+          len,  // char length
+          0,    /* charValOffset */
+          len,  /* charValueLen */
+          (uint8_t *)pPayload);
+
       if (ret != BLE_STATUS_SUCCESS) {
         APP_DBG_MSG(
             "  Fail   : aci_gatt_update_char_value TX command, result : 0x%x "
