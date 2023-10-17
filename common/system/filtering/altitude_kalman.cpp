@@ -33,7 +33,7 @@ const AltitudeKalmanOutput_s AltitudeKalman::getXhat() const { return xHat; }
 void AltitudeKalman::setDt(double dt) { m_dt = dt; }
 
 void AltitudeKalman::calculateDt() {
-  m_dt = (double)(current_ts - last_ts) / 1000.0;
+  m_dt = (current_ts == 0) ? 0.015 : (double)(current_ts - last_ts) / 1000.0;
 }
 
 void AltitudeKalman::pushTimeStamps(const uint32_t ts) {
