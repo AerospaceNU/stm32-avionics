@@ -17,7 +17,7 @@ void CliEraseFlashState::init() {
 
 EndCondition_e CliEraseFlashState::run() {
   // Run buzzer heartbeat
-  buzzerHeartbeat_tick();
+  buzzerHeartbeat_tick(BuzzerState::PYRO);
 
   // Only send data or check end condition once per second
   if (!hm_flashIsEraseComplete(_curFlashId)) {
