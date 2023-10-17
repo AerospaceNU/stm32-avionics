@@ -381,6 +381,21 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event) {
              * CUSTOM_STM_Service_1_Char_1_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE
              */
 
+            extern UART_HandleTypeDef huart1;
+            HAL_UART_Transmit(&huart1, "Got:->", 6, HAL_MAX_DELAY);
+            HAL_UART_Transmit(&huart1, write_perm_req->Data,
+                              write_perm_req->Data_Length, HAL_MAX_DELAY);
+            char *str = "\n=======================\n";
+            HAL_UART_Transmit(&huart1, str, strlen(str), HAL_MAX_DELAY);
+
+            // acknowledge the write (MUST BE PRESENT LMAO)
+            aci_gatt_write_resp(write_perm_req->Connection_Handle,
+                    write_perm_req->Attribute_Handle,
+                    0x00, /* write_status = 0 (no error))*/
+                    0x00, /* err_code */
+                    write_perm_req->Data_Length,
+                    (uint8_t *)&(write_perm_req->Data[0]));
+
             /*USER CODE END
              * CUSTOM_STM_Service_1_Char_1_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE*/
           } /*if (write_perm_req->Attribute_Handle ==
