@@ -23,7 +23,7 @@ void PostFlightState::init() {
 
 EndCondition_e PostFlightState::run() {
   // Run buzzer heartbeat
-  buzzerHeartbeat_tick();
+  buzzerHeartbeat_tick(BuzzerState::PYRO);
 
   // Check if data is still coming in (sim mode)
   uint32_t curTime = hm_millis();
