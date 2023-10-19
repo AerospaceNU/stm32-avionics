@@ -100,3 +100,13 @@ void Groundstation::runOnce() {
 
   HAL_Delay(1);
 }
+
+extern "C" {
+void groundstation_main() {
+  Groundstation groundstation;
+  groundstation.init();
+  while (1) {
+    groundstation.runOnce();
+  }
+}
+}
