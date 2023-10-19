@@ -9,6 +9,7 @@ extern "C" {
 enum class BuzzerState { PYRO };
 
 void buzzerHeartbeat_setBuzzer(int buzzerId);
+// update the buzzer state machine
 void buzzerHeartbeat_tick(BuzzerState state);
 
 #ifdef __cplusplus
