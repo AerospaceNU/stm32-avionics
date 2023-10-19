@@ -5,7 +5,6 @@
 extern "C" {
 #endif
 
-#include "hardware_manager.h"
 enum class BuzzerState { PYRO };
 
 void buzzerHeartbeat_setBuzzer(int buzzerId);

@@ -1,5 +1,7 @@
 #include "buzzer_heartbeat.h"
 
+#include "hardware_manager.h"
+
 static uint32_t last_time = 0;
 static int buzzerId_ = 0;
 const int goodFreq = 1000;
