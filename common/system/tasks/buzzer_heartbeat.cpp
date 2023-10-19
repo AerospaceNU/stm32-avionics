@@ -2,10 +2,12 @@
 
 static uint32_t last_time = 0;
 static int buzzerId_ = 0;
+const int goodFreq = 1000;
+const int badFreq = 300;
 
 void buzzerHeartbeat_setBuzzer(int buzzerId) { buzzerId_ = buzzerId; }
 
-// Beeps out Pyro Connectivity
+// Beeps out PYRO Connectivity
 void pyroSoundOff(bool pyroContCheck, int& pyroCounter) {
   static bool on = false;
   static int beepCounter = 0;
@@ -14,15 +16,9 @@ void pyroSoundOff(bool pyroContCheck, int& pyroCounter) {
     hm_buzzerStop(buzzerId_);
   } else {
     if (beepCounter <= pyroCounter) {
-      if (pyroContCheck) {
-        hm_buzzerSetFrequency(buzzerId_, 1000);
-        hm_buzzerStart(buzzerId_);
-        on = true;
-      } else {
-        hm_buzzerSetFrequency(buzzerId_, 300);
-        hm_buzzerStart(buzzerId_);
-        on = true;
-      }
+      hm_buzzerSetFrequency(buzzerId_, pyroContCheck ? goodFreq : badFreq);
+      hm_buzzerStart(buzzerId_);
+      on = true;
       beepCounter++;
     } else {
       beepCounter = 0;
