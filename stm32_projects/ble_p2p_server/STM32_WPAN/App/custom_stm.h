@@ -34,13 +34,15 @@ extern "C" {
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
-typedef enum {
+typedef enum
+{
   /* bleuart */
   CUSTOM_STM_RX,
   CUSTOM_STM_TX,
 } Custom_STM_Char_Opcode_t;
 
-typedef enum {
+typedef enum
+{
   /* bleuart_rxd */
   CUSTOM_STM_RX_WRITE_EVT,
   /* bleuart_txd */
@@ -51,16 +53,18 @@ typedef enum {
   CUSTOM_STM_BOOT_REQUEST_EVT
 } Custom_STM_Opcode_evt_t;
 
-typedef struct {
-  uint8_t *pPayload;
-  uint8_t Length;
+typedef struct
+{
+  uint8_t * pPayload;
+  uint8_t   Length;
 } Custom_STM_Data_t;
 
-typedef struct {
-  Custom_STM_Opcode_evt_t Custom_Evt_Opcode;
-  Custom_STM_Data_t DataTransfered;
-  uint16_t ConnectionHandle;
-  uint8_t ServiceInstance;
+typedef struct
+{
+  Custom_STM_Opcode_evt_t       Custom_Evt_Opcode;
+  Custom_STM_Data_t             DataTransfered;
+  uint16_t                      ConnectionHandle;
+  uint8_t                       ServiceInstance;
 } Custom_STM_App_Notification_evt_t;
 
 /* USER CODE BEGIN ET */
@@ -87,10 +91,8 @@ extern uint8_t SizeTx;
 
 /* Exported functions ------------------------------------------------------- */
 void SVCCTL_InitCustomSvc(void);
-void Custom_STM_App_Notification(
-    Custom_STM_App_Notification_evt_t *pNotification);
-tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode,
-                                      uint8_t *pPayload);
+void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotification);
+tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode,  uint8_t *pPayload);
 /* USER CODE BEGIN EF */
 tBleStatus Custom_STM_App_Update_Char_EX(Custom_STM_Char_Opcode_t CharOpcode,
                                          uint8_t *pPayload, size_t len);

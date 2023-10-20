@@ -2,6 +2,8 @@
 
 #ifdef USE_STM_HARDWARE_MANAGER
 
+#include <math.h>
+
 #include "hal_callbacks.h"
 #include "radio_packet_types.h"
 

@@ -19,13 +19,12 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "custom_app.h"
-
-#include "app_common.h"
-#include "ble.h"
-#include "custom_stm.h"
-#include "dbg_trace.h"
 #include "main.h"
+#include "app_common.h"
+#include "dbg_trace.h"
+#include "ble.h"
+#include "custom_app.h"
+#include "custom_stm.h"
 #include "stm32_seq.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -34,28 +33,27 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
-typedef struct {
+typedef struct
+{
   /* bleuart */
-  uint8_t Tx_Notification_Status;
+  uint8_t               Tx_Notification_Status;
   /* USER CODE BEGIN CUSTOM_APP_Context_t */
 
   /* USER CODE END CUSTOM_APP_Context_t */
 
-  uint16_t ConnectionHandle;
+  uint16_t              ConnectionHandle;
 } Custom_App_Context_t;
 
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
 
-/* Private defines
- * ------------------------------------------------------------*/
+/* Private defines ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
 /* USER CODE END PD */
 
-/* Private macros
- * -------------------------------------------------------------*/
+/* Private macros -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
 /* USER CODE END PM */
@@ -88,12 +86,13 @@ static void Custom_Tx_Send_Notification(void);
 /* USER CODE END PFP */
 
 /* Functions Definition ------------------------------------------------------*/
-void Custom_STM_App_Notification(
-    Custom_STM_App_Notification_evt_t *pNotification) {
+void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotification)
+{
   /* USER CODE BEGIN CUSTOM_STM_App_Notification_1 */
   extern UART_HandleTypeDef huart1;
   /* USER CODE END CUSTOM_STM_App_Notification_1 */
-  switch (pNotification->Custom_Evt_Opcode) {
+  switch (pNotification->Custom_Evt_Opcode)
+  {
     /* USER CODE BEGIN CUSTOM_STM_App_Notification_Custom_Evt_Opcode */
 
     /* USER CODE END CUSTOM_STM_App_Notification_Custom_Evt_Opcode */
@@ -149,17 +148,19 @@ void Custom_STM_App_Notification(
   return;
 }
 
-void Custom_APP_Notification(Custom_App_ConnHandle_Not_evt_t *pNotification) {
+void Custom_APP_Notification(Custom_App_ConnHandle_Not_evt_t *pNotification)
+{
   /* USER CODE BEGIN CUSTOM_APP_Notification_1 */
   extern UART_HandleTypeDef huart1;
   const char *str;
   /* USER CODE END CUSTOM_APP_Notification_1 */
 
-  switch (pNotification->Custom_Evt_Opcode) {
+  switch (pNotification->Custom_Evt_Opcode)
+  {
     /* USER CODE BEGIN CUSTOM_APP_Notification_Custom_Evt_Opcode */
 
     /* USER CODE END P2PS_CUSTOM_Notification_Custom_Evt_Opcode */
-    case CUSTOM_CONN_HANDLE_EVT:
+    case CUSTOM_CONN_HANDLE_EVT :
       /* USER CODE BEGIN CUSTOM_CONN_HANDLE_EVT */
 
       str = "CUSTOM_CONN_HANDLE_EVT\n";
@@ -167,7 +168,7 @@ void Custom_APP_Notification(Custom_App_ConnHandle_Not_evt_t *pNotification) {
       /* USER CODE END CUSTOM_CONN_HANDLE_EVT */
       break;
 
-    case CUSTOM_DISCON_HANDLE_EVT:
+    case CUSTOM_DISCON_HANDLE_EVT :
       /* USER CODE BEGIN CUSTOM_DISCON_HANDLE_EVT */
 
       str = "CUSTOM_DISCON_HANDLE_EVT\n";
@@ -191,7 +192,8 @@ void Custom_APP_Notification(Custom_App_ConnHandle_Not_evt_t *pNotification) {
   return;
 }
 
-void Custom_APP_Init(void) {
+void Custom_APP_Init(void)
+{
   /* USER CODE BEGIN CUSTOM_APP_Init */
 
   /* USER CODE END CUSTOM_APP_Init */
@@ -217,7 +219,8 @@ void Custom_Tx_Update_Char(void) /* Property Read */
 
   /* USER CODE END Tx_UC_1*/
 
-  if (updateflag != 0) {
+  if (updateflag != 0)
+  {
     Custom_STM_App_Update_Char(CUSTOM_STM_TX, (uint8_t *)UpdateCharData);
   }
 
@@ -235,7 +238,8 @@ void Custom_Tx_Send_Notification(void) /* Property Notification */
 
   /* USER CODE END Tx_NS_1*/
 
-  if (updateflag != 0) {
+  if (updateflag != 0)
+  {
     Custom_STM_App_Update_Char(CUSTOM_STM_TX, (uint8_t *)NotifyCharData);
   }
 

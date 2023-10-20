@@ -34,14 +34,16 @@ extern "C" {
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
-typedef enum {
+typedef enum
+{
   CUSTOM_CONN_HANDLE_EVT,
   CUSTOM_DISCON_HANDLE_EVT,
 } Custom_App_Opcode_Notification_evt_t;
 
-typedef struct {
-  Custom_App_Opcode_Notification_evt_t Custom_Evt_Opcode;
-  uint16_t ConnectionHandle;
+typedef struct
+{
+  Custom_App_Opcode_Notification_evt_t     Custom_Evt_Opcode;
+  uint16_t                                 ConnectionHandle;
 } Custom_App_ConnHandle_Not_evt_t;
 /* USER CODE BEGIN ET */
 
@@ -57,8 +59,7 @@ typedef struct {
 
 /* USER CODE END EV */
 
-/* Exported macros
- * ------------------------------------------------------------*/
+/* Exported macros ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
