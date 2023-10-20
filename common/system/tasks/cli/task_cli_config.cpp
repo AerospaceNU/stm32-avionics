@@ -43,7 +43,7 @@ void CliTasks::config() {
 
     if (options.D) {
       triggerConfig->mode = TRIGGER_TYPE_EMPTY;
-      triggerManager_removeTrigger((uint8_t)triggerNum);
+      triggerManager_removeTrigger(static_cast<uint8_t>(triggerNum));
       // Write new cli configs to flash
       dataLog_writeCliConfigs();
       cli_sendAck(true, nullptr);
@@ -89,8 +89,8 @@ void CliTasks::config() {
     float duration = 0;
 
     if (mode == TRIGGER_TYPE_PYRO || mode == TRIGGER_TYPE_PWM_PYRO) {
-      duration =
-          (float)smallStrtod(options.d, &endPtr) * 1000;  // Convert to ms
+      duration = static_cast<float>(smallStrtod(options.d, &endPtr) *
+                                    1000);  // Convert to ms
       if (*endPtr != '\0') {
         cli_sendAck(false, "Pyro/PWM must specify a duration");
         return;
@@ -109,7 +109,7 @@ void CliTasks::config() {
 
     triggerConfig->duration = duration;
     triggerConfig->pulseWidth = pulseWidth;
-    triggerConfig->mode = (uint8_t)mode;
+    triggerConfig->mode = static_cast<uint8_t>(mode);
 
     int port = strtol(options.p, &endPtr, 10);
     if (*endPtr != '\0' || port < 0 || port >= maxPort) {
@@ -121,11 +121,11 @@ void CliTasks::config() {
       return;
     }
 
-    triggerConfig->port = (uint8_t)port;
+    triggerConfig->port = static_cast<uint8_t>(port);
 
     if (options.C) {
       const char* configString = options.C;
-      if (!triggerManager_setTriggerConfig((uint8_t)triggerNum,
+      if (!triggerManager_setTriggerConfig(static_cast<uint8_t>(triggerNum),
                                            &configString)) {
         cli_sendAck(false, "Invalid config string");
         return;
@@ -212,10 +212,10 @@ void CliTasks::config() {
           format = false;
           break;
         case TRIGGER_TYPE_PYRO:
-          snprintf(
-              deviceText, sizeof(deviceText), "Fire pyro %d for %ds on ",
-              triggerConfig->port,
-              (int)(triggerConfig->duration / 1000.0));  // Convert back to s
+          snprintf(deviceText, sizeof(deviceText), "Fire pyro %d for %ds on ",
+                   triggerConfig->port,
+                   static_cast<int>(triggerConfig->duration /
+                                    1000.0));  // Convert back to s
           break;
         case TRIGGER_TYPE_LINE_CUTTER:
           snprintf(deviceText, sizeof(deviceText), "Cut line cutter %d on ",
@@ -230,11 +230,12 @@ void CliTasks::config() {
                    triggerConfig->port);
           break;
         case TRIGGER_TYPE_PWM_PYRO:
-          snprintf(
-              deviceText, sizeof(deviceText),
-              "PWM on pyro %d for %ds with %ld width on ", triggerConfig->port,
-              (int)(triggerConfig->duration / 1000.0),  // Convert back to ms
-              triggerConfig->pulseWidth);
+          snprintf(deviceText, sizeof(deviceText),
+                   "PWM on pyro %d for %ds with %ld width on ",
+                   triggerConfig->port,
+                   static_cast<int>(triggerConfig->duration /
+                                    1000.0),  // Convert back to ms
+                   triggerConfig->pulseWidth);
           break;
         default:
           snprintf(deviceText, sizeof(deviceText), "error");

@@ -88,8 +88,9 @@ static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
                                  const SensorProperties_s* sensorProperties) {
   int numAccelsValid = 0;
   double accelSum = 0;
+#if HAS_DEV(ACCEL) || HAS_DEV(IMU)
   int highestValidPriority = 0;
-
+#endif  // HAS_DEV(ACCEL) || HAS_DEV(IMU)
   // Only pull data if accel below fullscale and sensor is working
 #if HAS_DEV(ACCEL)
   for (int i = 0; i < NUM_ACCEL; i++) {
@@ -144,6 +145,7 @@ static double filterGyroOneAxis(double* imuReadings) {
   return numGyrosValid == 0 ? 0.0 : gyroSum / numGyrosValid;
 }
 
+#if HAS_DEV(IMU) || HAS_DEV(ACCEL) || HAS_DEV(MAG)
 static double getSensorAxis(const Axis_e boardAxis,
                             const Orientation_s* sensorOrientation,
                             double* sensorVals) {
@@ -159,6 +161,7 @@ static double getSensorAxis(const Axis_e boardAxis,
 
   return multiplier * sensorVals[sensorOrient.axis];
 }
+#endif  // HAS_DEV(IMU) || HAS_DEV(ACCEL) || HAS_DEV(MAG)
 
 static void filterMags(SensorData_s* curSensorVals) {
 #if HAS_DEV(MAG)

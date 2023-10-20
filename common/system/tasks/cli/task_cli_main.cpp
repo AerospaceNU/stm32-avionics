@@ -46,7 +46,7 @@ EndCondition_e CliTasks::tick() {
     // Special case: in sim mode, don't parse data coming in over USB
     if (hm_inSimMode() && i == CliComms_e::CLI_USB) continue;
 
-    CliCommand_e command = cli_parse((CliComms_e)i);
+    CliCommand_e command = cli_parse(static_cast<CliComms_e>(i));
     if (command == NONE) continue;
 
     // If the command is a task, do it

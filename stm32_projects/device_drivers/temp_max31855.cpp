@@ -17,9 +17,11 @@
 // using factors from
 // https://www.conaxtechnologies.com/wp-content/uploads/2016/04/EMF_Type_K_Thermocouple_Conversion_Table_Celsius.pdf
 static float voltageToTemperature(float voltage) {
-  float temp = 0.1602 * (pow(voltage, 5)) + 2.2934 * (pow(voltage, 4)) +
-               11.869 * (pow(voltage, 3)) + 25.009 * (pow(voltage, 2)) +
-               46.013 * voltage + 3.8124;
+  float temp = static_cast<float>(0.1602 * (pow(voltage, 5)) +
+                                  2.2934 * (pow(voltage, 4))) +
+               static_cast<float>(11.869 * (pow(voltage, 3)) +
+                                  25.009 * (pow(voltage, 2))) +
+               static_cast<float>(46.013 * voltage + 3.8124);
   return temp;
 }
 
@@ -33,9 +35,9 @@ static void convertThermocouple(TempMax31855Ctrl_s *dev, uint32_t raw) {
   } reg;
   reg.raw_temp = raw;
   dev->data.rawThermocouple = reg.raw_temp;
-  dev->data.thermocoupleTemp = reg.raw_temp * 0.25;
-  float thermocoupleVoltage =
-      K_THERMOCOUPLE_SENSITIVITY * dev->data.thermocoupleTemp;
+  dev->data.thermocoupleTemp = static_cast<float>(reg.raw_temp * 0.25);
+  float thermocoupleVoltage = static_cast<float>(K_THERMOCOUPLE_SENSITIVITY *
+                                                 dev->data.thermocoupleTemp);
   if (thermocoupleVoltage < 0) {
     // only recalibrate if voltage is negative
     dev->data.thermocoupleTemp =
@@ -50,7 +52,7 @@ static void convertReferenceJunction(TempMax31855Ctrl_s *dev, uint32_t raw) {
   } reg;
   reg.raw_temp = raw;
   dev->data.rawInternal = reg.raw_temp;
-  dev->data.internalTemp = reg.raw_temp * 0.0625;
+  dev->data.internalTemp = static_cast<float>(reg.raw_temp * 0.0625);
 }
 
 void tempMax31855_read(TempMax31855Ctrl_s *dev) {
@@ -70,7 +72,7 @@ void tempMax31855_read(TempMax31855Ctrl_s *dev) {
   d |= rxBuff[3];
 
   // Fun pointer wizardry to convert to our struct
-  Max31855Raw_s *raw = (Max31855Raw_s *)&d;
+  Max31855Raw_s *raw = reinterpret_cast<Max31855Raw_s *>(&d);
 
   // Convert to real numbers
   convertReferenceJunction(dev, d >> 4);
@@ -78,8 +80,9 @@ void tempMax31855_read(TempMax31855Ctrl_s *dev) {
   dev->data.timestamp = HAL_GetTick();
 
   // Falut bitfield, with contents [fault, open, gnd, vcc] from LSB to MSB
-  dev->data.faultFlags = (raw->faulted) | (raw->openCircuit << 1) |
-                         (raw->gndFault << 2) | (raw->vccFault << 3);
+  dev->data.faultFlags =
+      static_cast<uint8_t>((raw->faulted) | (raw->openCircuit << 1) |
+                           (raw->gndFault << 2) | (raw->vccFault << 3));
 }
 
 void tempMax31855_init(TempMax31855Ctrl_s *dev, SPI_HandleTypeDef *hspi,

@@ -32,7 +32,7 @@ void CliTasks::triggerFire() {
     cli_send(msg);
     hm_radioUpdate();
 
-    triggerManager_triggerFire((uint8_t)triggerNum, false);
+    triggerManager_triggerFire(static_cast<uint8_t>(triggerNum), false);
 
     // Send success ack to CLI
     cli_sendAck(true, nullptr);

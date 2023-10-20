@@ -68,7 +68,8 @@ bool flashMb85rsx_readStart(FlashMb85rsxCtrl_s *mb85rsx, uint32_t startLoc,
   // Transmit read command and location
   csPull(mb85rsx, GPIO_PIN_RESET);
 
-  uint8_t cmd[3] = {READ_CMD, (startLoc >> 8) & 0b11111, startLoc & 0xff};
+  uint8_t cmd[3] = {READ_CMD, static_cast<uint8_t>((startLoc >> 8) & 0b11111),
+                    static_cast<uint8_t>(startLoc & 0xff)};
   HAL_SPI_Transmit(mb85rsx->spi.hspi, cmd, sizeof(cmd), SPI_TX_RX_TIMEOUT_MS);
   HAL_SPI_Receive(mb85rsx->spi.hspi, pData, numBytes, SPI_TX_RX_TIMEOUT_MS);
 
@@ -94,7 +95,8 @@ bool flashMb85rsx_writeStart(FlashMb85rsxCtrl_s *mb85rsx, uint32_t startLoc,
   csPull(mb85rsx, GPIO_PIN_RESET);
 
   // Fill in TX buffer for WRITE command and send
-  uint8_t cmd[3] = {WRITE_CMD, (startLoc >> 8) & 0b11111, startLoc & 0xff};
+  uint8_t cmd[3] = {WRITE_CMD, static_cast<uint8_t>((startLoc >> 8) & 0b11111),
+                    static_cast<uint8_t>(startLoc & 0xff)};
   bool success = HAL_SPI_Transmit(mb85rsx->spi.hspi, cmd, sizeof(cmd),
                                   SPI_TX_RX_TIMEOUT_MS) == HAL_OK;
 

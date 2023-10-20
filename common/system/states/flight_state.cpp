@@ -39,7 +39,7 @@ EndCondition_e FlightState::runState() {
   triggerManager_update(filterData);
 
   // Run buzzer heartbeat
-  buzzerHeartbeat_tick();
+  buzzerHeartbeat_tick(BuzzerState::PYRO);
 
   // Run the state
   EndCondition_e normalEndCondition = State::runState();

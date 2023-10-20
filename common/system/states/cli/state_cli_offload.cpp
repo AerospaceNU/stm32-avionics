@@ -61,7 +61,7 @@ EndCondition_e CliOffloadState::run() {
   }
 
   // Run buzzer heartbeat
-  buzzerHeartbeat_tick();
+  buzzerHeartbeat_tick(BuzzerState::PYRO);
 
   // If help command, send help and stop
   if (cli_getOptions().h) {

@@ -35,3 +35,6 @@ CMakeListsPrivate.txt
 build_stm/*
 *.hex
 **/*.hex
+build_stm32/
+build/*
+build_desktop/*

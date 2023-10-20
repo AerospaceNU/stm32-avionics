@@ -89,7 +89,7 @@ static bool isConnected(ImuICM20600Ctrl_s *sensor) {
 bool icm20600_init(ImuICM20600Ctrl_s *sensor,
                    ImuICM20600AccelFullscale_e accelFullscale,
                    ImuICM20600GyroFullscale_e gyroFullscale) {
-  HAL_GPIO_WritePin(sensor->spi.port, sensor->spi.pin, 1);
+  HAL_GPIO_WritePin(sensor->spi.port, sensor->spi.pin, GPIO_PIN_SET);
   HAL_Delay(1);
 
   // Reset the device
@@ -104,8 +104,8 @@ bool icm20600_init(ImuICM20600Ctrl_s *sensor,
     return false;
   }
 
-  setGyroFullscale(sensor, accelFullscale);
-  setAccelFullscale(sensor, gyroFullscale);
+  setGyroFullscale(sensor, gyroFullscale);
+  setAccelFullscale(sensor, accelFullscale);
 
   return true;
 }
