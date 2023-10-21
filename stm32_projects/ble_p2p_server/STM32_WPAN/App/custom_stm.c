@@ -23,7 +23,7 @@
 #include "custom_stm.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "hal_callbacks.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -331,6 +331,18 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
             return_value = SVCCTL_EvtAckFlowEnable;
             /* Allow or reject a write request from a client using aci_gatt_write_resp(...) function */
             /*USER CODE BEGIN CUSTOM_STM_Service_1_Char_1_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE */
+
+
+            // acknowledge the write (MUST BE PRESENT LMAO)
+            aci_gatt_write_resp(write_perm_req->Connection_Handle,
+                    write_perm_req->Attribute_Handle,
+                    0x00, /* write_status = 0 (no error))*/
+                    0x00, /* err_code */
+                    write_perm_req->Data_Length,
+                    (uint8_t *)&(write_perm_req->Data[0]));
+
+            halCallbacks_notifyBleCharacteristicWrite(CUSTOM_STM_RX_WRITE_EVT, write_perm_req->Data, write_perm_req->Data_Length);
+
 
             /*USER CODE END CUSTOM_STM_Service_1_Char_1_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE*/
           } /*if (write_perm_req->Attribute_Handle == (CustomContext.CustomRxHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
