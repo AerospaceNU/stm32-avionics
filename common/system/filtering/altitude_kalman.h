@@ -1,5 +1,6 @@
 #ifndef COMMON_SYSTEM_FILTERING_ALTITUDE_KALMAN_H_
 #define COMMON_SYSTEM_FILTERING_ALTITUDE_KALMAN_H_
+#include <cstdint>
 
 typedef struct {
   double estimatedVelocity;

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "leetcode-api-ts": "^1.1.1"
+  }
+}
