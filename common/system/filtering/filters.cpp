@@ -11,10 +11,10 @@
 #include "board_config_common.h"
 #include "circular_buffer.h"
 #include "cli.h"
+#include "data_log.h"
 #include "hardware_manager.h"
 #include "math_utils.h"
 #include "orientation_estimator.h"
-#include "data_log.h"
 
 #define RAD_TO_DEG 57.29578     // 180 / PI
 #define MATH_PI 3.141592653589  // PI
