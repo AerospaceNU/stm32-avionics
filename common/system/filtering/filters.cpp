@@ -388,7 +388,8 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
   // iteration We don't update accelerations till after this, so the z
   // acceleration should still be from the last timestep
 
-  //Updates Kalman filter timestamps to the current loop and uses new vlaues to calculate the current dt
+  // Updates Kalman filter timestamps to the current loop and uses new values to
+  // calculate the current dt
   kalman.pushTimeStamps(curSensorVals->timestampMs);
   kalman.calculateDt();
 

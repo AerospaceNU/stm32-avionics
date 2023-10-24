@@ -163,7 +163,7 @@ class AltitudeKalman {
   const AltitudeKalmanOutput_s getXhat() const;
 
   void setDt(const double dt);
-  
+
   void calculateDt();
 
   void pushTimeStamps(const uint32_t ts);
@@ -185,12 +185,12 @@ class AltitudeKalman {
 
   // TODO should we calculate this every loop?
   double m_dt = 0.015;
-  
-  //Current and previous timestamps from the sensor data
+
+  // Current and previous timestamps from the sensor data
   uint32_t current_ts = 0;
   uint32_t last_ts = 0;
 
-  //Indicates whether the filter code has ran before during the program
+  // Indicates whether the filter code has ran before during the program
   bool has_ran = false;
 };
 
