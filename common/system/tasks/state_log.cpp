@@ -30,6 +30,9 @@ void stateLog_reloadFlight() {
   // Load in recovered values
   filter_setPressureRef(oldMetadataPacket.pressureRef);
   filter_setGravityRef(oldMetadataPacket.gravityRef);
+  filter_setGyroOffsets(oldMetadataPacket.gyroOffsets[0],
+                        oldMetadataPacket.gyroOffsets[1],
+                        oldMetadataPacket.gyroOffsets[2]);
   triggerManager_init();
   triggerManager_setTriggerFireStatus(~oldMetadataPacket.triggerFireStatus);
 

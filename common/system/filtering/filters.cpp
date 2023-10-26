@@ -11,6 +11,7 @@
 #include "board_config_common.h"
 #include "circular_buffer.h"
 #include "cli.h"
+#include "data_log.h"
 #include "hardware_manager.h"
 #include "math_utils.h"
 #include "orientation_estimator.h"
@@ -348,6 +349,9 @@ void filter_addGyroRef() {
   updateGyroOffsetOneAxis(&gyroYRefBuffer, noOffset, &gyroYOffset);
   noOffset = static_cast<float>(filterData.rocket_ang_vel_z) + gyroZOffset;
   updateGyroOffsetOneAxis(&gyroZRefBuffer, noOffset, &gyroZOffset);
+  dataLog_getFlightMetadata()->gyroOffsets[0] = gyroXOffset;
+  dataLog_getFlightMetadata()->gyroOffsets[1] = gyroYOffset;
+  dataLog_getFlightMetadata()->gyroOffsets[2] = gyroZOffset;
 }
 
 static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
@@ -554,3 +558,9 @@ void filter_applyData(SensorData_s* curSensorVals,
 }
 
 FilterData_s* filter_getData() { return &filterData; }
+
+void filter_setGyroOffsets(float xOffset, float yOffset, float zOffset) {
+  gyroXOffset = xOffset;
+  gyroYOffset = yOffset;
+  gyroZOffset = zOffset;
+}
