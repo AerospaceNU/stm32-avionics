@@ -179,6 +179,9 @@ class AltitudeKalman {
   static constexpr const double DEFAULT_KALMAN_GAIN[2] = {0.03407042,
                                                           0.03685564};
 
+  // 
+  double kalman_gain[2] = {};
+
  private:
   // The estimated state of the rocket. We assume we start at (0,0).
   AltitudeKalmanOutput_s xHat = {0, 0};
