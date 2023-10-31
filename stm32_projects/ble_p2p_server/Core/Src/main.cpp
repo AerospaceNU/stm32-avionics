@@ -123,6 +123,7 @@ int main(void) {
   MX_RNG_Init();
   MX_MEMORYMAP_Init();
   MX_SPI1_Init();
+  hm_hardwareInit();
   /* USER CODE BEGIN 2 */
   cli_init();
   /* USER CODE END 2 */

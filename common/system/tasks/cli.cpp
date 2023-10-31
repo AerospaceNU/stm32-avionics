@@ -29,12 +29,6 @@ static CircularBuffer_s radioRxCircBuffer;
 static uint8_t bleRxBuffer[INPUT_BUFFER_SIZE];
 static CircularBuffer_s bleRxCircBuffer;
 
-void cli_bleCallback(void*, uint8_t* pdata, size_t len) {
-  for (size_t i = 0; i < len; i++) {
-    cb_enqueue(&bleRxCircBuffer, (unknownPtr_t)pdata + i);
-  }
-}
-
 static char applicationName[2];
 
 static CliOptionVals_s cliOptionVals = {
@@ -104,9 +98,9 @@ void cli_init() {
           sizeof(radioRxBuffer), 1);
   //radioManager_addMessageCallback(RADIO_CLI_ID, cli_parseRadio);
 
-  cb_init(&bleRxCircBuffer, (unknownPtr_t)bleRxBuffer, sizeof(bleRxBuffer), 1);
-  halCallbacks_registerBluetoothRxCallback(CUSTOM_STM_RX_WRITE_EVT,
-                                           cli_bleCallback, NULL);
+//  cb_init(&bleRxCircBuffer, (unknownPtr_t)bleRxBuffer, sizeof(bleRxBuffer), 1);
+//  halCallbacks_registerBluetoothRxCallback(CUSTOM_STM_RX_WRITE_EVT,
+//                                           cli_bleCallback, NULL);
 
   // Generate fake application name
   strncpy(applicationName, "F", 2);
@@ -422,7 +416,8 @@ CircularBuffer_s* cli_getRxBufferFor(CliComms_e source) {
     case CLI_USB:
       return hm_usbGetRxBuffer(USB_CLI_ID);
     case CLI_BLEUART:
-      return &bleRxCircBuffer;
+      // return &bleRxCircBuffer;
+      return hm_bleUartGetRxBuffer();
     default:
       return NULL;
   }
