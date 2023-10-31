@@ -21,10 +21,17 @@
 
 static ExpressionStore expressionStore;
 static bool triggerFireStatus[MAX_TRIGGER] = {0};
+// TODO num pyro + numlinecutter
+static TriggerConnect_s triggerConnectivityStatus[NUM_PYRO];
 
 void triggerManager_init() {
   for (int i = 0; i < MAX_TRIGGER; ++i) triggerFireStatus[i] = 0;
   expressionStore.init();
+
+  for (int i = 0; i < NUM_PYRO; i++) {
+    triggerConnectivityStatus[i].configuration =
+        static_cast<int>(TriggerState::NOT_CONFIGURED);
+  }
 }
 
 uint16_t triggerManager_status() {
@@ -80,6 +87,40 @@ bool triggerManager_setTriggerConfig(uint8_t triggerNum,
     return true;
   }
   return false;
+}
+// WIP :)
+//  Get expected trigger status
+//  get actual connected from pyrocont
+//  get expected by parsing the triggers
+//  TriggerConfig_s triggerConfiguration[MAX_TRIGGER];
+
+// add a way to determine which trigger this is
+SensorData_s* sensorData = hm_getSensorData();
+
+// WIP :)
+// errors: Need a better way to keep track of which element in the struct is
+// which triggerConnectivityStatus[port] is an annoying way to store that
+// how to find if we expect that pyro
+void checkExpectedTriggers() {  //, bool& pyroContCheck) {
+  int port;
+  for (int i = 0; i < MAX_TRIGGER; i++) {
+    if (cli_getConfigs()->triggerConfiguration[i].mode == TRIGGER_TYPE_PYRO) {
+      port = cli_getConfigs()->triggerConfiguration[i].port;
+      if (sensorData->pyroContData[port]) {
+        triggerConnectivityStatus[port].configuration =
+            static_cast<int>(TriggerState::CONNECTED_CONFIGURED);
+      } else {
+        triggerConnectivityStatus[port].configuration =
+            static_cast<int>(TriggerState::NOT_CONNECTED_CONFIGURED);
+      }
+      // else if(cli_getConfigs()->triggerConfiguration[i].mode ==  SOMETHING
+      // ELSE){
+      //}
+    }
+  }
+}
+const TriggerConnect_s* getExpectedTriggers(int i) {
+  return &triggerConnectivityStatus[i];
 }
 
 void triggerManager_removeTrigger(uint8_t triggerNum) {

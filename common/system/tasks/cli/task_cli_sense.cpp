@@ -122,6 +122,17 @@ void CliTasks::sense() {
     snprintf(cliStr, sizeof(cliStr), " %i", data->pyroContData[i]);
     cli_send(cliStr);
   }
+  // WIP :)
+  snprintf(cliStr, sizeof(cliStr), "Pyro Continuity TEST" PRIu32 ":",
+           static_cast<uint32_t>(NUM_PYRO_CONT));
+  cli_send(cliStr);
+  checkExpectedTriggers();
+  for (int i = 0; i < NUM_PYRO; i++) {
+    snprintf(cliStr, sizeof(cliStr), " %i",
+             getExpectedTriggers(i)->configuration);
+    cli_send(cliStr);
+  }
+
 #endif  // HAS_DEV(PYRO_CONT)
 #if HAS_DEV(FLASH)
   char flashStr[43];

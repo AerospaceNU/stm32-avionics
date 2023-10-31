@@ -36,6 +36,15 @@ typedef struct __attribute__((__packed__)) {
   uint16_t rootExpressionID;
 } TriggerConfig_s;
 
+enum class TriggerState {
+  CONNECTED_CONFIGURED,
+  NOT_CONNECTED_CONFIGURED,
+  NOT_CONFIGURED
+};
+
+typedef struct {
+  int configuration;
+} TriggerConnect_s;
 /**
  * @brief Initializes Trigger Manager
  */
@@ -83,6 +92,11 @@ void triggerManager_triggerFire(uint8_t triggerNum, bool logFire);
  */
 bool triggerManager_setTriggerConfig(uint8_t triggerNum,
                                      const char **configString);
+
+// WIP :)
+void checkExpectedTriggers();
+
+const TriggerConnect_s *getExpectedTriggers(int i);
 
 /**
  * Remove a trigger of a given index.
