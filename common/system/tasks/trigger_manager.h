@@ -93,9 +93,15 @@ void triggerManager_triggerFire(uint8_t triggerNum, bool logFire);
 bool triggerManager_setTriggerConfig(uint8_t triggerNum,
                                      const char **configString);
 
-// WIP :)
+/**
+ * Checks if a trigger(Pyro or linecutter) is configured and if that trigger is
+ *connected or not
+ *  TODO add linecutter functionality
+ *  updates triggerConnectivityStatus array
+ **/
 void checkExpectedTriggers();
 
+// returns the configuration of the trigger
 const TriggerConnect_s *getExpectedTriggers(int i);
 
 /**

@@ -88,20 +88,9 @@ bool triggerManager_setTriggerConfig(uint8_t triggerNum,
   }
   return false;
 }
-// WIP :)
-//  Get expected trigger status
-//  get actual connected from pyrocont
-//  get expected by parsing the triggers
-//  TriggerConfig_s triggerConfiguration[MAX_TRIGGER];
 
-// add a way to determine which trigger this is
-SensorData_s* sensorData = hm_getSensorData();
-
-// WIP :)
-// errors: Need a better way to keep track of which element in the struct is
-// which triggerConnectivityStatus[port] is an annoying way to store that
-// how to find if we expect that pyro
-void checkExpectedTriggers() {  //, bool& pyroContCheck) {
+void checkExpectedTriggers() {
+  SensorData_s* sensorData = hm_getSensorData();
   int port;
   for (int i = 0; i < MAX_TRIGGER; i++) {
     if (cli_getConfigs()->triggerConfiguration[i].mode == TRIGGER_TYPE_PYRO) {
@@ -113,8 +102,8 @@ void checkExpectedTriggers() {  //, bool& pyroContCheck) {
         triggerConnectivityStatus[port].configuration =
             static_cast<int>(TriggerState::NOT_CONNECTED_CONFIGURED);
       }
-      // else if(cli_getConfigs()->triggerConfiguration[i].mode ==  SOMETHING
-      // ELSE){
+      // TODO else if(cli_getConfigs()->triggerConfiguration[i].mode ==
+      // SOMETHING ELSE){
       //}
     }
   }
