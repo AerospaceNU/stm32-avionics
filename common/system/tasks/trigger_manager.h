@@ -42,9 +42,10 @@ enum class TriggerState {
   NOT_CONFIGURED
 };
 
-typedef struct {
-  int configuration;
-} TriggerConnect_s;
+const char *triggerManager_triggerStatusToString(TriggerState i);
+
+// enum configuration;
+
 /**
  * @brief Initializes Trigger Manager
  */
@@ -93,16 +94,8 @@ void triggerManager_triggerFire(uint8_t triggerNum, bool logFire);
 bool triggerManager_setTriggerConfig(uint8_t triggerNum,
                                      const char **configString);
 
-/**
- * Checks if a trigger(Pyro or linecutter) is configured and if that trigger is
- *connected or not
- *  TODO add linecutter functionality
- *  updates triggerConnectivityStatus array
- **/
-void checkExpectedTriggers();
-
 // returns the configuration of the trigger
-const TriggerConnect_s *getExpectedTriggers(int i);
+const TriggerState triggerManager_getExpectedTriggers(uint8_t i);
 
 /**
  * Remove a trigger of a given index.
