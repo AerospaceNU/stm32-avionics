@@ -122,13 +122,14 @@ void CliTasks::sense() {
     snprintf(cliStr, sizeof(cliStr), " %i", data->pyroContData[i]);
     cli_send(cliStr);
   }
-  snprintf(cliStr, sizeof(cliStr), "\n Pyro Continuity TEST 1-%" PRIu32 ":\n",
+  snprintf(cliStr, sizeof(cliStr),
+           "\n Pyro Configuration Status 1-%" PRIu32 ":\n",
            static_cast<uint32_t>(NUM_PYRO_CONT));
   cli_send(cliStr);
   for (int i = 0; i < NUM_PYRO; i++) {
     snprintf(cliStr, sizeof(cliStr), "Pyro %i : %s \r\n", i,
              triggerManager_triggerStatusToString(
-                 triggerManager_getExpectedTriggers(i)));
+                 triggerManager_getTriggerConnectivity(i)));
     cli_send(cliStr);
   }
 #endif  // HAS_DEV(PYRO_CONT)

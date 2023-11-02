@@ -21,15 +21,17 @@
 
 static ExpressionStore expressionStore;
 static bool triggerFireStatus[MAX_TRIGGER] = {0};
+static const char* triggerStatusToString[] = {"CONNECTED", "NOT_CONNECTED",
+                                              "NOT_CONFIGURED"};
 
-// TODO num pyro + numlinecutter
+// TODO NUM_PYRO + NUM_LINE_CUTTER
 static TriggerState triggerConnectivityStatus[NUM_PYRO];
 
 void triggerManager_init() {
   for (int i = 0; i < MAX_TRIGGER; ++i) triggerFireStatus[i] = 0;
   expressionStore.init();
 
-  for (int i = 0; i < NUM_PYRO; i++) {
+  for (int i = 0; i < NUM_PYRO; i++) {  // TODO NUM_PYRO + NUM_LINE_CUTTER
     triggerConnectivityStatus[i] = (TriggerState::NOT_CONFIGURED);
   }
 }
@@ -60,10 +62,10 @@ void triggerManager_setTriggerFireStatus(uint16_t status) {
 }
 
 /**
- * Checks if a trigger(Pyro or linecutter) is configured and if that trigger is
- *connected or not
+ * @brief Checks if a trigger(Pyro or linecutter) is configured and if that
+ *		trigger is connected or not. Updates triggerConnectivityStatus
+ *array
  *  TODO add linecutter functionality
- *  updates triggerConnectivityStatus array
  **/
 void triggerManager_checkExpectedTriggers() {
   for (int i = 0; i < NUM_PYRO; i++) {
@@ -76,14 +78,11 @@ void triggerManager_checkExpectedTriggers() {
     if (cli_getConfigs()->triggerConfiguration[i].mode == TRIGGER_TYPE_PYRO) {
       port = cli_getConfigs()->triggerConfiguration[i].port;
       if (sensorData->pyroContData[port]) {
-        triggerConnectivityStatus[port] = (TriggerState::CONNECTED_CONFIGURED);
+        triggerConnectivityStatus[port] = TriggerState::CONNECTED_CONFIGURED;
       } else {
         triggerConnectivityStatus[port] =
-            (TriggerState::NOT_CONNECTED_CONFIGURED);
+            TriggerState::NOT_CONNECTED_CONFIGURED;
       }
-      // TODO else if(cli_getConfigs()->triggerConfiguration[i].mode ==
-      // SOMETHING ELSE){
-      //}
     }
 #endif  // HAS_DEV(PYRO_CONT)
   }
@@ -120,19 +119,14 @@ bool triggerManager_setTriggerConfig(uint8_t triggerNum,
   return false;
 }
 
-const TriggerState triggerManager_getExpectedTriggers(uint8_t i) {
-  if (i < NUM_PYRO) {
+const TriggerState triggerManager_getTriggerConnectivity(uint8_t i) {
+  if (i < NUM_PYRO) {  // TODO NUM_PYRO + NUM_LINE_CUTTER
     return triggerConnectivityStatus[i];
   }
   return TriggerState::NOT_CONFIGURED;
 }
 
-/**
- * Manage array bc Sam says users are stupid
- */
 const char* triggerManager_triggerStatusToString(TriggerState i) {
-  const char* triggerStatusToString[] = {"CONNECTED", "NOT_CONNECTED",
-                                         "NOT_CONFIGURED"};
   if (static_cast<uint8_t>(i) <
       (sizeof(triggerStatusToString) / sizeof(triggerStatusToString[0]))) {
     return triggerStatusToString[static_cast<uint8_t>(i)];

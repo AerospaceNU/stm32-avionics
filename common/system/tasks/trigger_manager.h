@@ -42,9 +42,10 @@ enum class TriggerState {
   NOT_CONFIGURED
 };
 
+/**
+ * @brief Manage array because Sam says users are stupid
+ */
 const char *triggerManager_triggerStatusToString(TriggerState i);
-
-// enum configuration;
 
 /**
  * @brief Initializes Trigger Manager
@@ -67,6 +68,7 @@ void triggerManager_setTriggerFireStatus(uint16_t status);
 
 /**
  * @brief Update the TriggerManager with new data
+ * 			updates triggerManager_checkExpectedTriggers()
  * @param filterData: Current filter data
  */
 void triggerManager_update(FilterData_s *filterData);
@@ -94,8 +96,12 @@ void triggerManager_triggerFire(uint8_t triggerNum, bool logFire);
 bool triggerManager_setTriggerConfig(uint8_t triggerNum,
                                      const char **configString);
 
-// returns the configuration of the trigger
-const TriggerState triggerManager_getExpectedTriggers(uint8_t i);
+/**
+ * @brief returns the configuration of the Trigger
+ * @param i: index of triggerConnectivityStatus
+ * @return TriggerState
+ */
+const TriggerState triggerManager_getTriggerConnectivity(uint8_t i);
 
 /**
  * Remove a trigger of a given index.
