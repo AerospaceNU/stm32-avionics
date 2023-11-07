@@ -400,8 +400,8 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
   // above/below, clamp to 1 or 0.3
   double gainMultiplier = map(
       clamp(kalman.getXhat().estimatedVelocity, 250, 350), 250, 350, 1, 0.3);
-  double kalmanGain[] = {kalman.DEFAULT_KALMAN_GAIN[0] * gainMultiplier,
-                         kalman.DEFAULT_KALMAN_GAIN[1] * gainMultiplier};
+  double kalmanGain[] = {kalman.calculateGain(0) * gainMultiplier,
+                         kalman.calculateGain(1) * gainMultiplier};
   kalman.correct(baroAltAgl, kalmanGain);
 
 #endif  // HAS_DEV(BAROMETER)
