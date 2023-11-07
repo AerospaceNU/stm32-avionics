@@ -89,6 +89,7 @@ static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
                                  const SensorProperties_s* sensorProperties) {
   int numAccelsValid = 0;
   double accelSum = 0;
+  int highestFsIndex = 0;
 #if HAS_DEV(ACCEL) || HAS_DEV(IMU)
   int highestValidPriority = 0;
 #endif  // HAS_DEV(ACCEL) || HAS_DEV(IMU)
@@ -112,6 +113,9 @@ static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
 
 #if HAS_DEV(IMU)
   for (int i = 0; i < NUM_IMU; i++) {
+	if (imuAccelFs[i] > imuAccelFs[highestFsIndex]) {
+		highestFsIndex = i;
+	}
     if (hardwareStatusImu[i] &&
         fabs(imuReadings[i]) <
             ACCEL_FS_THRESHOLD * sensorProperties->imuAccelFs[i]) {
@@ -127,7 +131,7 @@ static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
   }
 #endif  // HAS_DEV(IMU)
 
-  return numAccelsValid == 0 ? 0.0 : accelSum / numAccelsValid;
+  return numAccelsValid == 0 ? imuReadings[highestFsIndex] : accelSum / numAccelsValid;
 }
 
 static double filterGyroOneAxis(double* imuReadings) {
