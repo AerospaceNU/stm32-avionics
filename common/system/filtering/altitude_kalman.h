@@ -190,8 +190,8 @@ class AltitudeKalman {
   double m_dt = 0.015;
   
   // Coefficients and intercepts for linear cureve fits for gains
-  const double KALMAN_M[2] = {0, 0};
-  const double KALMAN_B[2] = {0, 0};
+  const double KALMAN_M[2] = {2.198535, 2.41608817};
+  const double KALMAN_B[2] = {0.54401007, 0.60129905};
 
   // Current and previous timestamps from the sensor data
   uint32_t current_ts = 0;
