@@ -40,7 +40,8 @@ void AltitudeKalman::calculateDt() {
 }
 
 double AltitudeKalman::calculateGain(int g) {
-  double gain = has_ran ? (m_dt * KALMAN_M[g]) + KALMAN_B[g] : DEFAULT_KALMAN_GAIN[g];    
+  double gain =
+      has_ran ? (m_dt * KALMAN_M[g]) + KALMAN_B[g] : DEFAULT_KALMAN_GAIN[g];
   return gain;
 }
 
