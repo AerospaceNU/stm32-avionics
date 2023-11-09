@@ -101,7 +101,7 @@ static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
       highestFs = sensorProperties->accelFs[i];
       highestFsAccelReading = accelReadings[i];
     } else if (sensorProperties->accelFs[i] == highestFs) {
-      if (accelReadings[i] < highestFsAccelReading) {
+      if (fabs(accelReadings[i]) < fabs(highestFsAccelReading)) {
         highestFsAccelReading = accelReadings[i];
       }
     }
@@ -126,7 +126,7 @@ static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
       highestFs = sensorProperties->imuAccelFs[i];
       highestFsAccelReading = imuReadings[i];
     } else if (sensorProperties->imuAccelFs[i] == highestFs) {
-      if (imuReadings[i] < highestFsAccelReading) {
+      if (fabs(imuReadings[i]) < fabs(highestFsAccelReading)) {
         highestFsAccelReading = imuReadings[i];
       }
     }
