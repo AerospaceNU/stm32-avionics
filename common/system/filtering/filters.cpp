@@ -89,20 +89,20 @@ static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
                                  const SensorProperties_s* sensorProperties) {
   int numAccelsValid = 0;
   double accelSum = 0;
-  int highestFsIndex = 0;
+  double highestFs = 0;
+  double highestFsAccelReading = 0;
 #if HAS_DEV(ACCEL) || HAS_DEV(IMU)
   int highestValidPriority = 0;
 #endif  // HAS_DEV(ACCEL) || HAS_DEV(IMU)
   // Only pull data if accel below fullscale and sensor is working
 #if HAS_DEV(ACCEL)
   for (int i = 0; i < NUM_ACCEL; i++) {
-    if (sensorProperties->accelFs[i] >
-        sensorProperties->accelFs[highestFsIndex]) {
-      highestFsIndex = i;
-    } else if (sensorProperties->accelFs[i] ==
-               sensorProperties->accelFs[highestFsIndex]) {
-      if (accelReadings[i] < accelReadings[highestFsIndex]) {
-        highestFsIndex = i;
+    if (sensorProperties->accelFs[i] > highestFs) {
+      highestFs = sensorProperties->accelFs[i];
+      highestFsAccelReading = accelReadings[i];
+    } else if (sensorProperties->accelFs[i] == highestFs) {
+      if (accelReadings[i] < highestFsAccelReading) {
+        highestFsAccelReading = accelReadings[i];
       }
     }
     if (hardwareStatusAccel[i] &&
@@ -122,13 +122,12 @@ static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
 
 #if HAS_DEV(IMU)
   for (int i = 0; i < NUM_IMU; i++) {
-    if (sensorProperties->imuAccelFs[i] >
-        sensorProperties->imuAccelFs[highestFsIndex]) {
-      highestFsIndex = i;
-    } else if (sensorProperties->imuAccelFs[i] ==
-               sensorProperties->imuAccelFs[highestFsIndex]) {
-      if (imuReadings[i] < imuReadings[highestFsIndex]) {
-        highestFsIndex = i;
+    if (sensorProperties->imuAccelFs[i] > highestFs) {
+      highestFs = sensorProperties->imuAccelFs[i];
+      highestFsAccelReading = imuReadings[i];
+    } else if (sensorProperties->imuAccelFs[i] == highestFs) {
+      if (imuReadings[i] < highestFsAccelReading) {
+        highestFsAccelReading = imuReadings[i];
       }
     }
     if (hardwareStatusImu[i] &&
@@ -146,7 +145,7 @@ static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
   }
 #endif  // HAS_DEV(IMU)
 
-  return numAccelsValid == 0 ? imuReadings[highestFsIndex]
+  return numAccelsValid == 0 ? highestFsAccelReading
                              : accelSum / numAccelsValid;
 }
 
