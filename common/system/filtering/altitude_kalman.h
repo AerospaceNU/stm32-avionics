@@ -178,20 +178,20 @@ class AltitudeKalman {
 
   // These numbers are for a dt of 0.01513 seconds, Q of diag([0.5, 1]).^2 and R
   // of diag([10]).^2
- 
+
   static constexpr const double DEFAULT_KALMAN_GAIN[2] = {0.03407042,
                                                           0.03685564};
 
- private: 
+ private:
   // The estimated state of the rocket. We assume we start at (0,0).
   AltitudeKalmanOutput_s xHat = {0, 0};
 
   // TODO should we calculate this every loop?
   double m_dt = 0.015;
-  
+
   // Coefficients and intercepts for linear cureve fits for gains
-  const double KALMAN_M[2] = {2.198535, 2.41608817};
-  const double KALMAN_B[2] = {0.54401007, 0.60129905};
+  const double KALMAN_M[2] = {2.22123116, 2.4411903};
+  const double KALMAN_B[2] = {0.20098926, 0.2218965};
 
   // Current and previous timestamps from the sensor data
   uint32_t current_ts = 0;
