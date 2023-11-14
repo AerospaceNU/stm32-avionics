@@ -164,11 +164,17 @@ class AltitudeKalman {
 
   void setDt(const double dt);
 
+  // Calculates the current DT based on the last and current timestamp
   void calculateDt();
+  
+  // Updates current_ts from the given ts
+  // Updates last_ts from the previous current_ts
+  void pushTimeStamps(const uint32_t ts);
+  
+  // Combonation of pushTimeStamps(ts) and calculateDt()
+  void updateDt(const uint32_t ts);
 
   double calculateGain(int g);
-
-  void pushTimeStamps(const uint32_t ts);
 
   void reset();
 

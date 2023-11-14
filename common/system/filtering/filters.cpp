@@ -390,8 +390,7 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
 
   // Updates Kalman filter timestamps to the current loop and uses new values to
   // calculate the current dt
-  kalman.pushTimeStamps(curSensorVals->timestampMs);
-  kalman.calculateDt();
+  kalman.updateDt(curSensorVals->timestampMs);
 
   kalman.predict(accz);
 

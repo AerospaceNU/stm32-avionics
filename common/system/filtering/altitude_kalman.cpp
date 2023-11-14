@@ -39,15 +39,20 @@ void AltitudeKalman::calculateDt() {
   has_ran = true;
 }
 
+void AltitudeKalman::pushTimeStamps(const uint32_t ts) {
+  last_ts = current_ts;
+  current_ts = ts;
+}
+
+void AltitudeKalman::updateDt(const uint32_t ts) {
+  pushTimeStamps(ts);
+  calculateDt;
+}
+
 double AltitudeKalman::calculateGain(int g) {
   double gain =
       has_ran ? (m_dt * KALMAN_M[g]) + KALMAN_B[g] : DEFAULT_KALMAN_GAIN[g];
   return gain;
-}
-
-void AltitudeKalman::pushTimeStamps(const uint32_t ts) {
-  last_ts = current_ts;
-  current_ts = ts;
 }
 
 void AltitudeKalman::reset() { xHat = {0, 0}; }
