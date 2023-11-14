@@ -46,7 +46,7 @@ void AltitudeKalman::pushTimeStamps(const uint32_t ts) {
 
 void AltitudeKalman::updateDt(const uint32_t ts) {
   pushTimeStamps(ts);
-  calculateDt;
+  calculateDt();
 }
 
 double AltitudeKalman::calculateGain(int g) {
