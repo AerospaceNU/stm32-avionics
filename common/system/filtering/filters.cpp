@@ -89,12 +89,22 @@ static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
                                  const SensorProperties_s* sensorProperties) {
   int numAccelsValid = 0;
   double accelSum = 0;
+  double highestFs = 0;
+  double highestFsAccelReading = 0;
 #if HAS_DEV(ACCEL) || HAS_DEV(IMU)
   int highestValidPriority = 0;
 #endif  // HAS_DEV(ACCEL) || HAS_DEV(IMU)
   // Only pull data if accel below fullscale and sensor is working
 #if HAS_DEV(ACCEL)
   for (int i = 0; i < NUM_ACCEL; i++) {
+    if (sensorProperties->accelFs[i] > highestFs) {
+      highestFs = sensorProperties->accelFs[i];
+      highestFsAccelReading = accelReadings[i];
+    } else if (sensorProperties->accelFs[i] == highestFs) {
+      if (fabs(accelReadings[i]) < fabs(highestFsAccelReading)) {
+        highestFsAccelReading = accelReadings[i];
+      }
+    }
     if (hardwareStatusAccel[i] &&
         fabs(accelReadings[i]) <
             ACCEL_FS_THRESHOLD * sensorProperties->accelFs[i]) {
@@ -112,6 +122,14 @@ static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
 
 #if HAS_DEV(IMU)
   for (int i = 0; i < NUM_IMU; i++) {
+    if (sensorProperties->imuAccelFs[i] > highestFs) {
+      highestFs = sensorProperties->imuAccelFs[i];
+      highestFsAccelReading = imuReadings[i];
+    } else if (sensorProperties->imuAccelFs[i] == highestFs) {
+      if (fabs(imuReadings[i]) < fabs(highestFsAccelReading)) {
+        highestFsAccelReading = imuReadings[i];
+      }
+    }
     if (hardwareStatusImu[i] &&
         fabs(imuReadings[i]) <
             ACCEL_FS_THRESHOLD * sensorProperties->imuAccelFs[i]) {
@@ -127,7 +145,8 @@ static double filterAccelOneAxis(double* accelReadings, double* imuReadings,
   }
 #endif  // HAS_DEV(IMU)
 
-  return numAccelsValid == 0 ? 0.0 : accelSum / numAccelsValid;
+  return numAccelsValid == 0 ? highestFsAccelReading
+                             : accelSum / numAccelsValid;
 }
 
 static double filterGyroOneAxis(double* imuReadings) {
