@@ -55,4 +55,7 @@ double AltitudeKalman::calculateGain(int g) {
   return gain;
 }
 
-void AltitudeKalman::reset() { xHat = {0, 0}; }
+void AltitudeKalman::reset() {
+  xHat = {0, 0};
+  has_ran = false;
+  }
