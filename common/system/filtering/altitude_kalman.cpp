@@ -26,6 +26,9 @@ void AltitudeKalman::correct(const double baroAltitude,
 
   xHat.estimatedAltitude += kalman_gain[0] * deltaAltitude;
   xHat.estimatedVelocity += kalman_gain[1] * deltaAltitude;
+  if (xHat.estimatedVelocity < -50) {
+	  xHat.estimatedVelocity -= 10;
+  }
 }
 
 const AltitudeKalmanOutput_s AltitudeKalman::getXhat() const { return xHat; }
@@ -33,7 +36,7 @@ const AltitudeKalmanOutput_s AltitudeKalman::getXhat() const { return xHat; }
 void AltitudeKalman::setDt(double dt) { m_dt = dt; }
 
 void AltitudeKalman::calculateDt() {
-  m_dt = ((current_ts == 0) || !has_ran)
+  m_dt = ((current_ts == 0) || !has_ran || (m_dt == 0))
              ? 0.015
              : (double)(current_ts - last_ts) / 1000.0;
   has_ran = true;
