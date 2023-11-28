@@ -16,7 +16,7 @@ extern "C" {
 /**
  * Ways the command line can receive information
  */
-typedef enum { CLI_PHONE, CLI_RADIO, CLI_USB, NUM_CLI_COMMS } CliComms_e;
+typedef enum { CLI_PHONE, CLI_RADIO, CLI_USB, CLI_BLEUART, NUM_CLI_COMMS } CliComms_e;
 
 /**
  * CLI command types

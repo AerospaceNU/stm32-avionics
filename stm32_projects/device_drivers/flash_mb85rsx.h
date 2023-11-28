@@ -5,6 +5,9 @@
 #ifndef STM32_PROJECTS_DEVICE_DRIVERS_FLASH_MB85RSX_H_
 #define STM32_PROJECTS_DEVICE_DRIVERS_FLASH_MB85RSX_H_
 
+#include "board_config_common.h"
+#if HAS_DEV(FLASH_S25FLX)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,7 +15,6 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "board_config_common.h"
 #include "spi_driver.h"
 
 typedef struct __attribute__((packed)) {
@@ -46,6 +48,8 @@ bool flashMb85rsx_isEraseComplete(FlashMb85rsxCtrl_s *s25flx);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif  // STM32_PROJECTS_DEVICE_DRIVERS_FLASH_MB85RSX_H_

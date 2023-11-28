@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include "board_config_common.h"
+#if HAS_DEV(LED_DIGITAL)
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,8 +21,11 @@ void led_set(LedCtrl_s *led, bool set);
 
 void led_toggle(LedCtrl_s *led);
 
+
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif  // STM32_PROJECTS_DEVICE_DRIVERS_LED_H_

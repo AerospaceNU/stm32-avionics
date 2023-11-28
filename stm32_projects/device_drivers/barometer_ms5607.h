@@ -9,6 +9,8 @@ extern "C" {
 
 #include "board_config_common.h"
 #include "data_structures.h"
+#include "spi.h"
+#include "gpio.h"
 
 typedef struct {
   SPI_HandleTypeDef *hspi;

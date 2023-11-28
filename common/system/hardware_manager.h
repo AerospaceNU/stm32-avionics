@@ -149,6 +149,9 @@ bool hm_bleClientConnected(int bleClientId);
 bool hm_bleClientSend(int bleClientId, const uint8_t* data, uint16_t numBytes);
 CircularBuffer_s* hm_bleClientGetRxBuffer(int bleClientId);
 
+/* BLE UART functions */
+CircularBuffer_s* hm_bleUartGetRxBuffer();
+
 void hm_bleTick();
 
 LineCutterData_s* hm_getLineCutterData(int lineCutterId);

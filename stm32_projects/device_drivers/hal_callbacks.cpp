@@ -325,3 +325,33 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 }
 
 #endif  // HAL_TIM_MODULE_ENABLED
+
+#define MAX_BLE_HANDLES 10
+typedef struct {
+  uint32_t characteristicID;
+  void (*callback)(void *, uint8_t*, size_t);
+  void *userData;
+} BluetoothWriteCallbackProperty_s;
+static BluetoothWriteCallbackProperty_s bleInterruptCallbacks[MAX_BLE_HANDLES];
+static int numBleCallbacksRegistered = 0;
+
+void halCallbacks_registerBluetoothRxCallback(uint32_t characteristic_id,
+                                              void (*callback)(void *, uint8_t*, size_t),
+                                              void *userData) {
+  // If reached, handle hasn't been registered, so create a new association
+  bleInterruptCallbacks[numBleCallbacksRegistered].characteristicID =
+      characteristic_id;
+  bleInterruptCallbacks[numBleCallbacksRegistered].callback = callback;
+  bleInterruptCallbacks[numBleCallbacksRegistered].userData = userData;
+  numBleCallbacksRegistered++;
+}
+
+void halCallbacks_notifyBleCharacteristicWrite(uint32_t characteristic_id,
+                                               uint8_t *data, size_t len) {
+  for (int i = 0; i < numBleCallbacksRegistered; i++) {
+    if (bleInterruptCallbacks[i].characteristicID == characteristic_id &&
+        bleInterruptCallbacks[i].callback != NULL) {
+      bleInterruptCallbacks[i].callback(bleInterruptCallbacks[i].userData, data, len);
+    }
+  }
+}

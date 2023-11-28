@@ -177,13 +177,5 @@
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.pathentry"/>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1864790587;com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1864790587.;com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1883713932;com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1145763924">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1864790587;com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1864790587.;com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.96496554;com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.input.cpp.121871861">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-	</storageModule>
+	<storageModule moduleId="scannerConfiguration"/>
 </cproject>
