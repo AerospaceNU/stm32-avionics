@@ -1,6 +1,7 @@
 #ifndef COMMON_SYSTEM_FILTERING_ALTITUDE_KALMAN_H_
 #define COMMON_SYSTEM_FILTERING_ALTITUDE_KALMAN_H_
 #include <cstdint>
+#include <vector>
 
 typedef struct {
   double estimatedVelocity;
@@ -171,9 +172,12 @@ class AltitudeKalman {
   // Updates last_ts from the previous current_ts
   
   void pushTimeStamps(const uint32_t ts);
-  
+
   // Combonation of pushTimeStamps(ts) and calculateDt()
   void updateDt(const uint32_t ts);
+
+  // Updates the list of previous DT times
+  void pushDTList();
 
   double calculateGain(int g);
 
@@ -199,6 +203,9 @@ class AltitudeKalman {
   // Coefficients and intercepts for linear cureve fits for gains
   const double KALMAN_M[2] = {2.22123116, 2.4411903};
   const double KALMAN_B[2] = {0.20098926, 0.2218965};
+
+  // List of last 100 dt values used for debugging
+  std::vector<uint32_t> dt_list;
 
   // Current and previous timestamps from the sensor data
   uint32_t current_ts = 0;
