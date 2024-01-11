@@ -25,7 +25,7 @@ class Rfm950 : public Radio {
   bool readData(uint8_t *buffer, size_t buffer_length) override;
 
  protected:
-  RFM95 *rf95{};
+  SX1262 *rf95{};
 };
 
 #endif  // PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_

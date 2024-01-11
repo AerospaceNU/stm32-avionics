@@ -12,11 +12,9 @@
 
 // Pin definitions
 // Radio
-#define RFM95_RST 4
-#define RFM95_CS 8
-#define RFM95_INT 3
-
-#define FEATHER_M0_ADC_RESOLUTION 4096
+#define RFM95_RST 2
+#define RFM95_CS 6
+#define RFM95_INT 7
 
 // FCB Code
 Groundstation groundstation;
@@ -30,8 +28,6 @@ void setup() {
 
   // Add them to device manager
   auto deviceManager = getDeviceManager();
-  deviceManager->addBatteryMonitorAdc(
-      A7, 2.0 / FEATHER_M0_ADC_RESOLUTION);  // Voltage divider divides by 2
   deviceManager->addRadio(&rfm950);
 
   // Run FCB code
