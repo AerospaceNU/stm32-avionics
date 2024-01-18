@@ -2,6 +2,8 @@
 // Created by nathan on 5/16/23.
 //
 
+#if __has_include(<Uart.h>)
+
 #include "nmea_0183_gps.h"
 
 Nmea0183Gps::Nmea0183Gps() = default;
@@ -37,3 +39,5 @@ void Nmea0183Gps::tick() {
     onNewFix();
   }
 }
+
+#endif

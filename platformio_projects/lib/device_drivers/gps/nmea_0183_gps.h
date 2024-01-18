@@ -5,6 +5,8 @@
 #ifndef PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_GPS_NMEA_0183_GPS_H_
 #define PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_GPS_NMEA_0183_GPS_H_
 
+#if __has_include(<Uart.h>)
+
 #include <Arduino.h>
 #include <TinyGPS++.h>
 
@@ -23,5 +25,7 @@ class Nmea0183Gps : public Gps {
 
   TinyGPSPlus tinyGpsPlus;
 };
+
+#endif
 
 #endif  // PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_GPS_NMEA_0183_GPS_H_

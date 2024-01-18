@@ -4,6 +4,8 @@
 
 #include "rfm_950.h"
 
+#ifdef RH_RF95_h
+
 Rfm950::Rfm950() : Radio(RH_RF95_MAX_MESSAGE_LEN) {}
 
 void Rfm950::init(int reset_pin, int cs_pin, int interrupt_pin) {
@@ -55,3 +57,5 @@ bool Rfm950::readData(uint8_t *buffer, size_t buffer_length) {
   lastRssi = rf95->lastRssi();
   return success;
 }
+
+#endif

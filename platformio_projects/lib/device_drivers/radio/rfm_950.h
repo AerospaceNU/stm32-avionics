@@ -5,6 +5,8 @@
 #ifndef PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_
 #define PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_
 
+#if __has_include(<RH_RF95.h>)
+
 #include <RH_RF95.h>
 #include <SPI.h>
 
@@ -28,5 +30,7 @@ class Rfm950 : public Radio {
   uint8_t driver_memory[sizeof(RH_RF95)]{};
   RH_RF95 *rf95{};
 };
+
+#endif  // RH_RF95_h
 
 #endif  // PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_

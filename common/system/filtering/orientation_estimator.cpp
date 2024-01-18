@@ -18,13 +18,11 @@ OrientationEstimator::OrientationEstimator(float dt) : m_dt(dt) {}
 
 OrientationEstimator::~OrientationEstimator() {}
 
-void OrientationEstimator::reset() { this->q = Matrix<4, 1>({1.0, 0, 0, 0}); }
+void OrientationEstimator::reset() { this->q = Matrix<4, 1>({1.0f, 0.0f, 0.0f, 0.0f}); }
 
 void OrientationEstimator::setDt(float dt) { this->m_dt = dt; }
 
-void OrientationEstimator::setAccelVector(float rocket_acc_x,
-                                          float rocket_acc_y,
-                                          float rocket_acc_z) {
+void OrientationEstimator::setAccelVector(float rocket_acc_x, float rocket_acc_y, float rocket_acc_z) {
   Matrix<3, 1> a({rocket_acc_x, rocket_acc_y, rocket_acc_z});
   float a_norm = a.norm();
   if (!(a_norm > G_THRESHOLD_MIN && a_norm < G_THRESHOLD_MAX)) return;
@@ -41,14 +39,11 @@ void OrientationEstimator::setAccelVector(float rocket_acc_x,
   this->q = q / q.norm();
 }
 
-void OrientationEstimator::update(float rocket_ang_vel_x,
-                                  float rocket_ang_vel_y,
-                                  float rocket_ang_vel_z) {
-  Matrix<4, 4> omega(
-      {0.0, -rocket_ang_vel_x, -rocket_ang_vel_y, -rocket_ang_vel_z,
-       rocket_ang_vel_x, 0.0, rocket_ang_vel_z, -rocket_ang_vel_y,
-       rocket_ang_vel_y, -rocket_ang_vel_z, 0.0, rocket_ang_vel_x,
-       rocket_ang_vel_z, rocket_ang_vel_y, -rocket_ang_vel_x, 0.0});
+void OrientationEstimator::update(float rocket_ang_vel_x, float rocket_ang_vel_y, float rocket_ang_vel_z) {
+  Matrix<4, 4> omega({0.0f, -rocket_ang_vel_x, -rocket_ang_vel_y, -rocket_ang_vel_z,
+                      rocket_ang_vel_x, 0.0f, rocket_ang_vel_z, -rocket_ang_vel_y,
+                      rocket_ang_vel_y,-rocket_ang_vel_z, 0.0f,rocket_ang_vel_x,
+                      rocket_ang_vel_z, rocket_ang_vel_y,-rocket_ang_vel_x, 0.0f});
   Matrix<3, 1> gyro({rocket_ang_vel_x, rocket_ang_vel_y, rocket_ang_vel_z});
 
   float w = gyro.norm();

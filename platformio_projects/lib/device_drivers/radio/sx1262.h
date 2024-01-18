@@ -5,6 +5,8 @@
 #ifndef PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_
 #define PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_
 
+#if __has_include(<RadioLib.h>)
+
 #include <RadioLib.h>
 #include <SPI.h>
 
@@ -27,5 +29,7 @@ class Sx1262 : public Radio {
  protected:
   SX1262 *rf95{};
 };
+
+#endif
 
 #endif  // PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_

@@ -26,7 +26,7 @@ Sx1262 sx1262;
 
 void setup() {
   // Init drivers
-  sx1262.init(RFM95_RST, RFM95_CS, RFM95_INT);
+  sx1262.init(SX1262_RST, SX1262_CS, SX1262_INT);
 
   // Add them to device manager
   auto deviceManager = getDeviceManager();

@@ -4,13 +4,20 @@
 
 #include "sx1262.h"
 
+#ifdef HSPI
 static SPIClass spi(HSPI);
+#endif
+
 Sx1262::Sx1262() : Radio(63) {}
 
 void Sx1262::init(int reset_pin, int cs_pin, int interrupt_pin) {
   // We do a little dynamic memory allocation
+#ifdef HSPI
   spi.begin(8, 3, 4, 5);
   rf95 = new SX1262(new Module(cs_pin, interrupt_pin, reset_pin, RADIOLIB_NC, spi));
+#else  // IDK if this works
+  rf95 = new SX1262(new Module(cs_pin, interrupt_pin, reset_pin, RADIOLIB_NC));
+#endif
 
   // Basically copied from Adafruit example code
   pinMode(reset_pin, OUTPUT);
@@ -48,5 +55,3 @@ bool Sx1262::readData(uint8_t *buffer, size_t buffer_length) {
 
   return success;
 }
-
-#endif
