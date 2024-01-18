@@ -16,8 +16,6 @@
 #define SX1262_CS 6
 #define SX1262_INT 7
 
-#define FEATHER_M0_ADC_RESOLUTION 4096
-
 // FCB Code
 Groundstation groundstation;
 
