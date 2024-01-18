@@ -27,7 +27,7 @@ class Sx1262 : public Radio {
   bool readData(uint8_t *buffer, size_t buffer_length) override;
 
  protected:
-  SX1262 *rf95{};
+  SX1262 *sx1262{};
 };
 
 #endif
