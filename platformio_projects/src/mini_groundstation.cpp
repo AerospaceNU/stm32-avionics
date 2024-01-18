@@ -30,7 +30,6 @@ void setup() {
 
   // Add them to device manager
   auto deviceManager = getDeviceManager();
-  //  deviceManager->addBatteryMonitorAdc(A7, 2.0 / FEATHER_M0_ADC_RESOLUTION);  // Voltage divider divides by 2
   deviceManager->addRadio(&sx1262);
 
   // Run FCB code
