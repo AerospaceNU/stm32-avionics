@@ -1,8 +1,8 @@
 /**
- * Blink
+ * FCB Code to run on an Adafruit Feather M0 LoRa with some sensors attached
+ * The actual flight hardware for this should be in the avionics box
  *
- * Turns on an LED on for one second,
- * then off for one second, repeatedly.
+ * Originally written to support Big BeanBooster and as a test for the platformio code
  */
 
 #include <Arduino.h>

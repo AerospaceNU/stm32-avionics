@@ -1,8 +1,7 @@
 /**
- * Blink
+ * Code for the new ESP32 Mini Groundstation boards
  *
- * Turns on an LED on for one second,
- * then off for one second, repeatedly.
+ * Does the same thing as the other ground stations (radio -> USB bridge), with devices configured for this specific piece of hardware
  */
 
 #include <Arduino.h>

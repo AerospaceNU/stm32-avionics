@@ -101,12 +101,10 @@ void DeviceManager::readSensors() {
   }
 }
 
-uint DeviceManager::getNumberBatteryMonitorAdcs() const {
-  return numBatteryMonitorADCs;
-}
+uint DeviceManager::getNumberBatteryMonitorAdcs() const { return numBatteryMonitorADCs; }
 
 double DeviceManager::readBatteryVoltage(uint battery_num) {
-  if (0 <= battery_num && battery_num < numBatteryMonitorADCs) {
+  if (battery_num < numBatteryMonitorADCs) {
     double raw_reading = analogRead(batteryMonitorADCPins[battery_num]);
     return raw_reading * batteryAdcMultipliers[battery_num];
   }
@@ -115,7 +113,7 @@ double DeviceManager::readBatteryVoltage(uint battery_num) {
 }
 
 Accelerometer *DeviceManager::getAccelerometer(uint index) {
-  if (0 <= index && index < accelerometers.size()) {
+  if (index < accelerometers.size()) {
     return accelerometers[index];
   } else {
     return nullptr;
@@ -123,7 +121,7 @@ Accelerometer *DeviceManager::getAccelerometer(uint index) {
 }
 
 Barometer *DeviceManager::getBarometer(uint index) {
-  if (0 <= index && index < barometers.size()) {
+  if (index < barometers.size()) {
     return barometers[index];
   } else {
     return nullptr;
@@ -131,7 +129,7 @@ Barometer *DeviceManager::getBarometer(uint index) {
 }
 
 Gps *DeviceManager::getGps(uint index) {
-  if (0 <= index && index < gps.size()) {
+  if (index < gps.size()) {
     return gps[index];
   } else {
     return nullptr;
@@ -139,7 +137,7 @@ Gps *DeviceManager::getGps(uint index) {
 }
 
 Gyroscope *DeviceManager::getGyroscope(uint index) {
-  if (0 <= index && index < gyroscopes.size()) {
+  if (index < gyroscopes.size()) {
     return gyroscopes[index];
   } else {
     return nullptr;
@@ -147,7 +145,7 @@ Gyroscope *DeviceManager::getGyroscope(uint index) {
 }
 
 Magnetometer *DeviceManager::getMagnetometer(uint index) {
-  if (0 <= index && index < magnetometers.size()) {
+  if (index < magnetometers.size()) {
     return magnetometers[index];
   } else {
     return nullptr;
@@ -155,7 +153,7 @@ Magnetometer *DeviceManager::getMagnetometer(uint index) {
 }
 
 Radio *DeviceManager::getRadio(uint index) {
-  if (0 <= index && index < radios.size()) {
+  if (index < radios.size()) {
     return radios[index];
   } else {
     return nullptr;

@@ -19,6 +19,7 @@
 #include "radio/radio.h"
 
 // TODO Could this be better?
+//Maybe device manager could be templated?
 #define MAX_ACCELEROMETERS 2
 #define MAX_BAROMETERS 2
 #define MAX_GPS 2
@@ -27,9 +28,7 @@
 #define MAX_MAGNETOMETERS 2
 #define MAX_RADIOS 2
 
-#define MAX_DEVICES                                                           \
-  MAX_ACCELEROMETERS + MAX_BAROMETERS + MAX_GPS + MAX_GYROSCOPES + MAX_IMUS + \
-      MAX_MAGNETOMETERS + MAX_RADIOS
+#define MAX_DEVICES (MAX_ACCELEROMETERS + MAX_BAROMETERS + MAX_GPS + MAX_GYROSCOPES + MAX_IMUS + MAX_MAGNETOMETERS + MAX_RADIOS)
 
 // TODO: Patrick or someone, is there a way to template this class to make it
 // easier to add more sensor types later?

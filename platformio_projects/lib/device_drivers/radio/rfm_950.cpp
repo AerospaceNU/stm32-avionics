@@ -2,9 +2,9 @@
 // Created by nathan on 5/14/23.
 //
 
-#include "rfm_950.h"
+#if __has_include(<RH_RF95.h>)
 
-#ifdef RH_RF95_h
+#include "rfm_950.h"
 
 Rfm950::Rfm950() : Radio(RH_RF95_MAX_MESSAGE_LEN) {}
 

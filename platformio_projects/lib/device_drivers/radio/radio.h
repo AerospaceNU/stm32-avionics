@@ -20,9 +20,9 @@ class Radio : public virtual BaseDevice {
 
   virtual bool readData(uint8_t *buffer, size_t buffer_length);
 
-  int getMaxMessageLength();
+  int getMaxMessageLength() const;
 
-  int getLastRssi();
+  int getLastRssi() const;
 
  protected:
   int maxMessageLength;

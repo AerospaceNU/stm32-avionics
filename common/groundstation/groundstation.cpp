@@ -14,14 +14,12 @@
 #include <Arduino.h>
 #endif
 
-static void OnDataRx(RadioRecievedPacket_s *packet) {
-  hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)packet, sizeof(*packet));
-}
+static void OnDataRx(RadioRecievedPacket_s *packet) { hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)packet, sizeof(*packet)); }
 
 static void GroundstationParseCommand(GroundstationUsbCommand_s *command) {
   if (command->data[0] == CHANNEL_COMMAND_ID) {
     uint8_t radioHw = command->data[1];
-    int8_t channel = command->data[2];
+    uint8_t channel = command->data[2];
 
     hm_radioSetChannel((int)radioHw, channel);
   }
@@ -69,8 +67,7 @@ void Groundstation::runOnce() {
     static uint8_t heartbeatArr[sizeof(RadioRecievedPacket_s)] = {0};
     memset(heartbeatArr, 0, sizeof(heartbeatArr));
     memcpy(heartbeatArr, &heartbeat, sizeof(heartbeat));
-    hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr,
-                   sizeof(heartbeatArr));
+    hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr, sizeof(heartbeatArr));
   }
 
   // A packet must have at least a destination [1 byte] and a len [2 bytes],
@@ -85,15 +82,12 @@ void Groundstation::runOnce() {
       if (command.destination == GROUNDSTATION) {
         GroundstationParseCommand(&command);
       } else {
-        int dest = command.destination == RAD_433 ? FIRST_ID_RADIO_TI_433
-                                                  : FIRST_ID_RADIO_TI_915;
+        int dest = command.destination == RAD_433 ? FIRST_ID_RADIO_TI_433 : FIRST_ID_RADIO_TI_915;
 
         radioManager_transmitString(dest, command.data, command.len);
       }
       cb_dequeue(buffer, count);
-    } else if (command.destination != GROUNDSTATION ||
-               command.destination != RAD_433 ||
-               command.destination != RAD_915) {
+    } else if (command.destination != GROUNDSTATION || command.destination != RAD_433 || command.destination != RAD_915) {
       cb_flush(buffer);
     }
   }

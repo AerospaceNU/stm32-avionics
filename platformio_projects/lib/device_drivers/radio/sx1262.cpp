@@ -16,7 +16,7 @@ void Sx1262::init(int reset_pin, int cs_pin, int interrupt_pin) {
   spi.begin(8, 3, 4, 5);
   sx1262 = new SX1262(new Module(cs_pin, interrupt_pin, reset_pin, RADIOLIB_NC, spi));
 #else  // IDK if this works
-  rf95 = new SX1262(new Module(cs_pin, interrupt_pin, reset_pin, RADIOLIB_NC));
+  sx1262 = new SX1262(new Module(cs_pin, interrupt_pin, reset_pin, RADIOLIB_NC));
 #endif
 
   // Basically copied from Adafruit example code

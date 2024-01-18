@@ -94,14 +94,12 @@ CircularBuffer_s *radioCircularBuffer;
 
 void hm_hardwareInit() {
   pinMode(LED_BUILTIN, OUTPUT);
-  cb_init(&serialCircularBuffer, serialBuffer, USB_SERIAL_BUFFER_SIZE,
-          sizeof(uint8_t));
+  cb_init(&serialCircularBuffer, serialBuffer, USB_SERIAL_BUFFER_SIZE, sizeof(uint8_t));
 
   deviceManager.init();
 
   if (deviceManager.getBarometer(0)) {
-    hardwareStatusBarometer[0] =
-        deviceManager.getBarometer(0)->getSensorStatus();
+    hardwareStatusBarometer[0] = deviceManager.getBarometer(0)->getSensorStatus();
   }
 
   if (deviceManager.getGps(0)) {
@@ -111,8 +109,7 @@ void hm_hardwareInit() {
   // TODO: Maybe this can be better?
   if (deviceManager.getAccelerometer(0)) {
     hardwareStatusImu[0] = deviceManager.getAccelerometer(0)->getSensorStatus();
-    sensorProperties.imuAccelFs[0] =
-        deviceManager.getAccelerometer(0)->getAccelerometerFullScale();
+    sensorProperties.imuAccelFs[0] = deviceManager.getAccelerometer(0)->getAccelerometerFullScale();
   }
 
   if (deviceManager.getMagnetometer(0)) {
@@ -129,16 +126,12 @@ void hm_hardwareInit() {
 
 uint32_t hm_millis() { return millis(); }
 
-bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
-                       uint8_t *pData) {
+bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes, uint8_t *pData) {
   memset(pData, 0xff, numBytes);
   return false;
 }
 
-bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
-                        uint8_t *data) {
-  return false;
-}
+bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes, uint8_t *data) { return false; }
 
 bool hm_flashEraseSectorStart(int flashId, uint32_t sectorNum) { return false; }
 
@@ -180,7 +173,7 @@ void hm_radioUpdate() {
     if (radio->isDataAvailable()) {
       static RadioRecievedPacket_s packet;
       packet.radioId = 0;
-      packet.rssi = radio->getLastRssi();
+      packet.rssi = (int8_t)radio->getLastRssi();
       packet.crc = true;
       packet.lqi = 0;
 
@@ -194,9 +187,7 @@ void hm_radioUpdate() {
   }
 }
 
-void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {
-  radioCircularBuffer = rxBuffer;
-}
+void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) { radioCircularBuffer = rxBuffer; }
 
 void hm_radioSetChannel(int radioNum, int channel) {}
 
@@ -214,9 +205,7 @@ CircularBuffer_s *hm_usbGetRxBuffer(int usbId) { return &serialCircularBuffer; }
 
 bool hm_bleClientConnected(int bleClientId) { return false; }
 
-bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
-  return false;
-}
+bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) { return false; }
 
 CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) { return nullptr; }
 
@@ -224,9 +213,7 @@ void hm_bleTick() {}
 
 LineCutterData_s *hm_getLineCutterData(int lineCutterId) { return nullptr; }
 
-LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
-  return nullptr;
-}
+LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) { return nullptr; }
 
 bool hm_lineCutterSendString(int lineCutterNumber, char *string) {
   printf("[Sent to LC %i] %s\n", lineCutterNumber, string);
@@ -248,8 +235,7 @@ void hm_pyroSet(int pyroId, bool enable) {
   // TODO: Implement
 }
 
-void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth,
-                   uint32_t duration) {
+void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth, uint32_t duration) {
   // TODO: Analogwrite()?
 }
 

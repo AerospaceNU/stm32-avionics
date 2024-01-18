@@ -1,8 +1,7 @@
 /**
-* Blink
-*
-* Turns on an LED on for one second,
-* then off for one second, repeatedly.
+ * Ground station code to run on an Adafruit Feather M0 LoRa
+ *
+ * Because the ground station does not require any extra hardware, this runs on a unmodified Feather M0 LoRa
 */
 
 #include <Arduino.h>

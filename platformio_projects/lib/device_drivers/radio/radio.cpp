@@ -12,6 +12,6 @@ bool Radio::isDataAvailable() { return false; }
 
 bool Radio::readData(uint8_t *buffer, size_t buffer_length) { return false; }
 
-int Radio::getMaxMessageLength() { return maxMessageLength; }
+int Radio::getMaxMessageLength() const { return maxMessageLength; }
 
-int Radio::getLastRssi() { return lastRssi; }
+int Radio::getLastRssi() const { return lastRssi; }
