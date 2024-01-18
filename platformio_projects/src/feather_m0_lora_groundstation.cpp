@@ -1,9 +1,9 @@
 /**
- * Blink
- *
- * Turns on an LED on for one second,
- * then off for one second, repeatedly.
- */
+* Blink
+*
+* Turns on an LED on for one second,
+* then off for one second, repeatedly.
+*/
 
 #include <Arduino.h>
 #include <arduino_hardware_manager.h>
@@ -12,9 +12,11 @@
 
 // Pin definitions
 // Radio
-#define RFM95_RST 2
-#define RFM95_CS 6
-#define RFM95_INT 7
+#define RFM95_RST 4
+#define RFM95_CS 8
+#define RFM95_INT 3
+
+#define FEATHER_M0_ADC_RESOLUTION 4096
 
 // FCB Code
 Groundstation groundstation;
@@ -23,15 +25,17 @@ Groundstation groundstation;
 Rfm950 rfm950;
 
 void setup() {
-  // Init drivers
-  rfm950.init(RFM95_RST, RFM95_CS, RFM95_INT);
+ // Init drivers
+ rfm950.init(RFM95_RST, RFM95_CS, RFM95_INT);
 
-  // Add them to device manager
-  auto deviceManager = getDeviceManager();
-  deviceManager->addRadio(&rfm950);
+ // Add them to device manager
+ auto deviceManager = getDeviceManager();
+ deviceManager->addBatteryMonitorAdc(
+     A7, 2.0 / FEATHER_M0_ADC_RESOLUTION);  // Voltage divider divides by 2
+ deviceManager->addRadio(&rfm950);
 
-  // Run FCB code
-  groundstation.init();
+ // Run FCB code
+ groundstation.init();
 }
 
 void loop() { groundstation.runOnce(); }

@@ -5,16 +5,16 @@
 #ifndef PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_
 #define PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_
 
-#include <RH_RF95.h>
+#include <RadioLib.h>
 #include <SPI.h>
 
 #include <new>
 
 #include "radio.h"
 
-class Rfm950 : public Radio {
+class Sx1262 : public Radio {
  public:
-  Rfm950();
+  Sx1262();
 
   void init(int reset_pin, int cs_pin, int interrupt_pin);
 
@@ -25,8 +25,7 @@ class Rfm950 : public Radio {
   bool readData(uint8_t *buffer, size_t buffer_length) override;
 
  protected:
-  uint8_t driver_memory[sizeof(RH_RF95)]{};
-  RH_RF95 *rf95{};
+  SX1262 *rf95{};
 };
 
 #endif  // PLATFORMIO_PROJECTS_LIB_DEVICE_DRIVERS_RADIO_RFM_950_H_

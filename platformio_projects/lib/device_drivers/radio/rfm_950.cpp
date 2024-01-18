@@ -3,14 +3,14 @@
 //
 
 #include "rfm_950.h"
-static SPIClass spi(HSPI);
-Rfm950::Rfm950() : Radio(63) {}
+
+Rfm950::Rfm950() : Radio(RH_RF95_MAX_MESSAGE_LEN) {}
 
 void Rfm950::init(int reset_pin, int cs_pin, int interrupt_pin) {
-  // We do a little dynamic memory allocation
-  spi.begin(8, 3, 4, 5);
-  rf95 = new SX1262(
-      new Module(cs_pin, interrupt_pin, reset_pin, RADIOLIB_NC, spi));
+  // Need to construct the object here, so we do this weird thing to avoid
+  // dynamic memory allocation
+  new (&driver_memory) RH_RF95(cs_pin, interrupt_pin);
+  rf95 = ((RH_RF95 *)&driver_memory);
 
   // Basically copied from Adafruit example code
   pinMode(reset_pin, OUTPUT);
@@ -22,19 +22,27 @@ void Rfm950::init(int reset_pin, int cs_pin, int interrupt_pin) {
   delay(10);
 
   // Initialize the chip
-  sensorStatus = rf95->beginFSK(915.0, 38.400, 20.0, 100.0, 17, 16);
-
-  rf95->setSyncWord(0x930B51DE);
+  sensorStatus = rf95->init();
 
   // Radio settings
   // Fast transmit, short range config
-  // rf95->setFrequency(915.0);
-  // rf95->setModemConfig(RH_RF95::Bw500Cr45Sf128);
-  // rf95->setTxPower(23, false);  // High power
+  rf95->setFrequency(915.0);
+  rf95->setModemConfig(RH_RF95::Bw500Cr45Sf128);
+  rf95->setTxPower(23, false);  // High power
 }
 
 bool Rfm950::sendData(uint8_t *data, size_t len) {
-  rf95->transmit(data, len);
+  //    long start_time = millis();
+
+  rf95->send(data, len);
+  //    delay(10);
+  //    rf95->waitPacketSent();  //send() automatically does the wait, so we
+  //    don't wait
+
+  //    int delta_time = millis() - start_time;
+
+  //    Serial.print(delta_time);
+  //    Serial.println(" Radio sent");
 
   return true;
 }
@@ -42,9 +50,8 @@ bool Rfm950::sendData(uint8_t *data, size_t len) {
 bool Rfm950::isDataAvailable() { return rf95->available(); }
 
 bool Rfm950::readData(uint8_t *buffer, size_t buffer_length) {
-  uint8_t len = buffer_length;
-
-  auto success = rf95->receive(buffer, len) == RADIOLIB_ERR_NONE;
-
+  uint8_t len = min((uint8_t)buffer_length, getMaxMessageLength());
+  bool success = rf95->recv(buffer, &len);
+  lastRssi = rf95->lastRssi();
   return success;
 }
