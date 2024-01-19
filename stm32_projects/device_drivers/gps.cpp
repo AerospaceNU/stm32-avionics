@@ -26,8 +26,10 @@ static void parseString(GpsCtrl_s *gps, char line[]) {
             !isnan(minmea_tofloat(&frame1.longitude)) &&
             !isnan(minmea_tofloat(&frame1.altitude)) &&
             !isnan(minmea_tofloat(&frame1.hdop))) {
-          gps->data.generalData.latitude = minmea_tofloat(&frame1.latitude);
-          gps->data.generalData.longitude = minmea_tofloat(&frame1.longitude);
+          gps->data.generalData.latitude =
+              ddmm_to_dddd(minmea_tofloat(&frame1.latitude));
+          gps->data.generalData.longitude =
+              ddmm_to_dddd(minmea_tofloat(&frame1.longitude));
           gps->data.generalData.altitude = minmea_tofloat(&frame1.altitude);
           gps->data.generalData.fixQuality =
               static_cast<uint8_t>(frame1.fix_quality);
