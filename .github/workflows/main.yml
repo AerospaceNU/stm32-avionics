@@ -76,7 +76,7 @@ jobs:
         working-directory: ${{github.workspace}}
         run: ./ci/build_desktop.sh
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
           name: desktop_sim
           path: ${{github.workspace}}/build/desktop_projects/desktop_sim/desktop_sim
@@ -128,7 +128,7 @@ jobs:
           mv firmware.bin ${{ matrix.env-name }}-pio.bin
           mv firmware.elf ${{ matrix.env-name }}-pio.elf
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.env-name }}
           if-no-files-found: error
@@ -197,7 +197,7 @@ jobs:
           mv ${{ matrix.prj-target }}.elf ${{ matrix.prj-target }}-cmake-${{ matrix.os }}.elf
           mv ${{ matrix.prj-target }}.hex ${{ matrix.prj-target }}-cmake-${{ matrix.os }}.hex
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.prj-target }}-${{ matrix.os }}
           path: |
@@ -249,7 +249,7 @@ jobs:
           cd ${{ matrix.prj-rel-path }}
           for f in **/*.elf; do mv "$f" "$(echo "$f" | sed s/.elf/-cube.elf/)"; done
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.prj-target }}
           path: ${{ matrix.prj-rel-path }}/**/*.elf
@@ -260,7 +260,7 @@ jobs:
     steps:
       # Download literally every single artifact. This also downloads client and docs,
       # but the filtering below won't pick these up (I hope)
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
 
       - run: find
 
