@@ -249,7 +249,7 @@ jobs:
           cd ${{ matrix.prj-rel-path }}
           for f in **/*.elf; do mv "$f" "$(echo "$f" | sed s/.elf/-cube.elf/)"; done
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.prj-target }}
           path: ${{ matrix.prj-rel-path }}/**/*.elf
@@ -260,7 +260,7 @@ jobs:
     steps:
       # Download literally every single artifact. This also downloads client and docs,
       # but the filtering below won't pick these up (I hope)
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
 
       - run: find
 
