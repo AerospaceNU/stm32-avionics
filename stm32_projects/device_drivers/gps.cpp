@@ -320,4 +320,10 @@ void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type) {
   }
 }
 
+float ddmm_to_dddd(float ddmm) {
+  int degrees = abs(ddmm / 100);
+  float minutes = abs(fmod(ddmm, 100));
+  return copysign(degrees + (minutes / 60.), ddmm);
+}
+
 #endif  // #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)

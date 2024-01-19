@@ -524,10 +524,4 @@ int minmea_gettime(struct timespec *ts, const struct minmea_date *date,
   }
 }
 
-float ddmm_to_dddd(float ddmm) {
-  int degrees = abs(ddmm / 100);
-  float minutes = abs(fmod(ddmm, 100));
-  return = copysign(degrees + (minutes / 60.), ddmm);
-}
-
 /* vim: set ts=4 sw=4 et: */

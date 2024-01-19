@@ -217,11 +217,6 @@ int minmea_gettime(struct timespec *ts, const struct minmea_date *date,
                    const struct minmea_time *time_);
 
 /**
- * Convert a latitude or longitude in DDDMM.MMMM format to DDD.DDDD format.
- */
-float ddmm_to_dddd(float ddmm);
-
-/**
  * Rescale a fixed-point value to a different scale. Rounds towards zero.
  */
 static inline int_least32_t minmea_rescale(struct minmea_float *f,
