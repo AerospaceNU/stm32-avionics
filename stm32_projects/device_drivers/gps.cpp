@@ -26,10 +26,10 @@ static void parseString(GpsCtrl_s *gps, char line[]) {
             !isnan(minmea_tofloat(&frame1.longitude)) &&
             !isnan(minmea_tofloat(&frame1.altitude)) &&
             !isnan(minmea_tofloat(&frame1.hdop))) {
-          gps->data.generalData.latitude =
-              ddmm_to_dddd(minmea_tofloat(&frame1.latitude));
-          gps->data.generalData.longitude =
-              ddmm_to_dddd(minmea_tofloat(&frame1.longitude));
+          gps->data.generalData.latitude = decimalminutes_to_decimaldegrees(
+              minmea_tofloat(&frame1.latitude));
+          gps->data.generalData.longitude = decimalminutes_to_decimaldegrees(
+              minmea_tofloat(&frame1.longitude));
           gps->data.generalData.altitude = minmea_tofloat(&frame1.altitude);
           gps->data.generalData.fixQuality =
               static_cast<uint8_t>(frame1.fix_quality);
@@ -318,12 +318,6 @@ void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type) {
     gps_setMessagesUsed(gps);
     gps_setRate(gps, 333);
   }
-}
-
-float ddmm_to_dddd(float ddmm) {
-  int degrees = abs(ddmm / 100);
-  float minutes = abs(fmod(ddmm, 100));
-  return copysign(degrees + (minutes / 60.), ddmm);
 }
 
 #endif  // #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)

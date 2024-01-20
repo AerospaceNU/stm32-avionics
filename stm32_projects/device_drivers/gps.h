@@ -46,11 +46,6 @@ void gps_enable4g(GpsCtrl_s *gps);
 
 void gps_addUbxChecksum(uint8_t *data, int len);
 
-/**
- * Convert a latitude or longitude in DDDMM.MMMM format to DDD.DDDD format.
- */
-float ddmm_to_dddd(float ddmm);
-
 #endif
 
 #endif  // STM32_PROJECTS_DEVICE_DRIVERS_GPS_H_
