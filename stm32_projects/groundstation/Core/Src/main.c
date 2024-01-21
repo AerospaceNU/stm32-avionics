@@ -31,9 +31,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "board_config_common.h"
-#include "hardware_manager.h"
-#include "radio_manager.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,6 +40,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+void groundstation_main();
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -65,52 +63,6 @@ void PeriphCommonClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-typedef struct __attribute__((__packed__)) {
-  uint8_t packetType;
-  float latitude;
-  float longitude;
-  float gps_alt;
-  double groundPressure;
-  double groundTemp;
-} HeartbeatData_s;
-
-typedef enum {
-  RAD_433 = FIRST_ID_RADIO_TI_433,
-  RAD_915 = FIRST_ID_RADIO_TI_915,
-  GROUNDSTATION = 0xff
-} MessageDestination_e;
-
-typedef struct __attribute__((packed)) {
-  uint8_t destination;
-  uint16_t len;
-  uint8_t data[256];
-} GroundstationUsbCommand_s;
-
-#define CHANNEL_COMMAND_ID 1
-#define RADIO_HARDWARE_COMMAND_ID 2
-
-static void GroundstationParseCommand(GroundstationUsbCommand_s *command) {
-  if (command->data[0] == CHANNEL_COMMAND_ID) {
-    uint8_t radioHw = command->data[1];
-    int8_t channel = command->data[2];
-
-    hm_radioSetChannel((int)radioHw, channel);
-  }
-
-  //  if (command->data[0] == CHANNEL_COMMAND_ID) {
-  //    uint8_t radioHw = command->data[1];
-  //    int8_t channel = command->data[2];
-  //
-  //    HM_RadioSetChannel(radioHw, channel);
-  //  }
-}
-
-static void OnDataRx(RadioRecievedPacket_s *packet) {
-  hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)packet, sizeof(*packet));
-}
-
-#define min(a, b) (a < b) ? a : b
 
 /* USER CODE END 0 */
 
@@ -157,79 +109,14 @@ int main(void)
   MX_I2C2_Init();
   MX_IWDG1_Init();
   /* USER CODE BEGIN 2 */
+  groundstation_main();
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
-  hm_hardwareInit();
-
-  radioManager_init();
-  for (int i = 0; i < NUM_RADIO; i++) {
-    radioManager_addMessageCallback(i, OnDataRx);
-  }
-
-  CircularBuffer_s *buffer = hm_usbGetRxBuffer(FIRST_ID_USB_STD);
-
-  uint32_t start = HAL_GetTick();
-
   while (1) {
-    // Update sensors
-    hm_watchdogRefresh();
-    hm_readSensorData();
-    hm_radioUpdate();
 
-    // Process incoming data
-    radioManager_tick();
-
-    // Send barometer ~1x/5sec
-    if ((HAL_GetTick() - start) >= 2000) {
-      start = HAL_GetTick();
-
-      static HeartbeatData_s heartbeat;
-      heartbeat.packetType = 200;
-      heartbeat.latitude = hm_getSensorData()->gpsData->generalData.latitude;
-      heartbeat.longitude = hm_getSensorData()->gpsData->generalData.longitude;
-      heartbeat.gps_alt = hm_getSensorData()->gpsData->generalData.altitude;
-      heartbeat.groundPressure =
-          hm_getSensorData()->barometerData[0].pressureAtm;
-      heartbeat.groundTemp = hm_getSensorData()->barometerData[0].temperatureC;
-
-      // Hack to make all packets the same length when sent over USB
-      static uint8_t heartbeatArr[sizeof(RadioRecievedPacket_s)] = {0};
-      memset(heartbeatArr, 0, sizeof(heartbeatArr));
-      memcpy(heartbeatArr, &heartbeat, sizeof(heartbeat));
-      hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr,
-                     sizeof(heartbeatArr));
-    }
-
-    // A packet must mave at least a destination [1 byte] and a len [2 bytes],
-    // and a non-zero quantity of data
-    if (cb_count(buffer) > 3) {
-      static GroundstationUsbCommand_s command;
-      size_t count = min(cb_count(buffer), sizeof(command));
-      cb_peek(buffer, (uint8_t *)&command, &count);
-
-      // If we got at least enough bytes for one message to be done
-      if (count >= command.len + 3) {
-        if (command.destination == GROUNDSTATION) {
-          GroundstationParseCommand(&command);
-        } else {
-          int dest = command.destination == RAD_433 ? FIRST_ID_RADIO_TI_433
-                                                    : FIRST_ID_RADIO_TI_915;
-
-          radioManager_transmitString(dest, command.data, command.len);
-        }
-        cb_dequeue(buffer, count);
-      } else if (command.destination != GROUNDSTATION ||
-                 command.destination != RAD_433 ||
-                 command.destination != RAD_915) {
-        cb_flush(buffer);
-      }
-    }
-
-    HAL_Delay(1);
 
     /* USER CODE END WHILE */
 
