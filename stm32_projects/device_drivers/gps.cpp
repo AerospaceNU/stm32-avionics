@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "hal_callbacks.h"
+#include "math_utils.h"
 #include "minmea.h"
 
 #define GPS_MIN_VALID_YEAR 2000
