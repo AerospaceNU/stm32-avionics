@@ -2,11 +2,11 @@ name: desktop_build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     tags:
-      - '*'
+      - "*"
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -18,70 +18,68 @@ jobs:
     name: "Lint job"
 
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: clang-format-11 git python3 python3-venv
+          version: 1.0
 
-    - uses: awalsh128/cache-apt-pkgs-action@latest
-      with:
-        packages: clang-format-11 git python3 python3-venv
-        version: 1.0
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
 
-    - uses: actions/checkout@v3
-      with:
-        submodules: 'recursive'
+      - name: Install things
+        working-directory: ${{github.workspace}}
+        run: |
+          python3 --version
+          python3 -m venv .venv/
+          source .venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install cpplint
 
-    - name: Install things
-      working-directory: ${{github.workspace}}
-      run: |
-        python3 --version
-        python3 -m venv .venv/
-        source .venv/bin/activate
-        python -m pip install --upgrade pip
-        pip install cpplint
-
-    - name: Run lint
-      working-directory: ${{github.workspace}}
-      run: |
-        source .venv/bin/activate
-        chmod -R +x ./ci/run_lint.sh
-        ./ci/run_lint.sh
-
+      - name: Run lint
+        working-directory: ${{github.workspace}}
+        run: |
+          source .venv/bin/activate
+          chmod -R +x ./ci/run_lint.sh
+          ./ci/run_lint.sh
 
   build-linux:
     runs-on: ubuntu-latest
     name: "Build desktop flight software"
 
     steps:
-    - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v1.13
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.13
 
-    - uses: awalsh128/cache-apt-pkgs-action@latest
-      with:
-        packages: make g++ gcc
-        version: 1.0
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: make g++ gcc
+          version: 1.0
 
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        submodules: 'recursive'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: "recursive"
 
-    # Fetch tags.
-    - name: Fetch tags
-      working-directory: ${{github.workspace}}
-      run: git fetch --tags --force
+      # Fetch tags.
+      - name: Fetch tags
+        working-directory: ${{github.workspace}}
+        run: git fetch --tags --force
 
-    - name: Configure CMake
-      working-directory: ${{github.workspace}}
-      run: |
-        touch CMakeListsPrivate.txt
-        chmod -R +x ci/build_desktop.sh
+      - name: Configure CMake
+        working-directory: ${{github.workspace}}
+        run: |
+          touch CMakeListsPrivate.txt
+          chmod -R +x ci/build_desktop.sh
 
-    - name: Build desktop
-      working-directory: ${{github.workspace}}
-      run: ./ci/build_desktop.sh
+      - name: Build desktop
+        working-directory: ${{github.workspace}}
+        run: ./ci/build_desktop.sh
 
-    - uses: actions/upload-artifact@master
-      with:
-        name: desktop_sim
-        path: ${{github.workspace}}/build/desktop_projects/desktop_sim/desktop_sim
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop_sim
+          path: ${{github.workspace}}/build/desktop_projects/desktop_sim/desktop_sim
 
   build-platformio:
     strategy:
@@ -96,108 +94,115 @@ jobs:
     name: "Build PlatformIO flight software for ${{ matrix.env-name }}"
 
     steps:
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+            .pio/libdeps
+          key: ${{ runner.os }}-pio
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
 
-    - uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cache/pip
-          ~/.platformio/.cache
-          .pio/libdeps
-        key: ${{ runner.os }}-pio
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    - name: Install PlatformIO Core
-      run: pip install --upgrade platformio
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: "recursive"
 
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        submodules: 'recursive'
+      - name: Fetch tags
+        working-directory: ${{github.workspace}}
+        run: |
+          git fetch --tags --force
 
-    - name: Fetch tags
-      working-directory: ${{github.workspace}}
-      run: |
-        git fetch --tags --force
+      - name: Build PlatformIO project
+        run: |
+          pio run -e ${{ matrix.env-name }}
+          find .pio/build
 
-    - name: Build PlatformIO project
-      run: |
-        pio run -e ${{ matrix.env-name }}
-        find .pio/build
+      - name: Rename artifact
+        working-directory: ${{github.workspace}}/.pio/build/${{ matrix.env-name }}
+        run: |
+          mv firmware.bin ${{ matrix.env-name }}-pio.bin
+          mv firmware.elf ${{ matrix.env-name }}-pio.elf
 
-    - name: Rename artifact
-      working-directory: ${{github.workspace}}/.pio/build/${{ matrix.env-name }}
-      run: |
-        mv firmware.bin ${{ matrix.env-name }}-pio.bin
-        mv firmware.elf ${{ matrix.env-name }}-pio.elf
-
-    - uses: actions/upload-artifact@master
-      with:
-        name: ${{ matrix.env-name }}
-        if-no-files-found: error
-        path: |
-          .pio/build/${{ matrix.env-name }}/**/*.elf
-          .pio/build/${{ matrix.env-name }}/**/*.bin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.env-name }}
+          if-no-files-found: error
+          path: |
+            .pio/build/${{ matrix.env-name }}/**/*.elf
+            .pio/build/${{ matrix.env-name }}/**/*.bin
 
   build-stm32-cmake:
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-12]
-        prj-target: ["fcb_v0","fcb_v1","fcb_v2","groundstation","amazon-stm32-arduino", "prop_adcboard_v2"]
+        prj-target:
+          [
+            "fcb_v0",
+            "fcb_v1",
+            "fcb_v2",
+            "groundstation",
+            "amazon-stm32-arduino",
+            "prop_adcboard_v2",
+          ]
 
     runs-on: ${{ matrix.os }}
 
     name: "CMake ${{ matrix.os}}: Build STM32 flight software for ${{ matrix.prj-target }}"
 
     steps:
-    - uses: carlosperate/arm-none-eabi-gcc-action@v1
-      with:
-        release: 12.3.Rel1
-    - uses: jwlawson/actions-setup-cmake@v1.13
+      - uses: carlosperate/arm-none-eabi-gcc-action@v1
+        with:
+          release: 12.3.Rel1
+      - uses: jwlawson/actions-setup-cmake@v1.13
 
-    - uses: actions/cache@v3
-      with:
-        path: |
-          build/_deps
-        key: ${{ runner.os }}-cmake_deps
+      - uses: actions/cache@v3
+        with:
+          path: |
+            build/_deps
+          key: ${{ runner.os }}-cmake_deps
 
-    # We need to use Ninja on Windows for builds -- install it here
-    - name: Install Ninja
-      if: startsWith(matrix.os, 'windows-latest')
-      run: |
-        choco install ninja
+      # We need to use Ninja on Windows for builds -- install it here
+      - name: Install Ninja
+        if: startsWith(matrix.os, 'windows-latest')
+        run: |
+          choco install ninja
 
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        submodules: 'recursive'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: "recursive"
 
-    - name: Fetch tags
-      working-directory: ${{github.workspace}}
-      run: |
-        git config --global --add safe.directory /__w/stm32-avionics/stm32-avionics
-        git fetch --tags --force
+      - name: Fetch tags
+        working-directory: ${{github.workspace}}
+        run: |
+          git config --global --add safe.directory /__w/stm32-avionics/stm32-avionics
+          git fetch --tags --force
 
-    - name: Configure CMake
-      working-directory: ${{github.workspace}}
-      run: |
-        touch CMakeListsPrivate.txt
-        cmake . -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32-cmake/cmake/stm32_gcc.cmake" ${{ (startsWith(matrix.os, 'windows-latest') && '-DCMAKE_GENERATOR=Ninja') || '' }}
-        cmake --build build --target ${{ matrix.prj-target }} -j
+      - name: Configure CMake
+        working-directory: ${{github.workspace}}
+        run: |
+          touch CMakeListsPrivate.txt
+          cmake . -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32-cmake/cmake/stm32_gcc.cmake" ${{ (startsWith(matrix.os, 'windows-latest') && '-DCMAKE_GENERATOR=Ninja') || '' }}
+          cmake --build build --target ${{ matrix.prj-target }} -j
 
-    - name: Rename artifact
-      working-directory: ${{github.workspace}}/build/stm32_projects/${{ matrix.prj-target }}
-      run: |
-        mv ${{ matrix.prj-target }}.elf ${{ matrix.prj-target }}-cmake-${{ matrix.os }}.elf
-        mv ${{ matrix.prj-target }}.hex ${{ matrix.prj-target }}-cmake-${{ matrix.os }}.hex
+      - name: Rename artifact
+        working-directory: ${{github.workspace}}/build/stm32_projects/${{ matrix.prj-target }}
+        run: |
+          mv ${{ matrix.prj-target }}.elf ${{ matrix.prj-target }}-cmake-${{ matrix.os }}.elf
+          mv ${{ matrix.prj-target }}.hex ${{ matrix.prj-target }}-cmake-${{ matrix.os }}.hex
 
-    - uses: actions/upload-artifact@master
-      with:
-        name: ${{ matrix.prj-target }}
-        path: |
-          build/stm32_projects/${{ matrix.prj-target }}/**/*.elf
-          build/stm32_projects/${{ matrix.prj-target }}/**/*.hex
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.prj-target }}-${{ matrix.os }}
+          path: |
+            build/stm32_projects/${{ matrix.prj-target }}/**/*.elf
+            build/stm32_projects/${{ matrix.prj-target }}/**/*.hex
 
   build-stm32-cube:
     strategy:
@@ -222,32 +227,32 @@ jobs:
     name: "Cube: Build STM32 flight software for ${{ matrix.prj-target }}"
 
     steps:
-    - name: Check for dockerenv file
-      run: (ls /.dockerenv && echo Found dockerenv) || (echo No dockerenv)
+      - name: Check for dockerenv file
+        run: (ls /.dockerenv && echo Found dockerenv) || (echo No dockerenv)
 
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        submodules: 'recursive'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: "recursive"
 
-    - name: Fetch tags
-      working-directory: ${{github.workspace}}
-      run: |
-        git config --global --add safe.directory /__w/stm32-avionics/stm32-avionics
-        git fetch --tags --force
+      - name: Fetch tags
+        working-directory: ${{github.workspace}}
+        run: |
+          git config --global --add safe.directory /__w/stm32-avionics/stm32-avionics
+          git fetch --tags --force
 
-    - name: Run build
-      run: /entrypoint.sh ${{ matrix.prj-rel-path }} ${{ matrix.prj-target }}
+      - name: Run build
+        run: /entrypoint.sh ${{ matrix.prj-rel-path }} ${{ matrix.prj-target }}
 
-    - name: Rename artifact
-      run: |
-        cd ${{ matrix.prj-rel-path }}
-        for f in **/*.elf; do mv "$f" "$(echo "$f" | sed s/.elf/-cube.elf/)"; done
+      - name: Rename artifact
+        run: |
+          cd ${{ matrix.prj-rel-path }}
+          for f in **/*.elf; do mv "$f" "$(echo "$f" | sed s/.elf/-cube.elf/)"; done
 
-    - uses: actions/upload-artifact@master
-      with:
-        name: ${{ matrix.prj-target }}
-        path: ${{ matrix.prj-rel-path }}/**/*.elf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.prj-target }}
+          path: ${{ matrix.prj-rel-path }}/**/*.elf
 
   release:
     needs: [build-linux, lint, build-stm32-cmake, build-stm32-cube]
@@ -255,7 +260,7 @@ jobs:
     steps:
       # Download literally every single artifact. This also downloads client and docs,
       # but the filtering below won't pick these up (I hope)
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
 
       - run: find
 
@@ -263,7 +268,7 @@ jobs:
       - uses: pyTooling/Actions/releaser@r0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: 'Dev'
+          tag: "Dev"
           rm: true
           files: |
             **/*

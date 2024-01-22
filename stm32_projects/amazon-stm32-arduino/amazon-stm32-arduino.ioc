@@ -1,4 +1,7 @@
 #MicroXplorer Configuration settings - do not modify
+CAD.formats=
+CAD.pinconfig=
+CAD.provider=
 File.Version=6
 GPIO.groupedBy=Group By Peripherals
 KeepUserPlacement=true
@@ -85,6 +88,7 @@ ProjectManager.PreviousToolchain=
 ProjectManager.ProjectBuild=false
 ProjectManager.ProjectFileName=amazon-stm32-arduino.ioc
 ProjectManager.ProjectName=amazon-stm32-arduino
+ProjectManager.ProjectStructure=
 ProjectManager.RegisterCallBack=
 ProjectManager.StackSize=0x400
 ProjectManager.TargetToolchain=STM32CubeIDE
