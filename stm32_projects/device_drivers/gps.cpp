@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "hal_callbacks.h"
+#include "math_utils.h"
 #include "minmea.h"
 
 #define GPS_MIN_VALID_YEAR 2000
@@ -26,8 +27,10 @@ static void parseString(GpsCtrl_s *gps, char line[]) {
             !isnan(minmea_tofloat(&frame1.longitude)) &&
             !isnan(minmea_tofloat(&frame1.altitude)) &&
             !isnan(minmea_tofloat(&frame1.hdop))) {
-          gps->data.generalData.latitude = minmea_tofloat(&frame1.latitude);
-          gps->data.generalData.longitude = minmea_tofloat(&frame1.longitude);
+          gps->data.generalData.latitude = decimalminutes_to_decimaldegrees(
+              minmea_tofloat(&frame1.latitude));
+          gps->data.generalData.longitude = decimalminutes_to_decimaldegrees(
+              minmea_tofloat(&frame1.longitude));
           gps->data.generalData.altitude = minmea_tofloat(&frame1.altitude);
           gps->data.generalData.fixQuality =
               static_cast<uint8_t>(frame1.fix_quality);
