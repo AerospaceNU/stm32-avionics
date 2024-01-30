@@ -62,8 +62,10 @@ void Groundstation::runOnce() {
     heartbeat.latitude = hm_getSensorData()->gpsData->generalData.latitude;
     heartbeat.longitude = hm_getSensorData()->gpsData->generalData.longitude;
     heartbeat.gps_alt = hm_getSensorData()->gpsData->generalData.altitude;
+#if HAS_DEV(BAROMETER)
     heartbeat.groundPressure = hm_getSensorData()->barometerData[0].pressureAtm;
     heartbeat.groundTemp = hm_getSensorData()->barometerData[0].temperatureC;
+#endif
 
     // Hack to make all packets the same length when sent over USB
     static uint8_t heartbeatArr[sizeof(RadioRecievedPacket_s)] = {0};
