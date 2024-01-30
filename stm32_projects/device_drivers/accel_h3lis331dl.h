@@ -8,11 +8,13 @@
 #ifndef STM32_PROJECTS_DEVICE_DRIVERS_ACCEL_H3LIS331DL_H_
 #define STM32_PROJECTS_DEVICE_DRIVERS_ACCEL_H3LIS331DL_H_
 
+#include "board_config_common.h"
+#if HAS_DEV(ACCEL_H3LIS331DL)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "board_config_common.h"
 #include "data_structures.h"
 #include "spi_driver.h"
 
@@ -28,5 +30,7 @@ void accelH3lis331dl_getData(AccelH3lis331dlCtrl_s *sensor);
 #ifdef __cplusplus
 }
 #endif
+
+#endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
 #endif  // STM32_PROJECTS_DEVICE_DRIVERS_ACCEL_H3LIS331DL_H_

@@ -46,4 +46,17 @@ void halCallbacks_registerTimPeriodElapsedCallback(TIM_HandleTypeDef *htim,
                                                    void *userData);
 #endif  // HAL_TIM_MODULE_ENABLED
 
+void halCallbacks_registerBluetoothRxCallback(
+    uint32_t characteristic_id, void (*callback)(void *, uint8_t *, size_t),
+    void *userData);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+void halCallbacks_notifyBleCharacteristicWrite(uint32_t characteristic_id,
+                                               uint8_t *data, size_t len);
+#ifdef __cplusplus
+}
+#endif
+
 #endif  // STM32_PROJECTS_DEVICE_DRIVERS_HAL_CALLBACKS_H_

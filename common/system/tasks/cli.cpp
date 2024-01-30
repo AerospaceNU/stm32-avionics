@@ -11,18 +11,23 @@
 #include <string.h>
 
 #include "board_config_common.h"
+#include "custom_stm.h"
+#include "hal_callbacks.h"
 #include "hardware_manager.h"
 #include "radio_manager.h"
 
-#define INPUT_BUFFER_SIZE 2048
+#define INPUT_BUFFER_SIZE 512
 #define MAX_ARGS 200
 
 static char
     inputBuffer[INPUT_BUFFER_SIZE +
                 1];  // +1 accounts for null terminator required for strtok
 
-static uint8_t radioRxBuffer[INPUT_BUFFER_SIZE];
+static uint8_t radioRxBuffer[2];
 static CircularBuffer_s radioRxCircBuffer;
+
+static uint8_t bleRxBuffer[INPUT_BUFFER_SIZE];
+static CircularBuffer_s bleRxCircBuffer;
 
 static char applicationName[2];
 
@@ -91,7 +96,12 @@ void cli_init() {
 
   cb_init(&radioRxCircBuffer, (unknownPtr_t)radioRxBuffer,
           sizeof(radioRxBuffer), 1);
-  radioManager_addMessageCallback(RADIO_CLI_ID, cli_parseRadio);
+  //radioManager_addMessageCallback(RADIO_CLI_ID, cli_parseRadio);
+
+//  cb_init(&bleRxCircBuffer, (unknownPtr_t)bleRxBuffer, sizeof(bleRxBuffer), 1);
+//  halCallbacks_registerBluetoothRxCallback(CUSTOM_STM_RX_WRITE_EVT,
+//                                           cli_bleCallback, NULL);
+
   // Generate fake application name
   strncpy(applicationName, "F", 2);
 }
@@ -360,6 +370,11 @@ void cli_send(const char* msg) {
     case CLI_USB:
       hm_usbTransmit(USB_CLI_ID, (uint8_t*)msg, (uint16_t)strlen(msg));
       break;
+    case CLI_BLEUART:
+      Custom_STM_App_Update_Char_EX(CUSTOM_STM_TX, (uint8_t*)msg,
+                                    (uint16_t)strlen(msg));
+      // TODO --retry if return code is bad
+      break;
     default:
       break;
   }
@@ -400,6 +415,9 @@ CircularBuffer_s* cli_getRxBufferFor(CliComms_e source) {
       return &radioRxCircBuffer;
     case CLI_USB:
       return hm_usbGetRxBuffer(USB_CLI_ID);
+    case CLI_BLEUART:
+      // return &bleRxCircBuffer;
+      return hm_bleUartGetRxBuffer();
     default:
       return NULL;
   }

@@ -7,8 +7,8 @@
 
 #include "board_config_types.h"
 
-#define HAL_HEADER "stm32h7xx.h"
-#define USE_STM32_HAL_HEADER
+#define HAL_HEADER "stm33h7xx.h"
+#define USE_STM33_HAL_HEADER
 #define USE_ARM_MATH
 #define USE_STM_HARDWARE_MANAGER
 

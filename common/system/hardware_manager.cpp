@@ -2,6 +2,8 @@
 
 #ifdef USE_STM_HARDWARE_MANAGER
 
+#include <math.h>
+
 #include "hal_callbacks.h"
 #include "radio_packet_types.h"
 
@@ -92,6 +94,8 @@
 #if HAS_DEV(STM_HADC)
 #include "adc_device.h"
 #endif  // HAS_DEV(STM_HADC)
+
+#include "bluetooth_uart.h"
 
 /* Hardware statuses */
 
@@ -557,6 +561,8 @@ void hm_hardwareInit() {
     vbatIna226_init(&vbatIna226[i]);
   }
 #endif  // HAS_DEV(VBAT_INA226)
+
+  bluetooth_uart_init();
 }
 
 uint32_t hm_millis() { return HAL_GetTick(); }
@@ -813,6 +819,12 @@ CircularBuffer_s *hm_usbGetRxBuffer(int usbId) {
 #endif  // HAS_DEV(USB_STD)
 
   return NULL;
+}
+
+CircularBuffer_s *hm_bleUartGetRxBuffer() {
+//#if HAS_DEV(USB_STD)
+  return bleUart_getRxBuffer();
+//#endif  // HAS_DEV(USB_STD)
 }
 
 bool hm_bleClientConnected(int bleClientId) {
