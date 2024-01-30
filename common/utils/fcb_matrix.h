@@ -216,6 +216,7 @@ class Matrix {
 #endif  // __arm__
 #else
     // Not implemented yet
+    assert(0);
 #endif
   }
 

@@ -9,7 +9,7 @@
 
 #define HAL_HEADER "stm32wlxx.h"
 #define USE_STM32_HAL_HEADER
-#define USE_ARM_MATH
+#undef USE_ARM_MATH
 #define USE_STM_HARDWARE_MANAGER
 
 // I think this is right? idk
