@@ -18,19 +18,22 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+
 #include "adc.h"
 #include "crc.h"
+#include "gpio.h"
 #include "iwdg.h"
 #include "spi.h"
 #include "subghz.h"
 #include "usart.h"
-#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <math.h>
 #include <stdbool.h>
 #include <string.h>
+
+#include "SX126x.hpp"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -288,21 +291,23 @@ void play_morse_word(uint8_t* letters, uint8_t len, bool use_cw) {
   }
 }
 
+SX126x radio;
+
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
+ * @brief  The application entry point.
+ * @retval int
+ */
+int main(void) {
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
+   */
   HAL_Init();
 
   /* USER CODE BEGIN Init */
@@ -559,21 +564,21 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
+ * @brief System Clock Configuration
+ * @retval None
+ */
+void SystemClock_Config(void) {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-  */
+   */
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
+   */
+  RCC_OscInitStruct.OscillatorType =
+      RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS_PWR;
   RCC_OscInitStruct.LSIDiv = RCC_LSI_DIV1;
   RCC_OscInitStruct.HSEDiv = RCC_HSE_DIV1;
@@ -585,24 +590,22 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     Error_Handler();
   }
 
   /** Configure the SYSCLKSource, HCLK, PCLK1 and PCLK2 clocks dividers
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK3|RCC_CLOCKTYPE_HCLK
-                              |RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_PCLK1
-                              |RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK3 | RCC_CLOCKTYPE_HCLK |
+                                RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 |
+                                RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.AHBCLK3Divider = RCC_SYSCLK_DIV16;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
     Error_Handler();
   }
 }
@@ -610,17 +613,20 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void SetStandbyXOSC() {
   uint8_t txbuf[2] = {0x80, 0x01};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf + 1, sizeof(txbuf) - 1);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf + 1,
+                        sizeof(txbuf) - 1);
 }
 
 void SetPacketTypeLora() {
   uint8_t txbuf[2] = {0x8A, 0x01};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf + 1, sizeof(txbuf) - 1);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf + 1,
+                        sizeof(txbuf) - 1);
 }
 
 void SetPacketTypeFSK() {
   uint8_t txbuf[2] = {0x8A, 0x00};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf + 1, sizeof(txbuf) - 1);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf + 1,
+                        sizeof(txbuf) - 1);
 }
 
 uint32_t ComputeRfFreq(double frequencyMhz) {
@@ -631,43 +637,48 @@ void SetRfFreq(uint32_t rfFreq) {
   uint8_t txbuf[5] = {0x86, (rfFreq & 0xFF000000) >> 24,
                       (rfFreq & 0x00FF0000) >> 16, (rfFreq & 0x0000FF00) >> 8,
                       rfFreq & 0x000000FF};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf + 1, sizeof(txbuf) - 1);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf + 1,
+                        sizeof(txbuf) - 1);
 }
 
 void SetPaLowPower() {
   // set Pa to 14 dB.
   uint8_t txbuf[5] = {0x95, 0x02, 0x02, 0x00, 0x01};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf + 1, sizeof(txbuf) - 1);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf + 1,
+                        sizeof(txbuf) - 1);
 }
 
 void SetPa22dB() {
   // set Pa to the highest 22 dBm
   uint8_t txbuf[5] = {0x95, 0x04, 0x07, 0x00, 0x01};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf + 1, sizeof(txbuf) - 1);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf + 1,
+                        sizeof(txbuf) - 1);
 }
 
 void SetTxPower(int8_t powerdBm) {
   // Between -9 and 22
   int8_t power = powerdBm < -9 ? -9 : ((powerdBm > 22) ? 22 : powerdBm);
   uint8_t txbuf[3] = {0x8E, (uint8_t)power, 0x02};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf + 1, sizeof(txbuf) - 1);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf + 1,
+                        sizeof(txbuf) - 1);
 }
 
 void SetContinuousWave() {
   uint8_t txbuf[1] = {0xD1};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf, 0);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf, 0);
 }
 
 void SetTxInfinitePreamble() {
   uint8_t txbuf[1] = {0xD2};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf, 0);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf, 0);
 }
 
 void SetTx(uint32_t timeout) {
   // Timeout * 15.625 µs
   uint8_t txbuf[4] = {0x83, (timeout & 0x00FF0000) >> 16,
                       (timeout & 0x0000FF00) >> 8, timeout & 0x000000FF};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf + 1, sizeof(txbuf) - 1);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf + 1,
+                        sizeof(txbuf) - 1);
 }
 
 void SetRx(uint32_t timeout) {
@@ -677,12 +688,14 @@ void SetRx(uint32_t timeout) {
   // sends a command to change the operation mode
   uint8_t txbuf[4] = {0x82, (timeout & 0x00FF0000) >> 16,
                       (timeout & 0x0000FF00) >> 8, timeout & 0x000000FF};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf + 1, sizeof(txbuf) - 1);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf + 1,
+                        sizeof(txbuf) - 1);
 }
 
 void SetModulationParamsLora(const uint8_t params[4]) {
   uint8_t txbuf[5] = {0x8B, params[0], params[1], params[2], params[3]};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf + 1, sizeof(txbuf) - 1);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf + 1,
+                        sizeof(txbuf) - 1);
 }
 
 void SetModulationParamsFSK(uint32_t bitrate, uint8_t pulseshape,
@@ -698,7 +711,8 @@ void SetModulationParamsFSK(uint32_t bitrate, uint8_t pulseshape,
                       (fdev & 0x00FF0000) >> 16,
                       (fdev & 0x0000FF00) >> 8,
                       fdev & 0x000000FF};
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf + 1, sizeof(txbuf) - 1);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf + 1,
+                        sizeof(txbuf) - 1);
 }
 
 void SetPacketParamsLora(uint16_t preamble_length, bool header_fixed,
@@ -712,7 +726,8 @@ void SetPacketParamsLora(uint16_t preamble_length, bool header_fixed,
                       (uint8_t)crc_enabled,
                       (uint8_t)invert_iq};
 
-  HAL_SUBGHZ_ExecSetCmd(&hsubghz, txbuf[0], txbuf + 1, sizeof(txbuf) - 1);
+  HAL_SUBGHZ_ExecSetCmd(&hsubghz, (SUBGHZ_RadioSetCmd_t)txbuf[0], txbuf + 1,
+                        sizeof(txbuf) - 1);
 }
 
 void FSKBeep(int8_t powerdBm, uint32_t toneHz, uint32_t lengthMs) {
@@ -739,11 +754,10 @@ void CWBeep(int8_t powerdBm, uint32_t lengthMs) {
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
@@ -752,16 +766,15 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
+void assert_failed(uint8_t* file, uint32_t line) {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line
      number,
