@@ -808,7 +808,7 @@ class SX126x {
   virtual ~SX126x() = default;
 
  private:
-  DeviceType_t DeviceType = SX1261;
+  DeviceType_t DeviceType = SX1262;
 
   /*!
    * \brief Holds the internal operating mode of the radio
