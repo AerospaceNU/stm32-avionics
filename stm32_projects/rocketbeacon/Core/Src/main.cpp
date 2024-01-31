@@ -34,6 +34,7 @@
 #include <string.h>
 
 #include "SX126x.hpp"
+#include "radio_packet_types.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -123,7 +124,8 @@ int main(void) {
 
   radio.SetModulationParams(params);
 
-  const uint8_t PACKET_LEN = 64;  // todo
+  RadioPacket_s packet;
+  const uint8_t PACKET_LEN = sizeof(packet);  // todo
 
   SX126x::PacketParams_t pparams;
   pparams.PacketType = SX126x::PACKET_TYPE_GFSK;
@@ -152,11 +154,13 @@ int main(void) {
     // explicitly set the FIFO back to the start (page 48 of SX1261/2 datasheet)
     radio.SetBufferBaseAddresses(0, 0);
 
-    uint8_t buffer[PACKET_LEN];
-    snprintf((char*)buffer, sizeof(buffer), "Hello at time %lu!\n",
+    memcpy(packet.callsign, "KM6GNL\0\0", 8);
+    packet.packetType = TELEMETRY_ID_STRING;
+    snprintf((char*)packet.payload.cliString.string,
+             sizeof(packet.payload.cliString.string), "Hello at time %lu!\n",
              HAL_GetTick());
 
-    radio.WriteBuffer(0, buffer, sizeof(buffer));
+    radio.WriteBuffer(0, (uint8_t*)&packet, sizeof(packet));
     // And put us into TX mode
     radio.SetTx(radio.GetTimeOnAir());
 
