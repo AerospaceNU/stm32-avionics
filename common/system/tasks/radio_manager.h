@@ -18,18 +18,6 @@ extern "C" {
 #include "hardware_manager.h"
 #include "radio_packet_types.h"
 
-// Struct to keep track of when messages were last sent
-typedef struct {
-  uint32_t propStuffLastSent;
-  uint32_t orientationLastSent;
-  uint32_t positionLastSent;
-  uint32_t lineCutterLastSent;
-  uint32_t lineCutterVarsLastSent;
-  uint32_t altInfoLastSent;
-  uint32_t hardwareStatusLastSent;
-  uint32_t cliStringLastSent;
-} DataTransmitState_s;
-
 #define RADIO_MAX_CALLBACKS 10
 typedef void (*RadioCallback_t)(RadioRecievedPacket_s*);
 

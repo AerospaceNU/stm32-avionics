@@ -14,6 +14,7 @@
 #include "data_log.h"
 #include "data_structures.h"
 #include "hardware_manager.h"
+#include "hm_timer.h"
 
 #define RADIO_INTERVAL_MS 200
 #define RADIO_SEND_MS 100
@@ -24,6 +25,18 @@ static DataTransmitState_s lastSent[NUM_RADIO];
 static RadioPacket_s transmitPacket[NUM_RADIO];
 
 static const char *call = "KM6GNL";
+
+struct PacketTimerCollection {
+  HmTickTimer orientationTimer(10);
+  HmTickTimer positionTimer(10);
+  HmTimer altInfoTimer(1213);
+  HmTimer lineCutterDataTimer(1000);
+  HmTimer lineCutterVarsTimer(1000);
+  HmTickTimer pyroContTimer(HARDWARE_STATUS_RATE);
+};
+
+PacketTimerCollection timers[NUM_RADIO];
+
 
 // https://stackoverflow.com/q/9695329
 #define ROUND_2_INT(f) ((int)((f) >= 0.0 ? (f + 0.5) : (f - 0.5)))
@@ -78,7 +91,7 @@ void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
   dataRx[radioId].numCallbacks++;
 }
 
-// Packet rates, in hz
+
 #define ORIENTATION_RATE 10
 #define POSITION_RATE 10
 #define HARDWARE_STATUS_RATE 1
@@ -86,27 +99,15 @@ void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
 void radioManager_transmitData(int radioId, SensorData_s *sensorData,
                                FilterData_s *filterData, uint8_t state) {
   uint32_t currentTime = hm_millis();
+
   if (currentTime % RADIO_INTERVAL_MS >= RADIO_SEND_MS) return;
+
+  const auto &timer = timers[radioId];
   transmitPacket[radioId].timestampMs = currentTime;
 
-  /*
-  if (currentTime - lastSent[radioId].propStuffLastSent >= 500) {
-    PropulsionPacket_s data = {
-        sensorData->loxTankDucer,  sensorData->kerTankDucer,
-        sensorData->purgeDucer,    sensorData->loxInletDucer,
-        sensorData->kerInletDucer, sensorData->loxVenturi,
-        sensorData->kerVenturi,    sensorData->loadcell,
-        sensorData->loxTank,       sensorData->injector,
-        sensorData->engine};
-    transmitPacket[radioId].packetType = 1;
-    transmitPacket[radioId].payload = data;
-    lastSent[radioId].propStuffLastSent = 0;
-    radioManager_sendInternal(radioId);
-  }
-  */
+  if (timer.orientationTimer.Expired(currentTime)) {
+    timer.orientationTimer.Reset();
 
-  if (currentTime - lastSent[radioId].orientationLastSent >=
-      1000 / ORIENTATION_RATE) {
     OrientationPacket_s data = {
       state,
       (int8_t)(filterData->qw * 100.0),
@@ -141,8 +142,8 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
     radioManager_sendInternal(radioId);
   }
 
-  if (currentTime - lastSent[radioId].positionLastSent >=
-      1000 / POSITION_RATE) {
+  if (timer.positionTimer.Expired(currentTime)) {
+    timer.positionTimer.Reset();
     PositionPacket_s data = {
 #if HAS_DEV(BAROMETER)
       (float)sensorData->barometerData[0].temperatureC,
@@ -186,7 +187,9 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
   }
 
 #if HAS_DEV(BAROMETER)
-  if (currentTime - lastSent[radioId].altInfoLastSent >= 1213) {
+  if (timer.altInfoTimer.Expired(currentTime)) {
+    timer.altInfoTimer.Reset();
+
     int num_baros = PRESSURE_MESSAGE_NUM_BAROMETERS;
     if (NUM_BAROMETER < PRESSURE_MESSAGE_NUM_BAROMETERS) {
       num_baros = NUM_BAROMETER;
@@ -215,8 +218,9 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 #endif  // HAS_DEV(BAROMETER)
 
 #if HAS_DEV(PYRO_CONT)
-  if (currentTime - lastSent[radioId].hardwareStatusLastSent >=
-      1000 / HARDWARE_STATUS_RATE) {
+  if (timer.pyroContTimer.Expired(currentTime)) {
+    timer.pyroContTimer.Reset();
+
     uint8_t pyroCont = 0;
     for (int i = 0; i < NUM_PYRO_CONT; i++)
       pyroCont |= (uint8_t)((sensorData->pyroContData[i] & 0b1) << i);
@@ -232,7 +236,8 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 #endif  // HAS_DEV(PYRO_CONT)
 
 #if HAS_DEV(LINE_CUTTER)
-  if (currentTime - lastSent[radioId].lineCutterLastSent >= 1000) {
+  if (timer.lineCutterDataTimer.Expired(currentTime)) {
+    timer.lineCutterDataTimer.Reset();
     for (int i = 0; i < NUM_LINE_CUTTER; i++) {
       transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER;
       transmitPacket[radioId].payload.lineCutter.data =
@@ -243,7 +248,8 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
     }
   }
 
-  if (currentTime - lastSent[radioId].lineCutterVarsLastSent >= 10000) {
+  if (timer.lineCutterVarsTimer.Expired(currentTime)) {
+    timer.lineCutterVarsTimer.Reset();
     for (int i = 0; i < NUM_LINE_CUTTER; i++) {
       transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER_VARS;
       transmitPacket[radioId].payload.lineCutterFlightVars.data =

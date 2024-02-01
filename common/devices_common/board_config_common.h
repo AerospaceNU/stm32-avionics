@@ -171,9 +171,15 @@
 #ifndef NUM_VBAT_DESKTOP_FILE
 #define NUM_VBAT_DESKTOP_FILE 0
 #endif  // NUM_VBAT_DESKTOP_FILE
+
+// Radio configuration metaparameters
 #ifndef MAX_PACKET_SIZE
 #define MAX_PACKET_SIZE 128
-#endif
+#endif // MAX_PACKET_SIZE
+#ifndef DO_SOFT_FECWHITEN
+#define DO_SOFT_FECWHITEN
+#endif // DO_SOFT_FECWHITEN
+
 
 // Flash stuff
 #ifndef FLASH_MAX_SECTOR_BYTES
