@@ -226,11 +226,7 @@ uint16_t FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
 
 #else
 
-    // might be a minimal speedup but u could cut down on all the calls to
-    // hammweight / multiple lookups / comparisons if you used an lut with
-    // iDestState (3bits), symbol (2bits), ilastbuf (1bit); i believe you can
-    // condense most of this into a 64-input lookup table..? might be missing
-    // sth iDestState (3) + symbol (2) + iLastBuf (1)
+    // Slightly slower TI reference implementation
     uint8_t iDestState;
     for (iDestState = 0; iDestState < 8; iDestState++) {
       nInputBit = aTrellisTransitionInput[iDestState];
@@ -281,11 +277,6 @@ uint16_t FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
         nPathBits -= 8;
       }
 
-      // finish = std::chrono::high_resolution_clock::now();
-      // std::cout << "Early, trellis\t" <<
-      // std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count()
-      // << "ns\n";
-
       return nOutputBytes;
     }
     // Swap current and last buffers for next iteration
@@ -293,21 +284,11 @@ uint16_t FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
     iCurrBuf = (iCurrBuf + 1) % 2;
   }
 
-  // finish = std::chrono::high_resolution_clock::now();
-  // std::cout << "Decode:  \t" <<
-  // std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count()
-  // << "ns\n"; start = std::chrono::high_resolution_clock::now();
-
   // Normalize costs so that minimum cost becomes 0
   {
     uint8_t iState;
     for (iState = 0; iState < 8; iState++) nCost[iLastBuf][iState] -= nMinCost;
   }
-
-  // finish = std::chrono::high_resolution_clock::now();
-  // std::cout << "Normalize\t" <<
-  // std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count()
-  // << "ns\n";
 
   return nOutputBytes;
 }

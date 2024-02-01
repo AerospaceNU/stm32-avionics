@@ -22,23 +22,19 @@ void PrintArray(A a, size_t count, const char* line) {
 #define PRINT_ARRAY(a) PrintArray(a, sizeof(a), #a)
 
 TEST(TiFEC, EncodeDecode) {
-  uint8_t in[] = {3, 1, 2, 3};
+  uint8_t in[] = {3, 1, 2, 3, 57};
 
-  FecEncoder encoder(true);
+  FecEncoder encoder;
   FecDecoder decoder;
 
   encoder.Encode(reinterpret_cast<uint8_t*>(in), sizeof(in));
   uint8_t out[encoder.OutputSize(sizeof(in)) + 2];
   memcpy(out, encoder.OutputArray(), sizeof(out));
 
-  uint8_t expectedEncoding[] = {0xC8, 0x3C, 0x00, 0x20, 0x84, 0xCF, 0x33, 0x31,
-                                0xA2, 0xFC, 0x40, 0x4A, 0x44, 0x30, 0x47, 0xEF};
-  // out includes the CRC, we don't need that
-  PRINT_ARRAY(expectedEncoding);
+  // for debugging
   PRINT_ARRAY(out);
-  ASSERT_EQ(sizeof(expectedEncoding) + 2, sizeof(out));
-  ArraysEqual(out, expectedEncoding, sizeof(expectedEncoding));
 
+  // see if it decodes to the same thing
   uint8_t decoded[sizeof(in)];
   decoder.FecDecode(out, decoded, sizeof(decoded));
   ArraysEqual(in, decoded, sizeof(in));

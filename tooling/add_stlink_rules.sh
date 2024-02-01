@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Helper for st-link udev rules for WSL
+# From https://calinradoni.github.io/pages/200616-non-root-access-usb.html
+
 sudo tee /etc/udev/rules.d/70-st-link.rules > /dev/null <<'EOF'
 # ST-LINK V2
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3748", MODE="600", TAG+="uaccess", SYMLINK+="stlinkv2_%n"
