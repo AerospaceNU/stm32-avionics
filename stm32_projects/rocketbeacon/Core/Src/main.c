@@ -61,7 +61,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void entrypoint(void);
 /* USER CODE END 0 */
 
 /**
@@ -101,6 +101,8 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM16_Init();
   /* USER CODE BEGIN 2 */
+
+  entrypoint();
 
   /* USER CODE END 2 */
 

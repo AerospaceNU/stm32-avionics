@@ -360,7 +360,7 @@ void SX126x::SetDio2AsRfSwitchCtrl(uint8_t enable) {
 #endif
   WriteCommand(RADIO_SET_RFSWITCHMODE, &enable, 1);
 }
-F
+
 void SX126x::SetDio3AsTcxoCtrl(RadioTcxoCtrlVoltage_t tcxoVoltage,
                                uint32_t timeout) {
   uint8_t buf[4];
