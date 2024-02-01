@@ -13,7 +13,6 @@
 
 class FecEncoder {
  public:
-
   /*
    * Encode a message. CRC will be appended, then FEC applied, then whitening
    * happens. The result can be retrieved via FecEncoder::OutputArray
@@ -73,7 +72,6 @@ class FecDecoder {
   uint16_t FecDecode4(unsigned char* pOutputArray, unsigned char* pInputArray,
                       uint16_t nRemBytes);
 
-
   // ==== Private varibles to keep track of state, reset with Reset() between
  private:
   void FillLUT();
@@ -94,6 +92,7 @@ class FecDecoder {
 };
 
 namespace ti_fec {
-  // Incrementally calculate the message CRC. We do this while copying the input into an internal buffer on encode, which saves time (n=1 tho)
-  uint16_t calculateCRC(uint8_t crcData, uint16_t crcReg);
+// Incrementally calculate the message CRC. We do this while copying the input
+// into an internal buffer on encode, which saves time (n=1 tho)
+uint16_t calculateCRC(uint8_t crcData, uint16_t crcReg);
 }  // namespace ti_fec

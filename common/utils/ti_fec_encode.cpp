@@ -18,10 +18,9 @@ void FecEncoder::Encode(uint8_t* inputPtr, size_t inLen) {
   // Total mesage size including terminator
   size_t inputNum = inLen;
 
-  // copy our array into local memory (needed so we can append the trellis terminator)
+  // copy our array into local memory (needed so we can append the trellis
+  // terminator)
   memcpy(input, inputPtr, inLen);
-
-
 
   // Append Trellis Terminator
   input[inputNum++] = 0x0B;
