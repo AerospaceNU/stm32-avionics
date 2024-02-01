@@ -124,6 +124,9 @@ int main(void) {
 
   radio.SetModulationParams(params);
 
+  const uint32_t FREQ_915 = 915000000;
+  radio.SetRfFrequency(FREQ_915);
+
   RadioPacket_s packet;
   const uint8_t PACKET_LEN = sizeof(packet);  // todo
 
