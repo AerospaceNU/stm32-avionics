@@ -22,7 +22,7 @@
 
 #define NUM_RADIO_STM32WL 1
 
-#define NUM_WATCHDOG_INTERNAL 1
+#define NUM_WATCHDOG_INTERNAL 0
 
 #define RADIO_CLI_ID 0
 #define USB_CLI_ID 0

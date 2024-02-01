@@ -20,7 +20,6 @@
 #include "main.h"
 #include "adc.h"
 #include "crc.h"
-#include "iwdg.h"
 #include "spi.h"
 #include "subghz.h"
 #include "tim.h"
@@ -97,7 +96,6 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CRC_Init();
   MX_USART1_UART_Init();
-  MX_IWDG_Init();
   MX_SPI1_Init();
   MX_TIM16_Init();
   /* USER CODE BEGIN 2 */
@@ -132,11 +130,9 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.LSIDiv = RCC_LSI_DIV1;
   RCC_OscInitStruct.HSEDiv = RCC_HSE_DIV1;
-  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV2;

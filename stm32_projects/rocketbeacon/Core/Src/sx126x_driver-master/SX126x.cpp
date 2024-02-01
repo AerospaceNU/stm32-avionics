@@ -29,7 +29,7 @@
 #include "stm32wlxx_hal_subghz.h"
 
 void SX126x::Init(void) {
-  Reset();
+//  Reset(); // MX_SUBGHZ_Init does this for us!
   Wakeup();
   SetStandby(STDBY_RC);
 
@@ -1162,11 +1162,20 @@ static HAL_StatusTypeDef SUBGHZSPI_TransmitRecieve(
 
 uint8_t SX126x::HalGpioRead(GpioPinFunction_t func) {
   // todo!!
-  return 0xff;
+//  return 0xff;
+
+	if (GPIO_PIN_BUSY == func) {
+		uint32_t mask = LL_PWR_IsActiveFlag_RFBUSYMS();
+		return (LL_PWR_IsActiveFlag_RFBUSYS()& mask) == 1UL;
+	} else {
+		assert(0);
+	}
+
 }
 
 void SX126x::HalGpioWrite(GpioPinFunction_t func, uint8_t value) {
   // todo !!
+	assert(0);
 }
 
 void SX126x::HalSpiTransfer(uint8_t *buffer_in, const uint8_t *buffer_out,
@@ -1181,6 +1190,4 @@ void SX126x::HalSpiTransfer(uint8_t *buffer_in, const uint8_t *buffer_out,
 
   /* NSS = 1 */
   LL_PWR_UnselectSUBGHZSPI_NSS();
-
-  (void)SUBGHZ_WaitOnBusy(&hsubghz);
 }
