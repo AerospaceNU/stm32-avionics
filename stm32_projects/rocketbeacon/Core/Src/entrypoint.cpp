@@ -67,7 +67,11 @@ extern "C" void entrypoint(void) {
     packet.packetType = TELEMETRY_ID_STRING;
 
     packet.timestampMs = HAL_GetTick();
-    for (int i = 0; i < RADIO_MAX_STRING; i++) packet.payload.cliString.string[i] = i;
+//    for (int i = 0; i < RADIO_MAX_STRING; i++) packet.payload.cliString.string[i] = i;
+
+    snprintf((char*)packet.payload.cliString.string,
+             sizeof(packet.payload.cliString.string), "Hello at time %lu!\n",
+             HAL_GetTick());
 
 //    snprintf((char*)packet.payload.cliString.string,
 //             sizeof(packet.payload.cliString.string), "Hello at time %lu!\n",
@@ -75,7 +79,10 @@ extern "C" void entrypoint(void) {
 
     radio.WriteBuffer(0, (uint8_t*)&packet, sizeof(packet));
     // And put us into TX mode
+    LED_on();
     radio.SetTx(radio.GetTimeOnAir());
+    HAL_Delay(radio.GetTimeOnAir() / 1000);
+    LED_off();
 
     HAL_Delay(500);
   }
