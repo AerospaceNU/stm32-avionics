@@ -20,23 +20,21 @@
 #define RADIO_SEND_MS 100
 
 static DataRecieveState_s dataRx[NUM_RADIO];
-static DataTransmitState_s lastSent[NUM_RADIO];
 
 static RadioPacket_s transmitPacket[NUM_RADIO];
 
 static const char *call = "KM6GNL";
 
 struct PacketTimerCollection {
-  HmTickTimer orientationTimer(10);
-  HmTickTimer positionTimer(10);
-  HmTimer altInfoTimer(1213);
-  HmTimer lineCutterDataTimer(1000);
-  HmTimer lineCutterVarsTimer(1000);
-  HmTickTimer pyroContTimer(HARDWARE_STATUS_RATE);
+  HmTickTimer orientationTimer{10};
+  HmTickTimer positionTimer{10};
+  HmTimer altInfoTimer{1213};
+  HmTimer lineCutterDataTimer{1000};
+  HmTimer lineCutterVarsTimer{1000};
+  HmTickTimer pyroContTimer{1};
 };
 
 PacketTimerCollection timers[NUM_RADIO];
-
 
 // https://stackoverflow.com/q/9695329
 #define ROUND_2_INT(f) ((int)((f) >= 0.0 ? (f + 0.5) : (f - 0.5)))
@@ -91,18 +89,13 @@ void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
   dataRx[radioId].numCallbacks++;
 }
 
-
-#define ORIENTATION_RATE 10
-#define POSITION_RATE 10
-#define HARDWARE_STATUS_RATE 1
-
 void radioManager_transmitData(int radioId, SensorData_s *sensorData,
                                FilterData_s *filterData, uint8_t state) {
   uint32_t currentTime = hm_millis();
 
   if (currentTime % RADIO_INTERVAL_MS >= RADIO_SEND_MS) return;
 
-  const auto &timer = timers[radioId];
+  auto &timer = timers[radioId];
   transmitPacket[radioId].timestampMs = currentTime;
 
   if (timer.orientationTimer.Expired(currentTime)) {
@@ -137,7 +130,6 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
     };
     transmitPacket[radioId].packetType = 2;
     transmitPacket[radioId].payload.orientation = data;
-    lastSent[radioId].orientationLastSent = currentTime;
 
     radioManager_sendInternal(radioId);
   }
@@ -181,7 +173,6 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 
     transmitPacket[radioId].packetType = TELEMETRY_ID_POSITION;
     transmitPacket[radioId].payload.positionData = data;
-    lastSent[radioId].positionLastSent = currentTime;
 
     radioManager_sendInternal(radioId);
   }
@@ -211,7 +202,6 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 
     transmitPacket[radioId].packetType = TELEMETRY_ID_ALT_INFO;
     transmitPacket[radioId].payload.altitudeInfo = data;
-    lastSent[radioId].altInfoLastSent = currentTime;
 
     radioManager_sendInternal(radioId);
   }
@@ -229,7 +219,6 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 
     transmitPacket[radioId].packetType = TELEMETRY_ID_HARDWARE_STATUS;
     transmitPacket[radioId].payload.hardwareStatus = data;
-    lastSent[radioId].hardwareStatusLastSent = currentTime;
 
     radioManager_sendInternal(radioId);
   }
@@ -242,7 +231,6 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER;
       transmitPacket[radioId].payload.lineCutter.data =
           *hm_getLineCutterData(i);
-      lastSent[radioId].lineCutterLastSent = currentTime;
 
       radioManager_sendInternal(radioId);
     }
@@ -254,7 +242,6 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER_VARS;
       transmitPacket[radioId].payload.lineCutterFlightVars.data =
           *hm_getLineCutterFlightVariables(i);
-      lastSent[radioId].lineCutterVarsLastSent = currentTime;
 
       radioManager_sendInternal(radioId);
     }
