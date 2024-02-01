@@ -13,7 +13,6 @@
 
 class FecEncoder {
  public:
-  explicit FecEncoder(bool appendCRC = false) : m_appendCRC(appendCRC) {}
 
   /*
    * Encode a message. CRC will be appended, then FEC applied, then whitening
@@ -22,16 +21,11 @@ class FecEncoder {
   void Encode(uint8_t* input, size_t inLen);
 
   inline const size_t OutputSize(const size_t inLen) {
-    if (m_appendCRC)
-      return 4 * ((inLen + TI_FEC_CRC_LEN_BYTES) / 2 + 1);
-    else
-      return 4 * ((inLen) / 2 + 1);
+    return 4 * ((inLen) / 2 + 1);
   }
   inline uint8_t* OutputArray() { return interleaved; }
 
  private:
-  bool m_appendCRC;
-
   //! input buffer + Trellis Terminator + CRC
   //! I probably only need one of these arrays, but an extra 300 bytes shouldn't
   //! be a huge deal?
@@ -80,9 +74,8 @@ class FecDecoder {
   uint16_t FecDecode4(unsigned char* pOutputArray, unsigned char* pInputArray,
                       uint16_t nRemBytes);
 
-  // ==== Private varibles to keep track of state, reset with Reset() between
-  // messages ====
 
+  // ==== Private varibles to keep track of state, reset with Reset() between
  private:
   void FillLUT();
 
@@ -102,6 +95,6 @@ class FecDecoder {
 };
 
 namespace ti_fec {
-uint16_t calculateCRC(uint8_t crcData, uint16_t crcReg);
-uint16_t calculateCRC_array(uint8_t* data, size_t len);
+  // Incrementally calculate the message CRC. We do this while copying the input into an internal buffer on encode, which saves time (n=1 tho)
+  uint16_t calculateCRC(uint8_t crcData, uint16_t crcReg);
 }  // namespace ti_fec

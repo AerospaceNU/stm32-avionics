@@ -15,23 +15,13 @@ static constexpr const uint16_t fecEncodeTable[] = {0, 3, 1, 2, 3, 0, 2, 1,
                                                     3, 0, 2, 1, 0, 3, 1, 2};
 
 void FecEncoder::Encode(uint8_t* inputPtr, size_t inLen) {
-  // TODO is a memcpy and then CRC faster than in the same loop?
-  // memcpy(inputPtr, inputPtr, inLen);
+  // Total mesage size including terminator
+  size_t inputNum = inLen;
 
-  uint16_t checksum = 0xFFFF;  // Init value for CRC calculation
-  uint8_t inByte;
-  size_t inputNum;
-  for (inputNum = 0; inputNum < inLen; inputNum++) {
-    inByte = inputPtr[inputNum];
-    checksum = ti_fec::calculateCRC(inByte, checksum);
-    input[inputNum] = inByte;
-  }
+  // copy our array into local memory (needed so we can append the trellis terminator)
+  memcpy(input, inputPtr, inLen);
 
-  if (m_appendCRC) {
-    // Append 2-byte CRC
-    input[inputNum++] = (checksum >> 8);
-    input[inputNum++] = checksum & 0xff;
-  }
+
 
   // Append Trellis Terminator
   input[inputNum++] = 0x0B;
