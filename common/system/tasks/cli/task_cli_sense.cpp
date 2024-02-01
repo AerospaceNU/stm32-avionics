@@ -8,6 +8,7 @@
 #include "dtoa.h"
 #include "hardware_manager.h"
 
+#if HAS_DEV(FLASH)
 static void flashUsageBar(char *barStr, uint8_t usage, uint8_t totalBarWidth) {
   barStr[0] = '[';
   int i;
@@ -21,6 +22,7 @@ static void flashUsageBar(char *barStr, uint8_t usage, uint8_t totalBarWidth) {
   barStr[k++] = ']';
   barStr[k] = '\0';
 }
+#endif  // HAS_DEV(FLASH)
 
 void CliTasks::sense() {
   // Send ack of command
@@ -32,8 +34,9 @@ void CliTasks::sense() {
   char cliStr[60];
   char float1[10];
   char float2[10];
+#if HAS_DEV(IMU) || HAS_DEV(MAG) || HAS_DEV(ACCEL)
   char float3[10];
-
+#endif  // HAS_DEV(IMU) || HAS_DEV(MAG) || HAS_DEV(ACCEL)
   cli_send("\r\n");
   snprintf(cliStr, sizeof(cliStr), "Timestamp (ms): %" PRIu32 "\r\n",
            data->timestampMs);
@@ -113,10 +116,20 @@ void CliTasks::sense() {
 #endif  // HAS_DEV(VBAT)
 #if HAS_DEV(PYRO_CONT)
   snprintf(cliStr, sizeof(cliStr), "Pyro Continuity 1-%" PRIu32 ":",
-           (uint32_t)(NUM_PYRO_CONT));
+           static_cast<uint32_t>(NUM_PYRO_CONT));
   cli_send(cliStr);
   for (int i = 0; i < NUM_PYRO_CONT; i++) {
     snprintf(cliStr, sizeof(cliStr), " %i", data->pyroContData[i]);
+    cli_send(cliStr);
+  }
+  snprintf(cliStr, sizeof(cliStr),
+           "\n Pyro Configuration Status 1-%" PRIu32 ":\n",
+           static_cast<uint32_t>(NUM_PYRO_CONT));
+  cli_send(cliStr);
+  for (int i = 0; i < NUM_PYRO; i++) {
+    snprintf(cliStr, sizeof(cliStr), "Pyro %i : %s \r\n", i,
+             triggerManager_triggerStatusToString(
+                 triggerManager_getTriggerConnectivity(i)));
     cli_send(cliStr);
   }
 #endif  // HAS_DEV(PYRO_CONT)

@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "hal_callbacks.h"
+#include "math_utils.h"
 #include "minmea.h"
 
 #define GPS_MIN_VALID_YEAR 2000
@@ -26,11 +27,15 @@ static void parseString(GpsCtrl_s *gps, char line[]) {
             !isnan(minmea_tofloat(&frame1.longitude)) &&
             !isnan(minmea_tofloat(&frame1.altitude)) &&
             !isnan(minmea_tofloat(&frame1.hdop))) {
-          gps->data.generalData.latitude = minmea_tofloat(&frame1.latitude);
-          gps->data.generalData.longitude = minmea_tofloat(&frame1.longitude);
+          gps->data.generalData.latitude = decimalminutes_to_decimaldegrees(
+              minmea_tofloat(&frame1.latitude));
+          gps->data.generalData.longitude = decimalminutes_to_decimaldegrees(
+              minmea_tofloat(&frame1.longitude));
           gps->data.generalData.altitude = minmea_tofloat(&frame1.altitude);
-          gps->data.generalData.fixQuality = frame1.fix_quality;
-          gps->data.generalData.satsTracked = frame1.satellites_tracked;
+          gps->data.generalData.fixQuality =
+              static_cast<uint8_t>(frame1.fix_quality);
+          gps->data.generalData.satsTracked =
+              static_cast<uint8_t>(frame1.satellites_tracked);
           gps->data.generalData.hdop = minmea_tofloat(&frame1.hdop);
         }
       }
@@ -102,7 +107,7 @@ static void gps_processData(GpsCtrl_s *gps) {
 
 void gps_rxEventCallback(void *gps, size_t Size) {
   // GPS data received
-  GpsCtrl_s *pgps = (GpsCtrl_s *)gps;
+  GpsCtrl_s *pgps = static_cast<GpsCtrl_s *>(gps);
   pgps->data_available = true;
 
   pgps->lastBufferedSize = Size;
@@ -111,9 +116,10 @@ void gps_rxEventCallback(void *gps, size_t Size) {
   pgps->firstBuf = !pgps->firstBuf;
 
   // Reconfigure the UART
-  HAL_UARTEx_ReceiveToIdle_DMA(pgps->gps_uart,
-                               (uint8_t *)gps_getActiveBuff(pgps, true),
-                               GPS_RX_BUF_SIZE);
+  HAL_UARTEx_ReceiveToIdle_DMA(
+      pgps->gps_uart,
+      reinterpret_cast<uint8_t *>(gps_getActiveBuff(pgps, true)),
+      GPS_RX_BUF_SIZE);
 }
 
 void gps_RxCpltCallback(void *gps) {
@@ -246,8 +252,8 @@ void gps_setRate(GpsCtrl_s *gps, uint16_t rate) {
       0x06,
       0x00,
       // measRate
-      rate & 0xFF,
-      rate >> 8,
+      static_cast<uint8_t>(rate & 0xFF),
+      static_cast<uint8_t>(rate >> 8),
       // navRate
       0x01,
       0x00,
@@ -304,7 +310,8 @@ void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type) {
 
   // Tell HAL to receive DMA serial data
   gps->firstBuf = true;
-  HAL_UARTEx_ReceiveToIdle_DMA(gps->gps_uart, (uint8_t *)gps->rx_firstBuff,
+  HAL_UARTEx_ReceiveToIdle_DMA(gps->gps_uart,
+                               reinterpret_cast<uint8_t *>(gps->rx_firstBuff),
                                GPS_RX_BUF_SIZE);
 
   if (gps->type == GPS_TYPE_UBLOX) {

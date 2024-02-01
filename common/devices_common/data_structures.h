@@ -85,10 +85,15 @@ typedef struct __attribute__((packed)) {
   //  Axis3dRaw_s mag;
 } ImuDataRaw_s;
 
+// IMU Sensor Reading Data struct
 typedef struct __attribute__((packed)) {
+  // Raw acceleration data from IMU
   Axis3dRaw_s accelRaw;
+  // Acceleration converted to meters per seconds squared
   Axis3dReal_s accelRealMps2;
+  // Raw angular velocity data from IMU
   Axis3dRaw_s angVelRaw;
+  // Angular velocity data converted to radians per second
   Axis3dReal_s angVelRealRadps;
   //  Axis3dRaw_s magRaw;
   //  Axis3dReal_s magRealG;

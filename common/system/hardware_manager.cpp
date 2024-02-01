@@ -406,8 +406,8 @@ void hm_hardwareInit() {
     pyroDigital_init(&pyroDigital[i]);
     hardwareStatusPyro[FIRST_ID_PYRO_DIGITAL + i] = true;
   }
-  halCallbacks_registerTimPeriodElapsedCallback(pyroDigitalTickTim,
-                                                hm_pyroUpdate, NULL);
+  halCallbacks_registerTimPeriodElapsedCallback(
+      pyroDigitalTickTim, (void (*)(void *))(hm_pyroUpdate), NULL);
   HAL_TIM_Base_Start_IT(pyroDigitalTickTim);
 #endif  // HAS_DEV(PYRO_DIGITAL)
 

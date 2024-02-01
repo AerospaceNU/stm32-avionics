@@ -18,14 +18,15 @@ void buzzerPwm_init(BuzzerPwmCtrl_s *buzzer, TIM_HandleTypeDef *htim,
   // a signal at (minFrequency / 2) Division by 2 is a safety factor, with the
   // tradeoff being inability to produce very high frequency signals
   buzzer->htim->Init.Prescaler =
-      (uint32_t)(((double)SystemCoreClock / minFrequency / TWO_POWER_SIXTEEN) -
-                 1);  // * 2 and / 2 cancel out
+      static_cast<uint32_t>((static_cast<double>(SystemCoreClock) /
+                             minFrequency / TWO_POWER_SIXTEEN) -
+                            1);  // * 2 and / 2 cancel out
 
   // Calculation of actually max frequency needed because prescaler could be
   // rounded a lot, resulting in different number than input
   buzzer->minFrequency =
-      (double)SystemCoreClock /
-      ((double)(htim->Init.Prescaler + 1) * TWO_POWER_SIXTEEN * 2);
+      static_cast<double>(SystemCoreClock) /
+      (static_cast<double>(htim->Init.Prescaler + 1) * TWO_POWER_SIXTEEN * 2);
 }
 
 void buzzerPwm_setFrequency(BuzzerPwmCtrl_s *buzzer, float fHz) {
@@ -34,7 +35,7 @@ void buzzerPwm_setFrequency(BuzzerPwmCtrl_s *buzzer, float fHz) {
     buzzer->htim->Init.Period = 0;
   } else {
     buzzer->htim->Init.Period =
-        (uint32_t)(TWO_POWER_SIXTEEN * buzzer->minFrequency / fHz);
+        static_cast<uint32_t>(TWO_POWER_SIXTEEN * buzzer->minFrequency / fHz);
   }
 
   // Ensure prescaler and period are set

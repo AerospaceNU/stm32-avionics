@@ -67,7 +67,7 @@ void lineCutterBle_tick(LineCutterBleCtrl_t *lineCutter) {
       lineCutterBle_parse(lineCutter, dequeuedLen, tempBuffer);
   } while (dequeuedLen > 0 && packetCount < MAX_PACKETS_PER_TICK);
 
-  volatile HAL_StatusTypeDef ec = 0;
+  volatile int ec = 0;
 
   // Ask for flight data periodically
   if (HAL_GetTick() > (lineCutter->lastDataTimestamp + LC_DATA_INTERVAL_MS)) {

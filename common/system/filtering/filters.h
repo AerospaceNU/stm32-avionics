@@ -79,6 +79,15 @@ int8_t filter_getGravityRef();
  */
 FilterData_s* filter_getData();
 
+/**
+ * @brief Sets gyro offsets in unit of sensor data
+ * 		(documented under ImuData_s)
+ * @param xOffset: x-axis gyro offset
+ * @param yOffset: y-axis gyro offset
+ * @param zOffset: z-axis gyro offset
+ */
+void filter_setGyroOffsets(float xOffset, float yOffset, float zOffset);
+
 #ifdef __cplusplus
 }
 #endif

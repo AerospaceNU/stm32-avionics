@@ -50,7 +50,7 @@ if(GIT_EXECUTABLE)
 
     # Sometimes this string has leading/trailing quotes. If so, yeet em
     string(REGEX REPLACE "\(^'\\s*\)|\(\\s*'$\)" "" GIT_LOG ${GIT_LOG})
-    string(STRIP ${GIT_LOG} GIT_LOG)
+    string(STRIP "${GIT_LOG}" GIT_LOG)
 
   endif()
   
@@ -67,7 +67,7 @@ if(GIT_EXECUTABLE)
 
     # Sometimes this string has leading/trailing quotes. If so, yeet em
     string(REGEX REPLACE "\(^'\\s*\)|\(\\s*'$\)" "" GIT_MSG ${GIT_MSG})
-    string(STRIP ${GIT_MSG} GIT_MSG)
+    string(STRIP "${GIT_MSG}" GIT_MSG)
 
   endif()
 endif()
@@ -81,4 +81,4 @@ endif()
 
 configure_file(${SRC} ${DST} @ONLY ESCAPE_QUOTES)
 
-string(STRIP ${GIT_MSG} GIT_MSG2)
+string(STRIP "${GIT_MSG}" GIT_MSG2)

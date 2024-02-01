@@ -141,13 +141,19 @@ bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
 }
 
 bool hm_flashEraseSectorStart(int flashId, uint32_t sectorNum) { return false; }
+
 bool hm_flashEraseChipStart(int flashId) { return false; }
+
 bool hm_flashIsReadComplete(int flashId) { return true; }
+
 bool hm_flashIsWriteComplete(int flashId) { return true; }
+
 bool hm_flashIsEraseComplete(int flashId) { return true; }
 
 void hm_buzzerSetFrequency(int buzzerId, float fHz) {}
+
 void hm_buzzerStart(int buzzerId) {}
+
 void hm_buzzerStop(int buzzerId) {}
 
 void hm_servoSetAngle(int servoId, float degrees) {}
@@ -155,6 +161,7 @@ void hm_servoSetAngle(int servoId, float degrees) {}
 bool led_on = false;
 
 void hm_ledSet(int ledId, bool set) {}
+
 void hm_ledToggle(int ledId) {
   digitalWrite(LED_BUILTIN, led_on);
   led_on = !led_on;
@@ -194,6 +201,7 @@ void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {
 void hm_radioSetChannel(int radioNum, int channel) {}
 
 bool hm_usbIsConnected(int usbId) { return false; }
+
 bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
   for (int i = 0; i < numBytes; i++) {
     Serial.print((char)data[i]);
@@ -201,13 +209,17 @@ bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
 
   return true;
 }
+
 CircularBuffer_s *hm_usbGetRxBuffer(int usbId) { return &serialCircularBuffer; }
 
 bool hm_bleClientConnected(int bleClientId) { return false; }
+
 bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
   return false;
 }
+
 CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) { return nullptr; }
+
 void hm_bleTick() {}
 
 LineCutterData_s *hm_getLineCutterData(int lineCutterId) { return nullptr; }
@@ -215,10 +227,12 @@ LineCutterData_s *hm_getLineCutterData(int lineCutterId) { return nullptr; }
 LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
   return nullptr;
 }
+
 bool hm_lineCutterSendString(int lineCutterNumber, char *string) {
   printf("[Sent to LC %i] %s\n", lineCutterNumber, string);
   return true;
 }
+
 bool hm_lineCuttersSendCut(int chan) {
   printf("Line cutter chan %i cut sent!\n", chan);
   return true;
@@ -293,8 +307,7 @@ void hm_readSensorData() {
 
   // Read battery monitor ADCs
   for (uint i = 0; i < deviceManager.getNumberBatteryMonitorAdcs(); i++) {
-    sensorData.vbatData[FIRST_ID_VBAT_EXTRA + i] =
-        deviceManager.readBatteryVoltage(i);
+    sensorData.vbatData[i] = deviceManager.readBatteryVoltage(i);
   }
 
   // Set data timestamp

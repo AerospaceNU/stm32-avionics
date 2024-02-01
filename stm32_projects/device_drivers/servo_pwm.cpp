@@ -21,8 +21,8 @@ bool servoPwm_init(ServoPwmCtrl_t *servo, TIM_HandleTypeDef *htim,
   // Set up timer prescaler for fastest counting possible that can still count
   // through one period of (periodMS * 2 safety factor)
   htim->Init.Prescaler =
-      (uint32_t)((SystemCoreClock / 1000 * periodMS / 65535) -
-                 1);  // * 2 and / 2 cancel out
+      static_cast<uint32_t>((SystemCoreClock / 1000 * periodMS / 65535) -
+                            1);  // * 2 and / 2 cancel out
 
   // Period should be half the max count of the clock, given how the prescaler
   // was set up
@@ -46,8 +46,9 @@ void servoPwm_setAngle(ServoPwmCtrl_t *servo, float degrees) {
       (degrees - servo->minAngle) / (servo->maxAngle - servo->minAngle);
   float pulseLengthMS = (servo->maxPulseMS - servo->minPulseMS) * pulsePercent +
                         servo->minPulseMS;
-  float dutyCycle = pulseLengthMS / servo->periodMS;
-  uint32_t pulse = (uint32_t)(servo->htim->Init.Period * dutyCycle);
+  float dutyCycle = pulseLengthMS / static_cast<float>(servo->periodMS);
+  uint32_t pulse = static_cast<uint32_t>(
+      static_cast<float>(servo->htim->Init.Period) * dutyCycle);
 
   // Set timer pulse
   __HAL_TIM_SET_COMPARE(servo->htim, servo->channel, pulse);

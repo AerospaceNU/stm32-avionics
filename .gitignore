@@ -32,3 +32,6 @@ git_info.h
 cmake-build*
 CMakeListsPrivate.txt
 build_stm/*
+build_stm32/
+build/*
+build_desktop/*

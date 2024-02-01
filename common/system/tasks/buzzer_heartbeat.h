@@ -1,4 +1,3 @@
-
 #ifndef COMMON_SYSTEM_TASKS_BUZZER_HEARTBEAT_H_
 #define COMMON_SYSTEM_TASKS_BUZZER_HEARTBEAT_H_
 
@@ -6,8 +5,11 @@
 extern "C" {
 #endif
 
+enum class BuzzerState { PYRO };
+
 void buzzerHeartbeat_setBuzzer(int buzzerId);
-void buzzerHeartbeat_tick();
+// update the buzzer state machine
+void buzzerHeartbeat_tick(BuzzerState state);
 
 #ifdef __cplusplus
 }
