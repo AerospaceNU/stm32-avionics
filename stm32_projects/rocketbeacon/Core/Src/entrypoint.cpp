@@ -1,9 +1,13 @@
 #include "SX126x.hpp"
+#include "main.h"
+#include "radio_packet_types.h"
+
+void LED_on() { HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET); }
+void LED_off() { HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); }
 
 SX126x radio;
 
-void entrypoint(void) {
-
+extern "C" void entrypoint(void) {
   radio.Init();
   radio.SetStandby(SX126x::STDBY_XOSC);
 
@@ -21,7 +25,7 @@ void entrypoint(void) {
 
   radio.SetModulationParams(params);
 
-  const uint32_t FREQ_915 = 915000000;
+  const uint32_t FREQ_915 = 433000000;
   radio.SetRfFrequency(FREQ_915);
 
   RadioPacket_s packet;
@@ -63,6 +67,7 @@ void entrypoint(void) {
     radio.WriteBuffer(0, (uint8_t*)&packet, sizeof(packet));
     // And put us into TX mode
     radio.SetTx(radio.GetTimeOnAir());
+
+    HAL_Delay(1000);
   }
 }
-
