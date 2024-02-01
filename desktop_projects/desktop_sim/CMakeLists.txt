@@ -50,6 +50,7 @@ set(TEST_FILES
   tests/test_file_flash.cpp
   tests/test_cli_parse.cpp
   tests/test_expressions.cpp
+  tests/test_ti_fec.cpp
   tests/test_circular_buffer.cpp
   tests/test_gps_format_conversion.cpp
   desktop_hardware_manager.cpp board_config.c

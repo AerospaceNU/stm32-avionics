@@ -958,7 +958,7 @@ void hm_pyroSetPwm(int pyroId, uint32_t duration, uint32_t frequency,
 #endif  // HAS_DEV(PYRO_DIGITAL)
 }
 
-void hm_pyroUpdate() {
+void hm_pyroUpdate(void *pUserData) {
 #if HAS_DEV(PYRO_DIGITAL)
   for (int i = 0; i < NUM_PYRO_DIGITAL; i++) {
     pyroDigital_tick(&pyroDigital[i]);
