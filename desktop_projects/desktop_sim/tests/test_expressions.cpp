@@ -16,9 +16,6 @@ class ExpressionStorageTests : public testing::Test {
     cli_init();
     cli_setDefaultConfig();
     expressionStore.init();
-    expressionStore.removeExpressionsForTrigger(0);
-    expressionStore.removeExpressionsForTrigger(1);
-    expressionStore.removeExpressionsForTrigger(2);
   }
 
   void TearDown() override { desktophm_teardown(); }
