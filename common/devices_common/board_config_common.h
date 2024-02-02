@@ -171,6 +171,9 @@
 #ifndef NUM_VBAT_DESKTOP_FILE
 #define NUM_VBAT_DESKTOP_FILE 0
 #endif  // NUM_VBAT_DESKTOP_FILE
+#ifndef MAX_PACKET_SIZE
+#define MAX_PACKET_SIZE 128
+#endif
 
 // Radio configuration metaparameters
 #ifndef RADIO_MAX_PACKET_SIZE
