@@ -11,6 +11,8 @@
 class FlightReplay {
  public:
   virtual void getNext(SensorData_s *data) {}
+
+  virtual ~FlightReplay() = default;
 };
 
 class CsvReplay : FlightReplay {
@@ -18,6 +20,8 @@ class CsvReplay : FlightReplay {
   explicit CsvReplay(std::string path);
 
   void getNext(SensorData_s *data) override;
+
+  ~CsvReplay() = default;
 
  private:
   rapidcsv::Document doc;

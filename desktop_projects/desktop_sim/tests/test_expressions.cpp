@@ -4,6 +4,7 @@
 
 #include "cli.h"
 #include "cli_tasks.h"
+#include "desktop_hardware_manager.h"
 #include "event_manager.h"
 #include "expression_store.h"
 #include "hardware_manager.h"
@@ -43,6 +44,8 @@ TEST(ExpressionStorage, expressionParsing) {
   ASSERT_EQ(strcmp(stringBuf, test2Input), 0);
   expressionStore.tick(&filterData);
   ASSERT_TRUE(expressionStore.getExprBoolValue(resID));
+
+  desktophm_teardown();
 }
 
 TEST(ExpressionStorage, expressionEvaluation) {
@@ -94,6 +97,8 @@ TEST(ExpressionStorage, expressionEvaluation) {
   expressionStore.tick(&filterData);
   ASSERT_TRUE(expressionStore.getExprBoolValue(res1ID));
   ASSERT_FALSE(expressionStore.getExprBoolValue(res2ID));
+
+  desktophm_teardown();
 }
 
 TEST(ExpressionStorage, chainedAndOr) {
@@ -128,4 +133,6 @@ TEST(ExpressionStorage, chainedAndOr) {
   expressionStore.tick(&filterData);
   ASSERT_TRUE(expressionStore.getExprBoolValue(res1ID));
   ASSERT_TRUE(expressionStore.getExprBoolValue(res2ID));
+
+  desktophm_teardown();
 }
