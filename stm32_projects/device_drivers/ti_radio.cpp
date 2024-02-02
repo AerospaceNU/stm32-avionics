@@ -258,7 +258,7 @@ static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
       // I think this is only for variable length?
       // Since we need to add a length byte to the message
       uint8_t packetLength = payloadLength + 1;
-      if (packetLength > MAX_PACKET_SIZE) {
+      if (packetLength > RADIO_MAX_PACKET_SIZE) {
         return false;
       }
 
@@ -304,14 +304,13 @@ static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
 static void cc1120EnqueuePacket(TiRadioCtrl_s *radio, uint8_t *buff,
                                 uint8_t size, bool crc) {
   // Fill our packet
-  static RadioRecievedPacket_s packet;
-  packet.radioId = radio->id;
-  packet.rssi = radio->RSSI;
-  packet.crc = crc;
-  packet.lqi = radio->LQI;
-  memset(packet.data, 0, sizeof(packet.data));
-  memcpy(packet.data, buff, size);
-  // uint8_t *pPacket = (uint8_t *) &packet;
+  static RadioRecievedOTAPacket packet;
+  packet.metadata.radioId = radio->id;
+  packet.metadata.rssi = radio->RSSI;
+  packet.metadata.crc = crc;
+  packet.metadata.lqi = radio->LQI;
+  packet.payload.payloadLen = size;
+  memcpy(packet.payload.payload, buff, size);
 
   for (int i = 0; i < MAX_COMSUMER; i++) {
     CircularBuffer_s *consumer = radio->messageConsumers[i];

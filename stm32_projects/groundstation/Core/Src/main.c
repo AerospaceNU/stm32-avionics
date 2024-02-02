@@ -106,7 +106,7 @@ static void GroundstationParseCommand(GroundstationUsbCommand_s *command) {
   //  }
 }
 
-static void OnDataRx(RadioRecievedPacket_s *packet) {
+static void OnDataRx(RadioDecodedRecievedPacket_s *packet) {
   hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)packet, sizeof(*packet));
 }
 
@@ -197,7 +197,7 @@ int main(void)
       heartbeat.groundTemp = hm_getSensorData()->barometerData[0].temperatureC;
 
       // Hack to make all packets the same length when sent over USB
-      static uint8_t heartbeatArr[sizeof(RadioRecievedPacket_s)] = {0};
+      static uint8_t heartbeatArr[sizeof(RadioDecodedRecievedPacket_s)] = {0};
       memset(heartbeatArr, 0, sizeof(heartbeatArr));
       memcpy(heartbeatArr, &heartbeat, sizeof(heartbeat));
       hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr,

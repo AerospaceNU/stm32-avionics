@@ -173,9 +173,9 @@
 #endif  // NUM_VBAT_DESKTOP_FILE
 
 // Radio configuration metaparameters
-#ifndef MAX_PACKET_SIZE
-#define MAX_PACKET_SIZE 128
-#endif  // MAX_PACKET_SIZE
+#ifndef RADIO_MAX_PACKET_SIZE
+#define RADIO_MAX_PACKET_SIZE 128
+#endif  // RADIO_MAX_PACKET_SIZE
 #ifndef DO_SOFT_FECWHITEN
 #define DO_SOFT_FECWHITEN
 #endif  // DO_SOFT_FECWHITEN

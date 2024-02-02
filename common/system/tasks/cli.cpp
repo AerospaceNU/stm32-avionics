@@ -64,11 +64,11 @@ static CliConfigs_s cliConfigs = {0};
 static CliComms_e lastCommsType;  // Used to help send ack to right places
 static uint8_t lastStringId = 0xFF;
 
-static void cli_parseRadio(RadioRecievedPacket_s* packet) {
+static void cli_parseRadio(RadioDecodedRecievedPacket_s* packet) {
   // Only accept packets with good CRC
-  RadioPacket_s* parsedPacket = (RadioPacket_s*)&packet->data;
+  RadioDecodedPacket_s* parsedPacket = (RadioDecodedPacket_s*)&packet->payload;
   if (parsedPacket->packetType == TELEMETRY_ID_STRING) {
-    if (packet->crc) {
+    if (packet->metadata.crc) {
       if (parsedPacket->payload.cliString.id == lastStringId) {
         // duplicate string, do nothing
         return;

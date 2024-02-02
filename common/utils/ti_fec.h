@@ -35,9 +35,9 @@ class FecEncoder {
   //! input buffer + Trellis Terminator + CRC
   //! I probably only need one of these arrays, but an extra 300 bytes shouldn't
   //! be a huge deal?
-  uint8_t input[MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES + 2];
-  uint8_t fec[4 * ((MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES) / 2 + 1)];
-  uint8_t interleaved[4 * ((MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES) / 2 + 1)];
+  uint8_t input[RADIO_MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES + 2];
+  uint8_t fec[4 * ((RADIO_MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES) / 2 + 1)];
+  uint8_t interleaved[4 * ((RADIO_MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES) / 2 + 1)];
 };
 
 class FecDecoder {

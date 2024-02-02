@@ -21,7 +21,7 @@
 
 static DataRecieveState_s dataRx[NUM_RADIO];
 
-static RadioPacket_s transmitPacket[NUM_RADIO];
+static RadioDecodedPacket_s transmitPacket[NUM_RADIO];
 
 static const char *call = "KM6GNL";
 
@@ -42,7 +42,7 @@ PacketTimerCollection timers[NUM_RADIO];
 void radioManager_init() {
   for (int i = 0; i < NUM_RADIO; i++) {
     cb_init(&(dataRx[i].rxBuffer), dataRx[i].rxArray, RX_BUFF_LEN,
-            sizeof(RadioRecievedPacket_s));
+            sizeof(RadioRecievedOTAPacket));
     hm_radioRegisterConsumer(i, &dataRx[i].rxBuffer);
 
     strncpy(transmitPacket[i].callsign, call, 8);
@@ -58,7 +58,7 @@ void radioManager_init() {
 
 //! Must be called periodically to output data over CLI or USB
 void radioManager_tick() {
-  static RadioRecievedPacket_s packet;
+  static RadioRecievedOTAPacket packet;
 
   // Try to dequeue all the packets we've gotten
   for (int i = 0; i < NUM_RADIO; i++) {
@@ -66,9 +66,13 @@ void radioManager_tick() {
     while (cb_count(&dataRx[i].rxBuffer)) {
       cb_peek(&dataRx[i].rxBuffer, (unknownPtr_t)&packet, &len);
       if (len) {
+
+        // TODO - first decode the packet   
+        RadioDecodedRecievedPacket_s decoded;
+
         // Send to all our callbacks
         for (size_t j = 0; j < dataRx[i].numCallbacks; j++) {
-          if (dataRx[i].callbacks[j]) dataRx[i].callbacks[j](&packet);
+          if (dataRx[i].callbacks[j]) dataRx[i].callbacks[j](&decoded);
         }
 
         cb_dequeue(&dataRx[i].rxBuffer, 1);
@@ -80,8 +84,10 @@ void radioManager_tick() {
 }
 
 void radioManager_sendInternal(int radioId) {
-  hm_radioSend(radioId, (uint8_t *)&transmitPacket[radioId],
-               sizeof(RadioPacket_s));
+  RadioDecodedPacket_s &packet = transmitPacket[radioId];
+
+  // hm_radioSend(radioId, (uint8_t *)&transmitPacket[radioId],
+  //              sizeof(RadioPacket_s));
 }
 
 void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
