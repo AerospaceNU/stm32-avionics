@@ -47,20 +47,24 @@ class RadioManager {
   static void TickAll();
 
  private:
-  void sendInternal();
-
   int radioId;
 
   // The radio will enqueue packets here automatically
   CircularBuffer_s rxBuffer;
   uint8_t rxArray[RX_BUFF_LEN * sizeof(RadioRecievedOTAPacket)];
 
+  // Output callbacks to notify other bits of code that a packet got recieved
   RadioCallback_t callbacks[RADIO_MAX_CALLBACKS];
   size_t numCallbacks;
 
+  // keep track of how long its been since we last transmited a kind of packet
   PacketTimerCollection timer;
 
+  // Helper packet that sticks around and we modify in place to trasnmit
+  // information
   RadioDecodedPacket_s transmitPacket;
+
+  void sendInternal(RadioDecodedPacket_s& packet);
 };
 
 // stupid hack for static list of all radio managers

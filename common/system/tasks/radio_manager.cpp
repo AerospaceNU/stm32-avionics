@@ -14,6 +14,7 @@
 #include "data_log.h"
 #include "data_structures.h"
 #include "hardware_manager.h"
+#include "packet_encoder.h"
 
 #define RADIO_INTERVAL_MS 200
 #define RADIO_SEND_MS 100
@@ -22,6 +23,15 @@ static const char *call = "KM6GNL";
 
 // https://stackoverflow.com/q/9695329
 #define ROUND_2_INT(f) ((int)((f) >= 0.0 ? (f + 0.5) : (f - 0.5)))
+
+// this is gross and smelly, but for rn, its valid that one board has only one
+// kind of radio on it. In the future, refactor based on transmit mode to
+// support lora as well
+#if HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915)
+FSKPacketRadioEncoder packetEncoder;
+#else
+PassthroughRadioEncoder packetEncoder;
+#endif
 
 void RadioManager::init(int id) {
   radioId = id;
@@ -50,12 +60,17 @@ void RadioManager::tick() {
   while (cb_count(&rxBuffer)) {
     cb_peek(&rxBuffer, (unknownPtr_t)&packet, &len);
     if (len) {
-      // TODO - first decode the packet
+      // first decode the packet
       RadioDecodedRecievedPacket_s decoded;
-
-      // Send to all our callbacks
-      for (size_t j = 0; j < numCallbacks; j++) {
-        if (callbacks[j]) callbacks[j](&decoded);
+      decoded.metadata = packet.metadata;
+      if (0 == packetEncoder.Decode(packet.payload, decoded.payload)) {
+        // Send to all our callbacks
+        for (size_t j = 0; j < numCallbacks; j++) {
+          if (callbacks[j]) callbacks[j](&decoded);
+        }
+      } else {
+        // Failed to decode?? give up is the best we can do?
+        printf("packet decode failed????\n");
       }
 
       cb_dequeue(&rxBuffer, 1);
@@ -65,10 +80,13 @@ void RadioManager::tick() {
   }
 }
 
-void RadioManager::sendInternal() {
-  RadioDecodedPacket_s &packet = transmitPacket;
-
-  // todo encode!
+void RadioManager::sendInternal(RadioDecodedPacket_s &packet) {
+  RadioOTAPayload_s output;
+  if (0 == packetEncoder.Encode(packet, output)) {
+    hm_radioSend(radioId, output.payload, output.payloadLen);
+  } else {
+    printf("Radio message encode failed?\n");
+  }
 }
 
 void RadioManager::addMessageCallback(RadioCallback_t callback) {
@@ -117,7 +135,7 @@ void RadioManager::transmitData(SensorData_s *sensorData,
     transmitPacket.packetType = 2;
     transmitPacket.payload.orientation = data;
 
-    sendInternal();
+    sendInternal(transmitPacket);
   }
 
   if (timer.positionTimer.Expired(currentTime)) {
@@ -160,7 +178,7 @@ void RadioManager::transmitData(SensorData_s *sensorData,
     transmitPacket.packetType = TELEMETRY_ID_POSITION;
     transmitPacket.payload.positionData = data;
 
-    sendInternal();
+    sendInternal(transmitPacket);
   }
 
 #if HAS_DEV(BAROMETER)
@@ -189,7 +207,7 @@ void RadioManager::transmitData(SensorData_s *sensorData,
     transmitPacket.packetType = TELEMETRY_ID_ALT_INFO;
     transmitPacket.payload.altitudeInfo = data;
 
-    sendInternal();
+    sendInternal(transmitPacket);
   }
 #endif  // HAS_DEV(BAROMETER)
 
@@ -206,7 +224,7 @@ void RadioManager::transmitData(SensorData_s *sensorData,
     transmitPacket.packetType = TELEMETRY_ID_HARDWARE_STATUS;
     transmitPacket.payload.hardwareStatus = data;
 
-    sendInternal();
+    sendInternal(transmitPacket);
   }
 #endif  // HAS_DEV(PYRO_CONT)
 
@@ -217,7 +235,7 @@ void RadioManager::transmitData(SensorData_s *sensorData,
       transmitPacket.packetType = TELEMETRY_ID_LINECUTTER;
       transmitPacket.payload.lineCutter.data = *hm_getLineCutterData(i);
 
-      sendInternal();
+      sendInternal(transmitPacket);
     }
   }
 
@@ -228,7 +246,7 @@ void RadioManager::transmitData(SensorData_s *sensorData,
       transmitPacket.payload.lineCutterFlightVars.data =
           *hm_getLineCutterFlightVariables(i);
 
-      sendInternal();
+      sendInternal(transmitPacket);
     }
   }
 #endif  // HAS_DEV(LINE_CUTTER)
@@ -253,8 +271,8 @@ void RadioManager::transmitString(uint8_t *data, size_t len) {
     for (int i = 0; i < 3; i++) {
       // This is intended to be called twice to hopefully successfully send at
       // least once
-      sendInternal();
-      sendInternal();
+      sendInternal(transmitPacket);
+      sendInternal(transmitPacket);
 
       // The radio seems to not actually send the packet unless we actually call
       // RadioUpdate a bunch
@@ -269,7 +287,7 @@ void RadioManager::transmitString(uint8_t *data, size_t len) {
       }
     }
 #else
-    sendInternal();
+    sendInternal(transmitPacket);
 #endif
 
     len -= txLen;

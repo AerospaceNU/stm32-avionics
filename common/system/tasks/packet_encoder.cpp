@@ -25,8 +25,8 @@ int FSKPacketRadioEncoder::Decode(RadioOTAPayload_s& input,
   return 0;
 }
 
-int LoRaRadioEncoder::Encode(RadioDecodedPacket_s& input,
-                             RadioOTAPayload_s& output) {
+int PassthroughRadioEncoder::Encode(RadioDecodedPacket_s& input,
+                                    RadioOTAPayload_s& output) {
   size_t outlen = sizeof(input);
   memcpy(output.payload, &input, outlen);
   output.payloadLen = outlen;
@@ -34,8 +34,8 @@ int LoRaRadioEncoder::Encode(RadioDecodedPacket_s& input,
   return 0;
 }
 
-int LoRaRadioEncoder::Decode(RadioOTAPayload_s& input,
-                             RadioDecodedPacket_s& output) {
+int PassthroughRadioEncoder::Decode(RadioOTAPayload_s& input,
+                                    RadioDecodedPacket_s& output) {
   if (input.payloadLen != sizeof(output)) {
     return -EMSGSIZE;
   }

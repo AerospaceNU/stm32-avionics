@@ -14,10 +14,8 @@ class FSKPacketRadioEncoder {
   FecDecoder decoder;
 };
 
-class LoRaRadioEncoder {
+class PassthroughRadioEncoder {
  public:
   int Encode(RadioDecodedPacket_s& input, RadioOTAPayload_s& output);
   int Decode(RadioOTAPayload_s& input, RadioDecodedPacket_s& output);
-
- private:
 };
