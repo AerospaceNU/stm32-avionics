@@ -5,10 +5,6 @@
 #ifndef COMMON_SYSTEM_TASKS_RADIO_MANAGER_H_
 #define COMMON_SYSTEM_TASKS_RADIO_MANAGER_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
 
 #include "board_config_common.h"
@@ -16,36 +12,58 @@ extern "C" {
 #include "data_structures.h"
 #include "filters.h"
 #include "hardware_manager.h"
+#include "hm_timer.h"
 #include "radio_packet_types.h"
 
 #define RADIO_MAX_CALLBACKS 10
 typedef void (*RadioCallback_t)(RadioDecodedRecievedPacket_s*);
 
-typedef struct {
+struct PacketTimerCollection {
+  HmTickTimer orientationTimer{10};
+  HmTickTimer positionTimer{10};
+  HmTimer altInfoTimer{1213};
+  HmTimer lineCutterDataTimer{1000};
+  HmTimer lineCutterVarsTimer{1000};
+  HmTickTimer pyroContTimer{1};
+};
+
+class RadioManager {
+ public:
+  RadioManager() = default;
+
+  void init(int id);
+  void tick();
+
+  void transmitData(SensorData_s* sensorData, FilterData_s* filterData,
+                    uint8_t state);
+
+  // Send a string over radio
+  // Note that this BLOCKS for up to 150ms!!
+  void transmitString(uint8_t* data, size_t len);
+
+  void addMessageCallback(RadioCallback_t callback);
+
+  static void InitAll();
+  static void TickAll();
+
+ private:
+  void sendInternal();
+
+  int radioId;
+
   // The radio will enqueue packets here automatically
   CircularBuffer_s rxBuffer;
   uint8_t rxArray[RX_BUFF_LEN * sizeof(RadioRecievedOTAPacket)];
 
   RadioCallback_t callbacks[RADIO_MAX_CALLBACKS];
   size_t numCallbacks;
-} DataRecieveState_s;
 
-void radioManager_init();
-void radioManager_tick();
+  PacketTimerCollection timer;
 
-void radioManager_transmitData(int radioId, SensorData_s* sensorData,
-                               FilterData_s* filterData, uint8_t state);
+  RadioDecodedPacket_s transmitPacket;
+};
 
-// Send a string over radio
-// Note that this BLOCKS for up to 150ms!!
-void radioManager_transmitString(int radioId, uint8_t* data, size_t len);
-// Default function is same, but sends over CLI
-void radioManager_transmitStringDefault(uint8_t* data, size_t len);
-
-void radioManager_addMessageCallback(int radioId, RadioCallback_t callback);
-
-#ifdef __cplusplus
-}
-#endif
+// stupid hack for static list of all radio managers
+extern RadioManager radioManagers[NUM_RADIO];
 
 #endif  // COMMON_SYSTEM_TASKS_RADIO_MANAGER_H_

@@ -80,8 +80,8 @@ void FecDecoder::Reset() {
   ((iDestState << 3) + (symbol << 1) + (path))
 
 void FecDecoder::FillLUT() {
-  for (uint8_t iDestState = 0; iDestState < 8; iDestState++) {
-    for (uint8_t symbol = 0; symbol < 8; symbol++) {
+  for (volatile uint8_t iDestState = 0; iDestState < 8; iDestState++) {
+    for (volatile uint8_t symbol = 0; symbol < 4; symbol++) {
       // Figure out how much the cost will increase for a given pair of
       // (destination, current symbol)
       uint8_t costStep0 =

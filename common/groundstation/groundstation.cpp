@@ -32,9 +32,9 @@ Groundstation::Groundstation() = default;
 void Groundstation::init() {
   hm_hardwareInit();
 
-  radioManager_init();
+  radioManagers[i].init();
   for (int i = 0; i < NUM_RADIO; i++) {
-    radioManager_addMessageCallback(i, OnDataRx);
+    radioManagers[i].addMessageCallback(i, OnDataRx);
   }
 
   buffer = hm_usbGetRxBuffer(FIRST_ID_USB_STD);
@@ -51,7 +51,7 @@ void Groundstation::runOnce() {
   hm_radioUpdate();
 
   // Process incoming data
-  radioManager_tick();
+  radioManagers[i].tick();
 
   // Send barometer ~1x/5sec
   if ((hm_millis() - start) >= 2000) {
@@ -88,7 +88,7 @@ void Groundstation::runOnce() {
         int dest = command.destination == RAD_433 ? FIRST_ID_RADIO_TI_433
                                                   : FIRST_ID_RADIO_TI_915;
 
-        radioManager_transmitString(dest, command.data, command.len);
+        radioManagers[i].transmitString(dest, command.data, command.len);
       }
       cb_dequeue(buffer, count);
     } else if (command.destination != GROUNDSTATION ||

@@ -177,7 +177,9 @@
 
 // Radio configuration metaparameters
 #ifndef RADIO_MAX_PACKET_SIZE
-#define RADIO_MAX_PACKET_SIZE 128
+// cc1120/1200 supports up to 256 in FEC disabled mode
+#define RADIO_MAX_PACKET_SIZE 256
+#define RADIO_MAX_DECODED_PACKET_SIZE 128
 #endif  // RADIO_MAX_PACKET_SIZE
 #ifndef DO_SOFT_FECWHITEN
 #define DO_SOFT_FECWHITEN

@@ -20,7 +20,7 @@ void InitializeState::init() {
   filter_init((float)this->period_ms_ / 1000.0f);
 
   // Initiliaze radio circular buffers and things
-  radioManager_init();
+  RadioManager::InitAll();
 
   dataLog_init();
   dataLog_loadCliConfigs();
@@ -32,7 +32,9 @@ void InitializeState::init() {
 
   // Set up line cutters to forward strings to radio
 #if HAS_DEV(LINE_CUTTER_BLE)
-  lineCutterBle_registerForwardStringCb(radioManager_transmitStringDefault);
+  using std::placeholders::_1, std::placeholders::_2;
+  lineCutterBle_registerForwardStringCb(std::bind(
+      &RadioManager::transmitString, &radioManagers[RADIO_CLI_ID], _1, _2));
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
 }
 
