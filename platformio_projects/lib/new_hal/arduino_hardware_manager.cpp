@@ -253,7 +253,7 @@ void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth,
   // TODO: Analogwrite()?
 }
 
-void hm_pyroUpdate() {
+void hm_pyroUpdate(void *pUserData) {
   // TODO: Actually do this
 }
 
