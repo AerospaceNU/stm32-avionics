@@ -4,7 +4,7 @@
 #include <string.h>
 
 int FSKPacketRadioEncoder::Encode(RadioDecodedPacket_s& input,
-                                   RadioOTAPayload_s& output) {
+                                  RadioOTAPayload_s& output) {
   encoder.Encode(reinterpret_cast<uint8_t*>(&input), sizeof(input));
   size_t outlen = encoder.OutputSize(sizeof(input));
   memcpy(output.payload, encoder.OutputArray(), outlen);
@@ -26,7 +26,7 @@ int FSKPacketRadioEncoder::Decode(RadioOTAPayload_s& input,
 }
 
 int LoRaRadioEncoder::Encode(RadioDecodedPacket_s& input,
-                              RadioOTAPayload_s& output) {
+                             RadioOTAPayload_s& output) {
   size_t outlen = sizeof(input);
   memcpy(output.payload, &input, outlen);
   output.payloadLen = outlen;

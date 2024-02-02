@@ -66,8 +66,7 @@ void radioManager_tick() {
     while (cb_count(&dataRx[i].rxBuffer)) {
       cb_peek(&dataRx[i].rxBuffer, (unknownPtr_t)&packet, &len);
       if (len) {
-
-        // TODO - first decode the packet   
+        // TODO - first decode the packet
         RadioDecodedRecievedPacket_s decoded;
 
         // Send to all our callbacks

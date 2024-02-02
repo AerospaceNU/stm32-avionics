@@ -21,8 +21,8 @@ extern "C" {
 
 #include "circular_buffer.h"
 #include "data_structures.h"
-#include "smartrf_registersettings.h"
 #include "radio_packet_types.h"
+#include "smartrf_registersettings.h"
 
 #include HAL_HEADER
 

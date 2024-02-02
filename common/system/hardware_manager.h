@@ -136,10 +136,12 @@ void hm_ledToggle(int ledId);
 /* Radio functions */
 bool hm_radioSend(int radioNum, uint8_t* data, uint16_t numBytes);
 /**
- * Register a  callback to be called whenever a new packet is recieved by a particular radio
+ * Register a  callback to be called whenever a new packet is recieved by a
+ * particular radio
  * @param radioNum the radio index to add a callback to
- * @param rxBuffer CircularBuffer of RadioRecievedOTAPacket's that will be filled as packets come in
-*/
+ * @param rxBuffer CircularBuffer of RadioRecievedOTAPacket's that will be
+ * filled as packets come in
+ */
 void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s* rxBuffer);
 void hm_radioUpdate();
 void hm_radioSetChannel(int radioNum, int channel);

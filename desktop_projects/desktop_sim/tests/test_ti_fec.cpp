@@ -53,8 +53,8 @@ TEST(PacketEncoder, FSKEncodeDecode) {
   RadioDecodedPacket_s decoded;
   RadioOTAPayload_s ota1;
 
-  ASSERT_TRUE(ende.Encode(raw, ota1) == 0);
-  ASSERT_TRUE(ende.Decode(ota1, decoded) == 0);
+  ASSERT_EQ(0, ende.Encode(raw, ota1));
+  ASSERT_EQ(0, ende.Decode(ota1, decoded));
 
   ArraysEqual<uint8_t*, uint8_t*>((uint8_t*)&raw, (uint8_t*)&decoded,
                                   sizeof(raw));
