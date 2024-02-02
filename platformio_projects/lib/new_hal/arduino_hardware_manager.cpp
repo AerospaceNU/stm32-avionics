@@ -10,6 +10,7 @@
 #include "circular_buffer.h"
 #include "device_manager.h"
 #include "hardware_manager.h"
+#include "radio_packet_types.h"
 
 #define USB_SERIAL_BUFFER_SIZE 500
 
@@ -176,21 +177,23 @@ bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
 }
 
 void hm_radioUpdate() {
+  int i = 0;
   for (auto &radio : deviceManager.radios) {
     if (radio->isDataAvailable()) {
-      static RadioRecievedPacket_s packet;
-      packet.radioId = 0;
-      packet.rssi = radio->getLastRssi();
-      packet.crc = true;
-      packet.lqi = 0;
+      static RadioRecievedOTAPacket packet;
+      packet.metadata.radioId = i;
+      packet.metadata.rssi = radio->getLastRssi();
+      packet.metadata.lqi = 0;
 
-      memset(packet.data, 0, sizeof(packet.data));
+      memset(&packet.payload, 0, sizeof(packet.payload));
 
-      uint8_t len = sizeof(packet.data);
-      radio->readData(packet.data, len);
+      uint8_t len = sizeof(packet.payload.payload) & 0xff;
+      radio->readData(packet.payload.payload, len);
+      packet.payload.payloadLen = len;
 
       cb_enqueue(radioCircularBuffer, (unknownPtr_t)&packet);
     }
+    i++;
   }
 }
 
