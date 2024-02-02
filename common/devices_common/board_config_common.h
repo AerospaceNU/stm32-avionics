@@ -171,6 +171,19 @@
 #ifndef NUM_VBAT_DESKTOP_FILE
 #define NUM_VBAT_DESKTOP_FILE 0
 #endif  // NUM_VBAT_DESKTOP_FILE
+#ifndef MAX_PACKET_SIZE
+#define MAX_PACKET_SIZE 128
+#endif
+
+// Radio configuration metaparameters
+#ifndef RADIO_MAX_PACKET_SIZE
+// cc1120/1200 supports up to 256 in FEC disabled mode
+#define RADIO_MAX_PACKET_SIZE 256
+#define RADIO_MAX_DECODED_PACKET_SIZE 128
+#endif  // RADIO_MAX_PACKET_SIZE
+#ifndef DO_SOFT_FECWHITEN
+#define DO_SOFT_FECWHITEN
+#endif  // DO_SOFT_FECWHITEN
 
 // Flash stuff
 #ifndef FLASH_MAX_SECTOR_BYTES

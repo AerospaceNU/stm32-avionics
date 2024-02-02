@@ -12,6 +12,12 @@ set(SIMULATOR_FILES_LIST
         desktop_hardware_manager.cpp 
         board_config.c)
 
+# add asan
+set (WITH_ASAN OFF)
+if (WITH_ASAN)
+    add_compile_options(-fsanitize=address -g -Wall -fsanitize=undefined)
+endif ()
+
 add_executable(desktop_sim 
   ${SIMULATOR_FILES_LIST}
   ${DEVICES_FILES_LIST}
@@ -44,12 +50,17 @@ if(CMAKE_HOST_WIN32)
   target_link_libraries(desktop_sim PRIVATE "ws2_32" -static)
 endif()
 
+if (WITH_ASAN)
+    target_link_libraries(desktop_sim PRIVATE -fsanitize=address -fsanitize=undefined)
+endif ()
+
 enable_testing()
 
 set(TEST_FILES
   tests/test_file_flash.cpp
   tests/test_cli_parse.cpp
   tests/test_expressions.cpp
+  tests/test_ti_fec.cpp
   tests/test_circular_buffer.cpp
   tests/test_gps_format_conversion.cpp
   desktop_hardware_manager.cpp board_config.c
@@ -92,6 +103,10 @@ target_include_directories(${DESKTOP_SIM_EXE_NAME} PRIVATE
   ${DEVICES_COMMON_INCLUDE_DIRS}
   ${GENERATED_INCLUDE_DIR}
 )
+
+if (WITH_ASAN)
+    target_link_libraries(${DESKTOP_SIM_EXE_NAME} PRIVATE -fsanitize=address -fsanitize=undefined)
+endif ()
 
 include(GoogleTest)
 gtest_discover_tests(${DESKTOP_SIM_EXE_NAME})

@@ -135,6 +135,13 @@ void hm_ledToggle(int ledId);
 
 /* Radio functions */
 bool hm_radioSend(int radioNum, uint8_t* data, uint16_t numBytes);
+/**
+ * Register a  callback to be called whenever a new packet is recieved by a
+ * particular radio
+ * @param radioNum the radio index to add a callback to
+ * @param rxBuffer CircularBuffer of RadioRecievedOTAPacket's that will be
+ * filled as packets come in
+ */
 void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s* rxBuffer);
 void hm_radioUpdate();
 void hm_radioSetChannel(int radioNum, int channel);
@@ -163,7 +170,7 @@ void hm_pyroFire(int pyroId, uint32_t duration);
 void hm_pyroSet(int pyroId, bool enabled);
 void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth,
                    uint32_t duration);
-void hm_pyroUpdate();
+void hm_pyroUpdate(void* pUserData);
 void hm_dcMotorSetPercent(int dcMotorId, double percent);
 
 /* Watchdogs */

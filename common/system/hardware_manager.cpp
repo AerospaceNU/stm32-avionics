@@ -440,7 +440,7 @@ void hm_hardwareInit() {
     radioTi433[i].GP2_pin = radioTi433Gp2Pin[i];
     radioTi433[i].GP3_port = radioTi433Gp3GpioPort[i];
     radioTi433[i].GP3_pin = radioTi433Gp3Pin[i];
-    radioTi433[i].payloadSize = sizeof(RadioPacket_s);
+    radioTi433[i].payloadSize = sizeof(RadioDecodedPacket_s);
     radioTi433[i].id = 0;
     radioTi433[i].packetCfg = TIRADIO_PKTLEN_FIXED;
     radioTi433[i].initialized = false;
@@ -479,7 +479,7 @@ void hm_hardwareInit() {
     radioTi915[i].GP2_pin = radioTi915Gp2Pin[i];
     radioTi915[i].GP3_port = radioTi915Gp3GpioPort[i];
     radioTi915[i].GP3_pin = radioTi915Gp3Pin[i];
-    radioTi915[i].payloadSize = sizeof(RadioPacket_s);
+    radioTi915[i].payloadSize = sizeof(RadioDecodedPacket_s);
     radioTi915[i].id = 1;
     radioTi915[i].packetCfg = TIRADIO_PKTLEN_FIXED;
     radioTi915[i].initialized = false;
@@ -958,7 +958,7 @@ void hm_pyroSetPwm(int pyroId, uint32_t duration, uint32_t frequency,
 #endif  // HAS_DEV(PYRO_DIGITAL)
 }
 
-void hm_pyroUpdate() {
+void hm_pyroUpdate(void *pUserData) {
 #if HAS_DEV(PYRO_DIGITAL)
   for (int i = 0; i < NUM_PYRO_DIGITAL; i++) {
     pyroDigital_tick(&pyroDigital[i]);

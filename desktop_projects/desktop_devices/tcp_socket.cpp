@@ -73,18 +73,17 @@ bool TcpSocket::readData() {
   int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
 
   if (bytes_received > 0 && buffer[0] == TELEMETRY_ID_STRING) {
-    RadioRecievedPacket_s packet;
-    packet.radioId = 0;
-    packet.rssi = 0;
-    packet.crc = true;
-    packet.lqi = 0;
+    RadioRecievedOTAPacket packet;
+    packet.metadata.radioId = 0;
+    packet.metadata.rssi = 0;
+    packet.metadata.lqi = 0;
 
-    void *stringPacket = buffer + offsetof(RadioPacket_s, payload);
+    void *stringPacket = buffer + offsetof(RadioDecodedPacket_s, payload);
     uint8_t len = *((uint8_t *)stringPacket + offsetof(CliStringPacket_s, len));
     uint8_t *fullString =
         (uint8_t *)stringPacket + offsetof(CliStringPacket_s, string);
 
-    RadioPacket_s packetOnAir = {0};
+    RadioDecodedPacket_s packetOnAir = {0};
     packetOnAir.packetType = buffer[0];
 
     // Copy in 48 byte chunks (ew)
@@ -100,7 +99,7 @@ bool TcpSocket::readData() {
       // Force tx-id to increment every time
       packetOnAir.payload.cliString.id = lastTxId++;
 
-      memcpy(packet.data, &packetOnAir, sizeof(packetOnAir));
+      memcpy(packet.payload.payload, &packetOnAir, sizeof(packetOnAir));
 
       cb_enqueue(rxBuffer, (unknownPtr_t)&packet);
     } while (len);
