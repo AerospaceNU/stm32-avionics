@@ -93,10 +93,10 @@ PACKED_STRUCT {
   uint32_t timestampMs;
   char callsign[8];
   PayloadPacket_u payload;
-  // message crc of all preceding bytes
+  // message crc of all preceding bytes, as set by the transmitting side
   // (some radios let you do this in hardware, others don't; for consistency and
   // simplicity, we will always add it ourselves)
-  uint16_t crc;
+  uint16_t packetCRC;
 }
 RadioDecodedPacket_s;
 
@@ -109,9 +109,12 @@ RadioOTAPayload_s;
 typedef struct __attribute__((packed)) {
   uint8_t radioId;
   int8_t rssi;
-  bool crc;
   uint8_t lqi;
-} RecievedPacketMetadat_s;
+} RecievedPacketRadioMetadat_s;
+
+typedef struct __attribute__((packed)) {
+  bool crcGood;
+} RecievedPacketDecodeMetadat_s;
 
 /**
  * Single radio packet, as recieved and demodulated by radio hardware. Includes
@@ -119,12 +122,13 @@ typedef struct __attribute__((packed)) {
  */
 typedef struct __attribute__((packed)) {
   RadioOTAPayload_s payload;
-  RecievedPacketMetadat_s metadata;
+  RecievedPacketRadioMetadat_s metadata;
 } RadioRecievedOTAPacket;
 
 typedef struct __attribute__((packed)) {
   RadioDecodedPacket_s payload;
-  RecievedPacketMetadat_s metadata;
+  RecievedPacketRadioMetadat_s metadata;
+  RecievedPacketDecodeMetadat_s decodeMetadata;
 } RadioDecodedRecievedPacket_s;
 
 #endif  // COMMON_SYSTEM_TASKS_RADIO_PACKET_TYPES_H_

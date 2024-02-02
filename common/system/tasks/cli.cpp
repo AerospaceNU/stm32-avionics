@@ -68,7 +68,7 @@ static void cli_parseRadio(RadioDecodedRecievedPacket_s* packet) {
   // Only accept packets with good CRC
   RadioDecodedPacket_s* parsedPacket = (RadioDecodedPacket_s*)&packet->payload;
   if (parsedPacket->packetType == TELEMETRY_ID_STRING) {
-    if (packet->metadata.crc) {
+    if (packet->decodeMetadata.crcGood) {
       if (parsedPacket->payload.cliString.id == lastStringId) {
         // duplicate string, do nothing
         return;

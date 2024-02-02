@@ -239,7 +239,6 @@ void hm_ledToggle(int ledId) {}
 
 bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
   static RadioRecievedOTAPacket packet;
-  packet.metadata.crc = true;
   packet.metadata.lqi = 4;
   packet.metadata.rssi = 10;
 

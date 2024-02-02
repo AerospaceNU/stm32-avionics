@@ -64,6 +64,10 @@ class RadioManager {
   // information
   RadioDecodedPacket_s transmitPacket;
 
+  /**
+   * Perform all common preprocessing to send a packet. Calculate and set CRC,
+   * and perform any data encoding.
+   */
   void sendInternal(RadioDecodedPacket_s& packet);
 };
 

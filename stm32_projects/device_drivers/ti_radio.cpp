@@ -307,7 +307,6 @@ static void cc1120EnqueuePacket(TiRadioCtrl_s *radio, uint8_t *buff,
   static RadioRecievedOTAPacket packet;
   packet.metadata.radioId = radio->id;
   packet.metadata.rssi = radio->RSSI;
-  packet.metadata.crc = crc;
   packet.metadata.lqi = radio->LQI;
   packet.payload.payloadLen = size;
   memcpy(packet.payload.payload, buff, size);

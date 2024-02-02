@@ -33,6 +33,22 @@ FSKPacketRadioEncoder packetEncoder;
 PassthroughRadioEncoder packetEncoder;
 #endif
 
+/**
+ * calculate the CRC of a packet, up to but excluding the CRC field at the end
+ */
+static uint16_t calculateRadioPacketCRC(RadioDecodedPacket_s &packet) {
+  // Init value for CRC calculation, by convention
+  uint16_t checksum = 0xFFFF;
+
+  // iterate over whole packet, up until CRC
+  uint8_t *pktAsBytes = reinterpret_cast<uint8_t *>(&packet);
+  for (int i = 0; i < sizeof(packet) - sizeof(packet.packetCRC); i++) {
+    checksum = ti_fec::calculateCRC(pktAsBytes[i], checksum);
+  }
+
+  return checksum;
+}
+
 void RadioManager::init(int id) {
   radioId = id;
 
@@ -64,6 +80,13 @@ void RadioManager::tick() {
       RadioDecodedRecievedPacket_s decoded;
       decoded.metadata = packet.metadata;
       if (0 == packetEncoder.Decode(packet.payload, decoded.payload)) {
+        // CRC of bytes we got from the radio
+        uint16_t localCRC = calculateRadioPacketCRC(decoded.payload);
+        // The CRC set by the sender
+        uint16_t remoteCRC = decoded.payload.packetCRC;
+        // and compare
+        decoded.decodeMetadata.crcGood = (localCRC == remoteCRC);
+
         // Send to all our callbacks
         for (size_t j = 0; j < numCallbacks; j++) {
           if (callbacks[j]) callbacks[j](&decoded);
@@ -81,6 +104,10 @@ void RadioManager::tick() {
 }
 
 void RadioManager::sendInternal(RadioDecodedPacket_s &packet) {
+  // set the CRC
+  packet.packetCRC = calculateRadioPacketCRC(packet);
+
+  // and encode
   RadioOTAPayload_s output;
   if (0 == packetEncoder.Encode(packet, output)) {
     hm_radioSend(radioId, output.payload, output.payloadLen);

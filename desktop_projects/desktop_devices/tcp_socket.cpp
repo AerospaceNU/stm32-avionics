@@ -76,7 +76,6 @@ bool TcpSocket::readData() {
     RadioRecievedOTAPacket packet;
     packet.metadata.radioId = 0;
     packet.metadata.rssi = 0;
-    packet.metadata.crc = true;
     packet.metadata.lqi = 0;
 
     void *stringPacket = buffer + offsetof(RadioDecodedPacket_s, payload);
