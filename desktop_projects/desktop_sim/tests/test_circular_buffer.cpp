@@ -2,6 +2,42 @@
 
 #include "cpp_circular_buffer.h"
 
+TEST(CircularBuffer, OverwriteCatch) {
+  CircularBuffer<uint32_t, 5> cb;
+  ASSERT_EQ(cb.count(), 0);
+  uint32_t vals[10];
+  for (int i = 5; i < 10; ++i) {
+    vals[i] = 255;
+  }
+  for (int i = 0; i < 5; ++i) {
+    ASSERT_EQ(cb.enqueue(i), true);
+  }
+  // Buffer is:
+  // [0, 1, 2, 3, 4, X]
+  ASSERT_EQ(cb.peek(vals, 5), true);
+  for (int i = 0; i < 5; ++i) {
+    ASSERT_EQ(vals[i], i);
+  }
+  for (int i = 5; i < 10; ++i) {
+    ASSERT_EQ(vals[i], 255);
+  }
+  ASSERT_EQ(cb.dequeue(2), true);
+  // Buffer is:
+  // [X, X, 2, 3, 4, X]
+  ASSERT_EQ(cb.enqueue(5), true);
+  ASSERT_EQ(cb.enqueue(6), true);
+  // Buffer is:
+  // [6, X, 2, 3, 4, 5]
+  ASSERT_EQ(cb.peek(vals, 5), true);
+  for (int i = 0; i < 5; ++i) {
+    ASSERT_EQ(vals[i], i + 2);
+  }
+  // Validate that our other values were not overwritten
+  for (int i = 5; i < 10; ++i) {
+    ASSERT_EQ(vals[i], 255);
+  }
+}
+
 TEST(CircularBuffer, GeneralTest) {
   CircularBuffer<uint32_t, 5> cb;
   ASSERT_EQ(cb.count(), 0);

@@ -90,14 +90,14 @@ class CircularBuffer {
     if (count > this->count()) {
       return false;
     }
-    size_t firstCount = 1 + this->endPtr - this->head;
-    if (firstCount >= count) {
+    size_t countToEnd = 1 + this->endPtr - this->head;
+    if (countToEnd >= count) {
       memcpy(destination, this->head, sizeof(Type) * count);
       return true;
     } else {
-      memcpy(destination, this->head, sizeof(Type) * firstCount);
-      memcpy(destination + firstCount, this->backingArray,
-             sizeof(Type) * (count - firstCount));
+      memcpy(destination, this->head, sizeof(Type) * countToEnd);
+      memcpy(destination + countToEnd, this->backingArray,
+             sizeof(Type) * (count - countToEnd));
       return true;
     }
   }
