@@ -14,7 +14,7 @@
 #include <Arduino.h>
 #endif
 
-static void OnDataRx(RadioRecievedPacket_s *packet) {
+static void OnDataRx(RadioDecodedRecievedPacket_s *packet) {
   hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)packet, sizeof(*packet));
 }
 
@@ -32,9 +32,9 @@ Groundstation::Groundstation() = default;
 void Groundstation::init() {
   hm_hardwareInit();
 
-  radioManagers[i].init();
+  RadioManager::InitAll();
   for (int i = 0; i < NUM_RADIO; i++) {
-    radioManagers[i].addMessageCallback(i, OnDataRx);
+    radioManagers[i].addMessageCallback(OnDataRx);
   }
 
   buffer = hm_usbGetRxBuffer(FIRST_ID_USB_STD);
@@ -51,7 +51,7 @@ void Groundstation::runOnce() {
   hm_radioUpdate();
 
   // Process incoming data
-  radioManagers[i].tick();
+  RadioManager::TickAll();
 
   // Send barometer ~1x/5sec
   if ((hm_millis() - start) >= 2000) {
@@ -66,7 +66,7 @@ void Groundstation::runOnce() {
     heartbeat.groundTemp = hm_getSensorData()->barometerData[0].temperatureC;
 
     // Hack to make all packets the same length when sent over USB
-    static uint8_t heartbeatArr[sizeof(RadioRecievedPacket_s)] = {0};
+    static uint8_t heartbeatArr[sizeof(RadioDecodedRecievedPacket_s)] = {0};
     memset(heartbeatArr, 0, sizeof(heartbeatArr));
     memcpy(heartbeatArr, &heartbeat, sizeof(heartbeat));
     hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr,
@@ -88,7 +88,7 @@ void Groundstation::runOnce() {
         int dest = command.destination == RAD_433 ? FIRST_ID_RADIO_TI_433
                                                   : FIRST_ID_RADIO_TI_915;
 
-        radioManagers[i].transmitString(dest, command.data, command.len);
+        radioManagers[dest].transmitString(command.data, command.len);
       }
       cb_dequeue(buffer, count);
     } else if (command.destination != GROUNDSTATION ||
