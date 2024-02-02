@@ -1,6 +1,7 @@
-#include "SX126x.hpp"
+#include "sx126x_driver-master/SX126x.hpp"
 #include "main.h"
 #include "radio_packet_types.h"
+#include "packet_encoder.h"
 
 void LED_on() { HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET); }
 void LED_off() { HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); }
@@ -31,8 +32,11 @@ extern "C" void entrypoint(void) {
   const uint32_t FREQ_915 = 433000000;
   radio.SetRfFrequency(FREQ_915);
 
-  RadioPacket_s packet;
-  const uint8_t PACKET_LEN = sizeof(packet);  // todo
+  RadioDecodedPacket_s packet;
+  
+  FSKPacketRadioEncoder packetEncoder;
+
+  const uint8_t PACKET_LEN = packetEncoder.EncodedLength();  // todo
 
   SX126x::PacketParams_t pparams;
   pparams.PacketType = SX126x::PACKET_TYPE_GFSK;
@@ -59,30 +63,37 @@ extern "C" void entrypoint(void) {
   /* USER CODE BEGIN WHILE */
 
   while (1) {
-    // Fill the TX buffer, starting at 0, to contain a packet
-    // explicitly set the FIFO back to the start (page 48 of SX1261/2 datasheet)
-    radio.SetBufferBaseAddresses(0, 0);
 
     memcpy(packet.callsign, "KM6GNL\0\0", 8);
     packet.packetType = TELEMETRY_ID_STRING;
 
     packet.timestampMs = HAL_GetTick();
-//    for (int i = 0; i < RADIO_MAX_STRING; i++) packet.payload.cliString.string[i] = i;
 
     snprintf((char*)packet.payload.cliString.string,
              sizeof(packet.payload.cliString.string), "Hello at time %lu!\n",
              HAL_GetTick());
 
-//    snprintf((char*)packet.payload.cliString.string,
-//             sizeof(packet.payload.cliString.string), "Hello at time %lu!\n",
-//             HAL_GetTick());
+    static RadioOTAPayload_s output;
+    if (0 == packetEncoder.Encode(packet, output)) {
+      // Fill the TX buffer, starting at 0, to contain a packet
+      // explicitly set the FIFO back to the start (page 48 of SX1261/2 datasheet)
+      radio.SetBufferBaseAddresses(0, 0);
 
-    radio.WriteBuffer(0, (uint8_t*)&packet, sizeof(packet));
-    // And put us into TX mode
-    LED_on();
-    radio.SetTx(radio.GetTimeOnAir());
-    HAL_Delay(radio.GetTimeOnAir() / 1000);
-    LED_off();
+      radio.WriteBuffer(0, (uint8_t*)&output.payload, output.payloadLen);
+
+      // And put us into TX mode
+      LED_on();
+      radio.SetTx(radio.GetTimeOnAir());
+      HAL_Delay(radio.GetTimeOnAir() / 1000);
+      LED_off();
+    } else {
+      // lol wut even 
+      assert(0);
+    }
+
+
+
+
 
     HAL_Delay(500);
   }

@@ -35,6 +35,33 @@
         {
             "type": "cortex-debug",
             "request": "launch",
+            "name": "Debug rocketbeacon (OpenOCD)",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "runToMain": true,
+            "executable": "${workspaceFolder}/build_stm/stm32_projects/rocketbeacon/rocketbeacon.elf",
+            "device": "STM32WL",
+            "configFiles": [
+                "${workspaceFolder}/tooling/openocd_wl.cfg"
+            ],
+            "swoConfig": {
+                "enabled": true,
+                "cpuFrequency": 80000000,
+                "swoFrequency": 2000000,
+                "source": "probe",
+                "decoders": [
+                    {
+                        "type": "console",
+                        "label": "ITM",
+                        "port": 0
+                    }
+                ]
+            },
+            "preLaunchTask": "Build rocketbeacon"
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
             "name": "Debug fcb_v0 (OpenOCD)",
             "servertype": "openocd",
             "cwd": "${workspaceFolder}",

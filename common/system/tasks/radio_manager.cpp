@@ -108,7 +108,7 @@ void RadioManager::sendInternal(RadioDecodedPacket_s &packet) {
   packet.packetCRC = calculateRadioPacketCRC(packet);
 
   // and encode
-  RadioOTAPayload_s output;
+  static RadioOTAPayload_s output;
   if (0 == packetEncoder.Encode(packet, output)) {
     hm_radioSend(radioId, output.payload, output.payloadLen);
   } else {
