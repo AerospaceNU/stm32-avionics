@@ -9,18 +9,28 @@
 #include "expression_store.h"
 #include "hardware_manager.h"
 
-TEST(ExpressionStorage, expressionParsing) {
+class ExpressionStorageTests : public testing::Test {
+ protected:
+  void SetUp() override {
+    hm_hardwareInit();
+    cli_init();
+    cli_setDefaultConfig();
+    expressionStore.init();
+    expressionStore.removeExpressionsForTrigger(0);
+    expressionStore.removeExpressionsForTrigger(1);
+    expressionStore.removeExpressionsForTrigger(2);
+  }
+
+  void TearDown() override { desktophm_teardown(); }
+
   FilterData_s filterData;
   char stringBuf[1000];
-  hm_hardwareInit();
-  cli_init();
-  cli_setDefaultConfig();
   ExpressionStore expressionStore;
-  expressionStore.init();
-  expressionStore.removeExpressionsForTrigger(0);
-  expressionStore.removeExpressionsForTrigger(1);
-  expressionStore.removeExpressionsForTrigger(2);
-  ASSERT_EQ(expressionStore.getNextExpressionSpot(0), 0);
+  uint16_t res1ID;
+  uint16_t res2ID;
+};
+
+TEST_F(ExpressionStorageTests, expressionParsing) {
   uint16_t resID;
   const char *test1Input =
       "((not unclean_restart) and ((2.00 after burnout) and ((not apogee) and "
@@ -44,25 +54,11 @@ TEST(ExpressionStorage, expressionParsing) {
   ASSERT_EQ(strcmp(stringBuf, test2Input), 0);
   expressionStore.tick(&filterData);
   ASSERT_TRUE(expressionStore.getExprBoolValue(resID));
-
-  desktophm_teardown();
 }
 
-TEST(ExpressionStorage, expressionEvaluation) {
-  FilterData_s filterData;
-  char stringBuf[1000];
-  hm_hardwareInit();
-  cli_init();
-  cli_setDefaultConfig();
-  ExpressionStore expressionStore;
+TEST_F(ExpressionStorageTests, expressionEvaluation) {
   eventManager_setEventIncomplete(Event_e::launch);
-  expressionStore.init();
-  expressionStore.removeExpressionsForTrigger(0);
-  expressionStore.removeExpressionsForTrigger(1);
-  expressionStore.removeExpressionsForTrigger(2);
   ASSERT_EQ(expressionStore.getNextExpressionSpot(0), 0);
-  uint16_t res1ID;
-  uint16_t res2ID;
 
   const char *test1Input = "(angle_vertical < 30)";
 
@@ -97,24 +93,10 @@ TEST(ExpressionStorage, expressionEvaluation) {
   expressionStore.tick(&filterData);
   ASSERT_TRUE(expressionStore.getExprBoolValue(res1ID));
   ASSERT_FALSE(expressionStore.getExprBoolValue(res2ID));
-
-  desktophm_teardown();
 }
 
-TEST(ExpressionStorage, chainedAndOr) {
-  FilterData_s filterData;
-  char stringBuf[1000];
-  hm_hardwareInit();
-  cli_init();
-  cli_setDefaultConfig();
-  ExpressionStore expressionStore;
-  expressionStore.init();
-  expressionStore.removeExpressionsForTrigger(0);
-  expressionStore.removeExpressionsForTrigger(1);
-  expressionStore.removeExpressionsForTrigger(2);
+TEST_F(ExpressionStorageTests, chainedAndOr) {
   ASSERT_EQ(expressionStore.getNextExpressionSpot(0), 0);
-  uint16_t res1ID;
-  uint16_t res2ID;
 
   const char *test1Input = "((3 == (3 / 1)) and (not (3 > 4)))";
 
@@ -133,6 +115,4 @@ TEST(ExpressionStorage, chainedAndOr) {
   expressionStore.tick(&filterData);
   ASSERT_TRUE(expressionStore.getExprBoolValue(res1ID));
   ASSERT_TRUE(expressionStore.getExprBoolValue(res2ID));
-
-  desktophm_teardown();
 }
