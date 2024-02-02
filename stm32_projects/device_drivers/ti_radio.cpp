@@ -118,16 +118,16 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
 }
 
 void tiRadio_setPaylodSize(TiRadioCtrl_s *radio, size_t lenBytes) {
-		radio->payloadSize = lenBytes;
-	  // Figure out what packet length/config we need to send to the radio
-	  uint8_t pkt_len = lenBytes;
-	  uint8_t pkt_cfg0 = 0x00;
+  radio->payloadSize = lenBytes;
+  // Figure out what packet length/config we need to send to the radio
+  uint8_t pkt_len = lenBytes;
+  uint8_t pkt_cfg0 = 0x00;
 
-	  // The size for fixed length should be known on init
-	  tiRadio_spiWriteReg(radio, TIRADIO_PKT_LEN, &pkt_len, 0x01);
-	  tiRadio_spiWriteReg(radio, TIRADIO_PKT_CFG0, &pkt_cfg0, 0x01);
+  // The size for fixed length should be known on init
+  tiRadio_spiWriteReg(radio, TIRADIO_PKT_LEN, &pkt_len, 0x01);
+  tiRadio_spiWriteReg(radio, TIRADIO_PKT_CFG0, &pkt_cfg0, 0x01);
 
-	  tiRadio_spiWriteReg(radio, TIRADIO_FIFO_CFG, &radio->payloadSize, 0x01);
+  tiRadio_spiWriteReg(radio, TIRADIO_FIFO_CFG, &radio->payloadSize, 0x01);
 }
 
 // The main tick function. Checks for new packets and transmits the waiting one,

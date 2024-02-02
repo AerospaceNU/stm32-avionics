@@ -45,7 +45,7 @@ TEST(PacketEncoder, FSKEncodeDecode) {
   FSKPacketRadioEncoder ende;
 
   RadioDecodedPacket_s raw = {0};
-  
+
   for (size_t i = 0; i < sizeof(raw); i++) {
     ((uint8_t*)&raw)[i] = i;
   }

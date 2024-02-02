@@ -363,9 +363,7 @@ SensorData_s *hm_getSensorData() { return &sensorData; }
 
 SensorProperties_s *hm_getSensorProperties() { return &sensorProperties; }
 
-bool hm_radioSetLen(int radioNum, uint16_t numBytes) {
-  return true;
-}
+bool hm_radioSetLen(int radioNum, uint16_t numBytes) { return true; }
 
 void hm_enableSimMode(CircularBuffer_s *rxBuffer) {}
 

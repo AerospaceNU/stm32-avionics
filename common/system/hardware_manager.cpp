@@ -719,7 +719,6 @@ bool hm_radioSetLen(int radioNum, uint16_t numBytes) {
 
 #if HAS_DEV(RADIO_TI_915)
   if (IS_DEVICE(radioNum, RADIO_TI_915)) {
-
     TiRadioCtrl_s *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
     tiRadio_setPaylodSize(pRadio, numBytes);
     return true;
@@ -734,16 +733,15 @@ bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
 #if HAS_DEV(RADIO_TI_433)
   if (IS_DEVICE(radioNum, RADIO_TI_433)) {
     TiRadioCtrl_s *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
-	if (numBytes != pRadio->payloadSize) return false;
+    if (numBytes != pRadio->payloadSize) return false;
     return tiRadio_addTxPacket(pRadio, data, pRadio->payloadSize);
   }
 #endif  // HAS_DEV(RADIO_TI_433)
 
 #if HAS_DEV(RADIO_TI_915)
   if (IS_DEVICE(radioNum, RADIO_TI_915)) {
-
     TiRadioCtrl_s *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
-	if (numBytes != pRadio->payloadSize) return false;
+    if (numBytes != pRadio->payloadSize) return false;
     return tiRadio_addTxPacket(pRadio, data, pRadio->payloadSize);
   }
 #endif  // HAS_DEV(RADIO_TI_915)
