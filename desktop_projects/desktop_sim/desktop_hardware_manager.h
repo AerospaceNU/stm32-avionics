@@ -11,4 +11,6 @@ extern std::string output_file;
 
 extern bool do_networking;
 
+void desktophm_teardown();
+
 #endif  // DESKTOP_PROJECTS_DESKTOP_SIM_DESKTOP_HARDWARE_MANAGER_H_
