@@ -45,7 +45,11 @@ TEST(PacketEncoder, FSKEncodeDecode) {
   FSKPacketRadioEncoder ende;
 
   RadioDecodedPacket_s raw = {0};
-  raw.board_serial_num = 45;
+  
+  for (size_t i = 0; i < sizeof(raw); i++) {
+    ((uint8_t*)&raw)[i] = i;
+  }
+
   RadioDecodedPacket_s decoded;
   RadioOTAPayload_s ota1;
 

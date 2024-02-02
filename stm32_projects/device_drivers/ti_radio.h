@@ -143,6 +143,8 @@ void tiRadio_configGpio(TiRadioCtrl_s *radio, uint16_t gpio_register,
                         uint8_t gpio_config, bool outputInverted);
 bool tiRadio_calibrate(TiRadioCtrl_s *radio);
 
+void tiRadio_setPaylodSize(TiRadioCtrl_s *radio, size_t lenBytes);
+
 #endif
 
 #ifdef __cplusplus

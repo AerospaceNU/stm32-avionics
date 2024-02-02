@@ -117,6 +117,19 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
   return true;
 }
 
+void tiRadio_setPaylodSize(TiRadioCtrl_s *radio, size_t lenBytes) {
+		radio->payloadSize = lenBytes;
+	  // Figure out what packet length/config we need to send to the radio
+	  uint8_t pkt_len = lenBytes;
+	  uint8_t pkt_cfg0 = 0x00;
+
+	  // The size for fixed length should be known on init
+	  tiRadio_spiWriteReg(radio, TIRADIO_PKT_LEN, &pkt_len, 0x01);
+	  tiRadio_spiWriteReg(radio, TIRADIO_PKT_CFG0, &pkt_cfg0, 0x01);
+
+	  tiRadio_spiWriteReg(radio, TIRADIO_FIFO_CFG, &radio->payloadSize, 0x01);
+}
+
 // The main tick function. Checks for new packets and transmits the waiting one,
 // if non-zero
 void tiRadio_update(TiRadioCtrl_s *radio) {
@@ -351,7 +364,7 @@ void tiRadio_registerConsumer(TiRadioCtrl_s *radio,
 
 bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
   static uint8_t rxbytes = 0x00;
-  static uint8_t rxBuffer[128] = {0};
+  static uint8_t rxBuffer[255] = {0};
 
   // Read GPIO, should be high until the RX FIFO is empty
   if (HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_SET) {

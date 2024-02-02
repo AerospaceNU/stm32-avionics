@@ -135,6 +135,8 @@ void hm_ledToggle(int ledId);
 
 /* Radio functions */
 bool hm_radioSend(int radioNum, uint8_t* data, uint16_t numBytes);
+bool hm_radioSetLen(int radioNum, uint16_t numBytes);
+
 /**
  * Register a  callback to be called whenever a new packet is recieved by a
  * particular radio

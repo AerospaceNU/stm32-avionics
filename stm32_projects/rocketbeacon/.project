@@ -32,14 +32,19 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>common</name>
-			<type>2</type>
-			<location>D:/Documents/GitHub/stm32-avionics/common</location>
-		</link>
-		<link>
 			<name>device_drivers</name>
 			<type>2</type>
-			<location>D:/Documents/GitHub/stm32-avionics/stm32_projects/device_drivers</location>
+			<locationURI>PARENT-1-PROJECT_LOC/device_drivers</locationURI>
+		</link>
+		<link>
+			<name>libs</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/libs</locationURI>
+		</link>
+		<link>
+			<name>common</name>
+			<type>2</type>
+			<locationURI>PARENT-2-PROJECT_LOC/common</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

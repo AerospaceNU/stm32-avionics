@@ -76,17 +76,13 @@ target_link_options(${EXECUTABLE} PRIVATE
         -Wl,--print-memory-usage
         )
 
-# target_link_libraries(${EXECUTABLE} PRIVATE 
-#     ${CMAKE_CURRENT_SOURCE_DIR}/../libs/libarm_cortexM7lfsp_math.a
-# )
-
 # Print executable size
 add_custom_command(TARGET ${EXECUTABLE}
         POST_BUILD
-        COMMAND arm-none-eabi-size ${EXECUTABLE}.elf)
+        COMMAND ${ARM_NONE_BIN_PATH}/arm-none-eabi-size ${EXECUTABLE}.elf)
 
 # Create hex file
 add_custom_command(TARGET ${EXECUTABLE}
         POST_BUILD
-        COMMAND arm-none-eabi-objcopy -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
-        COMMAND arm-none-eabi-objcopy -O binary ${EXECUTABLE}.elf ${EXECUTABLE}.bin)
+        COMMAND ${ARM_NONE_BIN_PATH}/arm-none-eabi-objcopy -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
+        COMMAND ${ARM_NONE_BIN_PATH}/arm-none-eabi-objcopy -O binary ${EXECUTABLE}.elf ${EXECUTABLE}.bin)

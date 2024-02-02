@@ -42,7 +42,7 @@ static uint16_t calculateRadioPacketCRC(RadioDecodedPacket_s &packet) {
 
   // iterate over whole packet, up until CRC
   uint8_t *pktAsBytes = reinterpret_cast<uint8_t *>(&packet);
-  for (int i = 0; i < sizeof(packet) - sizeof(packet.packetCRC); i++) {
+  for (size_t i = 0; i < sizeof(packet) - sizeof(packet.packetCRC); i++) {
     checksum = ti_fec::calculateCRC(pktAsBytes[i], checksum);
   }
 
@@ -52,9 +52,8 @@ static uint16_t calculateRadioPacketCRC(RadioDecodedPacket_s &packet) {
 void RadioManager::init(int id) {
   radioId = id;
 
-  for (int i = 0; i < NUM_RADIO; i++) {
     cb_init(&rxBuffer, rxArray, RX_BUFF_LEN, sizeof(RadioRecievedOTAPacket));
-    hm_radioRegisterConsumer(i, &rxBuffer);
+    hm_radioRegisterConsumer(radioId, &rxBuffer);
 
     strncpy(transmitPacket.callsign, call, 8);
 
@@ -63,8 +62,8 @@ void RadioManager::init(int id) {
 #endif
     transmitPacket.board_serial_num = 0;  // TODO set this;
 
-    hm_radioSetChannel(i, 2);
-  }
+    hm_radioSetChannel(radioId , 0);
+    hm_radioSetLen(radioId, packetEncoder.EncodedLength());
 }
 
 //! Must be called periodically to output data over CLI or USB
