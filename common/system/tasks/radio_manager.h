@@ -27,6 +27,8 @@ struct PacketTimerCollection {
   HmTickTimer pyroContTimer{1};
 };
 
+uint16_t calculateRadioPacketCRC(RadioDecodedPacket_s &packet);
+
 class RadioManager {
  public:
   RadioManager() = default;

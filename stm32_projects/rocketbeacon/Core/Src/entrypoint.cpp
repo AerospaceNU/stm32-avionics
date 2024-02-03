@@ -2,6 +2,7 @@
 #include "main.h"
 #include "radio_packet_types.h"
 #include "packet_encoder.h"
+#include "radio_manager.h"
 
 void LED_on() { HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET); }
 void LED_off() { HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); }
@@ -41,7 +42,7 @@ extern "C" void entrypoint(void) {
   SX126x::PacketParams_t pparams;
   pparams.PacketType = SX126x::PACKET_TYPE_GFSK;
   pparams.Params.Gfsk.HeaderType = SX126x::RADIO_PACKET_FIXED_LENGTH;
-  pparams.Params.Gfsk.CrcLength = SX126x::RADIO_CRC_2_BYTES;  // TODO
+  pparams.Params.Gfsk.CrcLength = SX126x::RADIO_CRC_OFF;  // TODO
   pparams.Params.Gfsk.PayloadLength = PACKET_LEN;
   pparams.Params.Gfsk.PreambleMinDetect =
       SX126x::RADIO_PREAMBLE_DETECTOR_08_BITS;  // TODO idk
@@ -69,21 +70,27 @@ extern "C" void entrypoint(void) {
 
     packet.timestampMs = HAL_GetTick();
 
-    snprintf((char*)packet.payload.cliString.string,
+    static int i;
+    packet.payload.cliString.id = i++;
+    packet.payload.cliString.len=snprintf((char*)packet.payload.cliString.string,
              sizeof(packet.payload.cliString.string), "Hello at time %lu!\n",
              HAL_GetTick());
 
+    packet.packetCRC = calculateRadioPacketCRC(packet);
+
+    // Fill the TX buffer, starting at 0, to contain a packet
+    // explicitly set the FIFO back to the start (page 48 of SX1261/2 datasheet)
+    radio.SetBufferBaseAddresses(0, 0);
+
+
     static RadioOTAPayload_s output;
     if (0 == packetEncoder.Encode(packet, output)) {
-      // Fill the TX buffer, starting at 0, to contain a packet
-      // explicitly set the FIFO back to the start (page 48 of SX1261/2 datasheet)
-      radio.SetBufferBaseAddresses(0, 0);
 
       radio.WriteBuffer(0, (uint8_t*)&output.payload, output.payloadLen);
 
-      // And put us into TX mode
+      // And put us into TX mode, which transmits starting at the TX base addr up to PACKET_LEN many bytes
       LED_on();
-      radio.SetTx(radio.GetTimeOnAir());
+      radio.SetTx(0xffffff);
       HAL_Delay(radio.GetTimeOnAir() / 1000);
       LED_off();
     } else {

@@ -36,7 +36,7 @@ PassthroughRadioEncoder packetEncoder;
 /**
  * calculate the CRC of a packet, up to but excluding the CRC field at the end
  */
-static uint16_t calculateRadioPacketCRC(RadioDecodedPacket_s &packet) {
+uint16_t calculateRadioPacketCRC(RadioDecodedPacket_s &packet) {
   // Init value for CRC calculation, by convention
   uint16_t checksum = 0xFFFF;
 
