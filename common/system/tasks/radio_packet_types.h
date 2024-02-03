@@ -40,7 +40,7 @@ LineCutterPacket_s;
 
 // Uplinked string (not necessarily null-terminated)
 #define TELEMETRY_ID_STRING 5
-#define RADIO_MAX_STRING 48
+#define RADIO_MAX_STRING 42
 #if RADIO_MAX_STRING > 0xff
 #error "Radio string length longer than 1 byte!"
 #endif

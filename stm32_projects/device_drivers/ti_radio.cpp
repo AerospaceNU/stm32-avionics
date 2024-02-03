@@ -72,6 +72,11 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
   uint8_t rfend0 = 0b00110000;
   tiRadio_spiWriteReg(radio, TIRADIO_RFEND_CFG0, &rfend0, 1);
 
+  // check precondition for tx len
+  if (radio->payloadSize > 128) {
+	  assert(0);
+  }
+
   // Figure out what packet length/config we need to send to the radio
   uint8_t pkt_len = 0xFF;
   uint8_t pkt_cfg0 = 0x20;
