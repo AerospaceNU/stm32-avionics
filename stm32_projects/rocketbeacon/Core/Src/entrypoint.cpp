@@ -4,6 +4,8 @@
 #include "packet_encoder.h"
 #include "radio_manager.h"
 
+#pragma GCC optimize("Ofast")
+
 void LED_on() { HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET); }
 void LED_off() { HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); }
 
@@ -11,21 +13,76 @@ SX126x radio;
 
 SX126x::ModulationParams_t params;
 
+uint32_t ComputeRfFreq(double frequencyMhz) {
+    return (uint32_t)(frequencyMhz * 1048576L); //2^25/(32e6)
+}
+void delay_cycles(uint32_t cycles) {
+    //34 s for 100*30000 cycles
+    //about 11 us per cycle
+    // We want 125 - 40 us
+    // Or about 125 - 40
+    // Try 8 cycles
+    for (size_t i = 0; i < cycles; i++) {
+        asm("NOP");
+    }
+}
+
+#define CENTER_FREQ 433
+
 // x 2 to convert frequency in hz to bitrate (where the bits are a preamble of 101010101...)
 static const double MIDDLE_C = 261.64;
 #define FREQ(NOTE, OCT) lround(MIDDLE_C * pow(2, (double) (OCT * 12 + NOTE) / 12.0) * 2)
 
-inline void play(uint8_t note, int octave, unsigned long durationMs) {
-	// offset by 4 since we play from middle c
-	params.Params.Gfsk.BitRate = FREQ(note, octave - 2);
-	radio.SetModulationParams(params);
-	HAL_Delay(durationMs);
+extern "C" HAL_StatusTypeDef SUBGHZSPI_Transmit(SUBGHZ_HandleTypeDef *hsubghz, uint8_t Data);
+extern "C" SUBGHZ_HandleTypeDef hsubghz;
+
+inline uint32_t play(uint8_t note, int octave, unsigned long durationMs) {
+	auto end = HAL_GetTick() + durationMs;
+	auto noteHz = FREQ(note, octave-4);
+
+	static const auto deviation = 0.003;
+
+	// sample at 4khz, or 1ms
+	// sin(2 pi f) does one cycle in 1/f, or 4000/f
+	size_t bound = 4000 / noteHz;
+	uint32_t lut[bound];
+	for (size_t i = 0; i < bound; i++) {
+		auto freq = CENTER_FREQ
+				+ deviation * sin(2.0 * 3.141592 * (float) i / (float) bound);
+		lut[i] = ComputeRfFreq(freq);
+	}
+
+	// Sample at 1khz? maybe?
+	size_t i = 0;
+	radio.SetTxContinuousWave();
+	while (HAL_GetTick() < end) {
+		uint32_t rfFreq = lut[i % bound];
+		uint8_t txbuf[5] = { 0x86, (rfFreq & 0xFF000000) >> 24, (rfFreq
+				& 0x00FF0000) >> 16, (rfFreq & 0x0000FF00) >> 8, rfFreq
+				& 0x000000FF };
+
+		/* NSS = 0 */
+		LL_PWR_SelectSUBGHZSPI_NSS();
+
+		for (uint16_t i = 0U; i < 5; i++) {
+			(void) SUBGHZSPI_Transmit(&hsubghz, txbuf[i]);
+		}
+
+		/* NSS = 1 */
+		LL_PWR_UnselectSUBGHZSPI_NSS();
+
+		i++;
+
+		delay_cycles(50);
+	}
+	radio.SetStandby(SX126x::STDBY_XOSC);
+
+	return i;
 }
 
 inline void rest(unsigned long durationMs) {
 	radio.SetStandby(SX126x::STDBY_XOSC);
 	HAL_Delay(durationMs);
-	radio.SetTxInfinitePreamble();
 }
 
 extern "C" void entrypoint(void) {
@@ -36,7 +93,7 @@ extern "C" void entrypoint(void) {
   radio.SetStandby(SX126x::STDBY_RC);
 
   // ramp time copied from elvin code
-  radio.SetTxParams(10, SX126x::RADIO_RAMP_40_US);
+  radio.SetTxParams(-9, SX126x::RADIO_RAMP_40_US);
   radio.SetPacketType(SX126x::PACKET_TYPE_GFSK);
 
 
@@ -100,7 +157,7 @@ extern "C" void entrypoint(void) {
   //static int i;
 	while (1) {
 		LED_on();
-		radio.SetTxInfinitePreamble();
+		//radio.SetTxInfinitePreamble();
 
 		play(D, 4, 250);
 		play(D, 4, 250);
