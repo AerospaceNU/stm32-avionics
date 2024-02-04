@@ -49,11 +49,11 @@ inline uint32_t play(volatile float noteHz, unsigned long durationMs) {
 
 	// sample at 4khz, or 1ms
 	// sin(2 pi f) does one cycle in 1/f, or 4000/f samples
-	size_t bound = 8000 / noteHz;
+	size_t bound = 1000;
 	uint32_t lut[bound];
 	for (size_t i = 0; i < bound; i++) {
 		auto freq = CENTER_FREQ
-				+ deviation * sin(2.0 * 3.141592 * (float) i / (float) bound);
+				+ deviation * sin(2.0 * 3.141592 * noteHz * (i / 8000.));
 		lut[i] = ComputeRfFreq(freq);
 	}
 
@@ -174,8 +174,8 @@ extern "C" void entrypoint(void) {
 //			HAL_Delay(500);
 //		}
 
-		for (int i = 0; i < 24; i++) {
-			play(A + i, 4, 250);
+		for (int i = 0; i < 36; i++) {
+			play(A + i, 3, 250);
 			HAL_Delay(500);
 		}
 
