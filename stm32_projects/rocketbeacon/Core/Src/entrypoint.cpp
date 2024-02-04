@@ -169,6 +169,8 @@ extern "C" void entrypoint(void) {
 
 		radio.SetTxContinuousWave();
 
+		// 1 - 4 //
+
 		play(D, 3, EIGTH_NOTE);
 		play(D, 3, EIGTH_NOTE);
 		play(D, 4, QUARTER_NOTE);
@@ -224,9 +226,146 @@ extern "C" void entrypoint(void) {
 		play(D, 3, EIGTH_NOTE);
 		play(F, 3, EIGTH_NOTE);
 		play(G, 3, EIGTH_NOTE);
+
+		// 5 - 8 //
+
+		play(D, 3, EIGTH_NOTE);
+		play(D, 3, EIGTH_NOTE);
+		play(D, 4, QUARTER_NOTE);
+		play(A, 4, QUARTER_NOTE);
+		rest(EIGTH_NOTE);
+		play(Gs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(Fs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(D, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(G, 3, EIGTH_NOTE);
+
+		play(C, 3, EIGTH_NOTE);
+		play(C, 3, EIGTH_NOTE);
+		play(D, 4, QUARTER_NOTE);
+		play(A, 4, QUARTER_NOTE);
+		rest(EIGTH_NOTE);
+		play(Gs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(Fs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(D, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(G, 3, EIGTH_NOTE);
+
+		play(B, 3, EIGTH_NOTE);
+		play(B, 3, EIGTH_NOTE);
+		play(D, 4, QUARTER_NOTE);
+		play(A, 4, QUARTER_NOTE);
+		rest(EIGTH_NOTE);
+		play(Gs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(Fs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(D, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(G, 3, EIGTH_NOTE);
+
+		play(As, 3, EIGTH_NOTE);
+		play(As, 3, EIGTH_NOTE);
+		play(D, 4, QUARTER_NOTE);
+		play(A, 4, QUARTER_NOTE);
+		rest(EIGTH_NOTE);
+		play(Gs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(Fs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(D, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(G, 3, EIGTH_NOTE);
+
+		// 14 - 15
+
+		play(F, 3, QUARTER_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(D, 3, QUARTER_NOTE);
+		play(D, 3, HALF_NOTE - EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+
+		play(F, 3, QUARTER_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(G, 3, QUARTER_NOTE);
+		play(Gs, 3, QUARTER_NOTE);
+		play(G, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(D, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(G, 3, QUARTER_NOTE);
+
+		// 16-17
+
+		play(F, 3, QUARTER_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(G, 3, QUARTER_NOTE);
+		play(Gs, 3, QUARTER_NOTE);
+		play(A, 4, QUARTER_NOTE);
+		play(C, 4, QUARTER_NOTE);
+		play(A, 4, QUARTER_NOTE);
+
+		play(D, 4, QUARTER_NOTE);
+		play(D, 4, QUARTER_NOTE);
+		play(D, 4, HALF_NOTE / 3);
+		play(A, 4, HALF_NOTE / 3);
+		play(D, 4, HALF_NOTE / 3);
+		play(C, 4, HALF_NOTE);
+		rest(HALF_NOTE);
+
+		// 18 - 21
+
+		play(F, 3, QUARTER_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(D, 3, QUARTER_NOTE);
+		play(D, 3, HALF_NOTE);
+		rest(QUARTER_NOTE);
+
+		play(F, 3, QUARTER_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(D, 3, QUARTER_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(A, 4, QUARTER_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(D, 3, EIGTH_NOTE);
+
+		play(D, 4, QUARTER_NOTE);
+		play(G, 3, QUARTER_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(E, 3, QUARTER_NOTE);
+		play(C, 4, QUARTER_NOTE);
+		play(G, 3, QUARTER_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(E, 3, QUARTER_NOTE);
+
+		play(B, 3, QUARTER_NOTE);
+		play(B, 3, EIGTH_NOTE);
+		play(C, 3, EIGTH_NOTE);
+		play(D, 3, QUARTER_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(C, 4, HALF_NOTE);
+		rest(EIGTH_NOTE);
 
 		radio.SetStandby(SX126x::STDBY_XOSC);
 		LED_off();
-//		HAL_Delay(1000);
+		HAL_Delay(1000);
 	}
 }
