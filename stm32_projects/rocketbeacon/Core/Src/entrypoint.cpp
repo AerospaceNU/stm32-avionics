@@ -49,7 +49,7 @@ inline uint32_t play(volatile float noteHz, unsigned long durationMs) {
 
 	// sample at 4khz, or 1ms
 	// sin(2 pi f) does one cycle in 1/f, or 4000/f samples
-	size_t bound = 1000;
+	size_t bound = 125;
 	uint32_t lut[bound];
 	for (size_t i = 0; i < bound; i++) {
 		auto freq = CENTER_FREQ
@@ -59,7 +59,6 @@ inline uint32_t play(volatile float noteHz, unsigned long durationMs) {
 
 	// Sample at 1khz? maybe?
 	size_t i = 0;
-	radio.SetTxContinuousWave();
 	unsigned long end = HAL_GetTick() + durationMs;
 	while (HAL_GetTick() < end) {
 		uint32_t rfFreq = lut[i % bound];
@@ -81,8 +80,6 @@ inline uint32_t play(volatile float noteHz, unsigned long durationMs) {
 
 		delay_cycles(40);
 	}
-	radio.SetStandby(SX126x::STDBY_XOSC);
-	HAL_Delay(100);
 
 	return i;
 }
@@ -93,8 +90,10 @@ inline uint32_t play(uint8_t note, int octave, unsigned long durationMs) {
 }
 
 inline void rest(unsigned long durationMs) {
-	radio.SetStandby(SX126x::STDBY_XOSC);
-	HAL_Delay(durationMs);
+//	radio.SetStandby(SX126x::STDBY_XOSC);
+	radio.SetRfFrequency(433000000);
+	HAL_Delay(durationMs > 5 ? durationMs - 5 : 0);
+//	radio.SetTxContinuousWave();
 }
 
 extern "C" void entrypoint(void) {
@@ -159,48 +158,75 @@ extern "C" void entrypoint(void) {
 #define Gs 11
 
 	// 2 seconds per measure, 0.5 seconds per full note
-#define FULL_NOTE 400
+#define FULL_NOTE 600
 #define HALF_NOTE (FULL_NOTE/2)
+#define QUARTER_NOTE (HALF_NOTE/2)
+#define EIGTH_NOTE (QUARTER_NOTE/2)
 
 	//static int i;
 	while (1) {
 		LED_on();
-		//radio.SetTxInfinitePreamble();
 
-//		float notes[] = { 440.00, 493.88, 523.25, 587.33, 659.25, 698.46,
-//				783.99, 880.00, 987.77, 1046.50 };
-//		for (float n : notes) {
-//			play(n, 500);
-//			HAL_Delay(500);
-//		}
+		radio.SetTxContinuousWave();
 
-		for (int i = 0; i < 36; i++) {
-			play(A + i, 3, 250);
-			HAL_Delay(500);
-		}
+		play(D, 3, EIGTH_NOTE);
+		play(D, 3, EIGTH_NOTE);
+		play(D, 4, QUARTER_NOTE);
+		play(A, 4, QUARTER_NOTE);
+		rest(EIGTH_NOTE);
+		play(Gs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(Fs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(D, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(G, 3, EIGTH_NOTE);
 
-//		volatile int dt1 = play(659.25, 500); // e5
-//
-//		HAL_Delay(1000);
-//
-//		volatile int dt2 = play(1046.50, 500); // c5
+		play(C, 3, EIGTH_NOTE);
+		play(C, 3, EIGTH_NOTE);
+		play(D, 4, QUARTER_NOTE);
+		play(A, 4, QUARTER_NOTE);
+		rest(EIGTH_NOTE);
+		play(Gs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(Fs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(D, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(G, 3, EIGTH_NOTE);
 
-//		play(A, 4, 250);
-//		play(D, 5, 250);
-//		rest(250);
-//		play(A, 4, 250);
-//		rest(500);
-//		play(Gs, 4, 250);
-//		rest(.25);
-//		play(G, 4, 250);
-//		rest(.25);
-//		play(F, 4, 500);
-//		play(D, 4, 250);
-//		play(F, 4, 250);
-//		play(G, 4, 250);
+		play(B, 3, EIGTH_NOTE);
+		play(B, 3, EIGTH_NOTE);
+		play(D, 4, QUARTER_NOTE);
+		play(A, 4, QUARTER_NOTE);
+		rest(EIGTH_NOTE);
+		play(Gs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(Fs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(D, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(G, 3, EIGTH_NOTE);
+
+		play(As, 3, EIGTH_NOTE);
+		play(As, 3, EIGTH_NOTE);
+		play(D, 4, QUARTER_NOTE);
+		play(A, 4, QUARTER_NOTE);
+		rest(EIGTH_NOTE);
+		play(Gs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(Fs, 3, EIGTH_NOTE);
+		rest(EIGTH_NOTE);
+		play(F, 3, QUARTER_NOTE);
+		play(D, 3, EIGTH_NOTE);
+		play(F, 3, EIGTH_NOTE);
+		play(G, 3, EIGTH_NOTE);
 
 		radio.SetStandby(SX126x::STDBY_XOSC);
 		LED_off();
-		HAL_Delay(1000);
+//		HAL_Delay(1000);
 	}
 }
