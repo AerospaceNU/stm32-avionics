@@ -44,6 +44,48 @@ extern "C" HAL_StatusTypeDef SUBGHZSPI_Transmit(SUBGHZ_HandleTypeDef *hsubghz,
 		uint8_t Data);
 extern "C" SUBGHZ_HandleTypeDef hsubghz;
 
+inline uint32_t play2tone(float note1, float note2, unsigned long durationMs) {
+	static const auto deviation = 0.009;
+
+	// sample at 4khz, or 1ms
+	// sin(2 pi f) does one cycle in 1/f, or 4000/f samples
+	size_t bound = 125;
+	uint32_t lut[bound];
+	for (size_t i = 0; i < bound; i++) {
+		auto freq = CENTER_FREQ
+				+ deviation
+						* (sin(2.0 * 3.141592 * note1 * (i / 8000.))
+								+ sin(2.0 * 3.141592 * note2 * (i / 8000.)));
+		lut[i] = ComputeRfFreq(freq);
+	}
+
+	// Sample at 1khz? maybe?
+	size_t i = 0;
+	unsigned long end = HAL_GetTick() + durationMs;
+	while (HAL_GetTick() < end) {
+		uint32_t rfFreq = lut[i % bound];
+		uint8_t txbuf[5] = { 0x86, (rfFreq & 0xFF000000) >> 24, (rfFreq
+				& 0x00FF0000) >> 16, (rfFreq & 0x0000FF00) >> 8, rfFreq
+				& 0x000000FF };
+
+		/* NSS = 0 */
+		LL_PWR_SelectSUBGHZSPI_NSS();
+
+		for (uint16_t i = 0U; i < 5; i++) {
+			(void) SUBGHZSPI_Transmit(&hsubghz, txbuf[i]);
+		}
+
+		/* NSS = 1 */
+		LL_PWR_UnselectSUBGHZSPI_NSS();
+
+		i++;
+
+		delay_cycles(40);
+	}
+
+	return i;
+}
+
 inline uint32_t play(volatile float noteHz, unsigned long durationMs) {
 	static const auto deviation = 0.009;
 
