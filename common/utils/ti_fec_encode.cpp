@@ -14,7 +14,7 @@
 static constexpr const uint16_t fecEncodeTable[] = {0, 3, 1, 2, 3, 0, 2, 1,
                                                     3, 0, 2, 1, 0, 3, 1, 2};
 
-void FecEncoder::Encode(uint8_t* inputPtr, size_t inLen) {
+void FecEncoder::Encode(const uint8_t* inputPtr, size_t inLen) {
   // Total mesage size including terminator
   size_t inputNum = inLen;
 

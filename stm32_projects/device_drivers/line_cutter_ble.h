@@ -8,11 +8,9 @@
 #ifndef STM32_PROJECTS_DEVICE_DRIVERS_LINE_CUTTER_BLE_H_
 #define STM32_PROJECTS_DEVICE_DRIVERS_LINE_CUTTER_BLE_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
+
+#include <functional>
 
 #include "ble_chip.h"
 #include "board_config_common.h"
@@ -20,7 +18,7 @@ extern "C" {
 
 #define LINE_CUTTER_CB_SIZE 512
 
-typedef void (*LineCutterForwardStringCb_t)(uint8_t *, size_t);
+using LineCutterForwardStringCb_t = std::function<void(uint8_t *, size_t)>;
 
 typedef struct {
   // Reference to the BLE chip driver
@@ -83,9 +81,5 @@ bool lineCutterBle_isAwaitingReply(LineCutterBleCtrl_t *ctrl);
 
 // Registers a function to call to forward strings to
 void lineCutterBle_registerForwardStringCb(LineCutterForwardStringCb_t cb);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif  // STM32_PROJECTS_DEVICE_DRIVERS_LINE_CUTTER_BLE_H_

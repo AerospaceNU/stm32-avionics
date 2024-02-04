@@ -11,15 +11,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define RADIO_MAX_LEN 128
-typedef struct __attribute__((packed)) {
-  uint8_t data[RADIO_MAX_LEN];
-  uint8_t radioId;
-  int8_t rssi;
-  bool crc;
-  uint8_t lqi;
-} RadioRecievedPacket_s;
-
 typedef enum { AXIS_X = 0, AXIS_Y, AXIS_Z } Axis_e;
 
 typedef struct {

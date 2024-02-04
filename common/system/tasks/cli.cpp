@@ -64,11 +64,11 @@ static CliConfigs_s cliConfigs = {0};
 static CliComms_e lastCommsType;  // Used to help send ack to right places
 static uint8_t lastStringId = 0xFF;
 
-static void cli_parseRadio(RadioRecievedPacket_s* packet) {
+static void cli_parseRadio(RadioDecodedRecievedPacket_s* packet) {
   // Only accept packets with good CRC
-  RadioPacket_s* parsedPacket = (RadioPacket_s*)&packet->data;
+  RadioDecodedPacket_s* parsedPacket = (RadioDecodedPacket_s*)&packet->payload;
   if (parsedPacket->packetType == TELEMETRY_ID_STRING) {
-    if (packet->crc) {
+    if (packet->decodeMetadata.crcGood) {
       if (parsedPacket->payload.cliString.id == lastStringId) {
         // duplicate string, do nothing
         return;
@@ -91,7 +91,7 @@ void cli_init() {
 
   cb_init(&radioRxCircBuffer, (unknownPtr_t)radioRxBuffer,
           sizeof(radioRxBuffer), 1);
-  radioManager_addMessageCallback(RADIO_CLI_ID, cli_parseRadio);
+  RadioManager::getRadio(RADIO_CLI_ID).addMessageCallback(cli_parseRadio);
   // Generate fake application name
   strncpy(applicationName, "F", 2);
 }
@@ -355,7 +355,8 @@ void cli_send(const char* msg) {
       hm_bleClientSend(BLE_CLI_ID, (uint8_t*)msg, (uint16_t)strlen(msg));
       break;
     case CLI_RADIO:
-      radioManager_transmitString(RADIO_CLI_ID, (uint8_t*)msg, strlen(msg));
+      RadioManager::getRadio(RADIO_CLI_ID)
+          .transmitString((uint8_t*)msg, strlen(msg));
       break;
     case CLI_USB:
       hm_usbTransmit(USB_CLI_ID, (uint8_t*)msg, (uint16_t)strlen(msg));

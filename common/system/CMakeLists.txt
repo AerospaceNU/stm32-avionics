@@ -7,6 +7,7 @@ set(SYSTEM_FILES_LIST
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/trigger_manager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/buzzer_heartbeat.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/data_offload.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tasks/packet_encoder.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_config.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_help.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tasks/cli/task_cli_main.cpp

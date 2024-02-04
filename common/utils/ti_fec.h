@@ -9,28 +9,33 @@
   {}
 // #define DEBUG_PRINTF(...) printf(__VA_ARGS__);
 
-#define TI_FEC_CRC_LEN_BYTES 2
-
 class FecEncoder {
  public:
   /*
    * Encode a message. CRC will be appended, then FEC applied, then whitening
    * happens. The result can be retrieved via FecEncoder::OutputArray
    */
-  void Encode(uint8_t* input, size_t inLen);
+  void Encode(const uint8_t* input, size_t inLen);
 
   inline const size_t OutputSize(const size_t inLen) {
     return 4 * ((inLen) / 2 + 1);
   }
-  inline uint8_t* OutputArray() { return interleaved; }
+  inline const uint8_t* const OutputArray() const { return interleaved; }
 
  private:
   //! input buffer + Trellis Terminator + CRC
   //! I probably only need one of these arrays, but an extra 300 bytes shouldn't
   //! be a huge deal?
-  uint8_t input[MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES + 2];
-  uint8_t fec[4 * ((MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES) / 2 + 1)];
-  uint8_t interleaved[4 * ((MAX_PACKET_SIZE + TI_FEC_CRC_LEN_BYTES) / 2 + 1)];
+
+  // Workspace with message contents and trellis terminator appended
+  uint8_t input[RADIO_MAX_DECODED_PACKET_SIZE + 2];
+  // Workspace for the FEC-encoded packet. Packet length includes rounding to
+  // nearest quartet of bytes and trellis terminator. See TI DN507 Page 3
+  uint8_t fec[4 * (RADIO_MAX_DECODED_PACKET_SIZE / 2 + 1)];
+  // Workspace for the output interleaved/whitened packet. Same length as the
+  // FEC packet, just with DC bias removal pseudo-random scrambling added. See
+  // TI DN504, page 4
+  uint8_t interleaved[sizeof(fec)];
 };
 
 class FecDecoder {
@@ -52,7 +57,7 @@ class FecDecoder {
    * @param pOutputBuffer where to store the decoded message
    * @param decodedMessageLen How long we expect the decoded message to be.
    */
-  void FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
+  void FecDecode(const uint8_t* pInputMessage, uint8_t* pOutputBuffer,
                  size_t decodedMessageLen);
 
  private:
@@ -69,8 +74,8 @@ class FecDecoder {
    *
    * @return Number of bytes of decoded data stored at pOutputArray
    */
-  uint16_t FecDecode4(unsigned char* pOutputArray, unsigned char* pInputArray,
-                      uint16_t nRemBytes);
+  uint16_t FecDecode4(unsigned char* pOutputArray,
+                      const unsigned char* pInputArray, uint16_t nRemBytes);
 
   // ==== Private varibles to keep track of state, reset with Reset() between
  private:
@@ -89,6 +94,8 @@ class FecDecoder {
   //! path[0]]. Records cost step for a packet tuple of state/symbol/path (a vs
   //! b) Total width is 6 bits
   uint8_t costStepLUT[1 << 6];
+
+  uint8_t deinterleavedQuartet[4];
 };
 
 namespace ti_fec {

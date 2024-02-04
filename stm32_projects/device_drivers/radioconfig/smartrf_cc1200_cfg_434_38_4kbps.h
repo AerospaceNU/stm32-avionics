@@ -50,9 +50,9 @@ const RegisterSetting_s cc1200_433_1_2kbps_cfg[] = {
     {TIRADIO_FS_CFG, 0x14},    // Frequency Synthesizer Configuration
     {TIRADIO_PKT_CFG2,
      CCA_MODE_INRX << CCA_MODE_SHIFT},  // Packet Configuration Reg. 2
-    {TIRADIO_PKT_CFG1,  // No FEC, Yes whiten, no PN9 swap, no address, default
-                        // CRC cfg, status appended
-     (0 << 7) | (1 << 6) | (0 << 5) | (0b00 << 3) | (0b01 << 1) | (1 << 0)},
+    {TIRADIO_PKT_CFG1,  // No FEC, no whiten, no PN9 swap, no address
+                        // no CRC calculation, status appended
+     (0 << 7) | (0 << 6) | (0 << 5) | (0b00 << 3) | (0b00 << 1) | (1 << 0)},
     {TIRADIO_PKT_CFG0, 0x20},    // Packet Configuration Reg. 0
     {TIRADIO_PKT_LEN, 0xFF},     // Packet Length Configuration
     {TIRADIO_IF_MIX_CFG, 0x1C},  // IF Mix Configuration

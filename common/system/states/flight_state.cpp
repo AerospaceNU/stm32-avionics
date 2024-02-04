@@ -21,7 +21,7 @@ EndCondition_e FlightState::m_lastCliEndConn;
 EndCondition_e FlightState::runState() {
   // We also should run periodic updates
   hm_radioUpdate();
-  radioManager_tick();
+  RadioManager::tick();
   hm_bleTick();
 
   // Collect, filter, and log all sensor data
@@ -32,7 +32,8 @@ EndCondition_e FlightState::runState() {
 
   // For now, transmit data to all attached radios
   for (int i = 0; i < NUM_RADIO; i++) {
-    radioManager_transmitData(i, sensorData, filterData, this->getID());
+    RadioManager::getRadio(i).transmitData(sensorData, filterData,
+                                           this->getID());
   }
 
   // Update pyros

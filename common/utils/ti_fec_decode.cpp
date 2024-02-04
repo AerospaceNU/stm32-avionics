@@ -96,7 +96,7 @@ void FecDecoder::FillLUT() {
   }
 }
 
-void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
+void FecDecoder::FecDecode(const uint8_t* pInputMessage, uint8_t* pOutputBuffer,
                            size_t decodedMessageLen) {
   Reset();
 
@@ -119,7 +119,7 @@ void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
   }
 }
 
-uint16_t FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
+uint16_t FecDecoder::FecDecode4(uint8_t* pOutputArray, const uint8_t* pInData,
                                 uint16_t nRemBytes) {
   // Variables used to hold # Viterbi iterations to run, # bytes output,
   // minimum cost for any destination state, bit index of input symbol
