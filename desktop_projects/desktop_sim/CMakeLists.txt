@@ -13,7 +13,7 @@ set(SIMULATOR_FILES_LIST
         board_config.c)
 
 # add asan
-set (WITH_ASAN OFF)
+set (WITH_ASAN ON)
 if (WITH_ASAN)
     add_compile_options(-fsanitize=address -g -Wall -fsanitize=undefined)
 endif ()
