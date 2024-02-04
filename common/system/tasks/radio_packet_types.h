@@ -110,11 +110,11 @@ typedef struct __attribute__((packed)) {
   uint8_t radioId;
   int8_t rssi;
   uint8_t lqi;
-} RecievedPacketRadioMetadat_s;
+} RecievedPacketRadioMetadata_s;
 
 typedef struct __attribute__((packed)) {
   bool crcGood;
-} RecievedPacketDecodeMetadat_s;
+} RecievedPacketDecodeMetadata_s;
 
 /**
  * Single radio packet, as recieved and demodulated by radio hardware. Includes
@@ -122,13 +122,13 @@ typedef struct __attribute__((packed)) {
  */
 typedef struct __attribute__((packed)) {
   RadioOTAPayload_s payload;
-  RecievedPacketRadioMetadat_s metadata;
+  RecievedPacketRadioMetadata_s metadata;
 } RadioRecievedOTAPacket;
 
 typedef struct __attribute__((packed)) {
   RadioDecodedPacket_s payload;
-  RecievedPacketRadioMetadat_s metadata;
-  RecievedPacketDecodeMetadat_s decodeMetadata;
+  RecievedPacketRadioMetadata_s metadata;
+  RecievedPacketDecodeMetadata_s decodeMetadata;
 } RadioDecodedRecievedPacket_s;
 
 #endif  // COMMON_SYSTEM_TASKS_RADIO_PACKET_TYPES_H_

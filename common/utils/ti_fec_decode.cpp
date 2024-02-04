@@ -80,8 +80,8 @@ void FecDecoder::Reset() {
   ((iDestState << 3) + (symbol << 1) + (path))
 
 void FecDecoder::FillLUT() {
-  for (volatile uint8_t iDestState = 0; iDestState < 8; iDestState++) {
-    for (volatile uint8_t symbol = 0; symbol < 4; symbol++) {
+  for (uint8_t iDestState = 0; iDestState < 8; iDestState++) {
+    for (uint8_t symbol = 0; symbol < 4; symbol++) {
       // Figure out how much the cost will increase for a given pair of
       // (destination, current symbol)
       uint8_t costStep0 =
@@ -96,7 +96,7 @@ void FecDecoder::FillLUT() {
   }
 }
 
-void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
+void FecDecoder::FecDecode(const uint8_t* pInputMessage, uint8_t* pOutputBuffer,
                            size_t decodedMessageLen) {
   Reset();
 
@@ -119,7 +119,7 @@ void FecDecoder::FecDecode(uint8_t* pInputMessage, uint8_t* pOutputBuffer,
   }
 }
 
-uint16_t FecDecoder::FecDecode4(uint8_t* pOutputArray, uint8_t* pInData,
+uint16_t FecDecoder::FecDecode4(uint8_t* pOutputArray, const uint8_t* pInData,
                                 uint16_t nRemBytes) {
   // Variables used to hold # Viterbi iterations to run, # bytes output,
   // minimum cost for any destination state, bit index of input symbol

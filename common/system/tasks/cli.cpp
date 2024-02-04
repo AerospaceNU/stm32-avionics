@@ -91,7 +91,7 @@ void cli_init() {
 
   cb_init(&radioRxCircBuffer, (unknownPtr_t)radioRxBuffer,
           sizeof(radioRxBuffer), 1);
-  radioManagers[RADIO_CLI_ID].addMessageCallback(cli_parseRadio);
+  RadioManager::getRadio(RADIO_CLI_ID).addMessageCallback(cli_parseRadio);
   // Generate fake application name
   strncpy(applicationName, "F", 2);
 }
@@ -355,7 +355,8 @@ void cli_send(const char* msg) {
       hm_bleClientSend(BLE_CLI_ID, (uint8_t*)msg, (uint16_t)strlen(msg));
       break;
     case CLI_RADIO:
-      radioManagers[RADIO_CLI_ID].transmitString((uint8_t*)msg, strlen(msg));
+      RadioManager::getRadio(RADIO_CLI_ID)
+          .transmitString((uint8_t*)msg, strlen(msg));
       break;
     case CLI_USB:
       hm_usbTransmit(USB_CLI_ID, (uint8_t*)msg, (uint16_t)strlen(msg));

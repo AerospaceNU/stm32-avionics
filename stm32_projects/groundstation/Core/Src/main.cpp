@@ -165,9 +165,9 @@ int main(void)
 
   hm_hardwareInit();
 
-  RadioManager::InitAll();
+  RadioManager::init();
   for (int i = 0; i < NUM_RADIO; i++) {
-    radioManagers[i].addMessageCallback(OnDataRx);
+    RadioManager::getRadio(i).addMessageCallback(OnDataRx);
   }
 
   CircularBuffer_s *buffer = hm_usbGetRxBuffer(FIRST_ID_USB_STD);
@@ -181,7 +181,7 @@ int main(void)
     hm_radioUpdate();
 
     // Process incoming data
-    RadioManager::TickAll();
+    RadioManager::tick();
 
     // Send barometer ~1x/5sec
     if ((HAL_GetTick() - start) >= 2000) {
@@ -219,7 +219,7 @@ int main(void)
           int dest = command.destination == RAD_433 ? FIRST_ID_RADIO_TI_433
                                                     : FIRST_ID_RADIO_TI_915;
 
-          radioManagers[dest].transmitString(command.data, command.len);
+          RadioManager::getRadio(dest).transmitString(command.data, command.len);
         }
         cb_dequeue(buffer, count);
       } else if (command.destination != GROUNDSTATION ||

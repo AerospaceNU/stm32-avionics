@@ -3,9 +3,9 @@
 #include <errno.h>
 #include <string.h>
 
-int FSKPacketRadioEncoder::Encode(RadioDecodedPacket_s& input,
+int FSKPacketRadioEncoder::encode(const RadioDecodedPacket_s& input,
                                   RadioOTAPayload_s& output) {
-  encoder.Encode(reinterpret_cast<uint8_t*>(&input), sizeof(input));
+  encoder.Encode(reinterpret_cast<const uint8_t*>(&input), sizeof(input));
   size_t outlen = encoder.OutputSize(sizeof(input));
   memcpy(output.payload, encoder.OutputArray(), outlen);
   output.payloadLen = outlen;
@@ -13,19 +13,19 @@ int FSKPacketRadioEncoder::Encode(RadioDecodedPacket_s& input,
   return 0;
 }
 
-int FSKPacketRadioEncoder::Decode(RadioOTAPayload_s& input,
+int FSKPacketRadioEncoder::decode(const RadioOTAPayload_s& input,
                                   RadioDecodedPacket_s& output) {
   if (input.payloadLen != encoder.OutputSize(sizeof(output))) {
     return -EMSGSIZE;
   }
 
-  decoder.FecDecode(reinterpret_cast<uint8_t*>(&input.payload),
+  decoder.FecDecode(reinterpret_cast<const uint8_t*>(&input.payload),
                     reinterpret_cast<uint8_t*>(&output), sizeof(output));
 
   return 0;
 }
 
-int PassthroughRadioEncoder::Encode(RadioDecodedPacket_s& input,
+int PassthroughRadioEncoder::encode(const RadioDecodedPacket_s& input,
                                     RadioOTAPayload_s& output) {
   size_t outlen = sizeof(input);
   memcpy(output.payload, &input, outlen);
@@ -34,7 +34,7 @@ int PassthroughRadioEncoder::Encode(RadioDecodedPacket_s& input,
   return 0;
 }
 
-int PassthroughRadioEncoder::Decode(RadioOTAPayload_s& input,
+int PassthroughRadioEncoder::decode(const RadioOTAPayload_s& input,
                                     RadioDecodedPacket_s& output) {
   if (input.payloadLen != sizeof(output)) {
     return -EMSGSIZE;

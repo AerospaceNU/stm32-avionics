@@ -6,8 +6,8 @@
 
 class FSKPacketRadioEncoder {
  public:
-  int Encode(RadioDecodedPacket_s& input, RadioOTAPayload_s& output);
-  int Decode(RadioOTAPayload_s& input, RadioDecodedPacket_s& output);
+  int encode(const RadioDecodedPacket_s& input, RadioOTAPayload_s& output);
+  int decode(const RadioOTAPayload_s& input, RadioDecodedPacket_s& output);
 
  private:
   FecEncoder encoder;
@@ -16,6 +16,6 @@ class FSKPacketRadioEncoder {
 
 class PassthroughRadioEncoder {
  public:
-  int Encode(RadioDecodedPacket_s& input, RadioOTAPayload_s& output);
-  int Decode(RadioOTAPayload_s& input, RadioDecodedPacket_s& output);
+  int encode(const RadioDecodedPacket_s& input, RadioOTAPayload_s& output);
+  int decode(const RadioOTAPayload_s& input, RadioDecodedPacket_s& output);
 };

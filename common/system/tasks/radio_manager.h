@@ -27,9 +27,17 @@ struct PacketTimerCollection {
   HmTickTimer pyroContTimer{1};
 };
 
-class RadioManager {
+/**
+ * Manages a single radio's I/O operations from a system-level perspective. The
+ * radio driver will enqueue incoming encoded packets for its particular radio
+ * ID into a CircularBuffer we hold, and we subsequently decode them into
+ * meaningful RadioDecodedRecievedPacket_s's to pass on to other system-level
+ * code such as the groundstation or CLI. Also manages periodically transmitting
+ * telemetry data based on data from sensors in transmitData
+ */
+class SingleRadioHandler {
  public:
-  RadioManager() = default;
+  SingleRadioHandler() = default;
 
   void init(int id);
   void tick();
@@ -42,9 +50,6 @@ class RadioManager {
   void transmitString(uint8_t* data, size_t len);
 
   void addMessageCallback(RadioCallback_t callback);
-
-  static void InitAll();
-  static void TickAll();
 
  private:
   int radioId;
@@ -71,7 +76,18 @@ class RadioManager {
   void sendInternal(RadioDecodedPacket_s& packet);
 };
 
-// stupid hack for static list of all radio managers
-extern RadioManager radioManagers[NUM_RADIO];
+/**
+ * RadioManager holds all radios on this board and deligates updating them. See
+ * SingleRadioHandler for what that does.
+ */
+class RadioManager {
+ public:
+  static void init();
+  static void tick();
+  static SingleRadioHandler& getRadio(int radio);
+
+ private:
+  RadioManager() = default;
+};
 
 #endif  // COMMON_SYSTEM_TASKS_RADIO_MANAGER_H_

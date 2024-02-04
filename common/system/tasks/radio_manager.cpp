@@ -19,7 +19,7 @@
 #define RADIO_INTERVAL_MS 200
 #define RADIO_SEND_MS 100
 
-static const char *call = "KM6GNL";
+static const char* call = "KM6GNL";
 
 // https://stackoverflow.com/q/9695329
 #define ROUND_2_INT(f) ((int)((f) >= 0.0 ? (f + 0.5) : (f - 0.5)))
@@ -36,20 +36,20 @@ PassthroughRadioEncoder packetEncoder;
 /**
  * calculate the CRC of a packet, up to but excluding the CRC field at the end
  */
-static uint16_t calculateRadioPacketCRC(RadioDecodedPacket_s &packet) {
+static uint16_t calculateRadioPacketCRC(RadioDecodedPacket_s& packet) {
   // Init value for CRC calculation, by convention
   uint16_t checksum = 0xFFFF;
 
   // iterate over whole packet, up until CRC
-  uint8_t *pktAsBytes = reinterpret_cast<uint8_t *>(&packet);
-  for (int i = 0; i < sizeof(packet) - sizeof(packet.packetCRC); i++) {
+  uint8_t* pktAsBytes = reinterpret_cast<uint8_t*>(&packet);
+  for (size_t i = 0; i < sizeof(packet) - sizeof(packet.packetCRC); i++) {
     checksum = ti_fec::calculateCRC(pktAsBytes[i], checksum);
   }
 
   return checksum;
 }
 
-void RadioManager::init(int id) {
+void SingleRadioHandler::init(int id) {
   radioId = id;
 
   for (int i = 0; i < NUM_RADIO; i++) {
@@ -68,7 +68,7 @@ void RadioManager::init(int id) {
 }
 
 //! Must be called periodically to output data over CLI or USB
-void RadioManager::tick() {
+void SingleRadioHandler::tick() {
   static RadioRecievedOTAPacket packet;
 
   // Try to dequeue all the packets we've gotten
@@ -79,7 +79,7 @@ void RadioManager::tick() {
       // first decode the packet
       RadioDecodedRecievedPacket_s decoded;
       decoded.metadata = packet.metadata;
-      if (0 == packetEncoder.Decode(packet.payload, decoded.payload)) {
+      if (0 == packetEncoder.decode(packet.payload, decoded.payload)) {
         // CRC of bytes we got from the radio
         uint16_t localCRC = calculateRadioPacketCRC(decoded.payload);
         // The CRC set by the sender
@@ -103,26 +103,26 @@ void RadioManager::tick() {
   }
 }
 
-void RadioManager::sendInternal(RadioDecodedPacket_s &packet) {
+void SingleRadioHandler::sendInternal(RadioDecodedPacket_s& packet) {
   // set the CRC
   packet.packetCRC = calculateRadioPacketCRC(packet);
 
   // and encode
   RadioOTAPayload_s output;
-  if (0 == packetEncoder.Encode(packet, output)) {
+  if (0 == packetEncoder.encode(packet, output)) {
     hm_radioSend(radioId, output.payload, output.payloadLen);
   } else {
     printf("Radio message encode failed?\n");
   }
 }
 
-void RadioManager::addMessageCallback(RadioCallback_t callback) {
+void SingleRadioHandler::addMessageCallback(RadioCallback_t callback) {
   callbacks[numCallbacks] = callback;
   numCallbacks++;
 }
 
-void RadioManager::transmitData(SensorData_s *sensorData,
-                                FilterData_s *filterData, uint8_t state) {
+void SingleRadioHandler::transmitData(SensorData_s* sensorData,
+                                      FilterData_s* filterData, uint8_t state) {
   uint32_t currentTime = hm_millis();
 
   if (currentTime % RADIO_INTERVAL_MS >= RADIO_SEND_MS) return;
@@ -279,7 +279,7 @@ void RadioManager::transmitData(SensorData_s *sensorData,
 #endif  // HAS_DEV(LINE_CUTTER)
 }
 
-void RadioManager::transmitString(uint8_t *data, size_t len) {
+void SingleRadioHandler::transmitString(uint8_t* data, size_t len) {
   static uint8_t lastTxId = 0;
 
   while (len) {
@@ -322,11 +322,17 @@ void RadioManager::transmitString(uint8_t *data, size_t len) {
   }
 }
 
-RadioManager radioManagers[NUM_RADIO];
+// All our radio handlers. this lives here instead of as a static member of
+// RadioManager since I can't figure out the linker, but this is smelly
+static SingleRadioHandler radioHandlers[NUM_RADIO];
 
-void RadioManager::InitAll() {
-  for (int i = 0; i < NUM_RADIO; i++) radioManagers[i].init(i);
+void RadioManager::init() {
+  for (int i = 0; i < NUM_RADIO; i++) radioHandlers[i].init(i);
 }
-void RadioManager::TickAll() {
-  for (auto &m : radioManagers) m.tick();
+void RadioManager::tick() {
+  for (auto& m : radioHandlers) m.tick();
+}
+
+SingleRadioHandler& RadioManager::getRadio(int radio) {
+  return radioHandlers[radio];
 }
