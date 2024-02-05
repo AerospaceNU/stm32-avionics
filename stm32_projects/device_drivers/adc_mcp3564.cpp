@@ -67,7 +67,7 @@ static const uint8_t DEV_ADDR = 0x1;
  * @param val the value to set into the register
  * @return an error code, if any
  */
-static int mcp356x_modifyReg8(AdcMcp3564Ctrl_s *dev, uint16_t reg_addr,
+static int mcp356x_modifyReg8(AdcMcp3564Ctrl_s* dev, uint16_t reg_addr,
                               uint8_t mask, int val) {
   // 1: Read data from register
   uint8_t tx_read[2] = {0};
@@ -118,7 +118,7 @@ static int mcp356x_modifyReg8(AdcMcp3564Ctrl_s *dev, uint16_t reg_addr,
  * @param val the value to set into the register
  * @return an error code, if any
  */
-static int mcp356x_modifyReg24(AdcMcp3564Ctrl_s *dev, int reg_addr, int mask,
+static int mcp356x_modifyReg24(AdcMcp3564Ctrl_s* dev, int reg_addr, int mask,
                                int val) {
   // 1: Read data from register
   uint8_t tx_read[4];
@@ -163,9 +163,9 @@ static int mcp356x_modifyReg24(AdcMcp3564Ctrl_s *dev, int reg_addr, int mask,
   return 0;
 }
 
-void mcp356x_txRxCpltCallback(void *pdev) {
+void mcp356x_txRxCpltCallback(void* pdev) {
   // When the DMA transaction is done, deassert CS and process the data
-  AdcMcp3564Ctrl_s *dev = static_cast<AdcMcp3564Ctrl_s *>(pdev);
+  AdcMcp3564Ctrl_s* dev = static_cast<AdcMcp3564Ctrl_s*>(pdev);
 
   CHIP_DESELECT
   // third byte from bottom, DR_STATUS
@@ -182,14 +182,14 @@ void mcp356x_txRxCpltCallback(void *pdev) {
                  (static_cast<uint32_t>(dev->rx_read_buf[4]));
 
   // TODO make this respect different DATA_FORMAT modes
-  AdcMcp3564_DataFormat_11 *output =
-      reinterpret_cast<AdcMcp3564_DataFormat_11 *>(&raw);
+  AdcMcp3564_DataFormat_11* output =
+      reinterpret_cast<AdcMcp3564_DataFormat_11*>(&raw);
   uint8_t channelID = output->channel_id;
   dev->result[channelID] = output->data;
 }
 
-void mcp356x_read(void *pdev) {
-  AdcMcp3564Ctrl_s *dev = static_cast<AdcMcp3564Ctrl_s *>(pdev);
+void mcp356x_read(void* pdev) {
+  AdcMcp3564Ctrl_s* dev = static_cast<AdcMcp3564Ctrl_s*>(pdev);
   // Static read (Table 6-2)
   dev->tx_read_buf[0] = DEV_ADDR << 6 | MCP356X_REG_ADCDATA << 2 |
                         (MCP356X_CMD_TYPE_STATIC_READ & 0x3);
@@ -199,8 +199,8 @@ void mcp356x_read(void *pdev) {
   HAL_SPI_TransmitReceive_DMA(dev->hspi, dev->tx_read_buf, dev->rx_read_buf, 5);
 }
 
-int mcp3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
-                 GPIO_TypeDef *csPort, uint16_t csPin, GPIO_TypeDef *intPort,
+int mcp3564_init(AdcMcp3564Ctrl_s* dev, SPI_HandleTypeDef* hspi,
+                 GPIO_TypeDef* csPort, uint16_t csPin, GPIO_TypeDef* intPort,
                  uint16_t intPin) {
   dev->hspi = hspi;
   dev->csPort = csPort;
@@ -307,7 +307,7 @@ int mcp3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
   return 0;
 }
 
-int mcp356x_channelSetup(AdcMcp3564Ctrl_s *dev,
+int mcp356x_channelSetup(AdcMcp3564Ctrl_s* dev,
                          const AdcMcp3564MuxChannels_e in_p,
                          const AdcMcp3564MuxChannels_e in_n) {
   // 1: Configure the MUX register to select the correct channel

@@ -10,7 +10,7 @@ Gps::Gps() = default;
 
 bool Gps::hasNewFix() const { return newFix; }
 
-GpsData_s *Gps::getLastFix() {
+GpsData_s* Gps::getLastFix() {
   newFix = false;
   return &gpsData;
 }

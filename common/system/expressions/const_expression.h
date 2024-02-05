@@ -27,13 +27,13 @@ class ConstExpression : public Expression {
    */
   ConstExpression(uint16_t triggerNum, int value);
 
-  void evaluate(FilterData_s *filterData,
-                ExpressionPtrCallback &expressionPtrCallback);
+  void evaluate(FilterData_s* filterData,
+                ExpressionPtrCallback& expressionPtrCallback);
 
-  int toString(char *buffer, int n,
-               ExpressionPtrCallback &expressionPtrCallback) const;
+  int toString(char* buffer, int n,
+               ExpressionPtrCallback& expressionPtrCallback) const;
 
-  void serializeInto(SerializedExpression_s *serialized) const;
+  void serializeInto(SerializedExpression_s* serialized) const;
 };
 
 #endif  // COMMON_SYSTEM_EXPRESSIONS_CONST_EXPRESSION_H_

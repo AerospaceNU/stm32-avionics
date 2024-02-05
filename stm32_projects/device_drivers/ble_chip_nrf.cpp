@@ -13,7 +13,7 @@
 
 #include "hal_callbacks.h"
 
-static bool bleChipNrf_txBusy(BleChipNrfCtrl_t *ctrl) {
+static bool bleChipNrf_txBusy(BleChipNrfCtrl_t* ctrl) {
   return HAL_UART_STATE_READY != ctrl->ble_uart->gState;
 }
 
@@ -28,8 +28,8 @@ static bool bleChipNrf_txBusy(BleChipNrfCtrl_t *ctrl) {
  * @return the status code from the HAL library from
  * sending a transmission.
  */
-static HAL_StatusTypeDef bleChipNrf_txInternal(BleChipNrfCtrl_t *ctrl,
-                                               uint8_t *buf, uint16_t bufLen) {
+static HAL_StatusTypeDef bleChipNrf_txInternal(BleChipNrfCtrl_t* ctrl,
+                                               uint8_t* buf, uint16_t bufLen) {
   uint32_t start = HAL_GetTick();
 
   while (HAL_GetTick() - start <
@@ -50,8 +50,8 @@ static HAL_StatusTypeDef bleChipNrf_txInternal(BleChipNrfCtrl_t *ctrl,
                                INCOMING_PACKET_SIZE)
 
 // A transmission Size bytes long just ended that began at the old dma_buff_head
-static void bleChipNrf_rxEventCallback(void *userData, size_t Size) {
-  BleChipNrfCtrl_t *ctrl = (BleChipNrfCtrl_t *)userData;
+static void bleChipNrf_rxEventCallback(void* userData, size_t Size) {
+  BleChipNrfCtrl_t* ctrl = (BleChipNrfCtrl_t*)userData;
 
   // Our new data starts at dma_buff_begin
   // Let's just cast it to a pointer to a RecievedPacket and
@@ -59,7 +59,7 @@ static void bleChipNrf_rxEventCallback(void *userData, size_t Size) {
   uint8_t address = ctrl->dma_buff_begin[0];
   uint16_t len = static_cast<uint16_t>(ctrl->dma_buff_begin[1] |
                                        ctrl->dma_buff_begin[2] << 8);
-  uint8_t *pdata = ctrl->dma_buff_begin + 3;
+  uint8_t* pdata = ctrl->dma_buff_begin + 3;
 
   // Dumb exception for "connected clients" packet
   if (address == BLEINTERFACE_SELF_ADDR && len == 1) {
@@ -80,16 +80,16 @@ static void bleChipNrf_rxEventCallback(void *userData, size_t Size) {
   START_DMA;
 }
 
-static void bleChipNrf_rxCpltCallback(void *userData) {
+static void bleChipNrf_rxCpltCallback(void* userData) {
   // The buffer should be full at this point
   bleChipNrf_rxEventCallback(userData, DMA_BUFF_SIZE);
 }
 
 // Associate a given circular buffer with an address. Bytes addressed to it will
 // be added to the buffer.
-static void bleChipNrf_registerAddress(void *ctrl, uint8_t address,
-                                       CircularBuffer_s *cb) {
-  BleChipNrfCtrl_t *realCtrl = (BleChipNrfCtrl_t *)ctrl;
+static void bleChipNrf_registerAddress(void* ctrl, uint8_t address,
+                                       CircularBuffer_s* cb) {
+  BleChipNrfCtrl_t* realCtrl = (BleChipNrfCtrl_t*)ctrl;
   realCtrl->circular_buffers[address] = cb;
 }
 
@@ -99,9 +99,9 @@ static void bleChipNrf_registerAddress(void *ctrl, uint8_t address,
  * which MUST be below MAX_PACKET Note that this blocks while transmission
  * happens
  */
-static bool bleChipNrf_sendRequest(void *ctrl, uint8_t address,
-                                   const void *pdata, uint16_t len) {
-  BleChipNrfCtrl_t *realCtrl = (BleChipNrfCtrl_t *)ctrl;
+static bool bleChipNrf_sendRequest(void* ctrl, uint8_t address,
+                                   const void* pdata, uint16_t len) {
+  BleChipNrfCtrl_t* realCtrl = (BleChipNrfCtrl_t*)ctrl;
 
   // We need to transmit 1 byte addr, 2 byte len, n bytes of data
   const uint16_t headerSize = sizeof(address) + sizeof(len);
@@ -125,8 +125,8 @@ static bool bleChipNrf_sendRequest(void *ctrl, uint8_t address,
   return ret == HAL_OK;
 }
 
-static size_t bleChipNrf_dequeuePacket(CircularBuffer_s *buffer,
-                                       uint8_t *pdata) {
+static size_t bleChipNrf_dequeuePacket(CircularBuffer_s* buffer,
+                                       uint8_t* pdata) {
   // We should have at least 2 bytes (the len bytes) in our array
   if (cb_count(buffer) < 2) return 0;
 
@@ -156,21 +156,21 @@ static size_t bleChipNrf_dequeuePacket(CircularBuffer_s *buffer,
 // Check if a particular address was reported as connected. Note that this uses
 // the cached connectedClients value! connectedClients should be updated
 // periodically
-static bool bleChipNrf_isAddressConnected(void *ctrl, uint8_t address) {
-  BleChipNrfCtrl_t *realCtrl = (BleChipNrfCtrl_t *)ctrl;
+static bool bleChipNrf_isAddressConnected(void* ctrl, uint8_t address) {
+  BleChipNrfCtrl_t* realCtrl = (BleChipNrfCtrl_t*)ctrl;
   uint8_t mask = 0b1 << (address - 1);
   return (bool)(realCtrl->connectedClients & mask);
 }
 
 // Send a request to the Bluetooth chip on the FCB to tell us what clients are
 // connected
-static bool bleChipNrf_pollConnectedClients(void *ctrl) {
+static bool bleChipNrf_pollConnectedClients(void* ctrl) {
   uint8_t one = 0x01;
   return HAL_OK ==
          bleChipNrf_sendRequest(ctrl, BLEINTERFACE_SELF_ADDR, &one, 1);
 }
 
-void bleChipNrf_init(BleChipNrfCtrl_t *ctrl, UART_HandleTypeDef *ble_uart) {
+void bleChipNrf_init(BleChipNrfCtrl_t* ctrl, UART_HandleTypeDef* ble_uart) {
   ctrl->bleChip.dequeuePacket = bleChipNrf_dequeuePacket;
   ctrl->bleChip.isAddressConnected = bleChipNrf_isAddressConnected;
   ctrl->bleChip.pollConnectedClients = bleChipNrf_pollConnectedClients;
@@ -195,7 +195,7 @@ void bleChipNrf_init(BleChipNrfCtrl_t *ctrl, UART_HandleTypeDef *ble_uart) {
   START_DMA;
 }
 
-void bleChipNrf_tick(BleChipNrfCtrl_t *ctrl) {
+void bleChipNrf_tick(BleChipNrfCtrl_t* ctrl) {
   if (HAL_GetTick() > ctrl->lastPollTimestamp + BLE_POLL_INTERVAL) {
     bleChipNrf_pollConnectedClients(ctrl);
     ctrl->lastPollTimestamp = HAL_GetTick();

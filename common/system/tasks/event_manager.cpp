@@ -2,7 +2,7 @@
 
 static bool eventStatus[Event_e::NUM_EVENT];
 void eventManager_init() {
-  for (bool &b : eventStatus) {
+  for (bool& b : eventStatus) {
     b = false;
   }
 }

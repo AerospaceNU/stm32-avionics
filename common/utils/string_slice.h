@@ -5,7 +5,7 @@
  */
 class StringSlice {
  private:
-  const char **src;
+  const char** src;
   int start;
   int end;
   int len;
@@ -17,7 +17,7 @@ class StringSlice {
    * @param start The starting character, included
    * @param end The ending character, excluded
    */
-  StringSlice(const char **src, int start, int end);
+  StringSlice(const char** src, int start, int end);
 
   /**
    * Default constructor.
@@ -27,13 +27,13 @@ class StringSlice {
   /*
    * See if this StringSlice matches a string constant.
    */
-  bool operator==(const char *other) const;
+  bool operator==(const char* other) const;
 
   /**
    * Get a pointer to the first character of the slice.
    * @return Pointer to the first character in the slice.
    */
-  const char *startPtr() const;
+  const char* startPtr() const;
 
   /**
    * Get a (double) pointer to the base character of the backing string.
@@ -41,7 +41,7 @@ class StringSlice {
    * 		 This will not necessarily be equivalent to the start of this
    * 		 slice.
    */
-  const char **basePtr() const;
+  const char** basePtr() const;
 
   /**
    * Get the length of the slice.
@@ -60,14 +60,14 @@ class StringSlice {
    * Get a pointer to the end of this slice.
    * @return The endpointer.
    */
-  const char *endptr() const;
+  const char* endptr() const;
 
   /**
    * Copy characters from this slice into a buffer.
    * @param buffer buffer to copy into.
    * @param n number of characters to copy.
    */
-  void copy(char *buffer, int n) const;
+  void copy(char* buffer, int n) const;
 
   /**
    * If this string is wrapped by (), return a new slice
@@ -84,7 +84,7 @@ class StringSlice {
    * @param delim Delimiter character to split on
    * @return int representing the number of splits made.
    */
-  int split(StringSlice *slices, int sliceCount, const char delim);
+  int split(StringSlice* slices, int sliceCount, const char delim);
 };
 
 #endif  // COMMON_UTILS_STRING_SLICE_H_

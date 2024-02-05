@@ -13,7 +13,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-#define unknownPtr_t uint8_t *
+#define unknownPtr_t uint8_t*
 
 typedef struct {
   // We use
@@ -35,7 +35,7 @@ typedef struct {
  * Note that circular buffer wraps an existing buffer. Memory of the existing
  * buffer must be allocated externally.
  */
-void cb_init(CircularBuffer_s *cb, unknownPtr_t buffer, size_t capacity,
+void cb_init(CircularBuffer_s* cb, unknownPtr_t buffer, size_t capacity,
              size_t size);
 
 /**
@@ -47,22 +47,22 @@ void cb_init(CircularBuffer_s *cb, unknownPtr_t buffer, size_t capacity,
  * @param numElements: [in] Max number of elements to read, or NULL if all
  * elements should be read. [out] Number of elements actually read
  */
-void cb_peek(CircularBuffer_s *cb, unknownPtr_t outputBuffer,
-             size_t *numElements);
+void cb_peek(CircularBuffer_s* cb, unknownPtr_t outputBuffer,
+             size_t* numElements);
 
 /**
  * @brief Get the number of items currently in the circular buffer
  * @param cb: Circular buffer to get count of
  * @return Number of items in buffer
  */
-size_t cb_count(CircularBuffer_s *cb);
+size_t cb_count(CircularBuffer_s* cb);
 
 /**
  * @brief Get the maximum number of items this buffer can hold
  * @param cb: Circular buffer to get capacity of
  * @return Max items it can hold
  */
-size_t cb_capacity(CircularBuffer_s *cb);
+size_t cb_capacity(CircularBuffer_s* cb);
 
 /**
  * @brief Adds an item to the queue if there's room. If buffer is at capacity,
@@ -72,7 +72,7 @@ size_t cb_capacity(CircularBuffer_s *cb);
  * size
  * @return: True if successful, false if buffer full
  */
-bool cb_enqueue(CircularBuffer_s *cb, const unknownPtr_t item);
+bool cb_enqueue(CircularBuffer_s* cb, const unknownPtr_t item);
 
 /**
  * @brief Removes a given number of elements from the front of the circular
@@ -80,20 +80,20 @@ bool cb_enqueue(CircularBuffer_s *cb, const unknownPtr_t item);
  * @param cb: Circular buffer to dequeue
  * @param numElements: Max number of elements to dequeue
  */
-void cb_dequeue(CircularBuffer_s *cb, size_t numElements);
+void cb_dequeue(CircularBuffer_s* cb, size_t numElements);
 
 /**
  * @brief Return whether circular buffer is full
  * @param cb: Circular buffer to check
  * @return: True if circular buffer full, False otherwises
  */
-bool cb_full(CircularBuffer_s *cb);
+bool cb_full(CircularBuffer_s* cb);
 
 /**
  * @brief Delete the circular buffer's contents by resetting it
  * @param cb: Circular buffer to flush
  */
-void cb_flush(CircularBuffer_s *cb);
+void cb_flush(CircularBuffer_s* cb);
 
 #ifdef __cplusplus
 }

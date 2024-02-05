@@ -22,8 +22,8 @@ typedef struct {
   AccelData_s val;
 } AccelH3lis331dlCtrl_s;
 
-bool accelH3lis331dl_init(AccelH3lis331dlCtrl_s *sensor, SpiCtrl_t spi);
-void accelH3lis331dl_getData(AccelH3lis331dlCtrl_s *sensor);
+bool accelH3lis331dl_init(AccelH3lis331dlCtrl_s* sensor, SpiCtrl_t spi);
+void accelH3lis331dl_getData(AccelH3lis331dlCtrl_s* sensor);
 
 #ifdef __cplusplus
 }

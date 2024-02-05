@@ -168,8 +168,8 @@ typedef struct LSM9DS1Ctrl_s {
   Lsm9ds1MCtrl_s m;
 } ImuLsm9ds1Ctrl_s;
 
-bool lsm9ds1_init(ImuLsm9ds1Ctrl_s *sensor);
-void lsm9ds1_getData(ImuLsm9ds1Ctrl_s *sensor);
+bool lsm9ds1_init(ImuLsm9ds1Ctrl_s* sensor);
+void lsm9ds1_getData(ImuLsm9ds1Ctrl_s* sensor);
 
 #ifdef __cplusplus
 }

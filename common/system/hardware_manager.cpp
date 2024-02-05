@@ -260,7 +260,7 @@ static size_t SENSOR_DATA_SIZE = sizeof(SensorData_s);
 
 /* Hardware manager sim mode trackers */
 static bool inSim = false;
-static CircularBuffer_s *simRxBuffer = NULL;
+static CircularBuffer_s* simRxBuffer = NULL;
 
 void hm_hardwareInit() {
   /* Accelerometers */
@@ -299,7 +299,7 @@ void hm_hardwareInit() {
   // Register each client with the 1 chip (1 chip should be enforced by config)
   for (int i = 0; i < NUM_BLE_CLIENT_STD; i++) {
 #if HAS_DEV(BLE_CHIP_NRF)
-    bleClientStd_init(&bleClientStd[i], (BleChip_s *)(&bleChipNrf[0]),
+    bleClientStd_init(&bleClientStd[i], (BleChip_s*)(&bleChipNrf[0]),
                       bleClientStdAddress[i]);
 #endif  // HAS_DEV(BLE_CHIP_NRF)
     hardwareStatusBleClient[FIRST_ID_BLE_CLIENT_STD + i] = true;
@@ -407,7 +407,7 @@ void hm_hardwareInit() {
     hardwareStatusPyro[FIRST_ID_PYRO_DIGITAL + i] = true;
   }
   halCallbacks_registerTimPeriodElapsedCallback(
-      pyroDigitalTickTim, (void (*)(void *))(hm_pyroUpdate), NULL);
+      pyroDigitalTickTim, (void (*)(void*))(hm_pyroUpdate), NULL);
   HAL_TIM_Base_Start_IT(pyroDigitalTickTim);
 #endif  // HAS_DEV(PYRO_DIGITAL)
 
@@ -417,7 +417,7 @@ void hm_hardwareInit() {
     // Register each BLE line cutter with the 1 chip (1 chip should be enforced
     // by config)
 #if HAS_DEV(BLE_CHIP_NRF)
-    lineCutterBle_init(&lineCutterBle[i], (BleChip_s *)(&bleChipNrf[0]),
+    lineCutterBle_init(&lineCutterBle[i], (BleChip_s*)(&bleChipNrf[0]),
                        lineCutterBleAddress[i]);
     hardwareStatusLineCutter[FIRST_ID_LINE_CUTTER_BLE + i] = true;
 #endif  // HAS_DEV(BLE_CHIP_NRF)
@@ -562,7 +562,7 @@ void hm_hardwareInit() {
 uint32_t hm_millis() { return HAL_GetTick(); }
 
 bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
-                       uint8_t *pData) {
+                       uint8_t* pData) {
 #if HAS_DEV(FLASH_S25FLX)
   if (IS_DEVICE(flashId, FLASH_S25FLX)) {
     return flashS25flx_readStart(
@@ -581,7 +581,7 @@ bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
 }
 
 bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
-                        uint8_t *data) {
+                        uint8_t* data) {
 #if HAS_DEV(FLASH_S25FLX)
   if (IS_DEVICE(flashId, FLASH_S25FLX)) {
     return flashS25flx_writeStart(
@@ -707,18 +707,18 @@ void hm_ledToggle(int ledId) {
 #endif  // HAS_DEV(LED_DIGITAL)
 }
 
-bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
+bool hm_radioSend(int radioNum, uint8_t* data, uint16_t numBytes) {
   (void)numBytes;
 #if HAS_DEV(RADIO_TI_433)
   if (IS_DEVICE(radioNum, RADIO_TI_433)) {
-    TiRadioCtrl_s *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
+    TiRadioCtrl_s* pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
     return tiRadio_addTxPacket(pRadio, data, pRadio->payloadSize);
   }
 #endif  // HAS_DEV(RADIO_TI_433)
 
 #if HAS_DEV(RADIO_TI_915)
   if (IS_DEVICE(radioNum, RADIO_TI_915)) {
-    TiRadioCtrl_s *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
+    TiRadioCtrl_s* pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
     return tiRadio_addTxPacket(pRadio, data, pRadio->payloadSize);
   }
 #endif  // HAS_DEV(RADIO_TI_915)
@@ -740,17 +740,17 @@ void hm_radioUpdate() {
 #endif  // HAS_DEV(RADIO_TI_915)
 }
 
-void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {
+void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s* rxBuffer) {
 #if HAS_DEV(RADIO_TI_433)
   if (IS_DEVICE(radioNum, RADIO_TI_433)) {
-    TiRadioCtrl_s *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
+    TiRadioCtrl_s* pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
     tiRadio_registerConsumer(pRadio, rxBuffer);
   }
 #endif  // HAS_DEV(RADIO_TI_433)
 
 #if HAS_DEV(RADIO_TI_915)
   if (IS_DEVICE(radioNum, RADIO_TI_915)) {
-    TiRadioCtrl_s *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
+    TiRadioCtrl_s* pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
     tiRadio_registerConsumer(pRadio, rxBuffer);
   }
 #endif  // HAS_DEV(RADIO_TI_915)
@@ -761,7 +761,7 @@ void hm_radioSetChannel(int radioNum, int channel) {
   // We set channels by starting from channel 0's frequency and incrementing
   // by a fixed bandwidth between channels
   float centerFrequency;
-  TiRadioCtrl_s *rad = NULL;
+  TiRadioCtrl_s* rad = NULL;
   TiRadioBand_e band;
 
 #if HAS_DEV(RADIO_TI_433)
@@ -795,7 +795,7 @@ bool hm_usbIsConnected(int usbId) {
   return false;
 }
 
-bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
+bool hm_usbTransmit(int usbId, uint8_t* data, uint16_t numBytes) {
 #if HAS_DEV(USB_STD)
   if (IS_DEVICE(usbId, USB_STD)) {
     return usbStd_transmit(data, numBytes);
@@ -805,7 +805,7 @@ bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
   return false;
 }
 
-CircularBuffer_s *hm_usbGetRxBuffer(int usbId) {
+CircularBuffer_s* hm_usbGetRxBuffer(int usbId) {
 #if HAS_DEV(USB_STD)
   if (IS_DEVICE(usbId, USB_STD)) {
     return usbStd_getRxBuffer();
@@ -827,7 +827,7 @@ bool hm_bleClientConnected(int bleClientId) {
   return false;
 }
 
-bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
+bool hm_bleClientSend(int bleClientId, const uint8_t* data, uint16_t numBytes) {
 #if HAS_DEV(BLE_CLIENT_STD)
   if (IS_DEVICE(bleClientId, BLE_CLIENT_STD)) {
     return bleClientStd[bleClientId - FIRST_ID_BLE_CLIENT_STD]
@@ -840,7 +840,7 @@ bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
   return false;
 }
 
-CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) {
+CircularBuffer_s* hm_bleClientGetRxBuffer(int bleClientId) {
 #if HAS_DEV(BLE_CLIENT_STD)
   if (IS_DEVICE(bleClientId, BLE_CLIENT_STD)) {
     return &bleClientStd[bleClientId - FIRST_ID_BLE_CLIENT_STD].parsedBuffer;
@@ -869,7 +869,7 @@ void hm_bleTick() {
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
 }
 
-LineCutterData_s *hm_getLineCutterData(int lineCutterId) {
+LineCutterData_s* hm_getLineCutterData(int lineCutterId) {
 #if HAS_DEV(LINE_CUTTER_BLE)
   if (IS_DEVICE(lineCutterId, LINE_CUTTER_BLE)) {
     return &lineCutterBle[lineCutterId - FIRST_ID_LINE_CUTTER_BLE].lastData;
@@ -878,7 +878,7 @@ LineCutterData_s *hm_getLineCutterData(int lineCutterId) {
   return NULL;
 }
 
-LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
+LineCutterFlightVars_s* hm_getLineCutterFlightVariables(int lineCutterId) {
 #if HAS_DEV(LINE_CUTTER_BLE)
   if (IS_DEVICE(lineCutterId, LINE_CUTTER_BLE)) {
     return &lineCutterBle[lineCutterId - FIRST_ID_LINE_CUTTER_BLE].flightVars;
@@ -887,7 +887,7 @@ LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
   return NULL;
 }
 
-bool hm_lineCutterSendString(int lineCutterNumber, char *string) {
+bool hm_lineCutterSendString(int lineCutterNumber, char* string) {
   if (!string) return false;
 #if HAS_DEV(LINE_CUTTER_BLE)
   for (int i = 0; i < NUM_LINE_CUTTER_BLE; i++) {
@@ -958,7 +958,7 @@ void hm_pyroSetPwm(int pyroId, uint32_t duration, uint32_t frequency,
 #endif  // HAS_DEV(PYRO_DIGITAL)
 }
 
-void hm_pyroUpdate(void *pUserData) {
+void hm_pyroUpdate(void* pUserData) {
 #if HAS_DEV(PYRO_DIGITAL)
   for (int i = 0; i < NUM_PYRO_DIGITAL; i++) {
     pyroDigital_tick(&pyroDigital[i]);
@@ -1108,11 +1108,11 @@ void hm_readSensorData() {
   }
 }
 
-SensorData_s *hm_getSensorData() { return &sensorData; }
+SensorData_s* hm_getSensorData() { return &sensorData; }
 
-SensorProperties_s *hm_getSensorProperties() { return &sensorProperties; }
+SensorProperties_s* hm_getSensorProperties() { return &sensorProperties; }
 
-void hm_enableSimMode(CircularBuffer_s *rxBuffer) {
+void hm_enableSimMode(CircularBuffer_s* rxBuffer) {
   inSim = true;
   simRxBuffer = rxBuffer;
 }

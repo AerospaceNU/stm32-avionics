@@ -17,7 +17,7 @@
 
 typedef struct {
   // Reference to the BLE chip driver "class"
-  BleChip_s *bleChip;
+  BleChip_s* bleChip;
 
   // BLE "address" data comes from
   uint8_t address;
@@ -32,8 +32,8 @@ typedef struct {
   CircularBuffer_s parsedBuffer;
 } BleClientStdCtrl_s;
 
-void bleClientStd_init(BleClientStdCtrl_s *ctrl, BleChip_s *bleChip,
+void bleClientStd_init(BleClientStdCtrl_s* ctrl, BleChip_s* bleChip,
                        uint8_t address);
-void bleClientStd_tick(BleClientStdCtrl_s *ctrl);
+void bleClientStd_tick(BleClientStdCtrl_s* ctrl);
 
 #endif  // STM32_PROJECTS_DEVICE_DRIVERS_BLE_CLIENT_STD_H_

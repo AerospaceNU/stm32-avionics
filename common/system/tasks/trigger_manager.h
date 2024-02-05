@@ -45,7 +45,7 @@ enum class TriggerState {
 /**
  * @brief Manage array because Sam says users are stupid
  */
-const char *triggerManager_triggerStatusToString(TriggerState i);
+const char* triggerManager_triggerStatusToString(TriggerState i);
 
 /**
  * @brief Initializes Trigger Manager
@@ -71,7 +71,7 @@ void triggerManager_setTriggerFireStatus(uint16_t status);
  * 			updates triggerManager_checkExpectedTriggers()
  * @param filterData: Current filter data
  */
-void triggerManager_update(FilterData_s *filterData);
+void triggerManager_update(FilterData_s* filterData);
 
 /**
  * @brief Sets a default configuration for triggers, presuming that current
@@ -94,7 +94,7 @@ void triggerManager_triggerFire(uint8_t triggerNum, bool logFire);
  * @param configString string to parse as config
  */
 bool triggerManager_setTriggerConfig(uint8_t triggerNum,
-                                     const char **configString);
+                                     const char** configString);
 
 /**
  * @brief returns the configuration of the Trigger
@@ -115,7 +115,7 @@ void triggerManager_removeTrigger(uint8_t triggerNum);
  * @param Buffer to fill
  * @param size of buffer
  */
-void triggerManager_getConfigString(uint8_t triggerNum, char *buffer, int n);
+void triggerManager_getConfigString(uint8_t triggerNum, char* buffer, int n);
 #ifdef __cplusplus
 }
 #endif

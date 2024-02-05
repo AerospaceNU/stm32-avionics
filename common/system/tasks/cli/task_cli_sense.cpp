@@ -9,7 +9,7 @@
 #include "hardware_manager.h"
 
 #if HAS_DEV(FLASH)
-static void flashUsageBar(char *barStr, uint8_t usage, uint8_t totalBarWidth) {
+static void flashUsageBar(char* barStr, uint8_t usage, uint8_t totalBarWidth) {
   barStr[0] = '[';
   int i;
   for (i = 1; i <= (usage / 100.0) * totalBarWidth; ++i) {
@@ -30,7 +30,7 @@ void CliTasks::sense() {
 
   // Read sensor data and send in human-readable format
   hm_readSensorData();
-  SensorData_s *data = hm_getSensorData();
+  SensorData_s* data = hm_getSensorData();
   char cliStr[60];
   char float1[10];
   char float2[10];

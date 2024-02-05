@@ -23,7 +23,7 @@ static DataTransmitState_s lastSent[NUM_RADIO];
 
 static RadioPacket_s transmitPacket[NUM_RADIO];
 
-static const char *call = "KM6GNL";
+static const char* call = "KM6GNL";
 
 // https://stackoverflow.com/q/9695329
 #define ROUND_2_INT(f) ((int)((f) >= 0.0 ? (f + 0.5) : (f - 0.5)))
@@ -69,7 +69,7 @@ void radioManager_tick() {
 }
 
 void radioManager_sendInternal(int radioId) {
-  hm_radioSend(radioId, (uint8_t *)&transmitPacket[radioId],
+  hm_radioSend(radioId, (uint8_t*)&transmitPacket[radioId],
                sizeof(RadioPacket_s));
 }
 
@@ -83,8 +83,8 @@ void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
 #define POSITION_RATE 10
 #define HARDWARE_STATUS_RATE 1
 
-void radioManager_transmitData(int radioId, SensorData_s *sensorData,
-                               FilterData_s *filterData, uint8_t state) {
+void radioManager_transmitData(int radioId, SensorData_s* sensorData,
+                               FilterData_s* filterData, uint8_t state) {
   uint32_t currentTime = hm_millis();
   if (currentTime % RADIO_INTERVAL_MS >= RADIO_SEND_MS) return;
   transmitPacket[radioId].timestampMs = currentTime;
@@ -256,7 +256,7 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
 #endif  // HAS_DEV(LINE_CUTTER)
 }
 
-void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
+void radioManager_transmitString(int radioId, uint8_t* data, size_t len) {
   static uint8_t lastTxId = 0;
 
   while (len) {
@@ -300,6 +300,6 @@ void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
   }
 }
 
-void radioManager_transmitStringDefault(uint8_t *data, size_t len) {
+void radioManager_transmitStringDefault(uint8_t* data, size_t len) {
   radioManager_transmitString(RADIO_CLI_ID, data, len);
 }

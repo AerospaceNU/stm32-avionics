@@ -7,8 +7,8 @@
 
 #include "string_slice.h"
 
-UnaryFunctionWrapper::UnaryFunctionWrapper(const char *stringRep,
-                                           UnaryFunction *function,
+UnaryFunctionWrapper::UnaryFunctionWrapper(const char* stringRep,
+                                           UnaryFunction* function,
                                            ExpressionValueType_e opType,
                                            ExpressionValueType_e valueType,
                                            bool defaultValue) {
@@ -21,12 +21,12 @@ UnaryFunctionWrapper::UnaryFunctionWrapper(const char *stringRep,
   this->defaultValue = defaultValue;
 }
 
-void UnaryFunctionWrapper::evaluate(Expression *expr, FilterData_s *filterData,
-                                    Expression *op1) {
+void UnaryFunctionWrapper::evaluate(Expression* expr, FilterData_s* filterData,
+                                    Expression* op1) {
   this->function(expr, filterData, op1);
 }
 
-bool UnaryFunctionWrapper::matchesSlice(const StringSlice &slice) {
+bool UnaryFunctionWrapper::matchesSlice(const StringSlice& slice) {
   return slice == this->stringRep;
 }
 
@@ -73,7 +73,7 @@ UnaryFunctionWrapper unaryFunctionWrappers[NUM_UNARY_FUNCTION] = {
 };
 
 int UnaryFuncExpression::toString(
-    char *buffer, int n, ExpressionPtrCallback &expressionPtrCallback) const {
+    char* buffer, int n, ExpressionPtrCallback& expressionPtrCallback) const {
   int selfLength = strnlen(unaryFunctionWrappers[this->opcode].stringRep, 7);
   snprintf(buffer, n, "(%s ", unaryFunctionWrappers[this->opcode].stringRep);
   if (selfLength + 2 < n) {
@@ -91,13 +91,13 @@ int UnaryFuncExpression::toString(
 }
 
 void UnaryFuncExpression::evaluate(
-    FilterData_s *filterData, ExpressionPtrCallback &expressionPtrCallback) {
+    FilterData_s* filterData, ExpressionPtrCallback& expressionPtrCallback) {
   unaryFunctionWrappers[this->opcode].evaluate(
       this, filterData, expressionPtrCallback(operandID));
 }
 
 void UnaryFuncExpression::serializeInto(
-    SerializedExpression_s *serialized) const {
+    SerializedExpression_s* serialized) const {
   serialized->triggerNum = this->triggerNum;
   serialized->type = unaryFunc;
   serialized->contents.unary.opcode = this->opcode;

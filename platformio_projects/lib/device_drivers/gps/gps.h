@@ -16,7 +16,7 @@ class Gps : public virtual BaseDevice {
 
   bool hasNewFix() const;
 
-  GpsData_s *getLastFix();
+  GpsData_s* getLastFix();
 
   void fillTimeStamp();
 

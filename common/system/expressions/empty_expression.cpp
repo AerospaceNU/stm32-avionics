@@ -9,18 +9,18 @@ EmptyExpression::EmptyExpression() {
 bool EmptyExpression::isEmpty() const { return true; }
 
 // Does nothing
-void EmptyExpression::evaluate(FilterData_s *filterData,
-                               ExpressionPtrCallback &expressionPtrCallback) {
+void EmptyExpression::evaluate(FilterData_s* filterData,
+                               ExpressionPtrCallback& expressionPtrCallback) {
   return;
 }
 
 int EmptyExpression::toString(
-    char *buffer, int n, ExpressionPtrCallback &expressionPtrCallback) const {
+    char* buffer, int n, ExpressionPtrCallback& expressionPtrCallback) const {
   strncpy(buffer, "empty", n);
   return 5;
 }
 
-void EmptyExpression::serializeInto(SerializedExpression_s *serialized) const {
+void EmptyExpression::serializeInto(SerializedExpression_s* serialized) const {
   serialized->triggerNum = this->triggerNum;
   serialized->type = empty;
 }

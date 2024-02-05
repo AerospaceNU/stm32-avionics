@@ -19,11 +19,11 @@ typedef struct {
   int id;
 } PrintPyroCtrl_s;
 
-void printPyro_init(PrintPyroCtrl_s *pyro, int id);
-void printPyro_start(PrintPyroCtrl_s *pyro, uint32_t duration);
-void printPyro_set(PrintPyroCtrl_s *pyro, bool enable);
-void printPyro_tick(PrintPyroCtrl_s *pyro);
-void printPyro_pwmStart(PrintPyroCtrl_s *pyro, uint32_t duration,
+void printPyro_init(PrintPyroCtrl_s* pyro, int id);
+void printPyro_start(PrintPyroCtrl_s* pyro, uint32_t duration);
+void printPyro_set(PrintPyroCtrl_s* pyro, bool enable);
+void printPyro_tick(PrintPyroCtrl_s* pyro);
+void printPyro_pwmStart(PrintPyroCtrl_s* pyro, uint32_t duration,
                         uint32_t frequency, uint32_t pulseWidth);
 #ifdef __cplusplus
 }

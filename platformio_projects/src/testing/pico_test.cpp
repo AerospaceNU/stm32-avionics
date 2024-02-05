@@ -39,7 +39,7 @@ void loop() {
     uint8_t packet_str[] = {3, 1, 2, 3};
     memcpy(packet.data, packet_str, sizeof(packet_str));
     size_t inputNum = sizeof(TestPacket_s);
-    uint8_t *input = (uint8_t *)&packet;
+    uint8_t* input = (uint8_t*)&packet;
 
     // Generate CRC
     {
@@ -75,7 +75,7 @@ void loop() {
     FecDecoder decoder;
     // uint8_t decoded_data[sizeof(packet)];
     TestPacket_s rxPacket;
-    decoder.FecDecode(fec_output, reinterpret_cast<uint8_t *>(&rxPacket),
+    decoder.FecDecode(fec_output, reinterpret_cast<uint8_t*>(&rxPacket),
                       sizeof(rxPacket));
 
     uint32_t t2 = micros();
@@ -84,7 +84,7 @@ void loop() {
              sizeof(rxPacket));
     Serial.print(buff);
     for (int i = 0; i < sizeof(rxPacket); i++) {
-      snprintf(buff, sizeof(buff), "%02X%s", ((uint8_t *)&rxPacket)[i],
+      snprintf(buff, sizeof(buff), "%02X%s", ((uint8_t*)&rxPacket)[i],
                (i % 8 == 7)   ? "\n"
                : (i % 2 == 1) ? " "
                               : " ");

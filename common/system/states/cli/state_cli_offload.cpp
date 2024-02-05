@@ -11,7 +11,7 @@
 #include "data_log.h"  // This include is only needed to pass a flightID to userSetFlightID before command line implementation
 #include "data_offload.h"
 
-static void formatTimeSeconds(char *result, int resultLen, uint32_t seconds) {
+static void formatTimeSeconds(char* result, int resultLen, uint32_t seconds) {
   uint32_t minutes = seconds / 60;
   seconds %= 60;
 
@@ -87,7 +87,7 @@ EndCondition_e CliOffloadState::run() {
       cli_send(sendString);
       for (uint8_t num = 1; num <= lastFlightNum; ++num) {
         dataLog_readFlightNumMetadata(num);
-        FlightMetadata_s *metadataPacket = dataLog_getFlightMetadata();
+        FlightMetadata_s* metadataPacket = dataLog_getFlightMetadata();
         flight_timestamp = (time_t)metadataPacket->gpsTimestamp;
         // Check timestamp between 2000 and 2100
         if (flight_timestamp > 946702800 && flight_timestamp < 4102462800) {

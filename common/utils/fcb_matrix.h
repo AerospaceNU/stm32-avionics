@@ -84,7 +84,7 @@ class Matrix {
    * @return New matrix from the multiplication, Rows * Columns of other
    */
   template <int oRows, int oCols>
-  Matrix<Rows, oCols> operator*(const Matrix<oRows, oCols> &other) {
+  Matrix<Rows, oCols> operator*(const Matrix<oRows, oCols>& other) {
     static_assert(Cols == oRows,
                   "Must multiply matrices with matching column and row count "
                   "(a x n * n x b)");
@@ -133,7 +133,7 @@ class Matrix {
    * @return New matrix from the multiplication
    */
   template <int oRows, int oCols>
-  Matrix<Rows, Cols> operator^(const Matrix<oRows, oCols> &other) {
+  Matrix<Rows, Cols> operator^(const Matrix<oRows, oCols>& other) {
     static_assert(Rows == oRows && Cols == oCols,
                   "Matrices must have same dimension!");
     float newElems[Rows * Cols] = {0};
@@ -153,7 +153,7 @@ class Matrix {
    * @return New matrix from the addition
    */
   template <int oRows, int oCols>
-  Matrix<Rows, Cols> operator+(const Matrix<oRows, oCols> &other) {
+  Matrix<Rows, Cols> operator+(const Matrix<oRows, oCols>& other) {
     static_assert(Rows == oRows && Cols == oCols,
                   "Matrices must have same dimension!");
     float newElems[Rows * Cols] = {0};
@@ -176,7 +176,7 @@ class Matrix {
    * @return New matrix from the subtraction
    */
   template <int oRows, int oCols>
-  Matrix<Rows, Cols> operator-(const Matrix<oRows, oCols> &other) {
+  Matrix<Rows, Cols> operator-(const Matrix<oRows, oCols>& other) {
     static_assert(Rows == oRows && Cols == oCols,
                   "Matrices must have same dimension!");
     float newElems[Rows * Cols] = {0};
@@ -290,7 +290,7 @@ class Matrix {
   /**
    * @brief Calculate elementwise cosine of the values in the given matrix
    */
-  static Matrix<Rows, Cols> cos(const Matrix<Rows, Cols> &start) {
+  static Matrix<Rows, Cols> cos(const Matrix<Rows, Cols>& start) {
     float32_t values[Rows * Cols] = {0};
     for (int i = 0; i < Rows * Cols; ++i) {
       values[i] = arm_cos_f32(start.m_backingArray[i]);
@@ -301,7 +301,7 @@ class Matrix {
   /**
    * @brief Calculate elementwise sine of the values in the given matrix
    */
-  static Matrix<Rows, Cols> sin(const Matrix<Rows, Cols> &start) {
+  static Matrix<Rows, Cols> sin(const Matrix<Rows, Cols>& start) {
     float32_t values[Rows * Cols] = {0};
     for (int i = 0; i < Rows * Cols; ++i) {
       values[i] = arm_sin_f32(start.m_backingArray[i]);

@@ -21,13 +21,13 @@ class VarExpression : public Expression {
    */
   VarExpression(uint16_t triggerNum, FilterData_e dataMember);
 
-  void evaluate(FilterData_s *filterData,
-                ExpressionPtrCallback &expressionPtrCallback);
+  void evaluate(FilterData_s* filterData,
+                ExpressionPtrCallback& expressionPtrCallback);
 
-  int toString(char *buffer, int n,
-               ExpressionPtrCallback &expressionPtrCallback) const;
+  int toString(char* buffer, int n,
+               ExpressionPtrCallback& expressionPtrCallback) const;
 
-  void serializeInto(SerializedExpression_s *serialized) const;
+  void serializeInto(SerializedExpression_s* serialized) const;
 };
 
 #endif  // COMMON_SYSTEM_EXPRESSIONS_VAR_EXPRESSION_H_

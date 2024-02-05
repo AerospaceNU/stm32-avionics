@@ -14,11 +14,11 @@
 #include <Arduino.h>
 #endif
 
-static void OnDataRx(RadioRecievedPacket_s *packet) {
-  hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)packet, sizeof(*packet));
+static void OnDataRx(RadioRecievedPacket_s* packet) {
+  hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t*)packet, sizeof(*packet));
 }
 
-static void GroundstationParseCommand(GroundstationUsbCommand_s *command) {
+static void GroundstationParseCommand(GroundstationUsbCommand_s* command) {
   if (command->data[0] == CHANNEL_COMMAND_ID) {
     uint8_t radioHw = command->data[1];
     int8_t channel = command->data[2];
@@ -69,7 +69,7 @@ void Groundstation::runOnce() {
     static uint8_t heartbeatArr[sizeof(RadioRecievedPacket_s)] = {0};
     memset(heartbeatArr, 0, sizeof(heartbeatArr));
     memcpy(heartbeatArr, &heartbeat, sizeof(heartbeat));
-    hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t *)&heartbeatArr,
+    hm_usbTransmit(FIRST_ID_USB_STD, (uint8_t*)&heartbeatArr,
                    sizeof(heartbeatArr));
   }
 
@@ -78,7 +78,7 @@ void Groundstation::runOnce() {
   if (cb_count(buffer) > 3) {
     static GroundstationUsbCommand_s command;
     size_t count = min(cb_count(buffer), sizeof(command));
-    cb_peek(buffer, (uint8_t *)&command, &count);
+    cb_peek(buffer, (uint8_t*)&command, &count);
 
     // If we got at least enough bytes for one message to be done
     if (count >= static_cast<uint32_t>(command.len + 3)) {

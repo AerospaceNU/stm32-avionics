@@ -18,30 +18,30 @@
 #include "cc1120_cc1200_defs.h"
 
 // Forward declarations for all internal register read/writes
-static uint8_t tiRadio_spiReadReg(TiRadioCtrl_s *radio, uint16_t addr,
-                                  uint8_t *data, uint8_t len);
-static uint8_t tiRadio_spiWriteReg(TiRadioCtrl_s *radio, uint16_t addr,
-                                   uint8_t *data, uint8_t len);
-static uint8_t tiRadio_spiWriteTxFifo(TiRadioCtrl_s *radio, uint8_t *pWriteData,
+static uint8_t tiRadio_spiReadReg(TiRadioCtrl_s* radio, uint16_t addr,
+                                  uint8_t* data, uint8_t len);
+static uint8_t tiRadio_spiWriteReg(TiRadioCtrl_s* radio, uint16_t addr,
+                                   uint8_t* data, uint8_t len);
+static uint8_t tiRadio_spiWriteTxFifo(TiRadioCtrl_s* radio, uint8_t* pWriteData,
                                       uint8_t len);
-static uint8_t tiRadio_spiReadRxFifo(TiRadioCtrl_s *radio, uint8_t *pReadData,
+static uint8_t tiRadio_spiReadRxFifo(TiRadioCtrl_s* radio, uint8_t* pReadData,
                                      uint8_t len);
-static uint8_t tiRadio_txRxSpiCmdStrobe(TiRadioCtrl_s *radio, uint8_t cmd);
-static void tiRadio_txRxReadWriteBurstSingle(TiRadioCtrl_s *radio, uint8_t addr,
-                                             uint8_t *pData, uint16_t len);
+static uint8_t tiRadio_txRxSpiCmdStrobe(TiRadioCtrl_s* radio, uint8_t cmd);
+static void tiRadio_txRxReadWriteBurstSingle(TiRadioCtrl_s* radio, uint8_t addr,
+                                             uint8_t* pData, uint16_t len);
 //! Try to transmit a packet. Returns true if we were able to add the packet to
 //! TX FIFO
-static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
+static bool tiRadio_TransmitPacket(TiRadioCtrl_s* radio, uint8_t* payload,
                                    uint8_t payloadLength);
 
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
-static bool manualCalibration(TiRadioCtrl_s *radio);
+static bool manualCalibration(TiRadioCtrl_s* radio);
 #endif
 
 #define TIRADIO_MAX_DELAY 10  // ms
 
 // Initially configure radio, apply settings provided
-bool tiRadio_init(TiRadioCtrl_s *radio) {
+bool tiRadio_init(TiRadioCtrl_s* radio) {
   // Set SPI pins into a known good state. Lots of waiting to make sure it
   // actually happens
   HAL_GPIO_WritePin(radio->RST_port, radio->RST_pin, GPIO_PIN_SET);
@@ -119,7 +119,7 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
 
 // The main tick function. Checks for new packets and transmits the waiting one,
 // if non-zero
-void tiRadio_update(TiRadioCtrl_s *radio) {
+void tiRadio_update(TiRadioCtrl_s* radio) {
   // Don't let anything happen if radio isn't initialized
   if (!radio->initialized) return;
 
@@ -226,7 +226,7 @@ static bool cc1120InTx(uint8_t status) {
          status == TIRADIO_STATE_SETTLING;
 }
 
-static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
+static bool tiRadio_TransmitPacket(TiRadioCtrl_s* radio, uint8_t* payload,
                                    uint8_t payloadLength) {
   static bool added = false;
 
@@ -301,7 +301,7 @@ static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
   return added;
 }
 
-static void cc1120EnqueuePacket(TiRadioCtrl_s *radio, uint8_t *buff,
+static void cc1120EnqueuePacket(TiRadioCtrl_s* radio, uint8_t* buff,
                                 uint8_t size, bool crc) {
   // Fill our packet
   static RadioRecievedPacket_s packet;
@@ -314,14 +314,14 @@ static void cc1120EnqueuePacket(TiRadioCtrl_s *radio, uint8_t *buff,
   // uint8_t *pPacket = (uint8_t *) &packet;
 
   for (int i = 0; i < MAX_COMSUMER; i++) {
-    CircularBuffer_s *consumer = radio->messageConsumers[i];
+    CircularBuffer_s* consumer = radio->messageConsumers[i];
     if (consumer == NULL) continue;
 
     cb_enqueue(consumer, reinterpret_cast<unknownPtr_t>(&packet));
   }
 }
 
-bool tiRadio_addTxPacket(TiRadioCtrl_s *radio, uint8_t *packet, uint8_t len) {
+bool tiRadio_addTxPacket(TiRadioCtrl_s* radio, uint8_t* packet, uint8_t len) {
   // Need to transmit in distinct packets, and we assume in fixed that there's
   // no delimination between packets This will require some refactoring to
   // support variable packet length
@@ -345,13 +345,13 @@ bool tiRadio_addTxPacket(TiRadioCtrl_s *radio, uint8_t *packet, uint8_t len) {
   return true;
 }
 
-void tiRadio_registerConsumer(TiRadioCtrl_s *radio,
-                              CircularBuffer_s *rxBuffer) {
+void tiRadio_registerConsumer(TiRadioCtrl_s* radio,
+                              CircularBuffer_s* rxBuffer) {
   radio->messageConsumers[radio->currentConsumerCount] = rxBuffer;
   radio->currentConsumerCount++;
 }
 
-bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
+bool tiRadio_checkNewPacket(TiRadioCtrl_s* radio) {
   static uint8_t rxbytes = 0x00;
   static uint8_t rxBuffer[128] = {0};
 
@@ -385,8 +385,7 @@ bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
       // Fixed means we have payloadSize many data bytes, then RSSI and CRC_LQI
       // appended
       tiRadio_spiReadRxFifo(radio, rxBuffer, radio->payloadSize);
-      tiRadio_spiReadRxFifo(radio, reinterpret_cast<uint8_t *>(&radio->RSSI),
-                            1);
+      tiRadio_spiReadRxFifo(radio, reinterpret_cast<uint8_t*>(&radio->RSSI), 1);
       uint8_t crc_lqi;
       tiRadio_spiReadRxFifo(radio, &crc_lqi, 1);
 
@@ -402,7 +401,7 @@ bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
   return false;
 }
 
-bool tiRadio_forceIdle(TiRadioCtrl_s *radio) {
+bool tiRadio_forceIdle(TiRadioCtrl_s* radio) {
   // return the radio to idle somehow
   uint8_t status;
   status = tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SNOP);
@@ -447,7 +446,7 @@ bool tiRadio_forceIdle(TiRadioCtrl_s *radio) {
   return false;
 }
 
-bool tiRadio_startRx(TiRadioCtrl_s *radio) {
+bool tiRadio_startRx(TiRadioCtrl_s* radio) {
   uint8_t readByte;
   tiRadio_txRxSpiCmdStrobe(radio, TIRADIO_SRX);
 
@@ -471,7 +470,7 @@ static const size_t maxValue24Bits = 16777216 - 1;
 #define RADIO_OSC_FREQ CC1200_OSC_FREQ
 #endif
 
-void tiRadio_setRadioFrequency(TiRadioCtrl_s *radio, TiRadioBand_e band,
+void tiRadio_setRadioFrequency(TiRadioCtrl_s* radio, TiRadioBand_e band,
                                float frequencyHz) {
   // LO divider and stuff should already be set for us, as we assume we must
   // be on the correct band already
@@ -524,7 +523,7 @@ void tiRadio_setRadioFrequency(TiRadioCtrl_s *radio, TiRadioBand_e band,
   tiRadio_calibrate(radio);
 }
 
-bool tiRadio_calibrate(TiRadioCtrl_s *radio) {
+bool tiRadio_calibrate(TiRadioCtrl_s* radio) {
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
   // calibrate the radio per errata
   return manualCalibration(radio);
@@ -540,7 +539,7 @@ bool tiRadio_calibrate(TiRadioCtrl_s *radio) {
 #define FS_CHP_INDEX 2
 
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1120
-static bool manualCalibration(TiRadioCtrl_s *radio) {
+static bool manualCalibration(TiRadioCtrl_s* radio) {
   uint8_t original_fs_cal2;
   uint8_t calResults_for_vcdac_start_high[3];
   uint8_t calResults_for_vcdac_start_mid[3];
@@ -628,7 +627,7 @@ static bool manualCalibration(TiRadioCtrl_s *radio) {
 #endif
 
 //! Set power in db. Make sure to respect your PA maximum!
-void tiRadio_setOutputPower(TiRadioCtrl_s *radio, uint8_t powerDbM) {
+void tiRadio_setOutputPower(TiRadioCtrl_s* radio, uint8_t powerDbM) {
   if (radio->has_cc1190 && powerDbM > 10) powerDbM = 10;
 
   // output = (ramp + 1)/2-18
@@ -659,7 +658,7 @@ void tiRadio_setOutputPower(TiRadioCtrl_s *radio, uint8_t powerDbM) {
 //! Configure a GPIO pin. register should be TIRADIO_IOCFG3 or TIRADIO_IOCFG2 or
 //! TIRADIO_IOCFG1 or TIRADIO_IOCFG0 gpio_config from tiRadio_GPIO_CFG, and
 //! outputInverted flips the logic of the pin
-void tiRadio_configGpio(TiRadioCtrl_s *radio, uint16_t gpio_register,
+void tiRadio_configGpio(TiRadioCtrl_s* radio, uint16_t gpio_register,
                         uint8_t gpio_config, bool outputInverted) {
   uint8_t invert = (outputInverted ? 1 : 0);
   // invert is bit 6, 7th from bottom
@@ -668,8 +667,8 @@ void tiRadio_configGpio(TiRadioCtrl_s *radio, uint16_t gpio_register,
   tiRadio_spiWriteReg(radio, gpio_register, &reg, 1);
 }
 
-uint8_t trx8BitRegAccess(TiRadioCtrl_s *radio, uint8_t accessType,
-                         uint8_t addrByte, uint8_t *pData, uint16_t len) {
+uint8_t trx8BitRegAccess(TiRadioCtrl_s* radio, uint8_t accessType,
+                         uint8_t addrByte, uint8_t* pData, uint16_t len) {
   uint8_t readValue;
   uint8_t txBuf = (accessType | addrByte);
 
@@ -692,8 +691,8 @@ uint8_t trx8BitRegAccess(TiRadioCtrl_s *radio, uint8_t accessType,
   return (readValue);
 }
 
-uint8_t trx16BitRegAccess(TiRadioCtrl_s *radio, uint8_t accessType,
-                          uint8_t extAddr, uint8_t regAddr, uint8_t *pData,
+uint8_t trx16BitRegAccess(TiRadioCtrl_s* radio, uint8_t accessType,
+                          uint8_t extAddr, uint8_t regAddr, uint8_t* pData,
                           uint16_t len) {
   uint8_t readValue;
   uint8_t txBuf = (accessType | extAddr);
@@ -722,7 +721,7 @@ uint8_t trx16BitRegAccess(TiRadioCtrl_s *radio, uint8_t accessType,
   return (readValue);
 }
 
-uint8_t tiRadio_txRxSpiCmdStrobe(TiRadioCtrl_s *radio, uint8_t cmd) {
+uint8_t tiRadio_txRxSpiCmdStrobe(TiRadioCtrl_s* radio, uint8_t cmd) {
   uint8_t rc;
 
   HAL_GPIO_WritePin(radio->CS_port, radio->CS_pin, GPIO_PIN_RESET);
@@ -739,8 +738,8 @@ uint8_t tiRadio_txRxSpiCmdStrobe(TiRadioCtrl_s *radio, uint8_t cmd) {
   return (rc);
 }
 
-void tiRadio_txRxReadWriteBurstSingle(TiRadioCtrl_s *radio, uint8_t addr,
-                                      uint8_t *pData, uint16_t len) {
+void tiRadio_txRxReadWriteBurstSingle(TiRadioCtrl_s* radio, uint8_t addr,
+                                      uint8_t* pData, uint16_t len) {
   uint16_t i;
   uint8_t pushByte = 0x00;
   uint8_t rxdump;
@@ -773,7 +772,7 @@ void tiRadio_txRxReadWriteBurstSingle(TiRadioCtrl_s *radio, uint8_t addr,
   return;
 }
 
-uint8_t tiRadio_spiReadReg(TiRadioCtrl_s *radio, uint16_t addr, uint8_t *pData,
+uint8_t tiRadio_spiReadReg(TiRadioCtrl_s* radio, uint16_t addr, uint8_t* pData,
                            uint8_t len) {
   uint8_t tempExt = static_cast<uint8_t>(addr >> 8);
   uint8_t tempAddr = static_cast<uint8_t>(addr & 0x00FF);
@@ -796,7 +795,7 @@ uint8_t tiRadio_spiReadReg(TiRadioCtrl_s *radio, uint16_t addr, uint8_t *pData,
   return (rc);
 }
 
-uint8_t tiRadio_spiWriteReg(TiRadioCtrl_s *radio, uint16_t addr, uint8_t *pData,
+uint8_t tiRadio_spiWriteReg(TiRadioCtrl_s* radio, uint16_t addr, uint8_t* pData,
                             uint8_t len) {
   uint8_t tempExt = static_cast<uint8_t>(addr >> 8);
   uint8_t tempAddr = static_cast<uint8_t>(addr & 0x00FF);
@@ -824,14 +823,14 @@ uint8_t tiRadio_spiWriteReg(TiRadioCtrl_s *radio, uint16_t addr, uint8_t *pData,
   return (rc);
 }
 
-uint8_t tiRadio_spiWriteTxFifo(TiRadioCtrl_s *radio, uint8_t *pData,
+uint8_t tiRadio_spiWriteTxFifo(TiRadioCtrl_s* radio, uint8_t* pData,
                                uint8_t len) {
   uint8_t rc;
   rc = trx8BitRegAccess(radio, (RADIO_BURST_ACCESS | RADIO_WRITE_ACCESS),
                         TIRADIO_BURST_TXFIFO, pData, len);
   return (rc);
 }
-uint8_t tiRadio_spiReadRxFifo(TiRadioCtrl_s *radio, uint8_t *pData,
+uint8_t tiRadio_spiReadRxFifo(TiRadioCtrl_s* radio, uint8_t* pData,
                               uint8_t len) {
   uint8_t rc;
   rc = trx8BitRegAccess(radio, 0x00, TIRADIO_BURST_RXFIFO, pData, len);

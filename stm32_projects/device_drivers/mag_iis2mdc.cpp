@@ -8,7 +8,7 @@
 
 #if HAS_DEV(MAG_IIS2MDC)
 
-static uint8_t readByte(ImuIIS2MDCCtrl_s *sensor, uint8_t addr) {
+static uint8_t readByte(ImuIIS2MDCCtrl_s* sensor, uint8_t addr) {
   //    HAL_I2C_Master_Transmit(sensor->hi2c, sensor->address, &addr, 1,
   // HAL_MAX_DELAY);
   uint8_t ret;
@@ -19,7 +19,7 @@ static uint8_t readByte(ImuIIS2MDCCtrl_s *sensor, uint8_t addr) {
   return ret;
 }
 
-static void readArray(ImuIIS2MDCCtrl_s *sensor, uint8_t addr, uint8_t *pData,
+static void readArray(ImuIIS2MDCCtrl_s* sensor, uint8_t addr, uint8_t* pData,
                       uint8_t len) {
   //    HAL_I2C_Master_Transmit(sensor->hi2c, sensor->address, &addr, 1,
   // HAL_MAX_DELAY);     HAL_I2C_Master_Receive(sensor->hi2c, sensor->address,
@@ -29,7 +29,7 @@ static void readArray(ImuIIS2MDCCtrl_s *sensor, uint8_t addr, uint8_t *pData,
                    HAL_MAX_DELAY);
 }
 
-static void writeByte(ImuIIS2MDCCtrl_s *sensor, uint8_t addr, uint8_t val) {
+static void writeByte(ImuIIS2MDCCtrl_s* sensor, uint8_t addr, uint8_t val) {
   //    uint8_t pData[2] = {addr, val};
   //    HAL_I2C_Master_Transmit(sensor->hi2c, sensor->address, pData,
   // sizeof(pData), HAL_MAX_DELAY);
@@ -48,7 +48,7 @@ static void writeByte(ImuIIS2MDCCtrl_s *sensor, uint8_t addr, uint8_t val) {
 
 #include <stdio.h>
 
-bool iis2mdc_init(ImuIIS2MDCCtrl_s *sensor, uint8_t address7bit) {
+bool iis2mdc_init(ImuIIS2MDCCtrl_s* sensor, uint8_t address7bit) {
   for (int i = 1; i < 128; i++) {
     uint8_t ret = HAL_I2C_IsDeviceReady(sensor->hi2c, (uint16_t)(i << 1), 3, 5);
     if (ret != HAL_OK) /* No ACK Received At That Address */ {
@@ -73,7 +73,7 @@ bool iis2mdc_init(ImuIIS2MDCCtrl_s *sensor, uint8_t address7bit) {
   return true;
 }
 
-void iis2mdc_getData(ImuIIS2MDCCtrl_s *sensor) {
+void iis2mdc_getData(ImuIIS2MDCCtrl_s* sensor) {
   // Currently still polling! TODO we can set up a latching drdy interrupt?
   uint8_t raw[6];
   readArray(sensor, OUTX_L_REG, raw, sizeof(raw));

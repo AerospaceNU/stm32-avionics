@@ -6,7 +6,7 @@
 
 #if HAS_DEV(SERVO_PWM)
 
-bool servoPwm_init(ServoPwmCtrl_t *servo, TIM_HandleTypeDef *htim,
+bool servoPwm_init(ServoPwmCtrl_t* servo, TIM_HandleTypeDef* htim,
                    uint32_t channel, uint32_t periodMS, float minPulseMS,
                    float maxPulseMS, float minAngle, float maxAngle) {
   // Set servo struct values
@@ -40,7 +40,7 @@ bool servoPwm_init(ServoPwmCtrl_t *servo, TIM_HandleTypeDef *htim,
   return true;
 }
 
-void servoPwm_setAngle(ServoPwmCtrl_t *servo, float degrees) {
+void servoPwm_setAngle(ServoPwmCtrl_t* servo, float degrees) {
   // Calculate pulse from degrees
   float pulsePercent =
       (degrees - servo->minAngle) / (servo->maxAngle - servo->minAngle);

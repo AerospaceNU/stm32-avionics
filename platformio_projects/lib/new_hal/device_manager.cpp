@@ -17,7 +17,7 @@ bool DeviceManager::addBatteryMonitorAdc(int pin, double multiplier) {
   return false;
 }
 
-bool DeviceManager::addRadio(Radio *radio) {
+bool DeviceManager::addRadio(Radio* radio) {
   if (!radios.full()) {
     radios.push_back(radio);
     return true;
@@ -26,7 +26,7 @@ bool DeviceManager::addRadio(Radio *radio) {
   }
 }
 
-bool DeviceManager::addBarometer(Barometer *barometer) {
+bool DeviceManager::addBarometer(Barometer* barometer) {
   if (!barometers.full()) {
     barometers.push_back(barometer);
     return true;
@@ -35,7 +35,7 @@ bool DeviceManager::addBarometer(Barometer *barometer) {
   }
 }
 
-bool DeviceManager::addGps(Gps *gps_ptr) {
+bool DeviceManager::addGps(Gps* gps_ptr) {
   if (!gps.full()) {
     gps.push_back(gps_ptr);
     return true;
@@ -44,7 +44,7 @@ bool DeviceManager::addGps(Gps *gps_ptr) {
   }
 }
 
-bool DeviceManager::addImu(Imu *imu, bool has_mag) {
+bool DeviceManager::addImu(Imu* imu, bool has_mag) {
   if (!gyroscopes.full() && !accelerometers.full()) {
     gyroscopes.push_back(imu);
     accelerometers.push_back(imu);
@@ -60,7 +60,7 @@ bool DeviceManager::addImu(Imu *imu, bool has_mag) {
   }
 }
 
-bool DeviceManager::addMagnetometer(Magnetometer *mag) {
+bool DeviceManager::addMagnetometer(Magnetometer* mag) {
   if (!magnetometers.full()) {
     magnetometers.push_back(mag);
     return true;
@@ -70,33 +70,33 @@ bool DeviceManager::addMagnetometer(Magnetometer *mag) {
 }
 
 void DeviceManager::init() {
-  for (auto &device : accelerometers) {
+  for (auto& device : accelerometers) {
     devices.push_back(device);
   }
 
-  for (auto &device : barometers) {
+  for (auto& device : barometers) {
     devices.push_back(device);
   }
 
-  for (auto &device : gps) {
+  for (auto& device : gps) {
     devices.push_back(device);
   }
 
-  for (auto &device : gyroscopes) {
+  for (auto& device : gyroscopes) {
     devices.push_back(device);
   }
 
-  for (auto &device : magnetometers) {
+  for (auto& device : magnetometers) {
     devices.push_back(device);
   }
 
-  for (auto &device : radios) {
+  for (auto& device : radios) {
     devices.push_back(device);
   }
 }
 
 void DeviceManager::readSensors() {
-  for (auto &device : devices) {
+  for (auto& device : devices) {
     device->tick();
   }
 }
@@ -114,7 +114,7 @@ double DeviceManager::readBatteryVoltage(uint battery_num) {
   return -1;
 }
 
-Accelerometer *DeviceManager::getAccelerometer(uint index) {
+Accelerometer* DeviceManager::getAccelerometer(uint index) {
   if (0 <= index && index < accelerometers.size()) {
     return accelerometers[index];
   } else {
@@ -122,7 +122,7 @@ Accelerometer *DeviceManager::getAccelerometer(uint index) {
   }
 }
 
-Barometer *DeviceManager::getBarometer(uint index) {
+Barometer* DeviceManager::getBarometer(uint index) {
   if (0 <= index && index < barometers.size()) {
     return barometers[index];
   } else {
@@ -130,7 +130,7 @@ Barometer *DeviceManager::getBarometer(uint index) {
   }
 }
 
-Gps *DeviceManager::getGps(uint index) {
+Gps* DeviceManager::getGps(uint index) {
   if (0 <= index && index < gps.size()) {
     return gps[index];
   } else {
@@ -138,7 +138,7 @@ Gps *DeviceManager::getGps(uint index) {
   }
 }
 
-Gyroscope *DeviceManager::getGyroscope(uint index) {
+Gyroscope* DeviceManager::getGyroscope(uint index) {
   if (0 <= index && index < gyroscopes.size()) {
     return gyroscopes[index];
   } else {
@@ -146,7 +146,7 @@ Gyroscope *DeviceManager::getGyroscope(uint index) {
   }
 }
 
-Magnetometer *DeviceManager::getMagnetometer(uint index) {
+Magnetometer* DeviceManager::getMagnetometer(uint index) {
   if (0 <= index && index < magnetometers.size()) {
     return magnetometers[index];
   } else {
@@ -154,7 +154,7 @@ Magnetometer *DeviceManager::getMagnetometer(uint index) {
   }
 }
 
-Radio *DeviceManager::getRadio(uint index) {
+Radio* DeviceManager::getRadio(uint index) {
   if (0 <= index && index < radios.size()) {
     return radios[index];
   } else {

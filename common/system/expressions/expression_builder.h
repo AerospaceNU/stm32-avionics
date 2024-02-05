@@ -31,10 +31,10 @@ class ExpressionBuilder {
    * into.
    * @return The value type built by the builder, which may be invalid.
    */
-  virtual ExpressionValueType_e build(const StringSlice &slice,
-                                      ExpressionStore *expressionStore,
+  virtual ExpressionValueType_e build(const StringSlice& slice,
+                                      ExpressionStore* expressionStore,
                                       uint16_t triggerNum,
-                                      ExpressionVariant_v *parseInto,
+                                      ExpressionVariant_v* parseInto,
                                       uint16_t destinationID) = 0;
 
   /**
@@ -50,10 +50,10 @@ class ExpressionBuilder {
  */
 class VarExpressionBuilder : public ExpressionBuilder {
  public:
-  ExpressionValueType_e build(const StringSlice &slice,
-                              ExpressionStore *expressionStore,
+  ExpressionValueType_e build(const StringSlice& slice,
+                              ExpressionStore* expressionStore,
                               uint16_t triggerNum,
-                              ExpressionVariant_v *parseInto,
+                              ExpressionVariant_v* parseInto,
                               uint16_t destinationID) override;
 };
 
@@ -64,10 +64,10 @@ class VarExpressionBuilder : public ExpressionBuilder {
  */
 class EventExpressionBuilder : public ExpressionBuilder {
  public:
-  ExpressionValueType_e build(const StringSlice &slice,
-                              ExpressionStore *expressionStore,
+  ExpressionValueType_e build(const StringSlice& slice,
+                              ExpressionStore* expressionStore,
                               uint16_t triggerNum,
-                              ExpressionVariant_v *parseInto,
+                              ExpressionVariant_v* parseInto,
                               uint16_t destinationID) override;
 };
 
@@ -78,10 +78,10 @@ class EventExpressionBuilder : public ExpressionBuilder {
  */
 class ConstExpressionBuilder : public ExpressionBuilder {
  public:
-  ExpressionValueType_e build(const StringSlice &slice,
-                              ExpressionStore *expressionStore,
+  ExpressionValueType_e build(const StringSlice& slice,
+                              ExpressionStore* expressionStore,
                               uint16_t triggerNum,
-                              ExpressionVariant_v *parseInto,
+                              ExpressionVariant_v* parseInto,
                               uint16_t destinationID) override;
 };
 
@@ -95,10 +95,10 @@ class ConstExpressionBuilder : public ExpressionBuilder {
  */
 class UnaryFuncExpressionBuilder : public ExpressionBuilder {
  public:
-  ExpressionValueType_e build(const StringSlice &slice,
-                              ExpressionStore *expressionStore,
+  ExpressionValueType_e build(const StringSlice& slice,
+                              ExpressionStore* expressionStore,
                               uint16_t triggerNum,
-                              ExpressionVariant_v *parseInto,
+                              ExpressionVariant_v* parseInto,
                               uint16_t destinationID) override;
 };
 
@@ -112,10 +112,10 @@ class UnaryFuncExpressionBuilder : public ExpressionBuilder {
  */
 class BinaryFuncExpressionBuilder : public ExpressionBuilder {
  public:
-  ExpressionValueType_e build(const StringSlice &slice,
-                              ExpressionStore *expressionStore,
+  ExpressionValueType_e build(const StringSlice& slice,
+                              ExpressionStore* expressionStore,
                               uint16_t triggerNum,
-                              ExpressionVariant_v *parseInto,
+                              ExpressionVariant_v* parseInto,
                               uint16_t destinationID) override;
 };
 

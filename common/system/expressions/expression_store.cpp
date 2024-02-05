@@ -13,7 +13,7 @@ static UnaryFuncExpressionBuilder unaryFuncExpressionBuilder;
 static BinaryFuncExpressionBuilder binaryFuncExpressionBuilder;
 static EventExpressionBuilder eventExpressionBuilder;
 
-static ExpressionBuilder *builders[] = {
+static ExpressionBuilder* builders[] = {
     &varExpressionBuilder, &constExpressionBuilder, &eventExpressionBuilder,
     &unaryFuncExpressionBuilder, &binaryFuncExpressionBuilder};
 
@@ -21,7 +21,7 @@ static EmptyExpression emptyExpr;
 
 void ExpressionStore::init() {
   for (int i = 0; i < MAX_EXPRESSION; ++i) {
-    SerializedExpression_s *serialized = cli_getConfigs()->serializedExprs + i;
+    SerializedExpression_s* serialized = cli_getConfigs()->serializedExprs + i;
     switch (serialized->type) {
       case event:
         expressions[i] =
@@ -56,24 +56,24 @@ void ExpressionStore::init() {
   }
 }
 
-Expression *ExpressionStore::getExpressionPtr(uint16_t expressionNum) {
-  ExpressionVariant_v *varPtr = &(expressions[expressionNum]);
-  if (Expression *ret = std::get_if<BinaryFuncExpression>(varPtr)) {
+Expression* ExpressionStore::getExpressionPtr(uint16_t expressionNum) {
+  ExpressionVariant_v* varPtr = &(expressions[expressionNum]);
+  if (Expression* ret = std::get_if<BinaryFuncExpression>(varPtr)) {
     return ret;
   }
-  if (Expression *ret = std::get_if<UnaryFuncExpression>(varPtr)) {
+  if (Expression* ret = std::get_if<UnaryFuncExpression>(varPtr)) {
     return ret;
   }
-  if (Expression *ret = std::get_if<ConstExpression>(varPtr)) {
+  if (Expression* ret = std::get_if<ConstExpression>(varPtr)) {
     return ret;
   }
-  if (Expression *ret = std::get_if<EventExpression>(varPtr)) {
+  if (Expression* ret = std::get_if<EventExpression>(varPtr)) {
     return ret;
   }
-  if (Expression *ret = std::get_if<VarExpression>(varPtr)) {
+  if (Expression* ret = std::get_if<VarExpression>(varPtr)) {
     return ret;
   }
-  if (Expression *ret = std::get_if<EmptyExpression>(varPtr)) {
+  if (Expression* ret = std::get_if<EmptyExpression>(varPtr)) {
     return ret;
   }
   return &emptyExpr;
@@ -81,7 +81,7 @@ Expression *ExpressionStore::getExpressionPtr(uint16_t expressionNum) {
 
 void ExpressionStore::removeExpressionsForTrigger(int triggerNum) {
   for (int i = 0; i < MAX_EXPRESSION; ++i) {
-    if (std::visit([](auto &&var) { return var.triggerNum; },
+    if (std::visit([](auto&& var) { return var.triggerNum; },
                    expressionBuffer[i]) == triggerNum) {
       expressionBuffer[i] = EmptyExpression();
     }
@@ -93,7 +93,7 @@ uint16_t ExpressionStore::getNextExpressionSpot(uint16_t startAt) const {
     return -1;
   }
   for (uint16_t i = startAt; i < MAX_EXPRESSION; ++i) {
-    if (std::visit([](auto &&var) { return var.isEmpty(); },
+    if (std::visit([](auto&& var) { return var.isEmpty(); },
                    expressionBuffer[i])) {
       return i;
     }
@@ -101,9 +101,9 @@ uint16_t ExpressionStore::getNextExpressionSpot(uint16_t startAt) const {
   return -1;
 }
 
-ExpressionValueType_e ExpressionStore::parseForTrigger(uint16_t *resultID,
+ExpressionValueType_e ExpressionStore::parseForTrigger(uint16_t* resultID,
                                                        uint16_t triggerNum,
-                                                       const StringSlice &slice,
+                                                       const StringSlice& slice,
                                                        uint16_t startAt) {
   if (startAt < 0 || startAt >= MAX_EXPRESSION) {
     return ExpressionValueType_e::invalid_type;
@@ -112,9 +112,9 @@ ExpressionValueType_e ExpressionStore::parseForTrigger(uint16_t *resultID,
   if (nextSpot < 0) {
     return ExpressionValueType_e::invalid_type;
   }
-  ExpressionVariant_v *buildInto = &expressionBuffer[nextSpot];
+  ExpressionVariant_v* buildInto = &expressionBuffer[nextSpot];
   ExpressionValueType_e parseResult;
-  for (ExpressionBuilder *builder : builders) {
+  for (ExpressionBuilder* builder : builders) {
     parseResult = builder->build(slice, this, triggerNum, buildInto, nextSpot);
     if (parseResult != ExpressionValueType_e::invalid_type) {
       *resultID = nextSpot;
@@ -128,7 +128,7 @@ bool ExpressionStore::getExprBoolValue(uint16_t expressionNum) const {
   if (expressionNum >= MAX_EXPRESSION || expressionNum < 0) {
     return false;
   }
-  return std::visit([&](auto &&var) { return var.getBooleanValue(); },
+  return std::visit([&](auto&& var) { return var.getBooleanValue(); },
                     expressions[expressionNum]);
 }
 
@@ -136,15 +136,15 @@ float ExpressionStore::getExprNumValue(uint16_t expressionNum) const {
   if (expressionNum >= MAX_EXPRESSION || expressionNum < 0) {
     return false;
   }
-  return std::visit([&](auto &&var) { return var.getNumberValue(); },
+  return std::visit([&](auto&& var) { return var.getNumberValue(); },
                     expressions[expressionNum]);
 }
 
-void ExpressionStore::tick(FilterData_s *filterData) {
-  std::function<Expression *(uint16_t)> pointerCallback =
+void ExpressionStore::tick(FilterData_s* filterData) {
+  std::function<Expression*(uint16_t)> pointerCallback =
       std::bind(&ExpressionStore::getExpressionPtr, this, _1);
   for (int i = MAX_EXPRESSION - 1; i >= 0; --i) {
-    std::visit([&](auto &&var) { var.evaluate(filterData, pointerCallback); },
+    std::visit([&](auto&& var) { var.evaluate(filterData, pointerCallback); },
                expressions[i]);
   }
 }
@@ -153,21 +153,21 @@ void ExpressionStore::writeNewConfigs() {
   for (int i = 0; i < MAX_EXPRESSION; ++i) {
     expressions[i] = expressionBuffer[i];
     std::visit(
-        [&](auto &&var) {
+        [&](auto&& var) {
           var.serializeInto(cli_getConfigs()->serializedExprs + i);
         },
         expressions[i]);
   }
 }
 
-void ExpressionStore::conditionToString(uint16_t expressionNum, char *buffer,
+void ExpressionStore::conditionToString(uint16_t expressionNum, char* buffer,
                                         int n) {
   if (expressionNum >= MAX_EXPRESSION || expressionNum < 0) {
     return;
   }
 
-  std::function<Expression *(uint16_t)> pointerCallback =
+  std::function<Expression*(uint16_t)> pointerCallback =
       std::bind(&ExpressionStore::getExpressionPtr, this, _1);
-  std::visit([&](auto &&var) { var.toString(buffer, n, pointerCallback); },
+  std::visit([&](auto&& var) { var.toString(buffer, n, pointerCallback); },
              expressions[expressionNum]);
 }
