@@ -13,10 +13,10 @@ extern "C" {
 #include "board_config_common.h"
 
 typedef struct {
-  SPI_HandleTypeDef *hspi;
-  GPIO_TypeDef *csPort;
+  SPI_HandleTypeDef* hspi;
+  GPIO_TypeDef* csPort;
   uint16_t csPin;
-  GPIO_TypeDef *intPort;
+  GPIO_TypeDef* intPort;
   uint16_t intPin;
 
   int32_t result[8];
@@ -90,13 +90,13 @@ typedef struct {
   AdcMcp3564ScanModeChannels_e channel_id : 4;  // (See table 5-14, page 54)
 } AdcMcp3564_DataFormat_11;
 
-void mcp356x_read(void *pdev);
-int mcp356x_process(AdcMcp3564Ctrl_s *dev);
-int mcp356x_channelSetup(AdcMcp3564Ctrl_s *dev,
+void mcp356x_read(void* pdev);
+int mcp356x_process(AdcMcp3564Ctrl_s* dev);
+int mcp356x_channelSetup(AdcMcp3564Ctrl_s* dev,
                          const AdcMcp3564MuxChannels_e in_p,
                          const AdcMcp3564MuxChannels_e in_n);
-int mcp3564_init(AdcMcp3564Ctrl_s *dev, SPI_HandleTypeDef *hspi,
-                 GPIO_TypeDef *csPort, uint16_t csPin, GPIO_TypeDef *intPort,
+int mcp3564_init(AdcMcp3564Ctrl_s* dev, SPI_HandleTypeDef* hspi,
+                 GPIO_TypeDef* csPort, uint16_t csPin, GPIO_TypeDef* intPort,
                  uint16_t intPin);
 
 #ifdef __cplusplus

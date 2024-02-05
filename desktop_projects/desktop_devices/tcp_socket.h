@@ -22,11 +22,11 @@ class TcpSocket {
  public:
   explicit TcpSocket(int port);
 
-  bool writeData(uint8_t *data, size_t len);
+  bool writeData(uint8_t* data, size_t len);
 
   bool readData();
 
-  void setRXBuffer(CircularBuffer_s *rx_buffer);
+  void setRXBuffer(CircularBuffer_s* rx_buffer);
 
  private:
   struct sockaddr_in address {};
@@ -39,7 +39,7 @@ class TcpSocket {
 #endif
   volatile int client_fd;
 
-  CircularBuffer_s *rxBuffer;
+  CircularBuffer_s* rxBuffer;
 
   std::thread acceptThread;
 

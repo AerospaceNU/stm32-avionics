@@ -42,15 +42,15 @@ typedef struct __attribute__((packed)) {
 } Max31855Data_s;
 
 typedef struct {
-  SPI_HandleTypeDef *hspi;
-  GPIO_TypeDef *csPort;
+  SPI_HandleTypeDef* hspi;
+  GPIO_TypeDef* csPort;
   uint16_t csPin;
   Max31855Data_s data;
 } TempMax31855Ctrl_s;
 
-void tempMax31855_init(TempMax31855Ctrl_s *dev, SPI_HandleTypeDef *hspi,
-                       GPIO_TypeDef *csPort, uint16_t csPin);
-void tempMax31855_read(TempMax31855Ctrl_s *dev);
+void tempMax31855_init(TempMax31855Ctrl_s* dev, SPI_HandleTypeDef* hspi,
+                       GPIO_TypeDef* csPort, uint16_t csPin);
+void tempMax31855_read(TempMax31855Ctrl_s* dev);
 
 #ifdef __cplusplus
 }

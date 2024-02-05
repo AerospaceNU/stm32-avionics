@@ -12,16 +12,16 @@ extern "C" {
 /* Definition of DC motor control struct */
 /* user needs to config timer */
 typedef struct {
-  TIM_HandleTypeDef *htim;
+  TIM_HandleTypeDef* htim;
   uint32_t channel;
 } DcMotorPwmCtrl_s;
 
 /* creates a new DC motor that can be started and stopped */
-void dcMotorPwm_init(DcMotorPwmCtrl_s *dev, TIM_HandleTypeDef *htim,
+void dcMotorPwm_init(DcMotorPwmCtrl_s* dev, TIM_HandleTypeDef* htim,
                      uint32_t channel);
 
 /* start a specified DC motor with a given speed percentage -100-100 */
-void dcMotorPwm_setPercent(DcMotorPwmCtrl_s *dev, double speed_percent);
+void dcMotorPwm_setPercent(DcMotorPwmCtrl_s* dev, double speed_percent);
 
 #endif
 

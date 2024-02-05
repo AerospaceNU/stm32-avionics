@@ -19,8 +19,8 @@ typedef enum {
 /**
  * Definition of a UnaryFunction lambda.
  */
-using UnaryFunction = void(Expression *expr, FilterData_s *filterData,
-                           Expression *operand);
+using UnaryFunction = void(Expression* expr, FilterData_s* filterData,
+                           Expression* operand);
 
 /**
  * A wrapper class for a lambda that makes it easier to use. This wrapper class
@@ -28,7 +28,7 @@ using UnaryFunction = void(Expression *expr, FilterData_s *filterData,
  * information about how the function works and what argument it takes.
  */
 class UnaryFunctionWrapper {
-  UnaryFunction *function;
+  UnaryFunction* function;
   ExpressionValueType_e opType;
   uint16_t stringLen;
   bool defaultValue;
@@ -45,7 +45,7 @@ class UnaryFunctionWrapper {
    * @param valueType The type of result this function returns.
    * @param defaultValue Default boolean value to set.
    */
-  UnaryFunctionWrapper(const char *stringRep, UnaryFunction *function,
+  UnaryFunctionWrapper(const char* stringRep, UnaryFunction* function,
                        ExpressionValueType_e opType,
                        ExpressionValueType_e valueType, bool defaultValue);
 
@@ -55,14 +55,14 @@ class UnaryFunctionWrapper {
    * @param filterData
    * @param op1 The expression operand.
    */
-  void evaluate(Expression *expr, FilterData_s *filterData, Expression *op1);
+  void evaluate(Expression* expr, FilterData_s* filterData, Expression* op1);
 
   /**
    * See if this wrapper's string name matches a slice of a string.
    * @param slice
    * @return bool of match or not.
    */
-  bool matchesSlice(const StringSlice &slice);
+  bool matchesSlice(const StringSlice& slice);
 
   /**
    * See if this wrapper matches a type of operand.
@@ -103,13 +103,13 @@ class UnaryFuncExpression : public Expression {
     this->setTriggerNum(triggerNum);
   }
 
-  void evaluate(FilterData_s *filterData,
-                ExpressionPtrCallback &expressionPtrCallback);
+  void evaluate(FilterData_s* filterData,
+                ExpressionPtrCallback& expressionPtrCallback);
 
-  int toString(char *buffer, int n,
-               ExpressionPtrCallback &expressionPtrCallback) const;
+  int toString(char* buffer, int n,
+               ExpressionPtrCallback& expressionPtrCallback) const;
 
-  void serializeInto(SerializedExpression_s *serialized) const;
+  void serializeInto(SerializedExpression_s* serialized) const;
 };
 
 #endif  // COMMON_SYSTEM_EXPRESSIONS_UNARY_FUNC_EXPRESSION_H_

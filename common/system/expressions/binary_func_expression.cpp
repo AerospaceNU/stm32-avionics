@@ -8,8 +8,8 @@
 
 #include "hardware_manager.h"
 
-BinaryFunctionWrapper::BinaryFunctionWrapper(const char *_stringRep,
-                                             BinaryFunction *function,
+BinaryFunctionWrapper::BinaryFunctionWrapper(const char* _stringRep,
+                                             BinaryFunction* function,
                                              ExpressionValueType_e _op1Type,
                                              ExpressionValueType_e _op2Type,
                                              ExpressionValueType_e _valueType) {
@@ -21,12 +21,12 @@ BinaryFunctionWrapper::BinaryFunctionWrapper(const char *_stringRep,
   this->valueType = _valueType;
 }
 
-void BinaryFunctionWrapper::evaluate(Expression *expr, FilterData_s *filterData,
-                                     Expression *op1, Expression *op2) {
+void BinaryFunctionWrapper::evaluate(Expression* expr, FilterData_s* filterData,
+                                     Expression* op1, Expression* op2) {
   this->function(expr, filterData, op1, op2);
 }
 
-bool BinaryFunctionWrapper::matchesSlice(const StringSlice &slice) {
+bool BinaryFunctionWrapper::matchesSlice(const StringSlice& slice) {
   return slice == this->stringRep;
 }
 
@@ -126,7 +126,7 @@ BinaryFunctionWrapper binaryFunctionWrappers[NUM_BINARY_FUNCTION] = {
     BinaryFunctionWrapper("/", divFunc, number, number, number)};
 
 int BinaryFuncExpression::toString(
-    char *buffer, int n, ExpressionPtrCallback &expressionPtrCallback) const {
+    char* buffer, int n, ExpressionPtrCallback& expressionPtrCallback) const {
   int selfLength = strlen(binaryFunctionWrappers[this->opcode].stringRep);
   if (n == 0) {
     return 0;
@@ -155,14 +155,14 @@ int BinaryFuncExpression::toString(
 }
 
 void BinaryFuncExpression::evaluate(
-    FilterData_s *filterData, ExpressionPtrCallback &expressionPtrCallback) {
+    FilterData_s* filterData, ExpressionPtrCallback& expressionPtrCallback) {
   binaryFunctionWrappers[this->opcode].evaluate(
       this, filterData, expressionPtrCallback(operand1ID),
       expressionPtrCallback(operand2ID));
 }
 
 void BinaryFuncExpression::serializeInto(
-    SerializedExpression_s *serialized) const {
+    SerializedExpression_s* serialized) const {
   serialized->triggerNum = this->triggerNum;
   serialized->type = binaryFunc;
   serialized->contents.binary.opcode = this->opcode;

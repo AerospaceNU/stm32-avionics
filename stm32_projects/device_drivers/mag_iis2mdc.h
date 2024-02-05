@@ -21,12 +21,12 @@ typedef struct IIS2MDCCtrl_s {
   // The most recent sensor reading
   MagData_s data;
 
-  I2C_HandleTypeDef *hi2c;
+  I2C_HandleTypeDef* hi2c;
   uint8_t address;
 } ImuIIS2MDCCtrl_s;
 
-bool iis2mdc_init(ImuIIS2MDCCtrl_s *sensor, uint8_t address7bit);
-void iis2mdc_getData(ImuIIS2MDCCtrl_s *sensor);
+bool iis2mdc_init(ImuIIS2MDCCtrl_s* sensor, uint8_t address7bit);
+void iis2mdc_getData(ImuIIS2MDCCtrl_s* sensor);
 
 #endif  // HAL_I2C_MODULE_ENABLED
 

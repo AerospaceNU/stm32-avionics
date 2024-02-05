@@ -15,8 +15,8 @@
 #define CLOCK_FREQUENCY_HZ 1000
 
 typedef struct {
-  GPIO_TypeDef *port;
-  TIM_HandleTypeDef *htim;
+  GPIO_TypeDef* port;
+  TIM_HandleTypeDef* htim;
   uint16_t pin;
   bool stayEnabled;
   uint32_t expireTime;
@@ -26,11 +26,11 @@ typedef struct {
   uint32_t counterMax;
 } PyroDigitalCtrl_s;
 
-void pyroDigital_init(PyroDigitalCtrl_s *pyro);
-void pyroDigital_start(PyroDigitalCtrl_s *pyro, uint32_t duration);
-void pyroDigital_set(PyroDigitalCtrl_s *pyro, bool enable);
-void pyroDigital_tick(PyroDigitalCtrl_s *pyro);
-void pyroDigital_pwmStart(PyroDigitalCtrl_s *pyro, uint32_t duration,
+void pyroDigital_init(PyroDigitalCtrl_s* pyro);
+void pyroDigital_start(PyroDigitalCtrl_s* pyro, uint32_t duration);
+void pyroDigital_set(PyroDigitalCtrl_s* pyro, bool enable);
+void pyroDigital_tick(PyroDigitalCtrl_s* pyro);
+void pyroDigital_pwmStart(PyroDigitalCtrl_s* pyro, uint32_t duration,
                           uint32_t frequency, uint32_t pulseWidth);
 
 #endif  // HAL_TIM_MODULE_ENABLED

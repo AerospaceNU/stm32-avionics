@@ -43,10 +43,10 @@ typedef struct ICM20600Ctrl_s {
   double tVal;
 } ImuICM20600Ctrl_s;
 
-bool icm20600_init(ImuICM20600Ctrl_s *sensor,
+bool icm20600_init(ImuICM20600Ctrl_s* sensor,
                    ImuICM20600AccelFullscale_e accelFullscale,
                    ImuICM20600GyroFullscale_e gyroFullscale);
-void icm20600_getData(ImuICM20600Ctrl_s *sensor);
+void icm20600_getData(ImuICM20600Ctrl_s* sensor);
 
 #ifdef __cplusplus
 }

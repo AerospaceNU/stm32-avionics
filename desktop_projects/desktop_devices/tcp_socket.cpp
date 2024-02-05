@@ -24,7 +24,7 @@ TcpSocket::TcpSocket(int port) {
 
   // Forcefully attaching socket to the port 8080
   if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR,
-                 reinterpret_cast<char *>(&opt), sizeof(opt))) {
+                 reinterpret_cast<char*>(&opt), sizeof(opt))) {
     perror("setsockopt");
     exit(EXIT_FAILURE);
   }
@@ -34,7 +34,7 @@ TcpSocket::TcpSocket(int port) {
   address.sin_port = htons(port);
 
   // Forcefully attaching socket to the port 8080
-  if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+  if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
     perror("bind failed");
     exit(EXIT_FAILURE);
   }
@@ -46,8 +46,8 @@ TcpSocket::TcpSocket(int port) {
 #if defined(__WIN32__) && !defined(socketlen_t)
 #define socklen_t int
 #endif
-  if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
-                           (socklen_t *)&addrlen)) < 0) {
+  if ((new_socket = accept(server_fd, (struct sockaddr*)&address,
+                           (socklen_t*)&addrlen)) < 0) {
     perror("accept");
     exit(EXIT_FAILURE);
   }
@@ -55,13 +55,13 @@ TcpSocket::TcpSocket(int port) {
 
   // Set receive timeout
   struct timeval tv = {0, 10000};
-  setsockopt(client_fd, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char *>(&tv),
+  setsockopt(client_fd, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char*>(&tv),
              sizeof(tv));
 }
 
-bool TcpSocket::writeData(uint8_t *data, size_t len) {
+bool TcpSocket::writeData(uint8_t* data, size_t len) {
   if (this && client_fd) {
-    send(client_fd, (char *)data, len, 0);
+    send(client_fd, (char*)data, len, 0);
   }
   return true;
 }
@@ -79,10 +79,10 @@ bool TcpSocket::readData() {
     packet.crc = true;
     packet.lqi = 0;
 
-    void *stringPacket = buffer + offsetof(RadioPacket_s, payload);
-    uint8_t len = *((uint8_t *)stringPacket + offsetof(CliStringPacket_s, len));
-    uint8_t *fullString =
-        (uint8_t *)stringPacket + offsetof(CliStringPacket_s, string);
+    void* stringPacket = buffer + offsetof(RadioPacket_s, payload);
+    uint8_t len = *((uint8_t*)stringPacket + offsetof(CliStringPacket_s, len));
+    uint8_t* fullString =
+        (uint8_t*)stringPacket + offsetof(CliStringPacket_s, string);
 
     RadioPacket_s packetOnAir = {0};
     packetOnAir.packetType = buffer[0];
@@ -109,6 +109,6 @@ bool TcpSocket::readData() {
   return true;
 }
 
-void TcpSocket::setRXBuffer(CircularBuffer_s *rx_buffer) {
+void TcpSocket::setRXBuffer(CircularBuffer_s* rx_buffer) {
   rxBuffer = rx_buffer;
 }

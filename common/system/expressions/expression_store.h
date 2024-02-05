@@ -69,7 +69,7 @@ class ExpressionStore {
    * @param expressionNum Index of the expression to get a pointer to.
    * @return Pointer to that expression.
    */
-  Expression *getExpressionPtr(uint16_t expressionNum);
+  Expression* getExpressionPtr(uint16_t expressionNum);
 
   /**
    * Remove all of the expressions for a certain trigger number.
@@ -88,8 +88,8 @@ class ExpressionStore {
    * @param startAt The start location to potentially store this expression.
    * @return The value type of this expression, or invalid if it couldn't parse.
    */
-  ExpressionValueType_e parseForTrigger(uint16_t *resultID, uint16_t triggerNum,
-                                        const StringSlice &slice,
+  ExpressionValueType_e parseForTrigger(uint16_t* resultID, uint16_t triggerNum,
+                                        const StringSlice& slice,
                                         uint16_t startAt = 0);
 
   /**
@@ -110,7 +110,7 @@ class ExpressionStore {
    * Should be run once per cycle. Evaluates all expressions with updated data.
    * @param filterData
    */
-  void tick(FilterData_s *filterData);
+  void tick(FilterData_s* filterData);
 
   /**
    * After a delete/update of triggers, actually write all of the changes to the
@@ -124,6 +124,6 @@ class ExpressionStore {
    * @param buffer Buffer to format into.
    * @param n Maximum size of buffer.
    */
-  void conditionToString(uint16_t expressionNum, char *buffer, int n);
+  void conditionToString(uint16_t expressionNum, char* buffer, int n);
 };
 #endif  // COMMON_SYSTEM_EXPRESSIONS_EXPRESSION_STORE_H_

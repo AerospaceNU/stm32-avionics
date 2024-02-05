@@ -36,7 +36,7 @@ typedef struct __attribute__((__packed__)) {
 #define INCOMING_PACKET_BUFF_LEN 10
 #define INCOMING_PACKET_SIZE (sizeof(BleChipNrfRecievedPacket_s) + 1)
 #define DMA_BUFF_SIZE \
-  INCOMING_PACKET_BUFF_LEN *INCOMING_PACKET_SIZE  // Buffer that DMA writes to
+  INCOMING_PACKET_BUFF_LEN* INCOMING_PACKET_SIZE  // Buffer that DMA writes to
 
 /*
  * A bluetooth client inplements the comm protocol defined here:
@@ -53,12 +53,12 @@ typedef struct __attribute__((__packed__)) {
 typedef struct {
   BleChip_s bleChip;
 
-  UART_HandleTypeDef *ble_uart;
+  UART_HandleTypeDef* ble_uart;
   uint8_t dma_buff_begin[INCOMING_PACKET_SIZE];
 
   // List of pointers to circular buffers for our 4 addresses. Set these from
   // device drivers
-  CircularBuffer_s *circular_buffers[MAX_ADDRESSES];
+  CircularBuffer_s* circular_buffers[MAX_ADDRESSES];
 
   uint8_t connectedClients;  // bits: 0 for phone, 1 for LC1, 2 for LC2
 
@@ -66,8 +66,8 @@ typedef struct {
   uint32_t lastPollTimestamp;
 } BleChipNrfCtrl_t;
 
-void bleChipNrf_init(BleChipNrfCtrl_t *ctrl, UART_HandleTypeDef *ble_uart);
-void bleChipNrf_tick(BleChipNrfCtrl_t *ctrl);
+void bleChipNrf_init(BleChipNrfCtrl_t* ctrl, UART_HandleTypeDef* ble_uart);
+void bleChipNrf_tick(BleChipNrfCtrl_t* ctrl);
 
 #endif
 

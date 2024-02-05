@@ -6,6 +6,6 @@
 #include "device_manager.h"
 #include "hardware_manager.h"
 
-DeviceManager *getDeviceManager();
+DeviceManager* getDeviceManager();
 
 #endif  // PLATFORMIO_PROJECTS_LIB_NEW_HAL_ARDUINO_HARDWARE_MANAGER_H_

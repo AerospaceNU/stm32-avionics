@@ -6,11 +6,11 @@
  */
 
 ExpressionValueType_e VarExpressionBuilder::build(
-    const StringSlice &slice, ExpressionStore *expressionStore,
-    uint16_t triggerNum, ExpressionVariant_v *parseInto,
+    const StringSlice& slice, ExpressionStore* expressionStore,
+    uint16_t triggerNum, ExpressionVariant_v* parseInto,
     uint16_t destinationID) {
   FilterData_e variableType =
-      getVariableEnumFromString((char *)slice.startPtr());
+      getVariableEnumFromString((char*)slice.startPtr());
   if (variableType != FilterData_e::invalid) {
     *parseInto = VarExpression(triggerNum, variableType);
     return ExpressionValueType_e::number;
@@ -25,8 +25,8 @@ ExpressionValueType_e VarExpressionBuilder::build(
  */
 
 ExpressionValueType_e EventExpressionBuilder::build(
-    const StringSlice &slice, ExpressionStore *expressionStore,
-    uint16_t triggerNum, ExpressionVariant_v *parseInto,
+    const StringSlice& slice, ExpressionStore* expressionStore,
+    uint16_t triggerNum, ExpressionVariant_v* parseInto,
     uint16_t destinationID) {
   for (int i = 0; i < Event_e::NUM_EVENT; ++i) {
     if (slice == eventStrings[i]) {
@@ -43,11 +43,11 @@ ExpressionValueType_e EventExpressionBuilder::build(
  * constant is found.
  */
 ExpressionValueType_e ConstExpressionBuilder::build(
-    const StringSlice &slice, ExpressionStore *expressionStore,
-    uint16_t triggerNum, ExpressionVariant_v *parseInto,
+    const StringSlice& slice, ExpressionStore* expressionStore,
+    uint16_t triggerNum, ExpressionVariant_v* parseInto,
     uint16_t destinationID) {
-  char *endptr;
-  double value = smallStrtod((char *)slice.startPtr(), &endptr);
+  char* endptr;
+  double value = smallStrtod((char*)slice.startPtr(), &endptr);
 
   if (endptr != slice.endptr()) {
     return ExpressionValueType_e::invalid_type;
@@ -66,8 +66,8 @@ ExpressionValueType_e ConstExpressionBuilder::build(
  */
 
 ExpressionValueType_e UnaryFuncExpressionBuilder::build(
-    const StringSlice &slice, ExpressionStore *expressionStore,
-    uint16_t triggerNum, ExpressionVariant_v *parseInto,
+    const StringSlice& slice, ExpressionStore* expressionStore,
+    uint16_t triggerNum, ExpressionVariant_v* parseInto,
     uint16_t destinationID) {
   if (slice[0] != '(' || slice[slice.length() - 1] != ')') {
     return ExpressionValueType_e::invalid_type;
@@ -106,8 +106,8 @@ ExpressionValueType_e UnaryFuncExpressionBuilder::build(
  * (boolean or number) are valid inputs to the function already determined.
  */
 ExpressionValueType_e BinaryFuncExpressionBuilder::build(
-    const StringSlice &slice, ExpressionStore *expressionStore,
-    uint16_t triggerNum, ExpressionVariant_v *parseInto,
+    const StringSlice& slice, ExpressionStore* expressionStore,
+    uint16_t triggerNum, ExpressionVariant_v* parseInto,
     uint16_t destinationID) {
   StringSlice slices[MAX_SLICE];
   if (slice[0] != '(' || slice[slice.length() - 1] != ')') {

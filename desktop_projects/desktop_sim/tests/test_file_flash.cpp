@@ -6,7 +6,7 @@
 
 TEST(FileFlash, ReadWrite) {
   std::string ext_flash_path = "flash_test_file.hex";
-  FileBackedFlash *externalFlash = new FileBackedFlash(ext_flash_path, 0x4000);
+  FileBackedFlash* externalFlash = new FileBackedFlash(ext_flash_path, 0x4000);
 
   uint8_t pdata[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   uint8_t pdata2[10] = {0};
@@ -36,7 +36,7 @@ TEST(FileFlash, ReadWrite) {
 
 TEST(FileFlash, WriteMiddle) {
   std::string ext_flash_path = "flash_test_file2.hex";
-  FileBackedFlash *externalFlash = new FileBackedFlash(ext_flash_path, 0x100);
+  FileBackedFlash* externalFlash = new FileBackedFlash(ext_flash_path, 0x100);
   externalFlash->reinit(true);
 
   uint8_t correct[0x100];

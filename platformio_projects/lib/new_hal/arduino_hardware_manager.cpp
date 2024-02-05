@@ -13,7 +13,7 @@
 
 #define USB_SERIAL_BUFFER_SIZE 500
 
-void stdArrayToAxis3d(Axis3dReal_s *s, std::array<double, 3> array) {
+void stdArrayToAxis3d(Axis3dReal_s* s, std::array<double, 3> array) {
   s->x = array[0];
   s->y = array[1];
   s->z = array[2];
@@ -23,7 +23,7 @@ void stdArrayToAxis3d(Axis3dReal_s *s, std::array<double, 3> array) {
 // hardware drivers
 DeviceManager deviceManager;
 
-DeviceManager *getDeviceManager() { return &deviceManager; }
+DeviceManager* getDeviceManager() { return &deviceManager; }
 
 // Hardware statuses
 #if HAS_DEV(ACCEL)
@@ -90,7 +90,7 @@ static uint8_t serialBuffer[USB_SERIAL_BUFFER_SIZE];
 static CircularBuffer_s serialCircularBuffer;
 
 // Circular buffer for radio reads
-CircularBuffer_s *radioCircularBuffer;
+CircularBuffer_s* radioCircularBuffer;
 
 void hm_hardwareInit() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -130,13 +130,13 @@ void hm_hardwareInit() {
 uint32_t hm_millis() { return millis(); }
 
 bool hm_flashReadStart(int flashId, uint32_t startLoc, uint32_t numBytes,
-                       uint8_t *pData) {
+                       uint8_t* pData) {
   memset(pData, 0xff, numBytes);
   return false;
 }
 
 bool hm_flashWriteStart(int flashId, uint32_t startLoc, uint32_t numBytes,
-                        uint8_t *data) {
+                        uint8_t* data) {
   return false;
 }
 
@@ -167,7 +167,7 @@ void hm_ledToggle(int ledId) {
   led_on = !led_on;
 }
 
-bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
+bool hm_radioSend(int radioNum, uint8_t* data, uint16_t numBytes) {
   if (deviceManager.getRadio(0)) {
     return deviceManager.getRadio(0)->sendData(data, numBytes);
   }
@@ -176,7 +176,7 @@ bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
 }
 
 void hm_radioUpdate() {
-  for (auto &radio : deviceManager.radios) {
+  for (auto& radio : deviceManager.radios) {
     if (radio->isDataAvailable()) {
       static RadioRecievedPacket_s packet;
       packet.radioId = 0;
@@ -194,7 +194,7 @@ void hm_radioUpdate() {
   }
 }
 
-void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s *rxBuffer) {
+void hm_radioRegisterConsumer(int radioNum, CircularBuffer_s* rxBuffer) {
   radioCircularBuffer = rxBuffer;
 }
 
@@ -202,7 +202,7 @@ void hm_radioSetChannel(int radioNum, int channel) {}
 
 bool hm_usbIsConnected(int usbId) { return false; }
 
-bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
+bool hm_usbTransmit(int usbId, uint8_t* data, uint16_t numBytes) {
   for (int i = 0; i < numBytes; i++) {
     Serial.print((char)data[i]);
   }
@@ -210,25 +210,25 @@ bool hm_usbTransmit(int usbId, uint8_t *data, uint16_t numBytes) {
   return true;
 }
 
-CircularBuffer_s *hm_usbGetRxBuffer(int usbId) { return &serialCircularBuffer; }
+CircularBuffer_s* hm_usbGetRxBuffer(int usbId) { return &serialCircularBuffer; }
 
 bool hm_bleClientConnected(int bleClientId) { return false; }
 
-bool hm_bleClientSend(int bleClientId, const uint8_t *data, uint16_t numBytes) {
+bool hm_bleClientSend(int bleClientId, const uint8_t* data, uint16_t numBytes) {
   return false;
 }
 
-CircularBuffer_s *hm_bleClientGetRxBuffer(int bleClientId) { return nullptr; }
+CircularBuffer_s* hm_bleClientGetRxBuffer(int bleClientId) { return nullptr; }
 
 void hm_bleTick() {}
 
-LineCutterData_s *hm_getLineCutterData(int lineCutterId) { return nullptr; }
+LineCutterData_s* hm_getLineCutterData(int lineCutterId) { return nullptr; }
 
-LineCutterFlightVars_s *hm_getLineCutterFlightVariables(int lineCutterId) {
+LineCutterFlightVars_s* hm_getLineCutterFlightVariables(int lineCutterId) {
   return nullptr;
 }
 
-bool hm_lineCutterSendString(int lineCutterNumber, char *string) {
+bool hm_lineCutterSendString(int lineCutterNumber, char* string) {
   printf("[Sent to LC %i] %s\n", lineCutterNumber, string);
   return true;
 }
@@ -253,7 +253,7 @@ void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth,
   // TODO: Analogwrite()?
 }
 
-void hm_pyroUpdate(void *pUserData) {
+void hm_pyroUpdate(void* pUserData) {
   // TODO: Actually do this
 }
 
@@ -314,11 +314,11 @@ void hm_readSensorData() {
   sensorData.timestampMs = hm_millis();
 }
 
-SensorData_s *hm_getSensorData() { return &sensorData; }
+SensorData_s* hm_getSensorData() { return &sensorData; }
 
-SensorProperties_s *hm_getSensorProperties() { return &sensorProperties; }
+SensorProperties_s* hm_getSensorProperties() { return &sensorProperties; }
 
-void hm_enableSimMode(CircularBuffer_s *rxBuffer) {}
+void hm_enableSimMode(CircularBuffer_s* rxBuffer) {}
 
 void hm_disableSimMode() {}
 

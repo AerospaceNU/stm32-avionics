@@ -64,7 +64,7 @@ void dataLog_loadLastStoredFlightMetadata();
  * @brief Get current flight metadata
  * @return Pointer to current FlightMetadata_s
  */
-FlightMetadata_s *dataLog_getFlightMetadata();
+FlightMetadata_s* dataLog_getFlightMetadata();
 
 /**
  * @brief Load metadata from a flight load into the current packet
@@ -82,7 +82,7 @@ void dataLog_writeFlightMetadata();
  * @param filterData: Filter info to write to log
  * @param state: Current state ID to write to log
  */
-void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
+void dataLog_write(SensorData_s* sensorData, FilterData_s* filterData,
                    uint8_t state);
 
 /**
@@ -96,7 +96,7 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
  * flightNum no matter what
  * @return Number of bytes actually read from the data log
  */
-uint32_t dataLog_read(uint32_t flightNum, uint32_t maxBytes, uint8_t *pdata,
+uint32_t dataLog_read(uint32_t flightNum, uint32_t maxBytes, uint8_t* pdata,
                       bool reset);
 
 /**

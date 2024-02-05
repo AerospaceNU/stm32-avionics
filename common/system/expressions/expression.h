@@ -33,7 +33,7 @@ class Expression {
    * ExpressionStore to fetch from.
    * @return Pointer to that expression as the base class Expression.
    */
-  using ExpressionPtrCallback = std::function<Expression *(uint16_t)>;
+  using ExpressionPtrCallback = std::function<Expression*(uint16_t)>;
   uint32_t firstTrue;
   uint32_t trueSince;
   uint16_t triggerNum;
@@ -54,8 +54,8 @@ class Expression {
    * @param expressionPtrCallback ExpressionPtrCallback to get a pointer to a
    * given child expression.
    */
-  virtual void evaluate(FilterData_s *filterData,
-                        ExpressionPtrCallback &expressionPtrCallback) = 0;
+  virtual void evaluate(FilterData_s* filterData,
+                        ExpressionPtrCallback& expressionPtrCallback) = 0;
 
   /**
    * If this is an empty expression.
@@ -105,14 +105,14 @@ class Expression {
    * given child expression.
    * @return Number of characters used by this expression in the buffer.
    */
-  virtual int toString(char *buffer, int n,
-                       ExpressionPtrCallback &expressionPtrCallback) const = 0;
+  virtual int toString(char* buffer, int n,
+                       ExpressionPtrCallback& expressionPtrCallback) const = 0;
 
   /**
    * Serialize this expression into a location.
    * @param serialized Struct to serialize into.
    */
-  virtual void serializeInto(SerializedExpression_s *serialized) const = 0;
+  virtual void serializeInto(SerializedExpression_s* serialized) const = 0;
 };
 
 #endif  // COMMON_SYSTEM_EXPRESSIONS_EXPRESSION_H_

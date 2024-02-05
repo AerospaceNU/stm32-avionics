@@ -19,7 +19,7 @@
  * @param data - Array of uint8_t to write
  * @param numBytes - Number of bytes to be written from data
  */
-bool internalFlash_write(uint32_t RelFlashAddress, uint8_t *data,
+bool internalFlash_write(uint32_t RelFlashAddress, uint8_t* data,
                          uint32_t numBytes) {
   return true;
 }
@@ -31,7 +31,7 @@ bool internalFlash_write(uint32_t RelFlashAddress, uint8_t *data,
  * @param pData - Array of uint8_t to read into
  * @param numBytes - Number of bytes to be read from flash
  */
-bool internalFlash_read(uint32_t RelFlashAddress, uint8_t *pData,
+bool internalFlash_read(uint32_t RelFlashAddress, uint8_t* pData,
                         uint32_t numBytes) {
   return false;
 }

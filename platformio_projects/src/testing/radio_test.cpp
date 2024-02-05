@@ -147,7 +147,7 @@ void loop() {
 
   Serial.println("Sending...");
   delay(10);
-  rf95.send((uint8_t *)radiopacket, 20);
+  rf95.send((uint8_t*)radiopacket, 20);
 
   Serial.println("Waiting for packet to complete...");
   delay(10);
@@ -161,7 +161,7 @@ void loop() {
     // Should be a reply message for us now
     if (rf95.recv(buf, &len)) {
       Serial.print("Got reply: ");
-      Serial.println((char *)buf);
+      Serial.println((char*)buf);
       Serial.print("RSSI: ");
       Serial.println(rf95.lastRssi(), DEC);
     } else {

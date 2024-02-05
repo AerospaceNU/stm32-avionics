@@ -14,11 +14,11 @@ class Radio : public virtual BaseDevice {
  public:
   explicit Radio(int max_message_length);
 
-  virtual bool sendData(uint8_t *data, size_t len);
+  virtual bool sendData(uint8_t* data, size_t len);
 
   virtual bool isDataAvailable();
 
-  virtual bool readData(uint8_t *buffer, size_t buffer_length);
+  virtual bool readData(uint8_t* buffer, size_t buffer_length);
 
   int getMaxMessageLength();
 

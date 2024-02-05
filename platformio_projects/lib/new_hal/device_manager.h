@@ -37,31 +37,31 @@
 class DeviceManager {
  public:
   // Driver objects
-  Array<Accelerometer *, MAX_ACCELEROMETERS> accelerometers{};
-  Array<Barometer *, MAX_BAROMETERS> barometers{};
-  Array<Gps *, MAX_GPS> gps{};
-  Array<Gyroscope *, MAX_GYROSCOPES> gyroscopes{};
+  Array<Accelerometer*, MAX_ACCELEROMETERS> accelerometers{};
+  Array<Barometer*, MAX_BAROMETERS> barometers{};
+  Array<Gps*, MAX_GPS> gps{};
+  Array<Gyroscope*, MAX_GYROSCOPES> gyroscopes{};
   //  Array<Imu *, MAX_IMUS> imus{};
-  Array<Magnetometer *, MAX_MAGNETOMETERS> magnetometers{};
-  Array<Radio *, MAX_RADIOS> radios{};
+  Array<Magnetometer*, MAX_MAGNETOMETERS> magnetometers{};
+  Array<Radio*, MAX_RADIOS> radios{};
 
   // Also store all the driver objects as an array of base class pointers
   // IDK how useful this really is, but we'll see
-  Array<BaseDevice *, MAX_DEVICES> devices{};
+  Array<BaseDevice*, MAX_DEVICES> devices{};
 
   DeviceManager();
 
   bool addBatteryMonitorAdc(int pin, double multiplier);
 
-  bool addRadio(Radio *radio);
+  bool addRadio(Radio* radio);
 
-  bool addBarometer(Barometer *barometer);
+  bool addBarometer(Barometer* barometer);
 
-  bool addGps(Gps *gps);
+  bool addGps(Gps* gps);
 
-  bool addImu(Imu *imu, bool has_mag = false);
+  bool addImu(Imu* imu, bool has_mag = false);
 
-  bool addMagnetometer(Magnetometer *mag);
+  bool addMagnetometer(Magnetometer* mag);
 
   void init();
 
@@ -71,17 +71,17 @@ class DeviceManager {
 
   double readBatteryVoltage(uint battery_num);
 
-  Accelerometer *getAccelerometer(uint index);
+  Accelerometer* getAccelerometer(uint index);
 
-  Barometer *getBarometer(uint index);
+  Barometer* getBarometer(uint index);
 
-  Gps *getGps(uint index);
+  Gps* getGps(uint index);
 
-  Gyroscope *getGyroscope(uint index);
+  Gyroscope* getGyroscope(uint index);
 
-  Magnetometer *getMagnetometer(uint index);
+  Magnetometer* getMagnetometer(uint index);
 
-  Radio *getRadio(uint index);
+  Radio* getRadio(uint index);
 
   //  Imu *getImu(int index);
 

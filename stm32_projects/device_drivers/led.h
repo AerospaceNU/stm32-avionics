@@ -10,15 +10,15 @@ extern "C" {
 #endif
 
 typedef struct {
-  GPIO_TypeDef *port;
+  GPIO_TypeDef* port;
   uint16_t pin;
 } LedCtrl_s;
 
-void led_init(LedCtrl_s *led);
+void led_init(LedCtrl_s* led);
 
-void led_set(LedCtrl_s *led, bool set);
+void led_set(LedCtrl_s* led, bool set);
 
-void led_toggle(LedCtrl_s *led);
+void led_toggle(LedCtrl_s* led);
 
 #ifdef __cplusplus
 }

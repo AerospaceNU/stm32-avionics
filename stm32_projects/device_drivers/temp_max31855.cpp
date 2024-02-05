@@ -29,7 +29,7 @@ static float voltageToTemperature(float voltage) {
 // https://github.com/Tuckie/max31855/blob/71b2724f6280a0970ff094290c63e01c889126c3/max31855.py#L111
 
 // Calculate internal raw counts, given the register value
-static void convertThermocouple(TempMax31855Ctrl_s *dev, uint32_t raw) {
+static void convertThermocouple(TempMax31855Ctrl_s* dev, uint32_t raw) {
   struct {
     int raw_temp : 14;
   } reg;
@@ -46,7 +46,7 @@ static void convertThermocouple(TempMax31855Ctrl_s *dev, uint32_t raw) {
 }
 
 // Calculate internal raw counts, given the register value
-static void convertReferenceJunction(TempMax31855Ctrl_s *dev, uint32_t raw) {
+static void convertReferenceJunction(TempMax31855Ctrl_s* dev, uint32_t raw) {
   struct {
     int raw_temp : 12;
   } reg;
@@ -55,7 +55,7 @@ static void convertReferenceJunction(TempMax31855Ctrl_s *dev, uint32_t raw) {
   dev->data.internalTemp = static_cast<float>(reg.raw_temp * 0.0625);
 }
 
-void tempMax31855_read(TempMax31855Ctrl_s *dev) {
+void tempMax31855_read(TempMax31855Ctrl_s* dev) {
   // Read 32 bits from SPI
   uint8_t rxBuff[4] = {0};
   HAL_GPIO_WritePin(dev->csPort, dev->csPin, GPIO_PIN_RESET);
@@ -72,7 +72,7 @@ void tempMax31855_read(TempMax31855Ctrl_s *dev) {
   d |= rxBuff[3];
 
   // Fun pointer wizardry to convert to our struct
-  Max31855Raw_s *raw = reinterpret_cast<Max31855Raw_s *>(&d);
+  Max31855Raw_s* raw = reinterpret_cast<Max31855Raw_s*>(&d);
 
   // Convert to real numbers
   convertReferenceJunction(dev, d >> 4);
@@ -85,8 +85,8 @@ void tempMax31855_read(TempMax31855Ctrl_s *dev) {
                            (raw->gndFault << 2) | (raw->vccFault << 3));
 }
 
-void tempMax31855_init(TempMax31855Ctrl_s *dev, SPI_HandleTypeDef *hspi,
-                       GPIO_TypeDef *csPort, uint16_t csPin) {
+void tempMax31855_init(TempMax31855Ctrl_s* dev, SPI_HandleTypeDef* hspi,
+                       GPIO_TypeDef* csPort, uint16_t csPin) {
   dev->hspi = hspi;
   dev->csPort = csPort;
   dev->csPin = csPin;

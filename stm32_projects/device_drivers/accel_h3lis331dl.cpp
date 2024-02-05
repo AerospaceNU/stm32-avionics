@@ -30,11 +30,11 @@
 #define Y_AXIS_ENABLE (1 << 1)
 #define X_AXIS_ENABLE (1 << 0)
 
-static uint8_t whoAmI(AccelH3lis331dlCtrl_s *sensor) {
+static uint8_t whoAmI(AccelH3lis331dlCtrl_s* sensor) {
   return spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_WHO_AM_I);
 }
 
-static void accelH3lis331dl_getDataRaw(AccelH3lis331dlCtrl_s *sensor) {
+static void accelH3lis331dl_getDataRaw(AccelH3lis331dlCtrl_s* sensor) {
   // Takes x, y, and z axis readings
   uint8_t x_l =
       spi_readRegister(&sensor->spi, H3LIS331DL_SPI_REG_MASK | REG_OUT_X_L);
@@ -55,11 +55,11 @@ static void accelH3lis331dl_getDataRaw(AccelH3lis331dlCtrl_s *sensor) {
   sensor->val.raw.z = static_cast<int16_t>((z_h << 8) | (z_l));
 }
 
-static void accelH3lis331dl_getGain(AccelH3lis331dlCtrl_s *sensor) {
+static void accelH3lis331dl_getGain(AccelH3lis331dlCtrl_s* sensor) {
   sensor->gain = 0.02942;
 }
 
-bool accelH3lis331dl_init(AccelH3lis331dlCtrl_s *sensor, SpiCtrl_t spi) {
+bool accelH3lis331dl_init(AccelH3lis331dlCtrl_s* sensor, SpiCtrl_t spi) {
   sensor->spi = spi;
   HAL_GPIO_WritePin(sensor->spi.port, sensor->spi.pin, GPIO_PIN_SET);
   HAL_Delay(1);
@@ -76,7 +76,7 @@ bool accelH3lis331dl_init(AccelH3lis331dlCtrl_s *sensor, SpiCtrl_t spi) {
   return true;
 }
 
-void accelH3lis331dl_getData(AccelH3lis331dlCtrl_s *sensor) {
+void accelH3lis331dl_getData(AccelH3lis331dlCtrl_s* sensor) {
   accelH3lis331dl_getDataRaw(sensor);
   sensor->val.realMps2.x = sensor->gain * sensor->val.raw.x;
   sensor->val.realMps2.y = sensor->gain * sensor->val.raw.y;

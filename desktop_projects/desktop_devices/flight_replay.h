@@ -10,7 +10,7 @@
 
 class FlightReplay {
  public:
-  virtual void getNext(SensorData_s *data) {}
+  virtual void getNext(SensorData_s* data) {}
 
   virtual ~FlightReplay() = default;
 };
@@ -19,7 +19,7 @@ class CsvReplay : FlightReplay {
  public:
   explicit CsvReplay(std::string path);
 
-  void getNext(SensorData_s *data) override;
+  void getNext(SensorData_s* data) override;
 
   ~CsvReplay() = default;
 

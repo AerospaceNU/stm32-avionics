@@ -33,8 +33,8 @@ HAL_StatusTypeDef Internal_Flash_Program(uint32_t FlashAddress,
 #endif  // STM32H743XX
 #ifdef STM32H750xx
   HAL_StatusTypeDef status;
-  __IO uint32_t *dest_addr = (__IO uint32_t *)FlashAddress;
-  __IO uint32_t *src_addr = (__IO uint32_t *)DataAddress;
+  __IO uint32_t* dest_addr = (__IO uint32_t*)FlashAddress;
+  __IO uint32_t* src_addr = (__IO uint32_t*)DataAddress;
   uint32_t bank;
   uint8_t row_index = FLASH_NB_32BITWORD_IN_FLASHWORD;
   /* Check the parameters */
@@ -91,7 +91,7 @@ HAL_StatusTypeDef Internal_Flash_Program(uint32_t FlashAddress,
  * @param data - Array of uint8_t to write
  * @param numBytes - Number of bytes to be written from data
  */
-bool internalFlash_write(uint32_t RelFlashAddress, uint8_t *data,
+bool internalFlash_write(uint32_t RelFlashAddress, uint8_t* data,
                          uint32_t numBytes) {
   if (RelFlashAddress % FLASH_BYTE_INCREMENT ||
       RelFlashAddress >
@@ -137,7 +137,7 @@ bool internalFlash_write(uint32_t RelFlashAddress, uint8_t *data,
  * @param pData - Array of uint8_t to read into
  * @param numBytes - Number of bytes to be read from flash
  */
-bool internalFlash_read(uint32_t RelFlashAddress, uint8_t *pData,
+bool internalFlash_read(uint32_t RelFlashAddress, uint8_t* pData,
                         uint32_t numBytes) {
   if (RelFlashAddress > MAX_FLASH_ADDRESS) {
     return false;
@@ -145,7 +145,7 @@ bool internalFlash_read(uint32_t RelFlashAddress, uint8_t *pData,
 
   uint32_t readAddress = INTERNAL_FLASH_START + RelFlashAddress;
 
-  memcpy(pData, reinterpret_cast<uint8_t *>(readAddress), numBytes);
+  memcpy(pData, reinterpret_cast<uint8_t*>(readAddress), numBytes);
 
   return true;
 }

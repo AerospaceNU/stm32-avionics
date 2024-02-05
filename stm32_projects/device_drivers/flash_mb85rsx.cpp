@@ -21,24 +21,24 @@
 #define READ_CMD 0b11
 #define WRITE_CMD 0b10
 
-static bool writeDisable(FlashMb85rsxCtrl_s *mb85rsx) {
+static bool writeDisable(FlashMb85rsxCtrl_s* mb85rsx) {
   uint8_t cmd = WRITE_DISABLE;
   spi_writeArray(&mb85rsx->spi, &cmd, sizeof(cmd));
   return true;  // TODO error checking
 }
 
-static bool writeEnable(FlashMb85rsxCtrl_s *mb85rsx) {
+static bool writeEnable(FlashMb85rsxCtrl_s* mb85rsx) {
   uint8_t cmd = WRITE_ENABLE;
   spi_writeArray(&mb85rsx->spi, &cmd, sizeof(cmd));
   return true;  // TODO error checking
 }
 
-static void csPull(const FlashMb85rsxCtrl_s *mb85rsx, GPIO_PinState direction) {
+static void csPull(const FlashMb85rsxCtrl_s* mb85rsx, GPIO_PinState direction) {
   HAL_GPIO_WritePin(mb85rsx->spi.port, mb85rsx->spi.pin, direction);
 }
 
-void flashMb85rsx_init(FlashMb85rsxCtrl_s *mb85rsx, SPI_HandleTypeDef *hspi,
-                       GPIO_TypeDef *csPort, uint16_t csPin) {
+void flashMb85rsx_init(FlashMb85rsxCtrl_s* mb85rsx, SPI_HandleTypeDef* hspi,
+                       GPIO_TypeDef* csPort, uint16_t csPin) {
   // Set struct properties
   mb85rsx->spi.hspi = hspi;
   mb85rsx->spi.port = csPort;
@@ -54,11 +54,11 @@ void flashMb85rsx_init(FlashMb85rsxCtrl_s *mb85rsx, SPI_HandleTypeDef *hspi,
 
   // disable protection on all blocks
   FlashMb85rsxStatusReg_s reg = {.bp0 = false, .bp1 = false};
-  spi_writeRegister(&mb85rsx->spi, WRITE_STATUS_REG, *(uint8_t *)&reg);
+  spi_writeRegister(&mb85rsx->spi, WRITE_STATUS_REG, *(uint8_t*)&reg);
 }
 
-bool flashMb85rsx_readStart(FlashMb85rsxCtrl_s *mb85rsx, uint32_t startLoc,
-                            uint32_t numBytes, uint8_t *pData) {
+bool flashMb85rsx_readStart(FlashMb85rsxCtrl_s* mb85rsx, uint32_t startLoc,
+                            uint32_t numBytes, uint8_t* pData) {
   // Check for valid parameters
   if ((startLoc + numBytes) > mb85rsx->flashSizeBytes || pData == NULL ||
       startLoc) {
@@ -79,8 +79,8 @@ bool flashMb85rsx_readStart(FlashMb85rsxCtrl_s *mb85rsx, uint32_t startLoc,
   return true;
 }
 
-bool flashMb85rsx_writeStart(FlashMb85rsxCtrl_s *mb85rsx, uint32_t startLoc,
-                             uint32_t numBytes, uint8_t *pData) {
+bool flashMb85rsx_writeStart(FlashMb85rsxCtrl_s* mb85rsx, uint32_t startLoc,
+                             uint32_t numBytes, uint8_t* pData) {
   // Check for valid parameters
   if (startLoc + numBytes > mb85rsx->flashSizeBytes || pData == NULL)
     return false;

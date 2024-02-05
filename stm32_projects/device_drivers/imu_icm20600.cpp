@@ -47,7 +47,7 @@ static float getGyroSensitivity(ImuICM20600GyroFullscale_e scale) {
   return f;
 }
 
-static void setGyroFullscale(ImuICM20600Ctrl_s *sensor,
+static void setGyroFullscale(ImuICM20600Ctrl_s* sensor,
                              ImuICM20600GyroFullscale_e range) {
   spi_writeRegister(&sensor->spi, 0x1B, 0x00 | range << 3);
   sensor->gyroSensitivity = getGyroSensitivity(range);
@@ -73,20 +73,20 @@ static float getAccelSensitivity(ImuICM20600AccelFullscale_e scale) {
   return f;
 }
 
-static void setAccelFullscale(ImuICM20600Ctrl_s *sensor,
+static void setAccelFullscale(ImuICM20600Ctrl_s* sensor,
                               ImuICM20600AccelFullscale_e range) {
   spi_writeRegister(&sensor->spi, 0x1C, 0x00 | range << 3);
   sensor->accelSensitivity = getAccelSensitivity(range);
 }
 
-static bool isConnected(ImuICM20600Ctrl_s *sensor) {
+static bool isConnected(ImuICM20600Ctrl_s* sensor) {
   uint8_t id = spi_readRegister(&sensor->spi, REG_WHO_AM_I);
   return (id == WHOAMI) || (id == 0xAF);  // icm 20608-g special case
                                           // page 21,
   // https://invensense.tdk.com/wp-content/uploads/2015/03/RM-000030-v1.0.pdf
 }
 
-bool icm20600_init(ImuICM20600Ctrl_s *sensor,
+bool icm20600_init(ImuICM20600Ctrl_s* sensor,
                    ImuICM20600AccelFullscale_e accelFullscale,
                    ImuICM20600GyroFullscale_e gyroFullscale) {
   HAL_GPIO_WritePin(sensor->spi.port, sensor->spi.pin, GPIO_PIN_SET);
@@ -110,7 +110,7 @@ bool icm20600_init(ImuICM20600Ctrl_s *sensor,
   return true;
 }
 
-void icm20600_getData(ImuICM20600Ctrl_s *sensor) {
+void icm20600_getData(ImuICM20600Ctrl_s* sensor) {
   // Allocate a buffer
   uint8_t txBuf[ACCEL_OUT_SIZE + 1] = {0};
   uint8_t rxBuf[ACCEL_OUT_SIZE + 1] = {0};

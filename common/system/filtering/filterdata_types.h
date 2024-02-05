@@ -76,9 +76,9 @@ typedef enum {
   angle_vertical,
 } FilterData_e;
 
-FilterData_e getVariableEnumFromString(char *input);
-double getVariableValue(FilterData_s *filterData, FilterData_e valueType);
-void fillVariableName(char *buffer, size_t n, FilterData_e valueType);
+FilterData_e getVariableEnumFromString(char* input);
+double getVariableValue(FilterData_s* filterData, FilterData_e valueType);
+void fillVariableName(char* buffer, size_t n, FilterData_e valueType);
 #ifdef __cplusplus
 }
 #endif

@@ -4,7 +4,7 @@
  * and run it with Python to generate this file automatically.
  */
 #include "filterdata_types.h"
-FilterData_e getVariableEnumFromString(char *input) {
+FilterData_e getVariableEnumFromString(char* input) {
   if (strncmp(input, "heading", 7) == 0) {
     return heading;
   }
@@ -92,7 +92,7 @@ FilterData_e getVariableEnumFromString(char *input) {
   // Matched no other valid value
   return invalid;
 }
-double getVariableValue(FilterData_s *filterData, FilterData_e valueType) {
+double getVariableValue(FilterData_s* filterData, FilterData_e valueType) {
   switch (valueType) {
     case invalid:
       return 0;
@@ -156,7 +156,7 @@ double getVariableValue(FilterData_s *filterData, FilterData_e valueType) {
       return 0;
   }
 }
-void fillVariableName(char *buffer, size_t n, FilterData_e valueType) {
+void fillVariableName(char* buffer, size_t n, FilterData_e valueType) {
   switch (valueType) {
     case invalid:
       strncpy(buffer, "invalid", n);

@@ -9,8 +9,8 @@
 #include <cstring>
 
 bool FileBackedFlash::writeStart(uint32_t startLoc, uint32_t numBytes,
-                                 uint8_t *pdata) {
-  FILE *ptr;
+                                 uint8_t* pdata) {
+  FILE* ptr;
   ptr = fopen(filepath.c_str(), "r+b");  // w for write, b for binary
   if (!ptr) return false;
 
@@ -26,8 +26,8 @@ bool FileBackedFlash::writeStart(uint32_t startLoc, uint32_t numBytes,
 }
 
 bool FileBackedFlash::readStart(uint32_t startLoc, uint32_t numBytes,
-                                uint8_t *pdata) {
-  FILE *ptr;
+                                uint8_t* pdata) {
+  FILE* ptr;
   ptr = fopen(filepath.c_str(), "rb");  // r for read, b for binary
   if (!ptr) return false;
 
@@ -41,7 +41,7 @@ bool FileBackedFlash::readStart(uint32_t startLoc, uint32_t numBytes,
   return true;
 }
 
-bool fileExists(const std::string &filename) {
+bool fileExists(const std::string& filename) {
   struct stat buf;
   if (stat(filename.c_str(), &buf) != -1) {
     return true;
@@ -63,8 +63,8 @@ void FileBackedFlash::reinit(bool overwrite) {
   ofs.open(filepath, std::ios::out | std::ios::binary);
   while (len > sizeof(ff)) {
     size_t bytes_to_write = std::min(sizeof(ff), len);
-    ofs.write((char *)ff, bytes_to_write);
+    ofs.write((char*)ff, bytes_to_write);
     len -= bytes_to_write;
   }
-  ofs.write((char *)ff, len);
+  ofs.write((char*)ff, len);
 }

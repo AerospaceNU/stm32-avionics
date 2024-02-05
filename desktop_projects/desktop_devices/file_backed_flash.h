@@ -18,8 +18,8 @@ class FileBackedFlash {
   }
 
   void reinit(bool overwrite);
-  bool readStart(uint32_t startLoc, uint32_t numBytes, uint8_t *pdata);
-  bool writeStart(uint32_t startLoc, uint32_t numBytes, uint8_t *pdata);
+  bool readStart(uint32_t startLoc, uint32_t numBytes, uint8_t* pdata);
+  bool writeStart(uint32_t startLoc, uint32_t numBytes, uint8_t* pdata);
 
  private:
   std::string filepath;

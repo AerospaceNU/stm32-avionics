@@ -6,7 +6,7 @@
 
 #include <string.h>
 
-void cb_init(CircularBuffer_s *cb, unknownPtr_t buffer, size_t capacity,
+void cb_init(CircularBuffer_s* cb, unknownPtr_t buffer, size_t capacity,
              size_t size) {
   if (cb == NULL) {
     return;
@@ -20,8 +20,8 @@ void cb_init(CircularBuffer_s *cb, unknownPtr_t buffer, size_t capacity,
   cb->tail = cb->buffer;
 }
 
-void cb_peek(CircularBuffer_s *cb, unknownPtr_t outputBuffer,
-             size_t *numElements) {
+void cb_peek(CircularBuffer_s* cb, unknownPtr_t outputBuffer,
+             size_t* numElements) {
   if (cb == NULL || outputBuffer == NULL) return;
 
   size_t count = cb_count(cb);
@@ -42,7 +42,7 @@ void cb_peek(CircularBuffer_s *cb, unknownPtr_t outputBuffer,
   }
 }
 
-size_t cb_count(CircularBuffer_s *cb) {
+size_t cb_count(CircularBuffer_s* cb) {
   if (!cb) {
     return 0;
   }
@@ -59,11 +59,11 @@ size_t cb_count(CircularBuffer_s *cb) {
   return ret_bytes / cb->size;
 }
 
-size_t cb_capacity(CircularBuffer_s *cb) {
+size_t cb_capacity(CircularBuffer_s* cb) {
   return ((size_t)(cb->buffer_end - cb->buffer) / cb->size) - (size_t)1u;
 }
 
-bool cb_enqueue(CircularBuffer_s *cb, const unknownPtr_t item) {
+bool cb_enqueue(CircularBuffer_s* cb, const unknownPtr_t item) {
   // Figure out what next spot to fill in buffer is
   unknownPtr_t next = cb->head + cb->size;
   if (next >= cb->buffer_end) {
@@ -81,7 +81,7 @@ bool cb_enqueue(CircularBuffer_s *cb, const unknownPtr_t item) {
   return true;
 }
 
-void cb_dequeue(CircularBuffer_s *cb, size_t numElements) {
+void cb_dequeue(CircularBuffer_s* cb, size_t numElements) {
   size_t count = cb_count(cb);
   if (numElements > count) {
     numElements = count;
@@ -93,7 +93,7 @@ void cb_dequeue(CircularBuffer_s *cb, size_t numElements) {
   }
 }
 
-bool cb_full(CircularBuffer_s *cb) {
+bool cb_full(CircularBuffer_s* cb) {
   unknownPtr_t next = cb->head + cb->size;
   if (next >= cb->buffer_end) {
     next = cb->buffer;
@@ -102,4 +102,4 @@ bool cb_full(CircularBuffer_s *cb) {
   return next == cb->tail;
 }
 
-void cb_flush(CircularBuffer_s *cb) { cb->tail = cb->head; }
+void cb_flush(CircularBuffer_s* cb) { cb->tail = cb->head; }

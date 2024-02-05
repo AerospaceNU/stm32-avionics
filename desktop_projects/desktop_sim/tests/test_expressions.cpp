@@ -29,7 +29,7 @@ class ExpressionStorageTests : public testing::Test {
 
 TEST_F(ExpressionStorageTests, expressionParsing) {
   uint16_t resID;
-  const char *test1Input =
+  const char* test1Input =
       "((not unclean_restart) and ((2.00 after burnout) and ((not apogee) and "
       "((world_vel_z > 30.00) and ((angle_vertical < 40.00) and ((pos_z_agl > "
       "150.00) and (not (ever (launch and (angle_vertical > 45.00))))))))))";
@@ -41,7 +41,7 @@ TEST_F(ExpressionStorageTests, expressionParsing) {
   expressionStore.conditionToString(resID, stringBuf, sizeof(stringBuf));
   ASSERT_EQ(strcmp(stringBuf, test1Input), 0);
 
-  const char *test2Input =
+  const char* test2Input =
       "(-6.00 == (12.00 - (9.00 * (1.00 + (2.00 / 2.00)))))";
   slice = StringSlice(&test2Input, 0, strlen(test2Input));
   valueType = expressionStore.parseForTrigger(&resID, 0, slice, 0);
@@ -57,9 +57,9 @@ TEST_F(ExpressionStorageTests, expressionEvaluation) {
   eventManager_setEventIncomplete(Event_e::launch);
   ASSERT_EQ(expressionStore.getNextExpressionSpot(0), 0);
 
-  const char *test1Input = "(angle_vertical < 30)";
+  const char* test1Input = "(angle_vertical < 30)";
 
-  const char *test2Input = "(not (ever (launch and (angle_vertical > 45))))";
+  const char* test2Input = "(not (ever (launch and (angle_vertical > 45))))";
 
   StringSlice slice1 = StringSlice(&test1Input, 0, strlen(test1Input));
   StringSlice slice2 = StringSlice(&test2Input, 0, strlen(test2Input));
@@ -95,9 +95,9 @@ TEST_F(ExpressionStorageTests, expressionEvaluation) {
 TEST_F(ExpressionStorageTests, chainedAndOr) {
   ASSERT_EQ(expressionStore.getNextExpressionSpot(0), 0);
 
-  const char *test1Input = "((3 == (3 / 1)) and (not (3 > 4)))";
+  const char* test1Input = "((3 == (3 / 1)) and (not (3 > 4)))";
 
-  const char *test2Input =
+  const char* test2Input =
       "((1 == 1) and ((1 == 1) and ((not (not (1 == 1))) or (not ((1 == 2) or "
       "(3 > 4))))))";
 

@@ -8,7 +8,7 @@
 
 static const float TWO_POWER_SIXTEEN = 65535.0f;
 
-void buzzerPwm_init(BuzzerPwmCtrl_s *buzzer, TIM_HandleTypeDef *htim,
+void buzzerPwm_init(BuzzerPwmCtrl_s* buzzer, TIM_HandleTypeDef* htim,
                     uint32_t channel, float minFrequency) {
   // Set buzzer struct values
   buzzer->htim = htim;
@@ -29,7 +29,7 @@ void buzzerPwm_init(BuzzerPwmCtrl_s *buzzer, TIM_HandleTypeDef *htim,
       (static_cast<double>(htim->Init.Prescaler + 1) * TWO_POWER_SIXTEEN * 2);
 }
 
-void buzzerPwm_setFrequency(BuzzerPwmCtrl_s *buzzer, float fHz) {
+void buzzerPwm_setFrequency(BuzzerPwmCtrl_s* buzzer, float fHz) {
   // Calculate period based on minimum and given frequencies
   if (fHz < buzzer->minFrequency) {
     buzzer->htim->Init.Period = 0;
@@ -46,12 +46,12 @@ void buzzerPwm_setFrequency(BuzzerPwmCtrl_s *buzzer, float fHz) {
                         buzzer->htim->Init.Period / 2);
 }
 
-void buzzerPwm_start(BuzzerPwmCtrl_s *buzzer) {
+void buzzerPwm_start(BuzzerPwmCtrl_s* buzzer) {
   // Start PWM generation
   HAL_TIM_PWM_Start(buzzer->htim, buzzer->channel);
 }
 
-void buzzerPwm_stop(BuzzerPwmCtrl_s *buzzer) {
+void buzzerPwm_stop(BuzzerPwmCtrl_s* buzzer) {
   // Stop PWM generation
   HAL_TIM_PWM_Stop(buzzer->htim, buzzer->channel);
 }

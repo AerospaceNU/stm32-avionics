@@ -14,7 +14,7 @@
 #define MAX_PACKETS_PER_TICK 10
 static uint8_t tempDataBuffer[DATA_BUFFER_SIZE] = {0};
 
-void bleClientStd_init(BleClientStdCtrl_s *ctrl, BleChip_s *bleChip,
+void bleClientStd_init(BleClientStdCtrl_s* ctrl, BleChip_s* bleChip,
                        uint8_t address) {
   ctrl->bleChip = bleChip;
   ctrl->address = address;
@@ -25,7 +25,7 @@ void bleClientStd_init(BleClientStdCtrl_s *ctrl, BleChip_s *bleChip,
   ctrl->bleChip->registerAddress(ctrl->bleChip, address, &ctrl->dmaBuffer);
 }
 
-void bleClientStd_tick(BleClientStdCtrl_s *ctrl) {
+void bleClientStd_tick(BleClientStdCtrl_s* ctrl) {
   size_t dequeuedLen;
   uint8_t packetCount = 0;
   do {

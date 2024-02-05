@@ -8,17 +8,17 @@
 
 #define LSM9DS1_SPI_REG_MASK (1 << 7)
 
-static uint8_t agWhoAmI(Lsm9ds1AgCtrl_s *sensor) {
+static uint8_t agWhoAmI(Lsm9ds1AgCtrl_s* sensor) {
   return spi_readRegister(&sensor->lsm9ds1Spi,
                           LSM9DS1_SPI_REG_MASK | REG_WHO_AM_I_AG);
 }
 
-static uint8_t mWhoAmI(Lsm9ds1MCtrl_s *sensor) {
+static uint8_t mWhoAmI(Lsm9ds1MCtrl_s* sensor) {
   return spi_readRegister(&sensor->lsm9ds1Spi,
                           LSM9DS1_SPI_REG_MASK | REG_WHO_AM_I_M);
 }
 
-static void lsm9ds1_getDataRaw(ImuLsm9ds1Ctrl_s *sensor) {
+static void lsm9ds1_getDataRaw(ImuLsm9ds1Ctrl_s* sensor) {
   // Takes x, y, and z axis readings
   uint8_t x_l_xl = spi_readRegister(&sensor->ag.lsm9ds1Spi,
                                     LSM9DS1_SPI_REG_MASK | OUT_X_L_XL);
@@ -80,7 +80,7 @@ static void lsm9ds1_getDataRaw(ImuLsm9ds1Ctrl_s *sensor) {
   sensor->ag.tRawVal = static_cast<int16_t>((t_h << 8) | t_l);
 }
 
-void lsm9ds1_getData(ImuLsm9ds1Ctrl_s *sensor) {
+void lsm9ds1_getData(ImuLsm9ds1Ctrl_s* sensor) {
   lsm9ds1_getDataRaw(sensor);
   sensor->agData.accelRealMps2.x = sensor->ag.aRes * sensor->agData.accelRaw.x;
   sensor->agData.accelRealMps2.y = sensor->ag.aRes * sensor->agData.accelRaw.y;
@@ -98,7 +98,7 @@ void lsm9ds1_getData(ImuLsm9ds1Ctrl_s *sensor) {
   sensor->mData.realGauss.z = sensor->m.mRes * sensor->mData.raw.z;
 }
 
-static void lsm9ds1_calcRes(ImuLsm9ds1Ctrl_s *sensor) {
+static void lsm9ds1_calcRes(ImuLsm9ds1Ctrl_s* sensor) {
   switch (sensor->ag.aFs) {
     case 0 << 3:
       sensor->ag.aRes = SENSITIVITY_ACCELEROMETER_2;
@@ -150,7 +150,7 @@ static void lsm9ds1_calcRes(ImuLsm9ds1Ctrl_s *sensor) {
   }
 }
 
-bool lsm9ds1_init(ImuLsm9ds1Ctrl_s *sensor) {
+bool lsm9ds1_init(ImuLsm9ds1Ctrl_s* sensor) {
   // Pull CS High
   HAL_GPIO_WritePin(sensor->ag.lsm9ds1Spi.port, sensor->ag.lsm9ds1Spi.pin,
                     GPIO_PIN_SET);

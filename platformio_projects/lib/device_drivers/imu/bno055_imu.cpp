@@ -4,17 +4,17 @@
 
 #include "bno055_imu.h"
 
-std::array<double, 3> adafruitVectorToArray(const sensors_vec_t &vector) {
+std::array<double, 3> adafruitVectorToArray(const sensors_vec_t& vector) {
   return {vector.x, vector.y, vector.z};
 }
 
 Bno055Imu::Bno055Imu() = default;
 
-void Bno055Imu::init(TwoWire *wire, uint8_t address) {
+void Bno055Imu::init(TwoWire* wire, uint8_t address) {
   //    Need to construct the object here, so we do this weird thing to avoid
   //    dynamic memory allocation
   new (&driver_memory) Adafruit_BNO055(55, address, wire);
-  bno055 = ((Adafruit_BNO055 *)&driver_memory);
+  bno055 = ((Adafruit_BNO055*)&driver_memory);
 
   // Init the sensor and turn off the internal fusion
   sensorStatus = bno055->begin();
@@ -37,7 +37,7 @@ void Bno055Imu::tick() {
   gyroscopeData = adafruitVectorToArray(gyroscope_data.gyro);
   magnetometerData = adafruitVectorToArray(magnetometer_data.magnetic);
 
-  for (double &i : magnetometerData) {
+  for (double& i : magnetometerData) {
     i *= 0.01;  // Convert from uT to Gauss
   }
 }

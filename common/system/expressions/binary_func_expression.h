@@ -25,8 +25,8 @@ typedef enum {
 /**
  * Lambda for a binary function.
  */
-using BinaryFunction = void(Expression *expr, FilterData_s *filterData,
-                            Expression *op1, Expression *op2);
+using BinaryFunction = void(Expression* expr, FilterData_s* filterData,
+                            Expression* op1, Expression* op2);
 
 /**
  * A wrapper class for a binary function lambda that makes it easier to use.
@@ -36,7 +36,7 @@ using BinaryFunction = void(Expression *expr, FilterData_s *filterData,
  */
 class BinaryFunctionWrapper {
  private:
-  BinaryFunction *function;
+  BinaryFunction* function;
   ExpressionValueType_e op1Type;
   ExpressionValueType_e op2Type;
   uint16_t stringLen;
@@ -45,15 +45,15 @@ class BinaryFunctionWrapper {
   char stringRep[10];
   ExpressionValueType_e valueType;
 
-  BinaryFunctionWrapper(const char *stringRep, BinaryFunction *function,
+  BinaryFunctionWrapper(const char* stringRep, BinaryFunction* function,
                         ExpressionValueType_e op1Type,
                         ExpressionValueType_e op2Type,
                         ExpressionValueType_e valueType);
 
-  void evaluate(Expression *expr, FilterData_s *filterData, Expression *op1,
-                Expression *op2);
+  void evaluate(Expression* expr, FilterData_s* filterData, Expression* op1,
+                Expression* op2);
 
-  bool matchesSlice(const StringSlice &slice);
+  bool matchesSlice(const StringSlice& slice);
 
   bool acceptsArgument1Type(ExpressionValueType_e type);
 
@@ -88,13 +88,13 @@ class BinaryFuncExpression : public Expression {
     this->setTriggerNum(triggerNum);
   }
 
-  void evaluate(FilterData_s *filterData,
-                ExpressionPtrCallback &expressionPtrCallback);
+  void evaluate(FilterData_s* filterData,
+                ExpressionPtrCallback& expressionPtrCallback);
 
-  int toString(char *buffer, int n,
-               ExpressionPtrCallback &expressionPtrCallback) const;
+  int toString(char* buffer, int n,
+               ExpressionPtrCallback& expressionPtrCallback) const;
 
-  void serializeInto(SerializedExpression_s *serialized) const;
+  void serializeInto(SerializedExpression_s* serialized) const;
 };
 
 #endif  // COMMON_SYSTEM_EXPRESSIONS_BINARY_FUNC_EXPRESSION_H_

@@ -13,12 +13,12 @@
 
 #define GPS_UART_TIMEOUT_MS 50
 
-char *gps_getActiveBuff(GpsCtrl_s *gps, bool swapBuff) {
+char* gps_getActiveBuff(GpsCtrl_s* gps, bool swapBuff) {
   bool desiredBuff = swapBuff ? gps->firstBuf : !gps->firstBuf;
   return desiredBuff ? gps->rx_firstBuff : gps->rx_secondBuff;
 }
 
-static void parseString(GpsCtrl_s *gps, char line[]) {
+static void parseString(GpsCtrl_s* gps, char line[]) {
   switch (minmea_sentence_id(line, false)) {
     case MINMEA_SENTENCE_GGA: {
       struct minmea_sentence_gga frame1;
@@ -75,11 +75,11 @@ static void parseString(GpsCtrl_s *gps, char line[]) {
   }
 }
 
-static void gps_processData(GpsCtrl_s *gps) {
+static void gps_processData(GpsCtrl_s* gps) {
   // Get the buffer to use
   // The false flips which buffer we get, as we want to parse
   // the inactive buffer, not the active buffer
-  char *buff = gps_getActiveBuff(gps, false);
+  char* buff = gps_getActiveBuff(gps, false);
 
   // Iterate over the entire buffer
   for (int i = 0; i < GPS_RX_BUF_SIZE;) {
@@ -105,9 +105,9 @@ static void gps_processData(GpsCtrl_s *gps) {
   gps->data_available = false;
 }
 
-void gps_rxEventCallback(void *gps, size_t Size) {
+void gps_rxEventCallback(void* gps, size_t Size) {
   // GPS data received
-  GpsCtrl_s *pgps = static_cast<GpsCtrl_s *>(gps);
+  GpsCtrl_s* pgps = static_cast<GpsCtrl_s*>(gps);
   pgps->data_available = true;
 
   pgps->lastBufferedSize = Size;
@@ -117,16 +117,15 @@ void gps_rxEventCallback(void *gps, size_t Size) {
 
   // Reconfigure the UART
   HAL_UARTEx_ReceiveToIdle_DMA(
-      pgps->gps_uart,
-      reinterpret_cast<uint8_t *>(gps_getActiveBuff(pgps, true)),
+      pgps->gps_uart, reinterpret_cast<uint8_t*>(gps_getActiveBuff(pgps, true)),
       GPS_RX_BUF_SIZE);
 }
 
-void gps_RxCpltCallback(void *gps) {
+void gps_RxCpltCallback(void* gps) {
   gps_rxEventCallback(gps, GPS_RX_BUF_SIZE);
 }
 
-bool gps_newData(GpsCtrl_s *gps) {
+bool gps_newData(GpsCtrl_s* gps) {
   if (gps->data_available) {
     gps_processData(gps);
     return true;
@@ -134,7 +133,7 @@ bool gps_newData(GpsCtrl_s *gps) {
   return false;
 }
 
-void gps_addUbxChecksum(uint8_t *data, int len) {
+void gps_addUbxChecksum(uint8_t* data, int len) {
   uint8_t CK_A = 0, CK_B = 0;
   for (int i = 2; i < len - 2; i++) {
     CK_A = CK_A + data[i];
@@ -144,7 +143,7 @@ void gps_addUbxChecksum(uint8_t *data, int len) {
   data[len - 1] = CK_B;
 }
 
-void gps_setMessagesUsed(GpsCtrl_s *gps) {
+void gps_setMessagesUsed(GpsCtrl_s* gps) {
   // UBX->CFG->MSG
 
   uint8_t ubloxBuff[] = {
@@ -240,7 +239,7 @@ void gps_setMessagesUsed(GpsCtrl_s *gps) {
                     GPS_UART_TIMEOUT_MS);
 }
 
-void gps_setRate(GpsCtrl_s *gps, uint16_t rate) {
+void gps_setRate(GpsCtrl_s* gps, uint16_t rate) {
   // UBX->CFG->RATE
   uint8_t ubloxBuff[14] = {
       // Header
@@ -273,7 +272,7 @@ void gps_setRate(GpsCtrl_s *gps, uint16_t rate) {
                     GPS_UART_TIMEOUT_MS);
 }
 
-void gps_enable4g(GpsCtrl_s *gps) {
+void gps_enable4g(GpsCtrl_s* gps) {
   // UBX->CFG->RATE
   uint8_t ubloxBuff[36 + 2 + 4 + 2] = {
       // Header
@@ -298,7 +297,7 @@ void gps_enable4g(GpsCtrl_s *gps) {
                     GPS_UART_TIMEOUT_MS);
 }
 
-void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type) {
+void gps_init(GpsCtrl_s* gps, UART_HandleTypeDef* huart, GpsType_e type) {
   gps->gps_uart = huart;
   gps->type = type;
 
@@ -311,7 +310,7 @@ void gps_init(GpsCtrl_s *gps, UART_HandleTypeDef *huart, GpsType_e type) {
   // Tell HAL to receive DMA serial data
   gps->firstBuf = true;
   HAL_UARTEx_ReceiveToIdle_DMA(gps->gps_uart,
-                               reinterpret_cast<uint8_t *>(gps->rx_firstBuff),
+                               reinterpret_cast<uint8_t*>(gps->rx_firstBuff),
                                GPS_RX_BUF_SIZE);
 
   if (gps->type == GPS_TYPE_UBLOX) {

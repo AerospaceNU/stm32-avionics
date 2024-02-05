@@ -46,7 +46,7 @@ class Groundstation {
   void runOnce();
 
  protected:
-  CircularBuffer_s *buffer{};
+  CircularBuffer_s* buffer{};
 
   uint32_t start = 0;
 };
