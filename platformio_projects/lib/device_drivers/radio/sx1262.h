@@ -28,6 +28,8 @@ class Sx1262 : public Radio {
 
  protected:
   SX1262 *sx1262{};
+
+  int16_t initErrorCode;
 };
 
 #endif
