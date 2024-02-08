@@ -4,6 +4,7 @@
 
 #include "hal_callbacks.h"
 #include "radio_packet_types.h"
+#include <math.h>
 
 /* Device includes */
 
