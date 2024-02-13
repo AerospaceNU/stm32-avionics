@@ -198,35 +198,35 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "/home/matt/stm32-avionics/.pio/build/feather_m4_hacky_lora_groundstation/firmware.elf",
-            "projectEnvName": "feather_m4_hacky_lora_groundstation",
-            "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "executable": "D:/Documents/GitHub/stm32-avionics/.pio/build/blink/firmware.elf",
+            "projectEnvName": "blink",
+            "toolchainBinDir": "C:/Users/matth/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
-            "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD51J19A.svd",
+            "svdPath": "C:/Users/matth/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
             "preLaunchTask": {
                 "type": "PlatformIO",
-                "task": "Pre-Debug (feather_m4_hacky_lora_groundstation)"
+                "task": "Pre-Debug"
             }
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "/home/matt/stm32-avionics/.pio/build/feather_m4_hacky_lora_groundstation/firmware.elf",
-            "projectEnvName": "feather_m4_hacky_lora_groundstation",
-            "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "executable": "D:/Documents/GitHub/stm32-avionics/.pio/build/blink/firmware.elf",
+            "projectEnvName": "blink",
+            "toolchainBinDir": "C:/Users/matth/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
-            "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD51J19A.svd"
+            "svdPath": "C:/Users/matth/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd"
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
-            "executable": "/home/matt/stm32-avionics/.pio/build/feather_m4_hacky_lora_groundstation/firmware.elf",
-            "projectEnvName": "feather_m4_hacky_lora_groundstation",
-            "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "executable": "D:/Documents/GitHub/stm32-avionics/.pio/build/blink/firmware.elf",
+            "projectEnvName": "blink",
+            "toolchainBinDir": "C:/Users/matth/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
-            "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD51J19A.svd",
+            "svdPath": "C:/Users/matth/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
             "loadMode": "manual"
         }
     ]

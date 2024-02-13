@@ -24,7 +24,7 @@
 
 #include "SX126x.hpp"
 
-#include "spi.h"
+
 #include "stm32wlxx_hal.h"
 #include "stm32wlxx_hal_subghz.h"
 

@@ -128,6 +128,12 @@
 #ifndef BLE_CLI_ID
 #define BLE_CLI_ID 0
 #endif  // BLE_CLI_ID
+#ifndef NUM_ADC_MCP3564
+#define NUM_ADC_MCP3564 0
+#endif  // NUM_ADC_MCP3564
+#ifndef NUM_TEMP_MAX31855
+#define NUM_TEMP_MAX31855 0
+#endif  // NUM_TEMP_MAX31855
 #ifndef RADIO_CLI_ID
 #define RADIO_CLI_ID 0
 #endif  // RADIO_CLI_ID

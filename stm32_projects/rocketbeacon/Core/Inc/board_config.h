@@ -29,4 +29,7 @@
 
 #define RADIO_TI_TYPE RADIO_TI_TYPE_CC1120
 
+// huge hack since we don't have SPI
+struct SPI_HandleTypeDef;
+
 #endif  // STM32_PROJECTS_ROCKETBEACON_CORE_INC_BOARD_CONFIG_H_
