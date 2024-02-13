@@ -30,7 +30,10 @@
 
 #define RADIO_TI_TYPE RADIO_TI_TYPE_CC1120
 
-#define RADIO_FREQ 915000000
+// This can be up to +22dbm (limit to 16 on coin cell due to current draw though
+#define RADIO_TX_POWER_DBM 10
+// channel 0 frequency, mhz
+#define RADIO_CENTER_FREQ 915
 
 // huge hack since we don't have SPI
 struct SPI_HandleTypeDef;
