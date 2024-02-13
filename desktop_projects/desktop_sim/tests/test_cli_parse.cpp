@@ -2,6 +2,7 @@
 
 #include "cli.h"
 #include "cli_tasks.h"
+#include "desktop_hardware_manager.h"
 #include "hardware_manager.h"
 
 // TEST(CliParse, ParseLineCutter) {
@@ -15,4 +16,5 @@ TEST(CliParse, CliTick) {
   CliTasks::configureForGround();
   auto opt = CliTasks::tick();
   ASSERT_EQ(NoChange, opt);
+  desktophm_teardown();
 }

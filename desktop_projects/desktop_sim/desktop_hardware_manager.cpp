@@ -371,3 +371,16 @@ void hm_disableSimMode() {}
 
 bool hm_inSimMode() { return false; }
 }  // extern "C"
+
+void desktophm_teardown() {
+  if (flightReplay) {
+    delete flightReplay;
+  }
+  if (internalFlash) {
+    delete internalFlash;
+  }
+
+  for (int i = 0; i < NUM_FLASH_DESKTOP_FILE_BACKED; i++) {
+    delete externalFlash[i];
+  }
+}
