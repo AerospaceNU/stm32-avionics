@@ -3,11 +3,20 @@
 #include "radio_packet_types.h"
 #include "packet_encoder.h"
 #include "radio_manager.h"
+#include "gps.h"
+#include "usart.h"
+#include "scheduler.h"
 
 void LED_on() { HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET); }
 void LED_off() { HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); }
 
 SX126x radio;
+GpsCtrl_s gps;
+
+RadioDecodedPacket_s packet;
+FSKPacketRadioEncoder packetEncoder;
+
+const uint8_t PACKET_LEN = packetEncoder.EncodedLength();
 
 extern "C" void entrypoint(void) {
 	LED_on();
@@ -26,23 +35,15 @@ extern "C" void entrypoint(void) {
   params.Params.Gfsk.BitRate = 38400;
   params.Params.Gfsk.Fdev = 20000;
   // todo random copy from elvin
-  params.Params.Gfsk.ModulationShaping = SX126x::MOD_SHAPING_G_BT_07;
-
+  params.Params.Gfsk.ModulationShaping = SX126x::MOD_SHAPING_G_BT_05;
   radio.SetModulationParams(params);
 
-  const uint32_t FREQ_915 = 433000000;
-  radio.SetRfFrequency(FREQ_915);
-
-  RadioDecodedPacket_s packet;
-  
-  FSKPacketRadioEncoder packetEncoder;
-
-  const uint8_t PACKET_LEN = packetEncoder.EncodedLength();  // todo
+  radio.SetRfFrequency(RADIO_FREQ);
 
   SX126x::PacketParams_t pparams;
   pparams.PacketType = SX126x::PACKET_TYPE_GFSK;
   pparams.Params.Gfsk.HeaderType = SX126x::RADIO_PACKET_FIXED_LENGTH;
-  pparams.Params.Gfsk.CrcLength = SX126x::RADIO_CRC_OFF;  // TODO
+  pparams.Params.Gfsk.CrcLength = SX126x::RADIO_CRC_OFF;
   pparams.Params.Gfsk.PayloadLength = PACKET_LEN;
   pparams.Params.Gfsk.PreambleMinDetect =
       SX126x::RADIO_PREAMBLE_DETECTOR_08_BITS;  // TODO idk
@@ -56,6 +57,9 @@ extern "C" void entrypoint(void) {
   uint8_t sync[8] = {0x93, 0x0b, 0x51, 0xde};
   radio.SetSyncWord(sync);
 
+  // And start our GPS doing its DMA thing
+  gps_init(&gps, &huart1, GPS_TYPE_UBLOX);
+
   LED_off();
 
   /* USER CODE END 2 */
@@ -64,17 +68,22 @@ extern "C" void entrypoint(void) {
   /* USER CODE BEGIN WHILE */
 
   while (1) {
+    // update GPS
+	gps_newData(&gps);
 
     memcpy(packet.callsign, "KM6GNL\0\0", 8);
-    packet.packetType = TELEMETRY_ID_STRING;
-
     packet.timestampMs = HAL_GetTick();
+    packet.softwareVersion = 0;
+    packet.board_serial_num = 0;
+    packet.packetType = TELEMETRY_ID_POSITION;
 
-    static int i;
-    packet.payload.cliString.id = i++;
-    packet.payload.cliString.len=snprintf((char*)packet.payload.cliString.string,
-             sizeof(packet.payload.cliString.string), "Hello at time %lu!\n",
-             HAL_GetTick());
+    packet.payload.positionData.lat = gps.data.generalData.latitude;
+    packet.payload.positionData.lon = gps.data.generalData.longitude;
+    packet.payload.positionData.gps_alt = gps.data.generalData.altitude;
+    packet.payload.positionData.gpsTime = gps.data.timeData.timestamp;
+    packet.payload.positionData.sats = gps.data.generalData.satsTracked;
+
+    packet.payload.positionData.state = Scheduler::StateId_e::PreFlight;
 
     packet.packetCRC = calculateRadioPacketCRC(packet);
 
@@ -98,10 +107,6 @@ extern "C" void entrypoint(void) {
       assert(0);
     }
 
-
-
-
-
-    HAL_Delay(500);
+    HAL_Delay(1000);
   }
 }

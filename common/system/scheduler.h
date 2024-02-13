@@ -8,7 +8,6 @@ class Scheduler {
   Scheduler() = default;
   void run(void);
 
- private:
   typedef enum {
     CliEraseFlash = 0,
     CliOffload,
@@ -22,6 +21,7 @@ class Scheduler {
     UNKNOWN
   } StateId_e;
 
+ private:
   StateId_e getNextState(EndCondition_e endCondition);
 
   State* pCurrentState_ = nullptr;

@@ -29,6 +29,8 @@
 
 #define RADIO_TI_TYPE RADIO_TI_TYPE_CC1120
 
+#define RADIO_FREQ 915000000
+
 // huge hack since we don't have SPI
 struct SPI_HandleTypeDef;
 
