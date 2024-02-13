@@ -74,7 +74,7 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
 
   // check precondition for tx len
   if (radio->payloadSize > 128) {
-	  assert(0);
+    assert(0);
   }
 
   // Figure out what packet length/config we need to send to the radio
@@ -123,10 +123,10 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
 }
 
 void tiRadio_setPaylodSize(TiRadioCtrl_s *radio, size_t lenBytes) {
-	  // check precondition for tx len
-	  if (lenBytes > 128) {
-		  assert(0);
-	  }
+  // check precondition for tx len
+  if (lenBytes > 128) {
+    assert(0);
+  }
 
   radio->payloadSize = lenBytes;
   // Figure out what packet length/config we need to send to the radio

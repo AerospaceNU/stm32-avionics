@@ -45,16 +45,16 @@ typedef struct __attribute__((packed)) {
   double pressureAtm;
 } BarometerData_s;
 
-enum class GPSFixQuality: uint8_t {
-	NO_FIX = 0,
-    // standard positioning service, valid
-	SPS_VALID = 1,
-	// DGPS in SPS mode, valid. We don't use dgps very likely never hit
-	DGPS_SPS_VALID=2,
-	// dead reckoning. Very likely never hit for us
-	DEAD_RECKONING=6,
-	// invalid (set by us for devices with no GPS
-	INVALID=0xff
+enum class GPSFixQuality : uint8_t {
+  NO_FIX = 0,
+  // standard positioning service, valid
+  SPS_VALID = 1,
+  // DGPS in SPS mode, valid. We don't use dgps very likely never hit
+  DGPS_SPS_VALID = 2,
+  // dead reckoning. Very likely never hit for us
+  DEAD_RECKONING = 6,
+  // invalid (set by us for devices with no GPS
+  INVALID = 0xff
 };
 
 typedef struct __attribute__((packed)) {
@@ -65,7 +65,6 @@ typedef struct __attribute__((packed)) {
   uint8_t satsTracked;
   float hdop;
 } GpsGeneralData_s;
-
 
 typedef struct __attribute__((packed)) {
   float speedKnots;

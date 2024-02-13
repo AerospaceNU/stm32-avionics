@@ -14,13 +14,14 @@
 typedef enum { GPS_TYPE_STD = 0, GPS_TYPE_UBLOX } GpsType_e;
 
 /**
- * @brief GPS driver. gps_init is responsible for populating members of this struct.
- * 
+ * @brief GPS driver. gps_init is responsible for populating members of this
+ * struct.
+ *
  * We require that the gps uart be configured with:
  * - DMA: RX, peripheral to memory, normal mode, byte width
  * - Interrupts: DMA stream global interrupt and UART global interrupt
  * - Baudrate/word length/parity/stop: very likely 9600 and 8n1
- * 
+ *
  */
 typedef struct {
   UART_HandleTypeDef *gps_uart;

@@ -30,8 +30,9 @@ PACKED_STRUCT {
   uint32_t gpsTime;
   uint8_t sats, state, btClients;
   GPSFixQuality gpsFixMode;
-  uint8_t deciHDOP; // hdop, 0-25.5 real, scaled up by 10x to be 0-255
-  uint16_t courseDeg; // fixed 0-360 heading. wasting 7 bytes here unused. could be a smaller number if we rescale
+  uint8_t deciHDOP;    // hdop, 0-25.5 real, scaled up by 10x to be 0-255
+  uint16_t courseDeg;  // fixed 0-360 heading. wasting 7 bytes here unused.
+                       // could be a smaller number if we rescale
   char gpsVTGmode;
 }
 PositionPacket_s;
@@ -102,7 +103,7 @@ PACKED_STRUCT {
 }
 RadioDecodedPacket_s;
 
-static_assert (sizeof(RadioDecodedPacket_s) == 61, "Size is not constant");
+static_assert(sizeof(RadioDecodedPacket_s) == 61, "Size is not constant");
 
 PACKED_STRUCT {
   uint8_t payloadLen;

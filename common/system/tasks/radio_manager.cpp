@@ -198,7 +198,7 @@ void RadioManager::transmitData(SensorData_s *sensorData,
       0,
 #endif  // HAS_DEV(GPS)
       state,
-	  GPSFixQuality::INVALID  // TODO bluetooth clients
+      GPSFixQuality::INVALID  // TODO bluetooth clients
     };
 
     transmitPacket.packetType = TELEMETRY_ID_POSITION;

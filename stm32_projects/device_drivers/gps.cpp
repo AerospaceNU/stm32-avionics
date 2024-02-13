@@ -73,11 +73,12 @@ static void parseString(GpsCtrl_s *gps, char line[]) {
     case MINMEA_SENTENCE_VTG: {
       struct minmea_sentence_vtg frame1;
       if (minmea_parse_vtg(&frame1, line)) {
-
-        if (frame1.speed_knots.scale != 0 && frame1.speed_kph.scale != 0
-        		&& frame1.magnetic_track_degrees.scale != 0 && frame1.true_track_degrees.scale != 0) {
+        if (frame1.speed_knots.scale != 0 && frame1.speed_kph.scale != 0 &&
+            frame1.magnetic_track_degrees.scale != 0 &&
+            frame1.true_track_degrees.scale != 0) {
           gps->data.speedData.speedKnots = minmea_tofloat(&frame1.speed_knots);
-          gps->data.speedData.courseDeg = minmea_tofloat(&frame1.true_track_degrees);
+          gps->data.speedData.courseDeg =
+              minmea_tofloat(&frame1.true_track_degrees);
           gps->data.speedData.faa_mode = frame1.faa_mode;
         }
       }
