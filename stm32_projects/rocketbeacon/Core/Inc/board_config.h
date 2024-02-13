@@ -17,6 +17,7 @@
 
 #define NUM_GPS_STD 0
 #define NUM_GPS_UBLOX 1
+#define GPS_ENABLE_VTG // enable speed/course over ground
 
 #define NUM_LED_DIGITAL 1
 

@@ -10,11 +10,16 @@
 void LED_on() { HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET); }
 void LED_off() { HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); }
 
-SX126x radio;
-GpsCtrl_s gps;
+static SX126x radio;
+static GpsCtrl_s gps;
 
-RadioDecodedPacket_s packet;
-FSKPacketRadioEncoder packetEncoder;
+static RadioDecodedPacket_s packet;
+static FSKPacketRadioEncoder packetEncoder;
+
+static uint8_t htop_to_fixed(float hdop) {
+	if (hdop < 0) return 0xff;
+	return round(hdop * 10);
+}
 
 const uint8_t PACKET_LEN = packetEncoder.EncodedLength();
 
@@ -82,6 +87,11 @@ extern "C" void entrypoint(void) {
     packet.payload.positionData.gps_alt = gps.data.generalData.altitude;
     packet.payload.positionData.gpsTime = gps.data.timeData.timestamp;
     packet.payload.positionData.sats = gps.data.generalData.satsTracked;
+    packet.payload.positionData.speedKnots = gps.data.speedData.speedKnots;
+    packet.payload.positionData.courseDeg = round(gps.data.speedData.courseDeg);
+    packet.payload.positionData.gpsFixMode = gps.data.generalData.fixQuality;
+    packet.payload.positionData.deciHDOP = htop_to_fixed(gps.data.generalData.hdop);
+    packet.payload.positionData.gpsVTGmode = gps.data.speedData.faa_mode;
 
     packet.payload.positionData.state = Scheduler::StateId_e::PreFlight;
 

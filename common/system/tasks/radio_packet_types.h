@@ -26,11 +26,13 @@ OrientationPacket_s;
 // Location data?? from the link budget Google sheet
 #define TELEMETRY_ID_POSITION 3
 PACKED_STRUCT {
-  float temp, pos_z, vel_z, lat, lon, gps_alt, batt_volts, speedKnots,
-      courseDeg;
+  float temp, pos_z, vel_z, lat, lon, gps_alt, batt_volts, speedKnots;
   uint32_t gpsTime;
   uint8_t sats, state, btClients;
-  // etc
+  GPSFixQuality gpsFixMode;
+  uint8_t deciHDOP; // hdop, 0-25.5 real, scaled up by 10x to be 0-255
+  uint16_t courseDeg; // fixed 0-360 heading. wasting 7 bytes here unused. could be a smaller number if we rescale
+  char gpsVTGmode;
 }
 PositionPacket_s;
 
@@ -99,6 +101,8 @@ PACKED_STRUCT {
   uint16_t packetCRC;
 }
 RadioDecodedPacket_s;
+
+static_assert (sizeof(RadioDecodedPacket_s) == 61, "Size is not constant");
 
 PACKED_STRUCT {
   uint8_t payloadLen;

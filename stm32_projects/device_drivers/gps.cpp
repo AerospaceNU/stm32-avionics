@@ -33,7 +33,7 @@ static void parseString(GpsCtrl_s *gps, char line[]) {
               minmea_tofloat(&frame1.longitude));
           gps->data.generalData.altitude = minmea_tofloat(&frame1.altitude);
           gps->data.generalData.fixQuality =
-              static_cast<uint8_t>(frame1.fix_quality);
+              static_cast<GPSFixQuality>(frame1.fix_quality);
           gps->data.generalData.satsTracked =
               static_cast<uint8_t>(frame1.satellites_tracked);
           gps->data.generalData.hdop = minmea_tofloat(&frame1.hdop);
@@ -66,6 +66,19 @@ static void parseString(GpsCtrl_s *gps, char line[]) {
             gps->data.timeData.year > GPS_MIN_VALID_YEAR &&
             gps->data.timeData.year < GPS_MAX_VALID_YEAR) {
           gps->data.timeData.timestamp = ts.tv_sec;
+        }
+      }
+      break;
+    }
+    case MINMEA_SENTENCE_VTG: {
+      struct minmea_sentence_vtg frame1;
+      if (minmea_parse_vtg(&frame1, line)) {
+
+        if (frame1.speed_knots.scale != 0 && frame1.speed_kph.scale != 0
+        		&& frame1.magnetic_track_degrees.scale != 0 && frame1.true_track_degrees.scale != 0) {
+          gps->data.speedData.speedKnots = minmea_tofloat(&frame1.speed_knots);
+          gps->data.speedData.courseDeg = minmea_tofloat(&frame1.true_track_degrees);
+          gps->data.speedData.faa_mode = frame1.faa_mode;
         }
       }
       break;
@@ -207,6 +220,7 @@ void gps_setMessagesUsed(GpsCtrl_s *gps) {
   HAL_UART_Transmit(gps->gps_uart, ubloxBuff, sizeof(ubloxBuff),
                     GPS_UART_TIMEOUT_MS);
 
+#ifndef GPS_ENABLE_VTG
   /*
    * VTG
    */
@@ -214,6 +228,7 @@ void gps_setMessagesUsed(GpsCtrl_s *gps) {
   gps_addUbxChecksum(ubloxBuff, sizeof(ubloxBuff));
   HAL_UART_Transmit(gps->gps_uart, ubloxBuff, sizeof(ubloxBuff),
                     GPS_UART_TIMEOUT_MS);
+#endif
 
   /*
    * GSV

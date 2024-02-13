@@ -28,9 +28,9 @@ static const char *call = "KM6GNL";
 // kind of radio on it. In the future, refactor based on transmit mode to
 // support lora as well
 #if HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915)
-FSKPacketRadioEncoder packetEncoder;
+static FSKPacketRadioEncoder packetEncoder;
 #else
-PassthroughRadioEncoder packetEncoder;
+static PassthroughRadioEncoder packetEncoder;
 #endif
 
 /**
@@ -198,7 +198,7 @@ void RadioManager::transmitData(SensorData_s *sensorData,
       0,
 #endif  // HAS_DEV(GPS)
       state,
-      0  // TODO bluetooth clients
+	  GPSFixQuality::INVALID  // TODO bluetooth clients
     };
 
     transmitPacket.packetType = TELEMETRY_ID_POSITION;
