@@ -1,0 +1,1 @@
+Install emcc, and build with `cmake -B build -DCMAKE_CXX_COMPILER=emcc -DCMAKE_C_COMPILER=emcc`

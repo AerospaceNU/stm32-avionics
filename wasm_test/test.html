@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+
+<body>
+
+  <h2>Expression Parser</h2>
+  <!-- Text field to enter expression -->
+  <input type="text" id="expressionInput" placeholder="Enter expression here" onkeydown="handleKeyPress(event)"
+    size="100">
+  <!-- Button to trigger parsing -->
+  <button onclick="parseExpression()">Parse Expression</button>
+
+  <div class="chart-container" style="position: relative; height:80vh; width:100vw">
+    <canvas id="altitudeChart"></canvas>
+  </div>
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  var Module = {
+    onRuntimeInitialized: function () {
+      // Module.parseExpression("(angle_vertical < 30)");
+    }
+  };
+
+  // Create a Chart.js chart
+  const ctx = document.getElementById('altitudeChart').getContext('2d');
+  const altitudeChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: 'pos_z_agl',
+          data: [],
+        },
+        {
+          label: 'rocket_vel_z',
+          data: [],
+        },
+        {
+          label: 'rocket_acc_z',
+          data: [],
+        },
+        {
+          label: 'angle_vertical',
+          data: [],
+        },
+        {
+          label: 'Expression result',
+          data: [],
+        },
+      ]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        },
+        x: {
+          display: false
+        }
+      }
+    }
+  });
+
+  function parseExpression() {
+    var expression = document.getElementById('expressionInput').value;
+
+    var ret = Module.parseExpression(expression);
+
+
+    altitudeChart.data.labels = ret.map(it => it.timestamp);
+    altitudeChart.data.datasets[0].data = ret.map(it => it.pos_z_agl);
+    altitudeChart.data.datasets[1].data = ret.map(it => it.rocket_vel_z);
+    altitudeChart.data.datasets[2].data = ret.map(it => it.rocket_acc_z);
+    altitudeChart.data.datasets[3].data = ret.map(it => it.angle_vertical);
+    altitudeChart.data.datasets[4].data = ret.map(it => it.success);
+    altitudeChart.update();
+
+  }
+
+  function handleKeyPress(event) {
+    if (event.keyCode === 13) { // 13 is the key code for "return"
+      parseExpression();
+    }
+  }
+</script>
+<script src="public/wasm_meme.js"></script>
+
+
+
+</html>
