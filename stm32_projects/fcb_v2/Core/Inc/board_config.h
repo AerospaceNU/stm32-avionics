@@ -31,7 +31,7 @@
 #define NUM_GPS_UBLOX 1
 
 #define NUM_IMU_ICM42688 2
-#define NUM_MAG_LIS3MDC 1
+#define NUM_MAG_LIS3MDL 1
 
 #define NUM_LED_DIGITAL 1
 

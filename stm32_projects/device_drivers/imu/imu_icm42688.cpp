@@ -4,6 +4,8 @@
 
 #include "imu_icm42688.h"
 
+#include "const_map.h"
+
 // registers in bank 0
 #define REG_GYRO_CONFIG0 79
 #define REG_ACCEL_CONFIG0 80
@@ -22,11 +24,45 @@
 
 #define WHO_AM_I 0x47
 
-#if HAS_DEV(IMU_ICM42688)
+#if HAS_DEV(IMU_ICM42688) + 1
+
+// ================================= //
+
+struct FullscaleEntry {
+  // Actual value to put into the register
+  uint8_t regValue;
+  // sensitivity, in native units per physical unit (eg ticks/dps)
+  float sensitivity;
+};
+
+using AccelFullscaleEntry =
+    std::pair<ImuIcm42688::AccelFullscale, FullscaleEntry>;
+using GyroFullscaleEntry =
+    std::pair<ImuIcm42688::GyroFullscale, FullscaleEntry>;
+
+constexpr ConstMap<
+    ImuIcm42688::AccelFullscale, FullscaleEntry,
+    static_cast<size_t>(ImuIcm42688::AccelFullscale::NUM_ACCEL_FULLSCALE)>
+    accelFullscales({AccelFullscaleEntry{ImuIcm42688::AccelFullscale::FS_8G,
+                                         {1, G_TO_MPS2(8)}},
+                     AccelFullscaleEntry{ImuIcm42688::AccelFullscale::FS_16G,
+                                         {1, G_TO_MPS2(16)}}});
+
+constexpr ConstMap<
+    ImuIcm42688::GyroFullscale, FullscaleEntry,
+    static_cast<size_t>(ImuIcm42688::GyroFullscale::NUM_GYRO_FULLSCALE)>
+    gyroFullscales({GyroFullscaleEntry{ImuIcm42688::GyroFullscale::FS_2000_DPS,
+                                       {0, DEG_TO_RAD(2000)}},
+                    GyroFullscaleEntry{ImuIcm42688::GyroFullscale::FS_1000_DPS,
+                                       {1, DEG_TO_RAD(1000)}}});
+
+// ================================= //
 
 ImuIcm42688::ImuIcm42688(SpiCtrl_t spidev) : spi(spidev) {}
 
-void ImuIcm42688::setGyroConfig(GyroFullscale range, GyroDataRate gyroRate) {
+void ImuIcm42688::setGyroConfig(const GyroFullscale range,
+                                GyroDataRate gyroRate) {
+  auto fsSetting = gyroFullscales[range];
   struct GYRO_CONFIG0 {
     GyroDataRate odr : 4;
     uint8_t reserved : 1;
@@ -34,16 +70,17 @@ void ImuIcm42688::setGyroConfig(GyroFullscale range, GyroDataRate gyroRate) {
   };
   GYRO_CONFIG0 config0{
       .odr = gyroRate,
-      .fs = range.regValue,
+      .fs = fsSetting.regValue,
   };
 
   spi_writeRegisters(&spi, REG_GYRO_CONFIG0,
                      reinterpret_cast<uint8_t*>(&config0), 1);
 
-  gyroFullscale = range;
+  gyroSensitivity = fsSetting.sensitivity;
 }
-void ImuIcm42688::setAccelConfig(AccelFullscale range,
+void ImuIcm42688::setAccelConfig(const AccelFullscale range,
                                  AccelDataRate accelRate) {
+  auto fsSetting = accelFullscales[range];
   struct ACCEL_CONFIG0 {
     AccelDataRate odr : 4;
     uint8_t reserved : 1;
@@ -51,13 +88,13 @@ void ImuIcm42688::setAccelConfig(AccelFullscale range,
   };
   ACCEL_CONFIG0 config0{
       .odr = accelRate,
-      .fs = range.regValue,
+      .fs = fsSetting.regValue,
   };
 
   spi_writeRegisters(&spi, REG_WRITE(REG_GYRO_CONFIG0),
                      reinterpret_cast<uint8_t*>(&config0), 1);
 
-  accelFullscale = range;
+  accelSensitivity = fsSetting.sensitivity;
 }
 
 void ImuIcm42688::setBank(int bank) {
@@ -118,12 +155,12 @@ void ImuIcm42688::newData() {
   data.angVelRaw = raw.angVel;
 
   // and convert to real units. Note that ticks / (ticks / unit) = unit
-  data.accelRealMps2.x = raw.accel.x / accelFullscale.sensitivity;
-  data.accelRealMps2.y = raw.accel.y / accelFullscale.sensitivity;
-  data.accelRealMps2.z = raw.accel.z / accelFullscale.sensitivity;
-  data.angVelRealRadps.x = raw.accel.x / gyroFullscale.sensitivity;
-  data.angVelRealRadps.y = raw.accel.y / gyroFullscale.sensitivity;
-  data.angVelRealRadps.z = raw.accel.z / gyroFullscale.sensitivity;
+  data.accelRealMps2.x = raw.accel.x / accelSensitivity;
+  data.accelRealMps2.y = raw.accel.y / accelSensitivity;
+  data.accelRealMps2.z = raw.accel.z / accelSensitivity;
+  data.angVelRealRadps.x = raw.accel.x / gyroSensitivity;
+  data.angVelRealRadps.y = raw.accel.y / gyroSensitivity;
+  data.angVelRealRadps.z = raw.accel.z / gyroSensitivity;
 
   // Convert temp per page 65
   tempC = raw.temp / 132.48 + 25;

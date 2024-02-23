@@ -62,6 +62,7 @@ target_compile_options(${EXECUTABLE} PRIVATE
         -fstack-usage
 
         -Wall
+        -Werror
         -MMD
         -MP
         -specs=nano.specs

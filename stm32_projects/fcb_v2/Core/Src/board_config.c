@@ -109,23 +109,20 @@ UART_HandleTypeDef* gpsStdHuart[NUM_GPS_STD + NUM_GPS_UBLOX] = {&huart3};
 
 /* IMU */
 
-#if HAS_DEV(IMU_ICM20600)
-SPI_HandleTypeDef* imuIcm20600Hspi[NUM_IMU_ICM20600] = {&hspi2, &hspi2};
-GPIO_TypeDef* imuIcm20600CsGpioPort[NUM_IMU_ICM20600] = {IMU1_CS_GPIO_Port,
-                                                         IMU2_CS_GPIO_Port};
-uint16_t imuIcm20600CsPin[NUM_IMU_ICM20600] = {IMU1_CS_Pin, IMU2_CS_Pin};
-#endif  // HAS_DEV(IMU_ICM20600)
+SPI_HandleTypeDef* imuIcm42688Hspi[NUM_IMU_ICM42688] = {&hspi2};
+GPIO_TypeDef* imuIcm42688CsGpioPort[NUM_IMU_ICM42688] = {IMU1_CS_GPIO_Port,
+                                                         };
+uint16_t imuIcm42688CsPin[NUM_IMU_ICM42688] = {IMU1_CS_Pin};
 
 #if HAS_DEV(IMU)
 // Index 0 of this struct is read to determine the sensor axis to measure accel in board X
 // So if board X = - sensor Y, the first index should be {AXIS_Y, -1}
 const Orientation_s imuBoardToLocal[NUM_IMU][3] = {
-    {{AXIS_Y, -1}, {AXIS_X, -1}, {AXIS_Z, -1}},
     {{AXIS_Y, -1}, {AXIS_X, -1}, {AXIS_Z, -1}}};
-int imuAccelFilterPriority[NUM_IMU] = {2, 2};
+int imuAccelFilterPriority[NUM_IMU] = {2};
 #endif  // HAS_DEV(IMU)
 
-I2C_HandleTypeDef* magIis2mdcHi2c[NUM_MAG_IIS2MDC] = {&hi2c1};
+SPI_HandleTypeDef* magLis3mdlHi2c[NUM_MAG_LIS3MDL] = {&hspi2};
 const Orientation_s magBoardToLocal[NUM_MAG][3] = {
     {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, -1}}};
 

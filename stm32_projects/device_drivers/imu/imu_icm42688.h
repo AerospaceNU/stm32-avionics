@@ -14,19 +14,8 @@
 
 class ImuIcm42688 {
  public:
-  struct FullscaleEntry {
-    uint8_t regValue;
-    // sensitivity, in native units per physical unit (eg ticks/dps)
-    float sensitivity;
-  };
-  struct AccelFullscale : FullscaleEntry {};
-  struct GyroFullscale : FullscaleEntry {};
-
-  static constexpr GyroFullscale GYRO_FS_2000_DPS{0, DEG_TO_RAD(2000)};
-  static constexpr GyroFullscale GYRO_FS_1000_DPS{1, DEG_TO_RAD(1000)};
-  static constexpr GyroFullscale GYRO_FS_500_DPS{2, DEG_TO_RAD(500)};
-  static constexpr AccelFullscale ACCEL_FS_16G{0, G_TO_MPS2(16)};
-  static constexpr AccelFullscale ACCEL_FS_8G{1, G_TO_MPS2(8)};
+  enum class GyroFullscale { FS_2000_DPS = 0, FS_1000_DPS, NUM_GYRO_FULLSCALE };
+  enum class AccelFullscale { FS_16G = 0, FS_8G, NUM_ACCEL_FULLSCALE };
 
   enum class GyroDataRate : uint8_t {
     RATE_32KHZ = 1,
@@ -54,8 +43,8 @@ class ImuIcm42688 {
   bool begin();
   void newData();
 
-  void setGyroConfig(GyroFullscale range, GyroDataRate gyroRate);
-  void setAccelConfig(AccelFullscale range, AccelDataRate accelRate);
+  void setGyroConfig(const GyroFullscale range, GyroDataRate gyroRate);
+  void setAccelConfig(const AccelFullscale range, AccelDataRate accelRate);
 
   ImuData_s data;
   double tempC;
@@ -66,8 +55,8 @@ class ImuIcm42688 {
 
   SpiCtrl_t spi;
 
-  AccelFullscale accelFullscale;
-  GyroFullscale gyroFullscale;
+  float accelSensitivity;
+  float gyroSensitivity;
 };
 
 #endif  // STM32_PROJECTS_DEVICE_DRIVERS_IMU_IMU_ICM42688_H_
