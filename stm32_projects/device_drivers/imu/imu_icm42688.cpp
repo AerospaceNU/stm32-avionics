@@ -14,10 +14,11 @@
 #define REG_DEVICE_CONFIG 17
 
 // Helper macros for read/write
-// SPI register address MSB is read/write (1 for read 0 for write, then 7 bit address)
+// SPI register address MSB is read/write (1 for read 0 for write, then 7 bit
+// address)
 #define REG_RW_MASK ~(1 << 7)
 #define REG_READ(x) (x & REG_RW_MASK) | 1
-#define REG_WRITE(x) (x & REG_RW_MASK) 
+#define REG_WRITE(x) (x & REG_RW_MASK)
 
 #define WHO_AM_I 0x47
 
@@ -26,7 +27,6 @@
 ImuIcm42688::ImuIcm42688(SpiCtrl_t spidev) : spi(spidev) {}
 
 void ImuIcm42688::setGyroConfig(GyroFullscale range, GyroDataRate gyroRate) {
-
   struct GYRO_CONFIG0 {
     GyroDataRate odr : 4;
     uint8_t reserved : 1;
@@ -37,7 +37,8 @@ void ImuIcm42688::setGyroConfig(GyroFullscale range, GyroDataRate gyroRate) {
       .fs = range.regValue,
   };
 
-  spi_writeRegisters(&spi, REG_GYRO_CONFIG0, reinterpret_cast<uint8_t*>(&config0), 1);
+  spi_writeRegisters(&spi, REG_GYRO_CONFIG0,
+                     reinterpret_cast<uint8_t*>(&config0), 1);
 
   gyroFullscale = range;
 }
@@ -53,7 +54,8 @@ void ImuIcm42688::setAccelConfig(AccelFullscale range,
       .fs = range.regValue,
   };
 
-  spi_writeRegisters(&spi, REG_WRITE(REG_GYRO_CONFIG0), reinterpret_cast<uint8_t*>(&config0), 1);
+  spi_writeRegisters(&spi, REG_WRITE(REG_GYRO_CONFIG0),
+                     reinterpret_cast<uint8_t*>(&config0), 1);
 
   accelFullscale = range;
 }
@@ -67,8 +69,8 @@ bool ImuIcm42688::begin() {
   HAL_GPIO_WritePin(spi.port, spi.pin, GPIO_PIN_SET);
   HAL_Delay(1);
 
-  // From https://github.com/finani/ICM42688/blob/245ddf8a3d2a6526278008cbc7edc1a04aae8041/src/ICM42688.cpp#L24
-
+  // From
+  // https://github.com/finani/ICM42688/blob/245ddf8a3d2a6526278008cbc7edc1a04aae8041/src/ICM42688.cpp#L24
 
   // Reset the device. Sets to 2000dps/16g by default
   setBank(0);
@@ -80,7 +82,7 @@ bool ImuIcm42688::begin() {
     return false;
   }
 
-  //turn on accel and gyro in low noise mode
+  // turn on accel and gyro in low noise mode
   struct PWR_MGMT0 {
     uint8_t accelMode : 2;
     uint8_t gyroMode : 2;
@@ -88,14 +90,13 @@ bool ImuIcm42688::begin() {
     uint8_t temp_disabled : 1;
     uint8_t reserved : 2;
   };
-  PWR_MGMT0 pwrCfg{
-    .accelMode=0b11,
-    .gyroMode=0b11,
-    .idle=0,
-    .temp_disabled=0,
-    .reserved=0
-  };
-  spi_writeRegisters(&spi, REG_WRITE(REG_PWR_MGMT0), reinterpret_cast<uint8_t*>(&pwrCfg), 1);
+  PWR_MGMT0 pwrCfg{.accelMode = 0b11,
+                   .gyroMode = 0b11,
+                   .idle = 0,
+                   .temp_disabled = 0,
+                   .reserved = 0};
+  spi_writeRegisters(&spi, REG_WRITE(REG_PWR_MGMT0),
+                     reinterpret_cast<uint8_t*>(&pwrCfg), 1);
 
   return true;
 }
@@ -110,7 +111,8 @@ void ImuIcm42688::newData() {
   } __attribute__((packed));
   AccelTempRaw raw;
 
-  spi_readRegisters(&spi, REG_READ(REG_TEMP_DATA1), reinterpret_cast<uint8_t*>(&raw), sizeof(raw));
+  spi_readRegisters(&spi, REG_READ(REG_TEMP_DATA1),
+                    reinterpret_cast<uint8_t*>(&raw), sizeof(raw));
 
   data.accelRaw = raw.accel;
   data.angVelRaw = raw.angVel;

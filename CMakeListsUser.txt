@@ -37,7 +37,7 @@ elseif (PROJECT_BUILD_TYPE MATCHES "stm32")
 
     # Set versions ourselves
     SET(CMAKE_C_STANDARD 17)
-    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD 20)
 
     # Include the desktop sim stuff
     add_subdirectory(common)

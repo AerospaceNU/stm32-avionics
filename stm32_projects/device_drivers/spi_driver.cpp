@@ -28,7 +28,8 @@ uint8_t spi_readRegister(SpiCtrl_t *sensor, uint8_t reg) {
   return rxBuff[1];
 }
 
-void spi_writeRegisters(SpiCtrl_t *sensor, uint8_t reg, uint8_t *pTxData, size_t len) {
+void spi_writeRegisters(SpiCtrl_t *sensor, uint8_t reg, uint8_t *pTxData,
+                        size_t len) {
   // bring CS pin low
   HAL_GPIO_WritePin(sensor->port, sensor->pin, GPIO_PIN_RESET);
 
@@ -39,7 +40,8 @@ void spi_writeRegisters(SpiCtrl_t *sensor, uint8_t reg, uint8_t *pTxData, size_t
   HAL_GPIO_WritePin(sensor->port, sensor->pin, GPIO_PIN_SET);
 }
 
-void spi_readRegisters(SpiCtrl_t *sensor, uint8_t reg, uint8_t *pRxData, size_t len) {
+void spi_readRegisters(SpiCtrl_t *sensor, uint8_t reg, uint8_t *pRxData,
+                       size_t len) {
   // bring CS pin low
   HAL_GPIO_WritePin(sensor->port, sensor->pin, GPIO_PIN_RESET);
 

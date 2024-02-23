@@ -5,15 +5,12 @@
  *      Author: John
  */
 
-#ifndef STM32_PROJECTS_DEVICE_DRIVERS_IMU_ICM20600_H_
-#define STM32_PROJECTS_DEVICE_DRIVERS_IMU_ICM20600_H_
+#ifndef STM32_PROJECTS_DEVICE_DRIVERS_IMU_IMU_ICM42688_H_
+#define STM32_PROJECTS_DEVICE_DRIVERS_IMU_IMU_ICM42688_H_
 
 #include "board_config_common.h"
+#include "math_utils.h"
 #include "spi_driver.h"
-#include <math.h>
-
-#define DEG_TO_RAD(x) x * M_PI / 180.0
-#define G_TO_MPS2(x) x * 9.80665
 
 class ImuIcm42688 {
  public:
@@ -53,7 +50,7 @@ class ImuIcm42688 {
     RATE_100HZ
   };
 
-  ImuIcm42688(SpiCtrl_t spidev);
+  explicit ImuIcm42688(SpiCtrl_t spidev);
   bool begin();
   void newData();
 
@@ -65,7 +62,7 @@ class ImuIcm42688 {
   int16_t tRaw;
 
  private:
-  void setBank(int bank);  
+  void setBank(int bank);
 
   SpiCtrl_t spi;
 
@@ -73,4 +70,4 @@ class ImuIcm42688 {
   GyroFullscale gyroFullscale;
 };
 
-#endif  // STM32_PROJECTS_DEVICE_DRIVERS_IMU_ICM20600_H_
+#endif  // STM32_PROJECTS_DEVICE_DRIVERS_IMU_IMU_ICM42688_H_

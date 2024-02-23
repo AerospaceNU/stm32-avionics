@@ -27,6 +27,7 @@ set(STM32_DEVICE_DRIVERS_SRCS
         ${CMAKE_CURRENT_SOURCE_DIR}/usb_std.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/vbat_ina226.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/imu/imu_icm42688.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/imu/accel_adx375.cpp
         CACHE INTERNAL "")
 
 set(STM32_DEVICE_DRIVERS_INCLUDE_DIRS
