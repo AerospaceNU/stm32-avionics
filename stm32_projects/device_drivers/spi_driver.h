@@ -23,7 +23,7 @@ typedef struct {
 uint8_t spi_readRegister(SpiCtrl_t *sensor, uint8_t reg);
 void spi_readRegisters(SpiCtrl_t *sensor, uint8_t reg, uint8_t *pRxData, size_t len);
 void spi_writeRegister(SpiCtrl_t *sensor, uint8_t reg, uint8_t val);
-void spi_writeRegisters(SpiCtrl_t *sensor, uint8_t reg, uint8_t *pRxData, size_t len);
+void spi_writeRegisters(SpiCtrl_t *sensor, uint8_t reg, uint8_t *pTxData, size_t len);
 
 void spi_writeArray(SpiCtrl_t *sensor, uint8_t *pTxData, size_t len);
 
