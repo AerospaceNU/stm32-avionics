@@ -12,7 +12,7 @@
 #define USE_ARM_MATH
 #define USE_STM_HARDWARE_MANAGER
 
-#define NUM_ACCEL_H3LIS331DL 1
+#define NUM_ACCEL_ADXL375 1
 
 #define NUM_BAROMETER_MS5607 2
 
@@ -30,8 +30,8 @@
 #define NUM_GPS_STD 0
 #define NUM_GPS_UBLOX 1
 
-#define NUM_IMU_ICM20600 2
-#define NUM_MAG_IIS2MDC 1
+#define NUM_IMU_ICM42688 2
+#define NUM_MAG_LIS3MDC 1
 
 #define NUM_LED_DIGITAL 1
 

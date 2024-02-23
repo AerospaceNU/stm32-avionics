@@ -4,10 +4,22 @@
 
 #include "imu_icm42688.h"
 
-// registers
-#define REG_GYRO_CONFIG0 0
-#define REG_ACCEL_CONFIG0 0
-#define REG_TEMP_DATA1 0
+// registers in bank 0
+#define REG_GYRO_CONFIG0 79
+#define REG_ACCEL_CONFIG0 80
+#define REG_TEMP_DATA1 29
+#define REG_BANK_SEL 118
+#define REG_WHO_AM_I 117
+#define REG_PWR_MGMT0 78
+#define REG_DEVICE_CONFIG 17
+
+// Helper macros for read/write
+// SPI register address MSB is read/write (1 for read 0 for write, then 7 bit address)
+#define REG_RW_MASK ~(1 << 7)
+#define REG_READ(x) (x & REG_RW_MASK) | 1
+#define REG_WRITE(x) (x & REG_RW_MASK) 
+
+#define WHO_AM_I 0x47
 
 #if HAS_DEV(IMU_ICM42688)
 
@@ -41,13 +53,13 @@ void ImuIcm42688::setAccelConfig(AccelFullscale range,
       .fs = range.regValue,
   };
 
-  spi_writeRegisters(&spi, REG_GYRO_CONFIG0, reinterpret_cast<uint8_t*>(&config0), 1);
+  spi_writeRegisters(&spi, REG_WRITE(REG_GYRO_CONFIG0), reinterpret_cast<uint8_t*>(&config0), 1);
 
   accelFullscale = range;
 }
 
-void setBank(int bank) {
-  spi_writeRegister(&spi, REG_BANK_SEL, bank);
+void ImuIcm42688::setBank(int bank) {
+  spi_writeRegister(&spi, REG_WRITE(REG_BANK_SEL), bank);
 }
 
 bool ImuIcm42688::begin() {
@@ -59,12 +71,12 @@ bool ImuIcm42688::begin() {
 
 
   // Reset the device. Sets to 2000dps/16g by default
-  setBank(0)
-  spi_writeRegister(&spi, REG_DEVICE_CONFIG, 1);
+  setBank(0);
+  spi_writeRegister(&spi, REG_WRITE(REG_DEVICE_CONFIG), 1);
   HAL_Delay(1);  // Wait 1ms per datasheet
 
   // check whoami
-  if (spi_readRegister(&spi, REG_WHO_AM_I, 1) != WHO_AM_I) {
+  if (spi_readRegister(&spi, REG_READ(REG_WHO_AM_I)) != WHO_AM_I) {
     return false;
   }
 
@@ -83,7 +95,7 @@ bool ImuIcm42688::begin() {
     .temp_disabled=0,
     .reserved=0
   };
-  spi_writeRegisters(&spi, REG_PWR_MGMT0, reinterpret_cast<uint8_t*>(&pwrCfg), 1);
+  spi_writeRegisters(&spi, REG_WRITE(REG_PWR_MGMT0), reinterpret_cast<uint8_t*>(&pwrCfg), 1);
 
   return true;
 }
@@ -98,7 +110,7 @@ void ImuIcm42688::newData() {
   } __attribute__((packed));
   AccelTempRaw raw;
 
-  spi_readRegisters(&spi, REG_TEMP_DATA1, reinterpret_cast<uint8_t*>(&raw), sizeof(raw));
+  spi_readRegisters(&spi, REG_READ(REG_TEMP_DATA1), reinterpret_cast<uint8_t*>(&raw), sizeof(raw));
 
   data.accelRaw = raw.accel;
   data.angVelRaw = raw.angVel;
@@ -114,17 +126,5 @@ void ImuIcm42688::newData() {
   // Convert temp per page 65
   tempC = raw.temp / 132.48 + 25;
 }
-
-//
-// void printReg(uint8_t reg) {
-// Serial.print(reg, HEX);
-// Serial.print(": ");
-// Serial.println(Read8(reg, address), DEC);
-//}
-
-// bool isConnected(ImuICM42688Ctrl_s *sensor) {
-//   uint8_t id = spi_readRegister(&spi, REG_WHO_AM_I);
-//   return (id == WHOAMI_VAL);
-// }
 
 #endif  // HAS_DEV(IMU_LSM9DS1)

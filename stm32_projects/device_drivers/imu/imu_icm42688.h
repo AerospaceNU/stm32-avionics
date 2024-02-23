@@ -10,8 +10,9 @@
 
 #include "board_config_common.h"
 #include "spi_driver.h"
+#include <math.h>
 
-#define DEG_TO_RAD(x) x *M_PI / 180.0
+#define DEG_TO_RAD(x) x * M_PI / 180.0
 #define G_TO_MPS2(x) x * 9.80665
 
 class ImuIcm42688 {
