@@ -72,6 +72,11 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
   uint8_t rfend0 = 0b00110000;
   tiRadio_spiWriteReg(radio, TIRADIO_RFEND_CFG0, &rfend0, 1);
 
+  // check precondition for tx len
+  if (radio->payloadSize > 128) {
+    assert(0);
+  }
+
   // Figure out what packet length/config we need to send to the radio
   uint8_t pkt_len = 0xFF;
   uint8_t pkt_cfg0 = 0x20;
@@ -115,6 +120,24 @@ bool tiRadio_init(TiRadioCtrl_s *radio) {
   // wrote tiRadio_SetOutputPower
 
   return true;
+}
+
+void tiRadio_setPaylodSize(TiRadioCtrl_s *radio, size_t lenBytes) {
+  // check precondition for tx len
+  if (lenBytes > 128) {
+    assert(0);
+  }
+
+  radio->payloadSize = lenBytes;
+  // Figure out what packet length/config we need to send to the radio
+  uint8_t pkt_len = lenBytes;
+  uint8_t pkt_cfg0 = 0x00;
+
+  // The size for fixed length should be known on init
+  tiRadio_spiWriteReg(radio, TIRADIO_PKT_LEN, &pkt_len, 0x01);
+  tiRadio_spiWriteReg(radio, TIRADIO_PKT_CFG0, &pkt_cfg0, 0x01);
+
+  tiRadio_spiWriteReg(radio, TIRADIO_FIFO_CFG, &radio->payloadSize, 0x01);
 }
 
 // The main tick function. Checks for new packets and transmits the waiting one,
@@ -258,7 +281,7 @@ static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
       // I think this is only for variable length?
       // Since we need to add a length byte to the message
       uint8_t packetLength = payloadLength + 1;
-      if (packetLength > MAX_PACKET_SIZE) {
+      if (packetLength > RADIO_MAX_PACKET_SIZE) {
         return false;
       }
 
@@ -304,14 +327,12 @@ static bool tiRadio_TransmitPacket(TiRadioCtrl_s *radio, uint8_t *payload,
 static void cc1120EnqueuePacket(TiRadioCtrl_s *radio, uint8_t *buff,
                                 uint8_t size, bool crc) {
   // Fill our packet
-  static RadioRecievedPacket_s packet;
-  packet.radioId = radio->id;
-  packet.rssi = radio->RSSI;
-  packet.crc = crc;
-  packet.lqi = radio->LQI;
-  memset(packet.data, 0, sizeof(packet.data));
-  memcpy(packet.data, buff, size);
-  // uint8_t *pPacket = (uint8_t *) &packet;
+  static RadioRecievedOTAPacket packet;
+  packet.metadata.radioId = radio->id;
+  packet.metadata.rssi = radio->RSSI;
+  packet.metadata.lqi = radio->LQI;
+  packet.payload.payloadLen = size;
+  memcpy(packet.payload.payload, buff, size);
 
   for (int i = 0; i < MAX_COMSUMER; i++) {
     CircularBuffer_s *consumer = radio->messageConsumers[i];
@@ -353,7 +374,7 @@ void tiRadio_registerConsumer(TiRadioCtrl_s *radio,
 
 bool tiRadio_checkNewPacket(TiRadioCtrl_s *radio) {
   static uint8_t rxbytes = 0x00;
-  static uint8_t rxBuffer[128] = {0};
+  static uint8_t rxBuffer[255] = {0};
 
   // Read GPIO, should be high until the RX FIFO is empty
   if (HAL_GPIO_ReadPin(radio->GP3_port, radio->GP3_pin) == GPIO_PIN_SET) {

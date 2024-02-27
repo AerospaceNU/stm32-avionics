@@ -28,6 +28,8 @@
 #define float32_t float_t
 #endif
 
+#include <assert.h>
+
 /**
  * @brief Holds an arm matrix internally, with wrappers for common operations.
  *
@@ -216,6 +218,7 @@ class Matrix {
 #endif  // __arm__
 #else
     // Not implemented yet
+    assert(0);
 #endif
   }
 

@@ -26,11 +26,14 @@ OrientationPacket_s;
 // Location data?? from the link budget Google sheet
 #define TELEMETRY_ID_POSITION 3
 PACKED_STRUCT {
-  float temp, pos_z, vel_z, lat, lon, gps_alt, batt_volts, speedKnots,
-      courseDeg;
+  float temp, pos_z, vel_z, lat, lon, gps_alt, batt_volts, speedKnots;
   uint32_t gpsTime;
   uint8_t sats, state, btClients;
-  // etc
+  GPSFixQuality gpsFixMode;
+  uint8_t deciHDOP;    // hdop, 0-25.5 real, scaled up by 10x to be 0-255
+  uint16_t courseDeg;  // fixed 0-360 heading. wasting 7 bytes here unused.
+                       // could be a smaller number if we rescale
+  char gpsVTGmode;
 }
 PositionPacket_s;
 
@@ -40,7 +43,7 @@ LineCutterPacket_s;
 
 // Uplinked string (not necessarily null-terminated)
 #define TELEMETRY_ID_STRING 5
-#define RADIO_MAX_STRING 48
+#define RADIO_MAX_STRING 42
 #if RADIO_MAX_STRING > 0xff
 #error "Radio string length longer than 1 byte!"
 #endif
@@ -93,7 +96,44 @@ PACKED_STRUCT {
   uint32_t timestampMs;
   char callsign[8];
   PayloadPacket_u payload;
+  // message crc of all preceding bytes, as set by the transmitting side
+  // (some radios let you do this in hardware, others don't; for consistency and
+  // simplicity, we will always add it ourselves)
+  uint16_t packetCRC;
 }
-RadioPacket_s;
+RadioDecodedPacket_s;
+
+static_assert(sizeof(RadioDecodedPacket_s) == 61, "Size is not constant");
+
+PACKED_STRUCT {
+  uint8_t payloadLen;
+  uint8_t payload[RADIO_MAX_PACKET_SIZE];
+}
+RadioOTAPayload_s;
+
+typedef struct __attribute__((packed)) {
+  uint8_t radioId;
+  int8_t rssi;
+  uint8_t lqi;
+} RecievedPacketRadioMetadat_s;
+
+typedef struct __attribute__((packed)) {
+  bool crcGood;
+} RecievedPacketDecodeMetadat_s;
+
+/**
+ * Single radio packet, as recieved and demodulated by radio hardware. Includes
+ * the message itself plus metadata collected during recieve
+ */
+typedef struct __attribute__((packed)) {
+  RadioOTAPayload_s payload;
+  RecievedPacketRadioMetadat_s metadata;
+} RadioRecievedOTAPacket;
+
+typedef struct __attribute__((packed)) {
+  RadioDecodedPacket_s payload;
+  RecievedPacketRadioMetadat_s metadata;
+  RecievedPacketDecodeMetadat_s decodeMetadata;
+} RadioDecodedRecievedPacket_s;
 
 #endif  // COMMON_SYSTEM_TASKS_RADIO_PACKET_TYPES_H_

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "packet_encoder.h"
 #include "ti_fec.h"
 
 template <typename A, typename B>
@@ -38,4 +39,23 @@ TEST(TiFEC, EncodeDecode) {
   uint8_t decoded[sizeof(in)];
   decoder.FecDecode(out, decoded, sizeof(decoded));
   ArraysEqual(in, decoded, sizeof(in));
+}
+
+TEST(PacketEncoder, FSKEncodeDecode) {
+  FSKPacketRadioEncoder ende;
+
+  RadioDecodedPacket_s raw = {0};
+
+  for (size_t i = 0; i < sizeof(raw); i++) {
+    ((uint8_t*)&raw)[i] = i;
+  }
+
+  RadioDecodedPacket_s decoded;
+  RadioOTAPayload_s ota1;
+
+  ASSERT_EQ(0, ende.Encode(raw, ota1));
+  ASSERT_EQ(0, ende.Decode(ota1, decoded));
+
+  ArraysEqual<uint8_t*, uint8_t*>((uint8_t*)&raw, (uint8_t*)&decoded,
+                                  sizeof(raw));
 }

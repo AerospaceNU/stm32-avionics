@@ -14,99 +14,123 @@
 #include "data_log.h"
 #include "data_structures.h"
 #include "hardware_manager.h"
+#include "packet_encoder.h"
 
 #define RADIO_INTERVAL_MS 200
 #define RADIO_SEND_MS 100
-
-static DataRecieveState_s dataRx[NUM_RADIO];
-static DataTransmitState_s lastSent[NUM_RADIO];
-
-static RadioPacket_s transmitPacket[NUM_RADIO];
 
 static const char *call = "KM6GNL";
 
 // https://stackoverflow.com/q/9695329
 #define ROUND_2_INT(f) ((int)((f) >= 0.0 ? (f + 0.5) : (f - 0.5)))
 
-void radioManager_init() {
-  for (int i = 0; i < NUM_RADIO; i++) {
-    cb_init(&(dataRx[i].rxBuffer), dataRx[i].rxArray, RX_BUFF_LEN,
-            sizeof(RadioRecievedPacket_s));
-    hm_radioRegisterConsumer(i, &dataRx[i].rxBuffer);
+// this is gross and smelly, but for rn, its valid that one board has only one
+// kind of radio on it. In the future, refactor based on transmit mode to
+// support lora as well
+#if HAS_DEV(RADIO_TI_433) || HAS_DEV(RADIO_TI_915)
+static FSKPacketRadioEncoder packetEncoder;
+#else
+static PassthroughRadioEncoder packetEncoder;
+#endif
 
-    strncpy(transmitPacket[i].callsign, call, 8);
+/**
+ * calculate the CRC of a packet, up to but excluding the CRC field at the end
+ */
+uint16_t calculateRadioPacketCRC(RadioDecodedPacket_s &packet) {
+  // Init value for CRC calculation, by convention
+  uint16_t checksum = 0xFFFF;
+
+  // iterate over whole packet, up until CRC
+  uint8_t *pktAsBytes = reinterpret_cast<uint8_t *>(&packet);
+  for (size_t i = 0; i < sizeof(packet) - sizeof(packet.packetCRC); i++) {
+    checksum = ti_fec::calculateCRC(pktAsBytes[i], checksum);
+  }
+
+  return checksum;
+}
+
+void RadioManager::init(int id) {
+  radioId = id;
+
+  cb_init(&rxBuffer, rxArray, RX_BUFF_LEN, sizeof(RadioRecievedOTAPacket));
+  hm_radioRegisterConsumer(radioId, &rxBuffer);
+
+  strncpy(transmitPacket.callsign, call, 8);
 
 #ifdef SOFTWARE_VERSION
-    transmitPacket[i].softwareVersion = SOFTWARE_VERSION;  // TODO set this;
+  transmitPacket.softwareVersion = SOFTWARE_VERSION;  // TODO set this;
 #endif
-    transmitPacket[i].board_serial_num = 0;  // TODO set this;
+  transmitPacket.board_serial_num = 0;  // TODO set this;
 
-    hm_radioSetChannel(i, 2);
-  }
+  hm_radioSetChannel(radioId, 0);
+  hm_radioSetLen(radioId, packetEncoder.EncodedLength());
 }
 
 //! Must be called periodically to output data over CLI or USB
-void radioManager_tick() {
-  static RadioRecievedPacket_s packet;
+void RadioManager::tick() {
+  static RadioRecievedOTAPacket packet;
 
   // Try to dequeue all the packets we've gotten
-  for (int i = 0; i < NUM_RADIO; i++) {
-    static size_t len = sizeof(packet);
-    while (cb_count(&dataRx[i].rxBuffer)) {
-      cb_peek(&dataRx[i].rxBuffer, (unknownPtr_t)&packet, &len);
-      if (len) {
-        // Send to all our callbacks
-        for (size_t j = 0; j < dataRx[i].numCallbacks; j++) {
-          if (dataRx[i].callbacks[j]) dataRx[i].callbacks[j](&packet);
-        }
+  static size_t len = sizeof(packet);
+  while (cb_count(&rxBuffer)) {
+    cb_peek(&rxBuffer, (unknownPtr_t)&packet, &len);
+    if (len) {
+      // first decode the packet
+      RadioDecodedRecievedPacket_s decoded;
+      decoded.metadata = packet.metadata;
+      if (0 == packetEncoder.Decode(packet.payload, decoded.payload)) {
+        // CRC of bytes we got from the radio
+        uint16_t localCRC = calculateRadioPacketCRC(decoded.payload);
+        // The CRC set by the sender
+        uint16_t remoteCRC = decoded.payload.packetCRC;
+        // and compare
+        decoded.decodeMetadata.crcGood = (localCRC == remoteCRC);
 
-        cb_dequeue(&dataRx[i].rxBuffer, 1);
+        // Send to all our callbacks
+        for (size_t j = 0; j < numCallbacks; j++) {
+          if (callbacks[j]) callbacks[j](&decoded);
+        }
       } else {
-        cb_flush(&dataRx[i].rxBuffer);
+        // Failed to decode?? give up is the best we can do?
+        printf("packet decode failed????\n");
       }
+
+      cb_dequeue(&rxBuffer, 1);
+    } else {
+      cb_flush(&rxBuffer);
     }
   }
 }
 
-void radioManager_sendInternal(int radioId) {
-  hm_radioSend(radioId, (uint8_t *)&transmitPacket[radioId],
-               sizeof(RadioPacket_s));
-}
+void RadioManager::sendInternal(RadioDecodedPacket_s &packet) {
+  // set the CRC
+  packet.packetCRC = calculateRadioPacketCRC(packet);
 
-void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
-  dataRx[radioId].callbacks[dataRx[radioId].numCallbacks] = callback;
-  dataRx[radioId].numCallbacks++;
-}
-
-// Packet rates, in hz
-#define ORIENTATION_RATE 10
-#define POSITION_RATE 10
-#define HARDWARE_STATUS_RATE 1
-
-void radioManager_transmitData(int radioId, SensorData_s *sensorData,
-                               FilterData_s *filterData, uint8_t state) {
-  uint32_t currentTime = hm_millis();
-  if (currentTime % RADIO_INTERVAL_MS >= RADIO_SEND_MS) return;
-  transmitPacket[radioId].timestampMs = currentTime;
-
-  /*
-  if (currentTime - lastSent[radioId].propStuffLastSent >= 500) {
-    PropulsionPacket_s data = {
-        sensorData->loxTankDucer,  sensorData->kerTankDucer,
-        sensorData->purgeDucer,    sensorData->loxInletDucer,
-        sensorData->kerInletDucer, sensorData->loxVenturi,
-        sensorData->kerVenturi,    sensorData->loadcell,
-        sensorData->loxTank,       sensorData->injector,
-        sensorData->engine};
-    transmitPacket[radioId].packetType = 1;
-    transmitPacket[radioId].payload = data;
-    lastSent[radioId].propStuffLastSent = 0;
-    radioManager_sendInternal(radioId);
+  // and encode
+  static RadioOTAPayload_s output;
+  if (0 == packetEncoder.Encode(packet, output)) {
+    hm_radioSend(radioId, output.payload, output.payloadLen);
+  } else {
+    printf("Radio message encode failed?\n");
   }
-  */
+}
 
-  if (currentTime - lastSent[radioId].orientationLastSent >=
-      1000 / ORIENTATION_RATE) {
+void RadioManager::addMessageCallback(RadioCallback_t callback) {
+  callbacks[numCallbacks] = callback;
+  numCallbacks++;
+}
+
+void RadioManager::transmitData(SensorData_s *sensorData,
+                                FilterData_s *filterData, uint8_t state) {
+  uint32_t currentTime = hm_millis();
+
+  if (currentTime % RADIO_INTERVAL_MS >= RADIO_SEND_MS) return;
+
+  transmitPacket.timestampMs = currentTime;
+
+  if (timer.orientationTimer.Expired(currentTime)) {
+    timer.orientationTimer.Reset();
+
     OrientationPacket_s data = {
       state,
       (int8_t)(filterData->qw * 100.0),
@@ -134,15 +158,14 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       // and improve more if required later
       static_cast<int16_t>(ROUND_2_INT(filterData->angle_vertical * 10))
     };
-    transmitPacket[radioId].packetType = 2;
-    transmitPacket[radioId].payload.orientation = data;
-    lastSent[radioId].orientationLastSent = currentTime;
+    transmitPacket.packetType = 2;
+    transmitPacket.payload.orientation = data;
 
-    radioManager_sendInternal(radioId);
+    sendInternal(transmitPacket);
   }
 
-  if (currentTime - lastSent[radioId].positionLastSent >=
-      1000 / POSITION_RATE) {
+  if (timer.positionTimer.Expired(currentTime)) {
+    timer.positionTimer.Reset();
     PositionPacket_s data = {
 #if HAS_DEV(BAROMETER)
       (float)sensorData->barometerData[0].temperatureC,
@@ -175,18 +198,19 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       0,
 #endif  // HAS_DEV(GPS)
       state,
-      0  // TODO bluetooth clients
+      GPSFixQuality::INVALID  // TODO bluetooth clients
     };
 
-    transmitPacket[radioId].packetType = TELEMETRY_ID_POSITION;
-    transmitPacket[radioId].payload.positionData = data;
-    lastSent[radioId].positionLastSent = currentTime;
+    transmitPacket.packetType = TELEMETRY_ID_POSITION;
+    transmitPacket.payload.positionData = data;
 
-    radioManager_sendInternal(radioId);
+    sendInternal(transmitPacket);
   }
 
 #if HAS_DEV(BAROMETER)
-  if (currentTime - lastSent[radioId].altInfoLastSent >= 1213) {
+  if (timer.altInfoTimer.Expired(currentTime)) {
+    timer.altInfoTimer.Reset();
+
     int num_baros = PRESSURE_MESSAGE_NUM_BAROMETERS;
     if (NUM_BAROMETER < PRESSURE_MESSAGE_NUM_BAROMETERS) {
       num_baros = NUM_BAROMETER;
@@ -206,78 +230,75 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
     data.groundElevation = (float)cli_getConfigs()->groundElevationM;
     data.groundTemp = (float)cli_getConfigs()->groundTemperatureC;
 
-    transmitPacket[radioId].packetType = TELEMETRY_ID_ALT_INFO;
-    transmitPacket[radioId].payload.altitudeInfo = data;
-    lastSent[radioId].altInfoLastSent = currentTime;
+    transmitPacket.packetType = TELEMETRY_ID_ALT_INFO;
+    transmitPacket.payload.altitudeInfo = data;
 
-    radioManager_sendInternal(radioId);
+    sendInternal(transmitPacket);
   }
 #endif  // HAS_DEV(BAROMETER)
 
 #if HAS_DEV(PYRO_CONT)
-  if (currentTime - lastSent[radioId].hardwareStatusLastSent >=
-      1000 / HARDWARE_STATUS_RATE) {
+  if (timer.pyroContTimer.Expired(currentTime)) {
+    timer.pyroContTimer.Reset();
+
     uint8_t pyroCont = 0;
     for (int i = 0; i < NUM_PYRO_CONT; i++)
       pyroCont |= (uint8_t)((sensorData->pyroContData[i] & 0b1) << i);
     HardwareStatusPacket_s data = {pyroCont, triggerManager_status(),
                                    dataLog_getFlashUsage()};
 
-    transmitPacket[radioId].packetType = TELEMETRY_ID_HARDWARE_STATUS;
-    transmitPacket[radioId].payload.hardwareStatus = data;
-    lastSent[radioId].hardwareStatusLastSent = currentTime;
+    transmitPacket.packetType = TELEMETRY_ID_HARDWARE_STATUS;
+    transmitPacket.payload.hardwareStatus = data;
 
-    radioManager_sendInternal(radioId);
+    sendInternal(transmitPacket);
   }
 #endif  // HAS_DEV(PYRO_CONT)
 
 #if HAS_DEV(LINE_CUTTER)
-  if (currentTime - lastSent[radioId].lineCutterLastSent >= 1000) {
+  if (timer.lineCutterDataTimer.Expired(currentTime)) {
+    timer.lineCutterDataTimer.Reset();
     for (int i = 0; i < NUM_LINE_CUTTER; i++) {
-      transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER;
-      transmitPacket[radioId].payload.lineCutter.data =
-          *hm_getLineCutterData(i);
-      lastSent[radioId].lineCutterLastSent = currentTime;
+      transmitPacket.packetType = TELEMETRY_ID_LINECUTTER;
+      transmitPacket.payload.lineCutter.data = *hm_getLineCutterData(i);
 
-      radioManager_sendInternal(radioId);
+      sendInternal(transmitPacket);
     }
   }
 
-  if (currentTime - lastSent[radioId].lineCutterVarsLastSent >= 10000) {
+  if (timer.lineCutterVarsTimer.Expired(currentTime)) {
+    timer.lineCutterVarsTimer.Reset();
     for (int i = 0; i < NUM_LINE_CUTTER; i++) {
-      transmitPacket[radioId].packetType = TELEMETRY_ID_LINECUTTER_VARS;
-      transmitPacket[radioId].payload.lineCutterFlightVars.data =
+      transmitPacket.packetType = TELEMETRY_ID_LINECUTTER_VARS;
+      transmitPacket.payload.lineCutterFlightVars.data =
           *hm_getLineCutterFlightVariables(i);
-      lastSent[radioId].lineCutterVarsLastSent = currentTime;
 
-      radioManager_sendInternal(radioId);
+      sendInternal(transmitPacket);
     }
   }
 #endif  // HAS_DEV(LINE_CUTTER)
 }
 
-void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
+void RadioManager::transmitString(uint8_t *data, size_t len) {
   static uint8_t lastTxId = 0;
 
   while (len) {
     size_t txLen = std::min(len, (size_t)RADIO_MAX_STRING);
 
-    transmitPacket[radioId].timestampMs = hm_millis();
-    transmitPacket[radioId].packetType = TELEMETRY_ID_STRING;
+    transmitPacket.timestampMs = hm_millis();
+    transmitPacket.packetType = TELEMETRY_ID_STRING;
 
     // copy txLen many bytes into the string, and set the rest to null chars
-    memset(transmitPacket[radioId].payload.cliString.string, 0,
-           RADIO_MAX_STRING);
-    memcpy(transmitPacket[radioId].payload.cliString.string, data, txLen);
-    transmitPacket[radioId].payload.cliString.len = (uint8_t)txLen;
-    transmitPacket[radioId].payload.cliString.id = lastTxId++;
+    memset(transmitPacket.payload.cliString.string, 0, RADIO_MAX_STRING);
+    memcpy(transmitPacket.payload.cliString.string, data, txLen);
+    transmitPacket.payload.cliString.len = (uint8_t)txLen;
+    transmitPacket.payload.cliString.id = lastTxId++;
 
 #ifndef DESKTOP_SIM
     for (int i = 0; i < 3; i++) {
       // This is intended to be called twice to hopefully successfully send at
       // least once
-      radioManager_sendInternal(radioId);
-      radioManager_sendInternal(radioId);
+      sendInternal(transmitPacket);
+      sendInternal(transmitPacket);
 
       // The radio seems to not actually send the packet unless we actually call
       // RadioUpdate a bunch
@@ -292,7 +313,7 @@ void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
       }
     }
 #else
-    radioManager_sendInternal(radioId);
+    sendInternal(transmitPacket);
 #endif
 
     len -= txLen;
@@ -300,6 +321,11 @@ void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
   }
 }
 
-void radioManager_transmitStringDefault(uint8_t *data, size_t len) {
-  radioManager_transmitString(RADIO_CLI_ID, data, len);
+RadioManager radioManagers[NUM_RADIO];
+
+void RadioManager::InitAll() {
+  for (int i = 0; i < NUM_RADIO; i++) radioManagers[i].init(i);
+}
+void RadioManager::TickAll() {
+  for (auto &m : radioManagers) m.tick();
 }

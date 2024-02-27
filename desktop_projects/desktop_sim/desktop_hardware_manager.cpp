@@ -9,6 +9,7 @@
 
 #include "circular_buffer.h"
 #include "hardware_manager.h"
+#include "radio_packet_types.h"
 
 /* Device includes */
 
@@ -237,15 +238,16 @@ void hm_ledSet(int ledId, bool set) {}
 void hm_ledToggle(int ledId) {}
 
 bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
-  static RadioRecievedPacket_s packet;
-  packet.crc = true;
-  packet.lqi = 4;
-  packet.rssi = 10;
-  memcpy(packet.data, data, numBytes);
+  static RadioRecievedOTAPacket packet;
+  packet.metadata.lqi = 4;
+  packet.metadata.rssi = 10;
+
+  packet.payload.payloadLen = numBytes;
+  memcpy(packet.payload.payload, data, numBytes);
 
 #if HAS_DEV(RADIO_DESKTOP_SOCKET)
   if (IS_DEVICE(radioNum, RADIO_DESKTOP_SOCKET)) {
-    packet.radioId = radioNum;
+    packet.metadata.radioId = radioNum;
     if (radioSocket[radioNum]) {
       radioSocket[radioNum]->writeData((uint8_t *)&packet, sizeof(packet));
     }
@@ -360,6 +362,8 @@ void hm_readSensorData() { flightReplay->getNext(&sensorData); }
 SensorData_s *hm_getSensorData() { return &sensorData; }
 
 SensorProperties_s *hm_getSensorProperties() { return &sensorProperties; }
+
+bool hm_radioSetLen(int radioNum, uint16_t numBytes) { return true; }
 
 void hm_enableSimMode(CircularBuffer_s *rxBuffer) {}
 

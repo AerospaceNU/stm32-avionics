@@ -15,6 +15,8 @@ message("Found c compiler at ${CMAKE_C_COMPILER}")
 message("Found cxx compiler at ${CMAKE_CXX_COMPILER}")
 message("Found asm compiler at ${CMAKE_ASM_COMPILER}")
 
+cmake_path(GET CMAKE_C_COMPILER PARENT_PATH ARM_NONE_BIN_PATH)
+
 add_subdirectory(device_drivers)
 add_subdirectory(fcb_v0)
 add_subdirectory(fcb_v1)
@@ -22,3 +24,4 @@ add_subdirectory(fcb_v2)
 add_subdirectory(groundstation)
 add_subdirectory(amazon-stm32-arduino)
 add_subdirectory(prop_adcboard_v2)
+add_subdirectory(rocketbeacon)

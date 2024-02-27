@@ -7,6 +7,8 @@
 
 #include "temp_max31855.h"
 
+#if HAS_DEV(ADC_MCP3564)
+
 #include <math.h>
 #include <stdio.h>
 
@@ -91,3 +93,4 @@ void tempMax31855_init(TempMax31855Ctrl_s *dev, SPI_HandleTypeDef *hspi,
   dev->csPort = csPort;
   dev->csPin = csPin;
 }
+#endif

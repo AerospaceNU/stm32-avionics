@@ -440,7 +440,7 @@ void hm_hardwareInit() {
     radioTi433[i].GP2_pin = radioTi433Gp2Pin[i];
     radioTi433[i].GP3_port = radioTi433Gp3GpioPort[i];
     radioTi433[i].GP3_pin = radioTi433Gp3Pin[i];
-    radioTi433[i].payloadSize = sizeof(RadioPacket_s);
+    radioTi433[i].payloadSize = sizeof(RadioDecodedPacket_s);
     radioTi433[i].id = 0;
     radioTi433[i].packetCfg = TIRADIO_PKTLEN_FIXED;
     radioTi433[i].initialized = false;
@@ -479,7 +479,7 @@ void hm_hardwareInit() {
     radioTi915[i].GP2_pin = radioTi915Gp2Pin[i];
     radioTi915[i].GP3_port = radioTi915Gp3GpioPort[i];
     radioTi915[i].GP3_pin = radioTi915Gp3Pin[i];
-    radioTi915[i].payloadSize = sizeof(RadioPacket_s);
+    radioTi915[i].payloadSize = sizeof(RadioDecodedPacket_s);
     radioTi915[i].id = 1;
     radioTi915[i].packetCfg = TIRADIO_PKTLEN_FIXED;
     radioTi915[i].initialized = false;
@@ -707,11 +707,33 @@ void hm_ledToggle(int ledId) {
 #endif  // HAS_DEV(LED_DIGITAL)
 }
 
+bool hm_radioSetLen(int radioNum, uint16_t numBytes) {
+  (void)numBytes;
+#if HAS_DEV(RADIO_TI_433)
+  if (IS_DEVICE(radioNum, RADIO_TI_433)) {
+    TiRadioCtrl_s *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
+    tiRadio_setPaylodSize(pRadio, numBytes);
+    return true;
+  }
+#endif  // HAS_DEV(RADIO_TI_433)
+
+#if HAS_DEV(RADIO_TI_915)
+  if (IS_DEVICE(radioNum, RADIO_TI_915)) {
+    TiRadioCtrl_s *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
+    tiRadio_setPaylodSize(pRadio, numBytes);
+    return true;
+  }
+#endif  // HAS_DEV(RADIO_TI_915)
+
+  return false;
+}
+
 bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
   (void)numBytes;
 #if HAS_DEV(RADIO_TI_433)
   if (IS_DEVICE(radioNum, RADIO_TI_433)) {
     TiRadioCtrl_s *pRadio = &radioTi433[radioNum - FIRST_ID_RADIO_TI_433];
+    if (numBytes != pRadio->payloadSize) return false;
     return tiRadio_addTxPacket(pRadio, data, pRadio->payloadSize);
   }
 #endif  // HAS_DEV(RADIO_TI_433)
@@ -719,6 +741,7 @@ bool hm_radioSend(int radioNum, uint8_t *data, uint16_t numBytes) {
 #if HAS_DEV(RADIO_TI_915)
   if (IS_DEVICE(radioNum, RADIO_TI_915)) {
     TiRadioCtrl_s *pRadio = &radioTi915[radioNum - FIRST_ID_RADIO_TI_915];
+    if (numBytes != pRadio->payloadSize) return false;
     return tiRadio_addTxPacket(pRadio, data, pRadio->payloadSize);
   }
 #endif  // HAS_DEV(RADIO_TI_915)

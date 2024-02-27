@@ -11,15 +11,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define RADIO_MAX_LEN 128
-typedef struct __attribute__((packed)) {
-  uint8_t data[RADIO_MAX_LEN];
-  uint8_t radioId;
-  int8_t rssi;
-  bool crc;
-  uint8_t lqi;
-} RadioRecievedPacket_s;
-
 typedef enum { AXIS_X = 0, AXIS_Y, AXIS_Z } Axis_e;
 
 typedef struct {
@@ -54,14 +45,32 @@ typedef struct __attribute__((packed)) {
   double pressureAtm;
 } BarometerData_s;
 
+enum class GPSFixQuality : uint8_t {
+  NO_FIX = 0,
+  // standard positioning service, valid
+  SPS_VALID = 1,
+  // DGPS in SPS mode, valid. We don't use dgps very likely never hit
+  DGPS_SPS_VALID = 2,
+  // dead reckoning. Very likely never hit for us
+  DEAD_RECKONING = 6,
+  // invalid (set by us for devices with no GPS
+  INVALID = 0xff
+};
+
 typedef struct __attribute__((packed)) {
   float latitude;
   float longitude;
   float altitude;
-  uint8_t fixQuality;
+  GPSFixQuality fixQuality;
   uint8_t satsTracked;
   float hdop;
 } GpsGeneralData_s;
+
+typedef struct __attribute__((packed)) {
+  float speedKnots;
+  float courseDeg;
+  char faa_mode;
+} GpsSpeedData_s;
 
 typedef struct __attribute__((packed)) {
   uint64_t timestamp;
@@ -77,6 +86,7 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
   GpsGeneralData_s generalData;
   GpsTimeData_s timeData;
+  GpsSpeedData_s speedData;
 } GpsData_s;
 
 typedef struct __attribute__((packed)) {

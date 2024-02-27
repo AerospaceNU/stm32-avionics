@@ -19,6 +19,8 @@ extern "C" {
 // comment when DMA works
 // TODO: Make DMA functional
 
+#if HAS_DEV(S25FLX)
+
 typedef struct {
   SPI_HandleTypeDef *hspi;
   GPIO_TypeDef *csPort;
@@ -46,6 +48,8 @@ bool flashS25flx_isReadComplete(const FlashS25flxCtrl_s *s25flx);
 #endif
 bool flashS25flx_isWriteComplete(FlashS25flxCtrl_s *s25flx);
 bool flashS25flx_isEraseComplete(FlashS25flxCtrl_s *s25flx);
+
+#endif
 
 #ifdef __cplusplus
 }

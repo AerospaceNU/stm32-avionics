@@ -21,6 +21,7 @@ extern "C" {
 
 #include "circular_buffer.h"
 #include "data_structures.h"
+#include "radio_packet_types.h"
 #include "smartrf_registersettings.h"
 
 #include HAL_HEADER
@@ -141,6 +142,8 @@ void tiRadio_setOutputPower(TiRadioCtrl_s *radio, uint8_t powerDbM);
 void tiRadio_configGpio(TiRadioCtrl_s *radio, uint16_t gpio_register,
                         uint8_t gpio_config, bool outputInverted);
 bool tiRadio_calibrate(TiRadioCtrl_s *radio);
+
+void tiRadio_setPaylodSize(TiRadioCtrl_s *radio, size_t lenBytes);
 
 #endif
 

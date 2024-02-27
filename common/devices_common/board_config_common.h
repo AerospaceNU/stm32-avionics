@@ -128,6 +128,12 @@
 #ifndef BLE_CLI_ID
 #define BLE_CLI_ID 0
 #endif  // BLE_CLI_ID
+#ifndef NUM_ADC_MCP3564
+#define NUM_ADC_MCP3564 0
+#endif  // NUM_ADC_MCP3564
+#ifndef NUM_TEMP_MAX31855
+#define NUM_TEMP_MAX31855 0
+#endif  // NUM_TEMP_MAX31855
 #ifndef RADIO_CLI_ID
 #define RADIO_CLI_ID 0
 #endif  // RADIO_CLI_ID
@@ -174,6 +180,16 @@
 #ifndef MAX_PACKET_SIZE
 #define MAX_PACKET_SIZE 128
 #endif
+
+// Radio configuration metaparameters
+#ifndef RADIO_MAX_PACKET_SIZE
+// cc1120/1200 supports up to 256 in FEC disabled mode
+#define RADIO_MAX_PACKET_SIZE 256
+#define RADIO_MAX_DECODED_PACKET_SIZE 128
+#endif  // RADIO_MAX_PACKET_SIZE
+#ifndef DO_SOFT_FECWHITEN
+#define DO_SOFT_FECWHITEN
+#endif  // DO_SOFT_FECWHITEN
 
 // Flash stuff
 #ifndef FLASH_MAX_SECTOR_BYTES

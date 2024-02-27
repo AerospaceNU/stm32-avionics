@@ -15,8 +15,10 @@
 
 #define NUM_USB_STD 1
 
-
 #define NUM_TC_READER 4
+
+#define NUM_ADC_MCP3564 2
+#define NUM_TEMP_MAX31855 4
 
 #define ADC1_FIRST_DUCER_ID 8
 #define ADC1_LAST_DUCER_ID 14

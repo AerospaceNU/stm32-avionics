@@ -7,6 +7,8 @@
 
 #include "adc_mcp3564.h"
 
+#if HAS_DEV(ADC_MCP3564)
+
 #include "errno.h"
 #include "hal_callbacks.h"
 
@@ -335,3 +337,4 @@ int mcp356x_channelSetup(AdcMcp3564Ctrl_s *dev,
 
   return 0;
 }
+#endif

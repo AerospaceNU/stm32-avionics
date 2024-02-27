@@ -46,16 +46,18 @@ const RegisterSetting_s cc1200_916_1_2kbps_cfg[] = {
     {TIRADIO_FS_CFG, 0x12},    // Frequency Synthesizer Configuration
     {TIRADIO_PKT_CFG2,
      CCA_MODE_RSSI_LBT << CCA_MODE_SHIFT},  // Packet Configuration Reg. 2
-    {TIRADIO_PKT_CFG1, 0b11000011},  // Yes FEC, Yes whiten, otherwise default
-    {TIRADIO_PKT_CFG0, 0x20},        // Packet Configuration Reg. 0
-    {TIRADIO_PA_CFG1, 0x55},         // Power Amplifier Configuration Reg. 1
-    {TIRADIO_PKT_LEN, 0xFF},         // Packet Length Configuration
-    {TIRADIO_IF_MIX_CFG, 0x1C},      // IF Mix Configuration
-    {TIRADIO_TOC_CFG, 0x03},         // Timing Offset Correction Configuration
-    {TIRADIO_MDMCFG2, 0x02},  // General Modem Parameter Configuration Reg. 2
-    {TIRADIO_FREQ2, 0x5B},    // Frequency Configuration [23:16]
-    {TIRADIO_FREQ1, 0x99},    // Frequency Configuration [15:8]
-    {TIRADIO_FREQ0, 0x98},    // Frequency Configuration [7:0]
+    {TIRADIO_PKT_CFG1,  // No FEC, no whiten, no PN9 swap, no address
+                        // no CRC calculation, status appended
+     (0 << 7) | (0 << 6) | (0 << 5) | (0b00 << 3) | (0b00 << 1) | (1 << 0)},
+    {TIRADIO_PKT_CFG0, 0x20},    // Packet Configuration Reg. 0
+    {TIRADIO_PA_CFG1, 0x55},     // Power Amplifier Configuration Reg. 1
+    {TIRADIO_PKT_LEN, 0xFF},     // Packet Length Configuration
+    {TIRADIO_IF_MIX_CFG, 0x1C},  // IF Mix Configuration
+    {TIRADIO_TOC_CFG, 0x03},     // Timing Offset Correction Configuration
+    {TIRADIO_MDMCFG2, 0x02},     // General Modem Parameter Configuration Reg. 2
+    {TIRADIO_FREQ2, 0x5B},       // Frequency Configuration [23:16]
+    {TIRADIO_FREQ1, 0x99},       // Frequency Configuration [15:8]
+    {TIRADIO_FREQ0, 0x98},       // Frequency Configuration [7:0]
     {TIRADIO_IF_ADC1,
      0xEE},  // Analog to Digital Converter Configuration Reg. 1
     {TIRADIO_IF_ADC0,

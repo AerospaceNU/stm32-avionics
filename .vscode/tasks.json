@@ -1,6 +1,24 @@
 {
   "tasks": [
     {
+      "label": "Build rocketbeacon",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "build_stm",
+        "--target",
+        "rocketbeacon"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
       "label": "Build fcb_v0",
       "type": "shell",
       "command": "cmake",
