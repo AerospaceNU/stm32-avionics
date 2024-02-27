@@ -94,7 +94,6 @@ int main(void)
   MX_DMA_Init();
   MX_ADC_Init();
   MX_SUBGHZ_Init();
-  MX_USART2_UART_Init();
   MX_CRC_Init();
   MX_USART1_UART_Init();
   MX_TIM16_Init();
@@ -131,7 +130,7 @@ void SystemClock_Config(void)
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS_PWR;
   RCC_OscInitStruct.HSEDiv = RCC_HSE_DIV1;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;

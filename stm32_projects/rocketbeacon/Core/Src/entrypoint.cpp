@@ -117,6 +117,9 @@ extern "C" void entrypoint(void) {
 		// update GPS
 		gps_newData(&gps);
 
+//		uint8_t line[16];
+//		HAL_UART_Receive(&huart1, line, sizeof(line), HAL_MAX_DELAY);
+
 		memcpy(packet.callsign, "KM6GNL\0\0", 8);
 		packet.timestampMs = HAL_GetTick();
 		packet.softwareVersion = 0;
@@ -151,10 +154,10 @@ extern "C" void entrypoint(void) {
 			radio.WriteBuffer(0, (uint8_t*) &output.payload, output.payloadLen);
 
 			// And put us into TX mode, which transmits starting at the TX base addr up to PACKET_LEN many bytes
-			LED_on();
-			radio.SetTx(0xffffff);
-			HAL_Delay(radio.GetTimeOnAir() / 1000);
-			LED_off();
+//			LED_on();
+//			radio.SetTx(0xffffff);
+//			HAL_Delay(radio.GetTimeOnAir() / 1000);
+//			LED_off();
 		} else {
 			// lol wut even
 			assert(0);
