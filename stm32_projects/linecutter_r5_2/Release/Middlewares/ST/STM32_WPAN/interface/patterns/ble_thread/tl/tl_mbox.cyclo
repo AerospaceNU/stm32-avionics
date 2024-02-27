@@ -1,0 +1,17 @@
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:622:13:SendFreeBuf	2
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:82:6:TL_Enable	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:90:6:TL_Init	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:110:9:TL_BLE_Init	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:133:9:TL_BLE_SendCmd	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:147:6:HW_IPCC_BLE_RxEvtNot	2
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:170:9:TL_BLE_SendAclData	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:182:6:HW_IPCC_BLE_AclDataAckNot	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:192:9:TL_SYS_Init	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:211:9:TL_SYS_SendCmd	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:225:6:HW_IPCC_SYS_CmdEvtNot	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:234:6:HW_IPCC_SYS_EvtNot	2
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:591:6:TL_MM_Init	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:611:6:TL_MM_EvtDone	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:638:6:TL_TRACES_Init	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:662:13:TL_TRACES_EvtReceived	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c:649:6:HW_IPCC_TRACES_EvtNot	2

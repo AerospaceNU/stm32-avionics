@@ -1,0 +1,9 @@
+../Middlewares/ST/STM32_WPAN/ble/core/auto/ble_l2cap_aci.c:21:12:aci_l2cap_connection_parameter_update_req	2
+../Middlewares/ST/STM32_WPAN/ble/core/auto/ble_l2cap_aci.c:55:12:aci_l2cap_connection_parameter_update_resp	2
+../Middlewares/ST/STM32_WPAN/ble/core/auto/ble_l2cap_aci.c:100:12:aci_l2cap_coc_connect	2
+../Middlewares/ST/STM32_WPAN/ble/core/auto/ble_l2cap_aci.c:136:12:aci_l2cap_coc_connect_confirm	3
+../Middlewares/ST/STM32_WPAN/ble/core/auto/ble_l2cap_aci.c:176:12:aci_l2cap_coc_reconf	2
+../Middlewares/ST/STM32_WPAN/ble/core/auto/ble_l2cap_aci.c:209:12:aci_l2cap_coc_reconf_confirm	2
+../Middlewares/ST/STM32_WPAN/ble/core/auto/ble_l2cap_aci.c:233:12:aci_l2cap_coc_disconnect	2
+../Middlewares/ST/STM32_WPAN/ble/core/auto/ble_l2cap_aci.c:254:12:aci_l2cap_coc_flow_control	2
+../Middlewares/ST/STM32_WPAN/ble/core/auto/ble_l2cap_aci.c:278:12:aci_l2cap_coc_tx_data	2

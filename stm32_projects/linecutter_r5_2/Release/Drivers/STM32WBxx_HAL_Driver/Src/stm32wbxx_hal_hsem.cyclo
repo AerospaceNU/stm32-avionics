@@ -1,0 +1,11 @@
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c:159:20:HAL_HSEM_Take	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c:184:19:HAL_HSEM_FastTake	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c:204:10:HAL_HSEM_IsSemTaken	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c:216:7:HAL_HSEM_Release	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c:233:6:HAL_HSEM_ReleaseAll	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c:265:7:HAL_HSEM_SetClearKey	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c:277:10:HAL_HSEM_GetClearKey	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c:304:6:HAL_HSEM_ActivateNotification	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c:314:6:HAL_HSEM_DeactivateNotification	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c:344:13:HAL_HSEM_FreeCallback	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c:323:6:HAL_HSEM_IRQHandler	1

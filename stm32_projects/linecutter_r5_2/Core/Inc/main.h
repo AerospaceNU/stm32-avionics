@@ -61,6 +61,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define FLASH_CS_Pin GPIO_PIN_8
+#define FLASH_CS_GPIO_Port GPIOB
+#define BARO1_CS_Pin_Pin GPIO_PIN_3
+#define BARO1_CS_Pin_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 

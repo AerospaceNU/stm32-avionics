@@ -1,0 +1,4 @@
+../Drivers/STM32WBxx_HAL_Driver/Inc/stm32wbxx_ll_bus.h:539:22:LL_AHB2_GRP1_EnableClock	1
+../Drivers/STM32WBxx_HAL_Driver/Inc/stm32wbxx_ll_bus.h:1636:22:LL_C2_AHB2_GRP1_EnableClock	1
+../Core/Src/app_debug.c:176:6:APPD_Init	9
+../Core/Src/app_debug.c:222:6:APPD_EnableCPU2	2

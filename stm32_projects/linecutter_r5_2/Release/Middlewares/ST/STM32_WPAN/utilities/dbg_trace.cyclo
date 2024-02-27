@@ -1,0 +1,3 @@
+../Middlewares/ST/STM32_WPAN/utilities/dbg_trace.c:120:13:DbgTraceGetFileName	3
+../Middlewares/ST/STM32_WPAN/utilities/dbg_trace.c:145:6:DbgTraceBuffer	2
+../Middlewares/ST/STM32_WPAN/utilities/dbg_trace.c:205:6:DbgTraceInit	1

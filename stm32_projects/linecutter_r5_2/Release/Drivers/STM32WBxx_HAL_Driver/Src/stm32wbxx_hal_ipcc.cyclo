@@ -1,0 +1,17 @@
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:604:13:HAL_IPCC_TxCallback	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:579:13:HAL_IPCC_RxCallback	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:211:13:HAL_IPCC_MspInit	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:226:13:HAL_IPCC_MspDeInit	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:418:27:HAL_IPCC_GetChannelStatus	2
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:502:6:HAL_IPCC_TX_IRQHandler	4
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:536:6:HAL_IPCC_RX_IRQHandler	4
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:640:23:HAL_IPCC_GetState	1
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:669:6:IPCC_MaskInterrupt	2
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:363:19:HAL_IPCC_DeActivateNotification	4
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:695:6:IPCC_UnmaskInterrupt	2
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:304:19:HAL_IPCC_ActivateNotification	5
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:455:19:HAL_IPCC_NotifyCPU	3
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:714:6:IPCC_SetDefaultCallbacks	2
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:126:19:HAL_IPCC_Init	3
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:171:19:HAL_IPCC_DeInit	2
+../Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c:729:6:IPCC_Reset_Register	1

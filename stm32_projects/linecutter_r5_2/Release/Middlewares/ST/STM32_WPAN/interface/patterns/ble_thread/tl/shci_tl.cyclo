@@ -1,0 +1,9 @@
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl.c:227:13:TlUserEvtReceived	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl.c:197:13:Cmd_SetStatus.constprop	2
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl.c:65:6:shci_init	2
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl.c:77:6:shci_user_evt_proc	7
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl.c:134:6:shci_resume_flow	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl.c:236:13:shci_cmd_resp_wait	2
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl.c:147:6:shci_send	2
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl.c:245:13:shci_cmd_resp_release	1
+../Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl.c:219:13:TlCmdEvtReceived	1

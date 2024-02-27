@@ -1,0 +1,3 @@
+../STM32_WPAN/App/custom_app.c:86:6:Custom_STM_App_Notification	1
+../STM32_WPAN/App/custom_app.c:116:6:Custom_APP_Notification	1
+../STM32_WPAN/App/custom_app.c:153:6:Custom_APP_Init	1

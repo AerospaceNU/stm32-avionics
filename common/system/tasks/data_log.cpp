@@ -31,7 +31,7 @@ static uint32_t logSizeBytes;
 static uint32_t lineCutterLastLogTime[NUM_LINE_CUTTER_BLE] = {0};
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
 
-static uint8_t tempPacketBuffer[PACKET_BUFFER_SIZE];
+static uint8_t tempPacketBuffer[PACKET_BUFFER_SIZE]; // 213504
 
 #define LOG_ID_FCB 0
 
@@ -87,7 +87,7 @@ typedef struct __attribute__((__packed__)) {
   uint16_t crc;
 } WrappedCliConfigs_s;
 
-static LogData_s logPackets[MAX_LOG_PACKETS];
+static LogData_s logPackets[0];
 static CircularBuffer_s logPacketBuffer;
 
 static FlightMetadata_s flightMetadataPacket;
