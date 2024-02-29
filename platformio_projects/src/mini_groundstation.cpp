@@ -33,12 +33,11 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Hello!");
 
-
   pinMode(SX1262_RST, OUTPUT);
   pinMode(SX1262_CS, OUTPUT);
-  pinMode(RAD_MISO, OUTPUT);
-  pinMode(RAD_MOSI, OUTPUT);
-  pinMode(RAD_SCK, OUTPUT);
+  // pinMode(RAD_MISO, OUTPUT);
+  // pinMode(RAD_MOSI, OUTPUT);
+  // pinMode(RAD_SCK, OUTPUT);
 
   Serial.setTimeout(30000);
   Serial.print("Waiting");
@@ -47,6 +46,7 @@ void setup() {
 
   digitalWrite(SX1262_CS, HIGH);
 
+  SPI.begin(RAD_SCK, RAD_MISO, RAD_MOSI, SX1262_CS);
   // spi.begin(RAD_SCK, RAD_MISO, RAD_MOSI, SX1262_CS);
 
   delay(100);
@@ -56,53 +56,21 @@ void setup() {
   delay(100);
 }
 
-SPISettings spiSettings(10000, MSBFIRST, SPI_MODE0);
+#define spi SPI
+SPISettings spiSettings(1000000, MSBFIRST, SPI_MODE0);
 
 void loop() {
   Serial.println("Waiting in loop");
   Serial.readStringUntil('\n');
 
-  int size = 2;
-  uint8_t data[size];
-  memset(data, 0, size);
-  data[0] = 0xC0;
-  Serial.println("Starting data transfer");
-  // spi.beginTransaction(spiSettings);
-
   digitalWrite(SX1262_CS, LOW);
-  digitalWrite(RAD_SCK, LOW);
-  delayMicroseconds(1);
-  uint8_t dataOut[3] = {0};
-  for (int i = 0; i < 2; i++) {
-    for (int j = 7; j >= 0; j--) {
-      auto bit = (data[i] >> j) & 1;
-      digitalWrite(RAD_MOSI, bit);
-
-      digitalWrite(RAD_SCK, HIGH);
-      delayMicroseconds(1);
-      dataOut[i] |= (digitalRead(RAD_MISO) << j);
-      delayMicroseconds(1);
-      digitalWrite(RAD_SCK, LOW);
-    }
-  }
-    
+  SPI.beginTransaction(spiSettings);
+  Serial.print(spi.transfer(0xC0));
+  Serial.print(" ");
+  Serial.print(spi.transfer(0), BIN);
+  Serial.println();
+  SPI.endTransaction();
   digitalWrite(SX1262_CS, HIGH);
-
-
-  for (int i = 0; i < 3; i++) {
-    Serial.print("Got: "); Serial.println(dataOut[i]);
-  }
-
-  // digitalWrite(SX1262_CS, LOW);
-  // Serial.print(spi.transfer(0xC0));
-  // Serial.print(" ");
-  // Serial.print(spi.transfer(0));
-  // Serial.print(" ");
-  // Serial.print(spi.transfer(0));
-  // Serial.println();
-  // digitalWrite(SX1262_CS, HIGH);
-
-  // spi.endTransaction();
 
 
   delay(2000);
