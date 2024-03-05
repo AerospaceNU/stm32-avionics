@@ -50,13 +50,23 @@ class ImuIcm42688 {
   double tempC;
   int16_t tRaw;
 
+struct FullscaleEntry {
+  // Actual value to put into the register
+  uint8_t regValue;
+  // Fullscale, in SI units
+  double fullscale;
+  // sensitivity, in native units per physical unit (eg ticks/dps)
+  float sensitivity;
+};
+
  private:
   void setBank(int bank);
 
   SpiCtrl_t spi;
 
-  float accelSensitivity;
-  float gyroSensitivity;
+
+  FullscaleEntry accelFS;
+  FullscaleEntry gyroFS;
 };
 
 #endif  // STM32_PROJECTS_DEVICE_DRIVERS_IMU_IMU_ICM42688_H_

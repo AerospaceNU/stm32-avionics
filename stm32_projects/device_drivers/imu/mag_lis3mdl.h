@@ -13,8 +13,6 @@
 #include "board_config_common.h"
 #include "spi_driver.h"
 
-#define G_TO_MPS2(x) x * 9.80665
-
 class MagLis3mdl {
  public:
   bool begin(SpiCtrl_t spidev);

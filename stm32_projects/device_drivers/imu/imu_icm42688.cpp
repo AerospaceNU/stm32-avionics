@@ -24,16 +24,11 @@
 
 #define WHO_AM_I 0x47
 
-#if HAS_DEV(IMU_ICM42688) + 1
+#if HAS_DEV(IMU_ICM42688)
 
 // ================================= //
 
-struct FullscaleEntry {
-  // Actual value to put into the register
-  uint8_t regValue;
-  // sensitivity, in native units per physical unit (eg ticks/dps)
-  float sensitivity;
-};
+using FullscaleEntry = ImuIcm42688::FullscaleEntry;
 
 using AccelFullscaleEntry =
     std::pair<ImuIcm42688::AccelFullscale, FullscaleEntry>;
@@ -44,21 +39,19 @@ constexpr ConstMap<
     ImuIcm42688::AccelFullscale, FullscaleEntry,
     static_cast<size_t>(ImuIcm42688::AccelFullscale::NUM_ACCEL_FULLSCALE)>
     accelFullscales({AccelFullscaleEntry{ImuIcm42688::AccelFullscale::FS_8G,
-                                         {1, G_TO_MPS2(8)}},
+                                         {1, G_TO_MPS2(8), 4096}},
                      AccelFullscaleEntry{ImuIcm42688::AccelFullscale::FS_16G,
-                                         {1, G_TO_MPS2(16)}}});
+                                         {1, G_TO_MPS2(16), 2048}}});
 
 constexpr ConstMap<
     ImuIcm42688::GyroFullscale, FullscaleEntry,
     static_cast<size_t>(ImuIcm42688::GyroFullscale::NUM_GYRO_FULLSCALE)>
     gyroFullscales({GyroFullscaleEntry{ImuIcm42688::GyroFullscale::FS_2000_DPS,
-                                       {0, DEG_TO_RAD(2000)}},
+                                       {0, DEG_TO_RAD(2000), 16.4}},
                     GyroFullscaleEntry{ImuIcm42688::GyroFullscale::FS_1000_DPS,
-                                       {1, DEG_TO_RAD(1000)}}});
+                                       {1, DEG_TO_RAD(1000), 32.8}}});
 
 // ================================= //
-
-ImuIcm42688::ImuIcm42688(SpiCtrl_t spidev) : spi(spidev) {}
 
 void ImuIcm42688::setGyroConfig(const GyroFullscale range,
                                 GyroDataRate gyroRate) {
@@ -76,7 +69,7 @@ void ImuIcm42688::setGyroConfig(const GyroFullscale range,
   spi_writeRegisters(&spi, REG_GYRO_CONFIG0,
                      reinterpret_cast<uint8_t*>(&config0), 1);
 
-  gyroSensitivity = fsSetting.sensitivity;
+  gyroFS = fsSetting;
 }
 void ImuIcm42688::setAccelConfig(const AccelFullscale range,
                                  AccelDataRate accelRate) {
@@ -94,14 +87,16 @@ void ImuIcm42688::setAccelConfig(const AccelFullscale range,
   spi_writeRegisters(&spi, REG_WRITE(REG_GYRO_CONFIG0),
                      reinterpret_cast<uint8_t*>(&config0), 1);
 
-  accelSensitivity = fsSetting.sensitivity;
+  accelFS = fsSetting;
 }
 
 void ImuIcm42688::setBank(int bank) {
   spi_writeRegister(&spi, REG_WRITE(REG_BANK_SEL), bank);
 }
 
-bool ImuIcm42688::begin() {
+bool ImuIcm42688::begin(SpiCtrl_t spi_) {
+  spi=spi_;
+
   // force CS high
   HAL_GPIO_WritePin(spi.port, spi.pin, GPIO_PIN_SET);
   HAL_Delay(1);
@@ -155,6 +150,8 @@ void ImuIcm42688::newData() {
   data.angVelRaw = raw.angVel;
 
   // and convert to real units. Note that ticks / (ticks / unit) = unit
+  float accelSensitivity=accelFS.sensitivity;
+  float gyroSensitivity=gyroFS.sensitivity;
   data.accelRealMps2.x = raw.accel.x / accelSensitivity;
   data.accelRealMps2.y = raw.accel.y / accelSensitivity;
   data.accelRealMps2.z = raw.accel.z / accelSensitivity;
@@ -164,6 +161,10 @@ void ImuIcm42688::newData() {
 
   // Convert temp per page 65
   tempC = raw.temp / 132.48 + 25;
+}
+
+double ImuIcm42688::getAccelFullscaleMps2() {
+  return accelFS.fullscale;
 }
 
 #endif  // HAS_DEV(IMU_LSM9DS1)

@@ -2,8 +2,6 @@
 
 #include "reg_helper.h"
 
-MagLis3mdl::MagLis3mdl(SpiCtrl_t spidev) : spi(spidev) {}
-
 struct RegisterAddress {
   uint8_t address : 6;
   // if we want the read/write pointer to auto advance
@@ -34,7 +32,9 @@ struct RegisterAddress {
           .address = addr, .multiByteRequest = false, .isRead = 0}), \
       val);
 
-bool MagLis3mdl::begin() {
+bool MagLis3mdl::begin(SpiCtrl_t spi_) {
+  spi=spi_;
+
   // adapted from
   // https://github.com/pololu/lis3mdl-arduino/blob/master/LIS3MDL.cpp
 

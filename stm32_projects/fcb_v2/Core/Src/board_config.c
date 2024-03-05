@@ -33,10 +33,10 @@
 
 /* Accelerometer */
 
-SPI_HandleTypeDef* accelH3lis331dlHspi[NUM_ACCEL_ADX375] = {&hspi2};
-GPIO_TypeDef* accelH3lis331dlCsGpioPort[NUM_ACCEL_ADX375] = {
+SPI_HandleTypeDef* accelAdx375Hspi[NUM_ACCEL_ADX375] = {&hspi2};
+GPIO_TypeDef* accelAdx375CsGpioPort[NUM_ACCEL_ADX375] = {
     HIGH_G_CS_GPIO_Port};
-uint16_t accelH3lis331dlCsPin[NUM_ACCEL_ADX375] = {HIGH_G_CS_Pin};
+uint16_t accelAdx375CsPin[NUM_ACCEL_ADX375] = {HIGH_G_CS_Pin};
 
 // Index 0 of this struct is read to determine the sensor axis to measure accel in board X
 // So if board X = - sensor Y, the first index should be {AXIS_Y, -1}
@@ -94,7 +94,6 @@ uint16_t imuIcm42688CsPin[NUM_IMU_ICM42688] = {IMU1_CS_Pin};
 const Orientation_s imuBoardToLocal[NUM_IMU][3] = {
     {{AXIS_Y, -1}, {AXIS_X, -1}, {AXIS_Z, -1}}};
 int imuAccelFilterPriority[NUM_IMU] = {2};
-#endif  // HAS_DEV(IMU)
 
 SPI_HandleTypeDef* magLis3mdlHi2c[NUM_MAG_LIS3MDL] = {&hspi2};
 const Orientation_s magBoardToLocal[NUM_MAG][3] = {
@@ -129,10 +128,10 @@ uint16_t radioTi915RstPin[NUM_RADIO_TI_915] = {RAD915_RST_Pin};
 GPIO_TypeDef* radioTi915MisoGpioPort[NUM_RADIO_TI_915] = {
     RAD915_MISO_GPIO_Port};
 uint16_t radioTi915MisoPin[NUM_RADIO_TI_915] = {RAD915_MISO_Pin};
-GPIO_TypeDef* radioTi915Gp0GpioPort[NUM_RADIO_TI_915] = {RAD915_IO0_GPIO_Port};
-uint16_t radioTi915Gp0Pin[NUM_RADIO_TI_915] = {RAD915_IO0_Pin};
-GPIO_TypeDef* radioTi915Gp2GpioPort[NUM_RADIO_TI_915] = {RAD915_IO2_GPIO_Port};
-uint16_t radioTi915Gp2Pin[NUM_RADIO_TI_915] = {RAD915_IO2_Pin};
+GPIO_TypeDef* radioTi915Gp0GpioPort[NUM_RADIO_TI_915] = {NULL};
+uint16_t radioTi915Gp0Pin[NUM_RADIO_TI_915] = {-1};
+GPIO_TypeDef* radioTi915Gp2GpioPort[NUM_RADIO_TI_915] = {NULL};
+uint16_t radioTi915Gp2Pin[NUM_RADIO_TI_915] = {-1};
 GPIO_TypeDef* radioTi915Gp3GpioPort[NUM_RADIO_TI_915] = {RAD915_IO3_GPIO_Port};
 uint16_t radioTi915Gp3Pin[NUM_RADIO_TI_915] = {RAD915_IO3_Pin};
 

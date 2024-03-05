@@ -170,7 +170,7 @@ static AccelH3lis331dlCtrl_s accelH3lis331dl[NUM_ACCEL_H3LIS331DL];
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
 #if HAS_DEV(ACCEL_ADX375)
-static AccelAdx375 accelADX375[NUM_ACCEL_ADX375];
+static AccelAdx375 accelAdx375[NUM_ACCEL_ADX375];
 #endif  // HAS_DEV(ACCEL_ADX375)
 
 /* Barometers */
@@ -301,13 +301,13 @@ void hm_hardwareInit() {
   }
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
-#if HAS_DEV(ACCEL_H3LIS331DL)
+#if HAS_DEV(ACCEL_ADX375)
   for (int i = 0; i < NUM_ACCEL_ADX375; i++) {
-    SpiCtrl_t accelADX375Spi = {accelADX375Hspi[i],
-                                    accelADX375CsGpioPort[i],
-                                    accelADX375CsPin[i]};
+    SpiCtrl_t accelADX375Spi = {accelAdx375Hspi[i],
+                                    accelAdx375CsGpioPort[i],
+                                    accelAdx375CsPin[i]};
     hardwareStatusAccel[FIRST_ID_ACCEL_ADX375 + i] = accelAdx375[i].begin(accelADX375Spi);
-    sensorProperties.accelFs[FIRST_ID_ACCEL_ADX375 + i] = accelAdx375[i].getFullscaleMps2();
+    sensorProperties.accelFs[FIRST_ID_ACCEL_ADX375 + i] = accelAdx375[i].getAccelFullscaleMps2();
   }
 #endif  // HAS_DEV(ACCEL_ADX375)
 
@@ -421,7 +421,7 @@ void hm_hardwareInit() {
     hardwareStatusImu[FIRST_ID_IMU_ICM42688 + i] = imuIcm42688[i].begin({imuIcm42688Hspi[i], 
       imuIcm42688CsGpioPort[i],
       imuIcm42688CsPin[i]});
-    sensorProperties.imuAccelFs[FIRST_ID_IMU_ICM42688 + i] = imuIcm42688.getAccelFullscaleMps2();
+    sensorProperties.imuAccelFs[FIRST_ID_IMU_ICM42688 + i] = imuIcm42688[i].getAccelFullscaleMps2();
   }
 #endif  // HAS_DEV(IMU_ICM42688)
 
@@ -537,19 +537,24 @@ void hm_hardwareInit() {
     radioTi915[i].id = 1;
     radioTi915[i].packetCfg = TIRADIO_PKTLEN_FIXED;
     radioTi915[i].initialized = false;
+    radioTi915[i].pinmask = {false, false, true};
 
-#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200_WITH_CC1200
     radioTi915[i].has_cc1190 = true;
-
-    radioTi915[i].settingsPtr = cc1200_916_1_2kbps_cfg;
-    radioTi915[i].settingsSize = sizeof(cc1200_916_1_2kbps_cfg);
+#ense
+    radioTi915[i].has_cc1190 = false;
+#endif
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
+    radioTi915[i].settingsPtr = cc1200_916_38_4kbps_cfg;
+    radioTi915[i].settingsSize = sizeof(cc1200_916_38_4kbps_cfg);
 #endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
 
     // Enable our radio and configure pins
     hardwareStatusRadio[FIRST_ID_RADIO_TI_915 + i] =
         tiRadio_init(&radioTi915[i]);
 
-#if (RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200)
+
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200_WITH_CC1200
     // PA/LNA control pins. TODO this seems somewhat code-smell-y since we
     // have CC1200 registers in hardware manager?
 
@@ -1066,7 +1071,7 @@ void hm_readSensorData() {
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 #if HAS_DEV(ACCEL_ADXL375)
     for (int i = 0; i < NUM_ACCEL_ADXL375; i++) {
-      accelAdxl375[i].newData();
+      accelAdx375[i].newData();
       sensorData.accelData[FIRST_ID_ACCEL_ADXL375 + i] = accelAdxl375[i].data;
     }
 #endif  // HAS_DEV(IMU_LSM9DS1)

@@ -13,8 +13,6 @@
 #include "board_config_common.h"
 #include "spi_driver.h"
 
-#define G_TO_MPS2(x) x * 9.80665
-
 class AccelAdx375 {
  public:
   // Page 10 specifies rate/bandwidth. Bandwidth is the -3db frequency (page 3)

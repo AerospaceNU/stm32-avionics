@@ -1,8 +1,9 @@
 #include "accel_adx375.h"
 
 #include "reg_helper.h"
+#include "math_utils.h"
 
-AccelAdx375::AccelAdx375(SpiCtrl_t spidev) : spi(spidev) {}
+#if HAS_DEV(ACCEL_ADX375)
 
 struct RegisterAddress {
   uint8_t address : 6;
@@ -22,10 +23,13 @@ struct RegisterAddress {
 // least it doesn't change all that much vs temperature (.02%/deg C for
 // sensitivity, 10mG/deg C for 0g offset)
 #define ACCEL_SENSITIVITY 20.5;
+#define ACCEL_FS G_TO_MPS2(200)
 
-bool AccelAdx375::begin() {
+bool AccelAdx375::begin(SpiCtrl_t spi_) {
+  spi=spi_;
+
   // adapted from
-  // https://github.com/adafruit/Adafruit_ADXL375/blob/master/Adafruit_ADXL375.cpp
+  // https://github.com/adafruit/Adafruit_ADX375/blob/master/Adafruit_ADX375.cpp
 
   auto wireID = spi_readRegister(
       &spi,
@@ -70,3 +74,9 @@ void AccelAdx375::newData() {
   data.realMps2.y = data.raw.y / ACCEL_SENSITIVITY;
   data.realMps2.z = data.raw.z / ACCEL_SENSITIVITY;
 }
+
+double AccelAdx375::getAccelFullscaleMps2() {
+  return ACCEL_FS;
+}
+
+#endif  // HAS_DEV(ACCEL_ADX375)
