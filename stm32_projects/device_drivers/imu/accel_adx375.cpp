@@ -1,7 +1,7 @@
 #include "accel_adx375.h"
 
-#include "reg_helper.h"
 #include "math_utils.h"
+#include "reg_helper.h"
 
 #if HAS_DEV(ACCEL_ADX375)
 
@@ -26,7 +26,7 @@ struct RegisterAddress {
 #define ACCEL_FS G_TO_MPS2(200)
 
 bool AccelAdx375::begin(SpiCtrl_t spi_) {
-  spi=spi_;
+  spi = spi_;
 
   // adapted from
   // https://github.com/adafruit/Adafruit_ADX375/blob/master/Adafruit_ADX375.cpp
@@ -75,8 +75,6 @@ void AccelAdx375::newData() {
   data.realMps2.z = data.raw.z / ACCEL_SENSITIVITY;
 }
 
-double AccelAdx375::getAccelFullscaleMps2() {
-  return ACCEL_FS;
-}
+double AccelAdx375::getAccelFullscaleMps2() { return ACCEL_FS; }
 
 #endif  // HAS_DEV(ACCEL_ADX375)

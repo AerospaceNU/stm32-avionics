@@ -303,11 +303,12 @@ void hm_hardwareInit() {
 
 #if HAS_DEV(ACCEL_ADX375)
   for (int i = 0; i < NUM_ACCEL_ADX375; i++) {
-    SpiCtrl_t accelADX375Spi = {accelAdx375Hspi[i],
-                                    accelAdx375CsGpioPort[i],
-                                    accelAdx375CsPin[i]};
-    hardwareStatusAccel[FIRST_ID_ACCEL_ADX375 + i] = accelAdx375[i].begin(accelADX375Spi);
-    sensorProperties.accelFs[FIRST_ID_ACCEL_ADX375 + i] = accelAdx375[i].getAccelFullscaleMps2();
+    SpiCtrl_t accelADX375Spi = {accelAdx375Hspi[i], accelAdx375CsGpioPort[i],
+                                accelAdx375CsPin[i]};
+    hardwareStatusAccel[FIRST_ID_ACCEL_ADX375 + i] =
+        accelAdx375[i].begin(accelADX375Spi);
+    sensorProperties.accelFs[FIRST_ID_ACCEL_ADX375 + i] =
+        accelAdx375[i].getAccelFullscaleMps2();
   }
 #endif  // HAS_DEV(ACCEL_ADX375)
 
@@ -418,10 +419,10 @@ void hm_hardwareInit() {
 
 #if HAS_DEV(IMU_ICM42688)
   for (int i = 0; i < NUM_IMU_ICM42688; i++) {
-    hardwareStatusImu[FIRST_ID_IMU_ICM42688 + i] = imuIcm42688[i].begin({imuIcm42688Hspi[i], 
-      imuIcm42688CsGpioPort[i],
-      imuIcm42688CsPin[i]});
-    sensorProperties.imuAccelFs[FIRST_ID_IMU_ICM42688 + i] = imuIcm42688[i].getAccelFullscaleMps2();
+    hardwareStatusImu[FIRST_ID_IMU_ICM42688 + i] = imuIcm42688[i].begin(
+        {imuIcm42688Hspi[i], imuIcm42688CsGpioPort[i], imuIcm42688CsPin[i]});
+    sensorProperties.imuAccelFs[FIRST_ID_IMU_ICM42688 + i] =
+        imuIcm42688[i].getAccelFullscaleMps2();
   }
 #endif  // HAS_DEV(IMU_ICM42688)
 
@@ -429,16 +430,15 @@ void hm_hardwareInit() {
 #if HAS_DEV(MAG_IIS2MDC)
   for (int i = 0; i < NUM_MAG_IIS2MDC; i++) {
     // TODO don't hard-code i2c address
-    hardwareStatusMag[FIRST_ID_MAG_IIS2MDC + i] = iis2mdc_init(imuIis2mdc + i, 0b11110);
+    hardwareStatusMag[FIRST_ID_MAG_IIS2MDC + i] =
+        iis2mdc_init(imuIis2mdc + i, 0b11110);
   }
 #endif
 
 #if HAS_DEV(MAG_LIS3MDL)
   for (int i = 0; i < NUM_MAG_LIS3MDL; i++) {
-    hardwareStatusMag[FIRST_ID_MAG_LIS3MDL + i] = 
-      imuIcm42688[i].begin({imuIcm42688Hspi[i], 
-        imuIcm42688CsGpioPort[i],
-        imuIcm42688CsPin[i]});
+    hardwareStatusMag[FIRST_ID_MAG_LIS3MDL + i] = imuIcm42688[i].begin(
+        {imuIcm42688Hspi[i], imuIcm42688CsGpioPort[i], imuIcm42688CsPin[i]});
   }
 #endif
 
@@ -552,7 +552,6 @@ void hm_hardwareInit() {
     // Enable our radio and configure pins
     hardwareStatusRadio[FIRST_ID_RADIO_TI_915 + i] =
         tiRadio_init(&radioTi915[i]);
-
 
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200_WITH_CC1200
     // PA/LNA control pins. TODO this seems somewhat code-smell-y since we

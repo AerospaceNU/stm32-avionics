@@ -91,9 +91,9 @@ typedef struct {
   GPIO_TypeDef *GP3_port;
   uint16_t GP3_pin;
   struct {
-    bool has_gp0: 1;
-    bool has_gp2: 1;
-    bool has_gp3: 1;
+    bool has_gp0 : 1;
+    bool has_gp2 : 1;
+    bool has_gp3 : 1;
   } pinmask;
 
   // 0x00 is fixed packet size, payload determined by payloadSize

@@ -50,20 +50,19 @@ class ImuIcm42688 {
   double tempC;
   int16_t tRaw;
 
-struct FullscaleEntry {
-  // Actual value to put into the register
-  uint8_t regValue;
-  // Fullscale, in SI units
-  double fullscale;
-  // sensitivity, in native units per physical unit (eg ticks/dps)
-  float sensitivity;
-};
+  struct FullscaleEntry {
+    // Actual value to put into the register
+    uint8_t regValue;
+    // Fullscale, in SI units
+    double fullscale;
+    // sensitivity, in native units per physical unit (eg ticks/dps)
+    float sensitivity;
+  };
 
  private:
   void setBank(int bank);
 
   SpiCtrl_t spi;
-
 
   FullscaleEntry accelFS;
   FullscaleEntry gyroFS;

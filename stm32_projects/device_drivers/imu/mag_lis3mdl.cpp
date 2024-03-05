@@ -25,7 +25,7 @@ struct RegisterAddress {
 #define MAG_SENSITIVITY 6842  // lsb/gauss at +-4 gauss
 
 // tiny helper
-#define WRITE_DEV_REG(addr, val)                                         \
+#define WRITE_DEV_REG(addr, val)                                     \
   spi_writeRegister(                                                 \
       &spi,                                                          \
       to_size_type(RegisterAddress{                                  \
@@ -33,7 +33,7 @@ struct RegisterAddress {
       val);
 
 bool MagLis3mdl::begin(SpiCtrl_t spi_) {
-  spi=spi_;
+  spi = spi_;
 
   // adapted from
   // https://github.com/pololu/lis3mdl-arduino/blob/master/LIS3MDL.cpp

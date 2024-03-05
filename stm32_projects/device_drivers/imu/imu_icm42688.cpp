@@ -95,7 +95,7 @@ void ImuIcm42688::setBank(int bank) {
 }
 
 bool ImuIcm42688::begin(SpiCtrl_t spi_) {
-  spi=spi_;
+  spi = spi_;
 
   // force CS high
   HAL_GPIO_WritePin(spi.port, spi.pin, GPIO_PIN_SET);
@@ -150,8 +150,8 @@ void ImuIcm42688::newData() {
   data.angVelRaw = raw.angVel;
 
   // and convert to real units. Note that ticks / (ticks / unit) = unit
-  float accelSensitivity=accelFS.sensitivity;
-  float gyroSensitivity=gyroFS.sensitivity;
+  float accelSensitivity = accelFS.sensitivity;
+  float gyroSensitivity = gyroFS.sensitivity;
   data.accelRealMps2.x = raw.accel.x / accelSensitivity;
   data.accelRealMps2.y = raw.accel.y / accelSensitivity;
   data.accelRealMps2.z = raw.accel.z / accelSensitivity;
@@ -163,8 +163,6 @@ void ImuIcm42688::newData() {
   tempC = raw.temp / 132.48 + 25;
 }
 
-double ImuIcm42688::getAccelFullscaleMps2() {
-  return accelFS.fullscale;
-}
+double ImuIcm42688::getAccelFullscaleMps2() { return accelFS.fullscale; }
 
 #endif  // HAS_DEV(IMU_LSM9DS1)
