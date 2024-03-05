@@ -11,6 +11,10 @@
 #include "accel_h3lis331dl.h"
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
+#if HAS_DEV(ACCEL_ADX375)
+#include "accel_ADX375.h"
+#endif  // HAS_DEV(ACCEL_ADX375)
+
 #if HAS_DEV(BAROMETER_MS5607)
 #include "barometer_ms5607.h"
 #endif  // HAS_DEV(BAROMETER_MS5607)
@@ -42,6 +46,10 @@
 #include "mag_iis2mdc.h"
 #endif  // HAS_DEV(MAG_IIS2MDC)
 
+#if HAS_DEV(MAG_LIS3MDL)
+#include "mag_lis3mdl.h"
+#endif  // HAS_DEV(MAG_LIS3MDL)
+
 #if HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
 #include "gps.h"
 #endif  // HAS_DEV(GPS_STD) || HAS_DEV(GPS_UBLOX)
@@ -53,6 +61,10 @@
 #if HAS_DEV(IMU_ICM20600)
 #include "imu_icm20600.h"
 #endif  // HAS_DEV(IMU_ICM20600)
+
+#if HAS_DEV(IMU_ICM42688)
+#include "imu_icm42688.h"
+#endif  // HAS_DEV(IMU_ICM42688)
 
 #if HAS_DEV(LINE_CUTTER_BLE)
 #include "line_cutter_ble.h"
@@ -157,6 +169,10 @@ bool hardwareStatusMag[NUM_MAG];
 static AccelH3lis331dlCtrl_s accelH3lis331dl[NUM_ACCEL_H3LIS331DL];
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
+#if HAS_DEV(ACCEL_ADX375)
+static AccelAdx375 accelADX375[NUM_ACCEL_ADX375];
+#endif  // HAS_DEV(ACCEL_ADX375)
+
 /* Barometers */
 #if HAS_DEV(BAROMETER_MS5607)
 static BarometerMs5607Ctrl_s barometerMs5607[NUM_BAROMETER_MS5607];
@@ -204,8 +220,17 @@ static ImuLsm9ds1Ctrl_s imuLsm9ds1[NUM_IMU_LSM9DS1];
 static ImuICM20600Ctrl_s imuIcm20600[NUM_IMU_ICM20600];
 #endif  // HAS_DEV(IMU_ICM20600)
 
+#if HAS_DEV(IMU_ICM42688)
+static ImuIcm42688 imuIcm42688[NUM_IMU_ICM42688];
+#endif  // HAS_DEV(IMU_ICM42688)
+
+/* Magnetometers */
 #if HAS_DEV(MAG_IIS2MDC)
-static ImuIIS2MDCCtrl_s imuIis2mdc[NUM_MAG_IIS2MDC];
+static ImuIIS2MDCCtrl_s magIis2mdc[NUM_MAG_IIS2MDC];
+#endif  // HAS_DEV(MAG_IIS2MDC)
+
+#if HAS_DEV(MAG_LIS3MDL)
+static MagLis3mdl magLis3mdl[NUM_MAG_LIS3MDL];
 #endif  // HAS_DEV(MAG_IIS2MDC)
 
 /* Line Cutters */
@@ -275,6 +300,16 @@ void hm_hardwareInit() {
         981;  // 100G * 9.81 m/s^2
   }
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
+
+#if HAS_DEV(ACCEL_H3LIS331DL)
+  for (int i = 0; i < NUM_ACCEL_ADX375; i++) {
+    SpiCtrl_t accelADX375Spi = {accelADX375Hspi[i],
+                                    accelADX375CsGpioPort[i],
+                                    accelADX375CsPin[i]};
+    hardwareStatusAccel[FIRST_ID_ACCEL_ADX375 + i] = accelAdx375[i].begin(accelADX375Spi);
+    sensorProperties.accelFs[FIRST_ID_ACCEL_ADX375 + i] = accelAdx375[i].getFullscaleMps2();
+  }
+#endif  // HAS_DEV(ACCEL_ADX375)
 
   /* Barometers */
 #if HAS_DEV(BAROMETER_MS5607)
@@ -381,10 +416,29 @@ void hm_hardwareInit() {
   }
 #endif  // HAS_DEV(IMU_ICM20600)
 
+#if HAS_DEV(IMU_ICM42688)
+  for (int i = 0; i < NUM_IMU_ICM42688; i++) {
+    hardwareStatusImu[FIRST_ID_IMU_ICM42688 + i] = imuIcm42688[i].begin({imuIcm42688Hspi[i], 
+      imuIcm42688CsGpioPort[i],
+      imuIcm42688CsPin[i]});
+    sensorProperties.imuAccelFs[FIRST_ID_IMU_ICM42688 + i] = imuIcm42688.getAccelFullscaleMps2();
+  }
+#endif  // HAS_DEV(IMU_ICM42688)
+
+  /* Magnetometers */
 #if HAS_DEV(MAG_IIS2MDC)
   for (int i = 0; i < NUM_MAG_IIS2MDC; i++) {
     // TODO don't hard-code i2c address
-    hardwareStatusMag[i] = iis2mdc_init(imuIis2mdc + i, 0b11110);
+    hardwareStatusMag[FIRST_ID_MAG_IIS2MDC + i] = iis2mdc_init(imuIis2mdc + i, 0b11110);
+  }
+#endif
+
+#if HAS_DEV(MAG_LIS3MDL)
+  for (int i = 0; i < NUM_MAG_LIS3MDL; i++) {
+    hardwareStatusMag[FIRST_ID_MAG_LIS3MDL + i] = 
+      imuIcm42688[i].begin({imuIcm42688Hspi[i], 
+        imuIcm42688CsGpioPort[i],
+        imuIcm42688CsPin[i]});
   }
 #endif
 
@@ -1010,6 +1064,12 @@ void hm_readSensorData() {
           accelH3lis331dl[i].val;
     }
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
+#if HAS_DEV(ACCEL_ADXL375)
+    for (int i = 0; i < NUM_ACCEL_ADXL375; i++) {
+      accelAdxl375[i].newData();
+      sensorData.accelData[FIRST_ID_ACCEL_ADXL375 + i] = accelAdxl375[i].data;
+    }
+#endif  // HAS_DEV(IMU_LSM9DS1)
 
     // Barometer data
 #if HAS_DEV(BAROMETER_MS5607)
@@ -1043,12 +1103,24 @@ void hm_readSensorData() {
       sensorData.imuData[FIRST_ID_IMU_ICM20600 + i] = imuIcm20600[i].data;
     }
 #endif  // HAS_DEV(IMU_LSM9DS1)
+#if HAS_DEV(IMU_ICM42688)
+    for (int i = 0; i < NUM_IMU_ICM42688; i++) {
+      imuIcm42688[i].newData();
+      sensorData.imuData[FIRST_ID_IMU_ICM42688 + i] = imuIcm42688[i].data;
+    }
+#endif  // HAS_DEV(IMU_LSM9DS1)
 
     // Mag data
 #if HAS_DEV(MAG_IIS2MDC)
     for (int i = 0; i < NUM_MAG_IIS2MDC; i++) {
       iis2mdc_getData(imuIis2mdc + i);
       sensorData.magData[FIRST_ID_MAG_IIS2DS1 + i] = imuIis2mdc[i].data;
+    }
+#endif  // HAS_DEV(MAG_IIS2MDC)
+#if HAS_DEV(MAG_LIS3MDL)
+    for (int i = 0; i < NUM_MAG_LIS3MDL; i++) {
+      magLis3mdl[i].newData();
+      sensorData.magData[FIRST_ID_MAG_LIS3MDL + i] = magLis3mdl[i].data;
     }
 #endif  // HAS_DEV(MAG_IIS2MDC)
 

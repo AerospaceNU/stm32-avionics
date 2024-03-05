@@ -14,7 +14,7 @@
 
 #define NUM_ACCEL_ADXL375 1
 
-#define NUM_BAROMETER_MS5607 2
+#define NUM_BAROMETER_MS5607 1
 
 #define NUM_BLE_CHIP_NRF 1
 
@@ -27,10 +27,9 @@
 #define NUM_FLASH_S25FLX 1
 #define NUM_FLASH_MB85RSX 1
 
-#define NUM_GPS_STD 0
 #define NUM_GPS_UBLOX 1
 
-#define NUM_IMU_ICM42688 2
+#define NUM_IMU_ICM42688 1
 #define NUM_MAG_LIS3MDL 1
 
 #define NUM_LED_DIGITAL 1
@@ -46,8 +45,8 @@
 #define NUM_PYRO_CONT_HADC 4
 #define NUM_VBAT_STM_ADC 2
 
-#define NUM_RADIO_TI_433 1
-#define NUM_RADIO_TI_915 0
+#define NUM_RADIO_TI_433 0
+#define NUM_RADIO_TI_915 1
 
 #define NUM_SERVO_PWM 4
 

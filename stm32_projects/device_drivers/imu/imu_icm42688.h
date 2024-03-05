@@ -39,9 +39,9 @@ class ImuIcm42688 {
     RATE_100HZ
   };
 
-  explicit ImuIcm42688(SpiCtrl_t spidev);
-  bool begin();
+  bool begin(SpiCtrl_t spidev);
   void newData();
+  double getAccelFullscaleMps2();
 
   void setGyroConfig(const GyroFullscale range, GyroDataRate gyroRate);
   void setAccelConfig(const AccelFullscale range, AccelDataRate accelRate);

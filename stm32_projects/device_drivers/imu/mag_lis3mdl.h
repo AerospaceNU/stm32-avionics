@@ -17,8 +17,7 @@
 
 class MagLis3mdl {
  public:
-  explicit MagLis3mdl(SpiCtrl_t spidev);
-  bool begin();
+  bool begin(SpiCtrl_t spidev);
   void newData();
 
   MagData_s data;

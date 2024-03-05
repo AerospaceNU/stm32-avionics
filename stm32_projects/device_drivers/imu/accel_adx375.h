@@ -24,9 +24,9 @@ class AccelAdx375 {
     RATE_200HZ_BW_100HZ = 0b1011
   };
 
-  explicit AccelAdx375(SpiCtrl_t spidev);
-  bool begin();
+  bool begin(SpiCtrl_t spidev);
   void newData();
+  double getAccelFullscaleMps2();
 
   /**
    * Change the output data rate of the sensor. Bandwidth is the -3db frequency
