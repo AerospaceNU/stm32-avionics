@@ -12,7 +12,7 @@
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
 
 #if HAS_DEV(ACCEL_ADX375)
-#include "accel_ADX375.h"
+#include "accel_adx375.h"
 #endif  // HAS_DEV(ACCEL_ADX375)
 
 #if HAS_DEV(BAROMETER_MS5607)
