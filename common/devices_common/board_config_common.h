@@ -197,8 +197,9 @@
 
 /* Accelerometer */
 
-#define NUM_ACCEL \
-  (NUM_ACCEL_H3LIS331DL + NUM_ACCEL_ADX375 + NUM_ACCEL_DESKTOP_FILE + NUM_OTHER_ACCEL)
+#define NUM_ACCEL                                                     \
+  (NUM_ACCEL_H3LIS331DL + NUM_ACCEL_ADX375 + NUM_ACCEL_DESKTOP_FILE + \
+   NUM_OTHER_ACCEL)
 
 #define FIRST_ID_ACCEL_H3LIS331DL 0
 #define FIRST_ID_ACCEL_DESKTOP_FILE \
@@ -323,7 +324,7 @@ extern UART_HandleTypeDef* gpsStdHuart[NUM_GPS_STD + NUM_GPS_UBLOX];
 
 /* IMU */
 
-#define NUM_IMU                                            \
+#define NUM_IMU                                                               \
   (NUM_IMU_LSM9DS1 + NUM_IMU_ICM20948 + NUM_IMU_ICM20600 + NUM_IMU_ICM42688 + \
    NUM_IMU_DESKTOP_FILE + NUM_OTHER_IMU)  // NOLINT
 
@@ -341,7 +342,7 @@ extern UART_HandleTypeDef* gpsStdHuart[NUM_GPS_STD + NUM_GPS_UBLOX];
 #define FIRST_ID_IMU_DESKTOP_FILE (FIRST_ID_IMU_ICM20600 + NUM_IMU_ICM20600)
 
 // Magnetometers
-#define NUM_MAG                                           \
+#define NUM_MAG                                                             \
   (NUM_MAG_IIS2MDC + NUM_IMU_LSM9DS1 + NUM_MAG_LIS3MDL + NUM_IMU_ICM20948 + \
    NUM_MAG_DESKTOP_FILE + NUM_OTHER_MAG)  // NOLINT
 
