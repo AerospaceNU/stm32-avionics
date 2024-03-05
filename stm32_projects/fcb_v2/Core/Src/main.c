@@ -21,7 +21,6 @@
 #include "adc.h"
 #include "can.h"
 #include "dma.h"
-#include "i2c.h"
 #include "iwdg.h"
 #include "spi.h"
 #include "tim.h"
@@ -96,7 +95,6 @@ int main(void)
   MX_DMA_Init();
   MX_ADC1_Init();
   MX_CAN1_Init();
-  MX_I2C2_Init();
   MX_SPI1_Init();
   MX_SPI2_Init();
   MX_SPI3_Init();
@@ -105,7 +103,6 @@ int main(void)
   MX_TIM3_Init();
   MX_USART2_UART_Init();
   MX_USART3_UART_Init();
-  MX_I2C1_Init();
   MX_USART1_UART_Init();
   MX_TIM17_Init();
   MX_IWDG_Init();
