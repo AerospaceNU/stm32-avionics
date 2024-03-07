@@ -288,6 +288,14 @@ static bool inSim = false;
 static CircularBuffer_s *simRxBuffer = NULL;
 
 void hm_hardwareInit() {
+
+	HAL_GPIO_WritePin(accelAdx375CsGpioPort[0], accelAdx375CsPin[0], GPIO_PIN_SET);
+	HAL_GPIO_WritePin(barometerMs5607CsGpioPort[0], barometerMs5607CsPin[0], GPIO_PIN_SET);
+	HAL_GPIO_WritePin(imuIcm42688CsGpioPort[0], imuIcm42688CsPin[0], GPIO_PIN_SET);
+	HAL_GPIO_WritePin(flashMb85rsxCsGpioPort[0], flashMb85rsxCsPin[0], GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, GPIO_PIN_SET);
+	HAL_Delay(10);
+
   /* Accelerometers */
 #if HAS_DEV(ACCEL_H3LIS331DL)
   for (int i = 0; i < NUM_ACCEL_H3LIS331DL; i++) {
@@ -437,8 +445,8 @@ void hm_hardwareInit() {
 
 #if HAS_DEV(MAG_LIS3MDL)
   for (int i = 0; i < NUM_MAG_LIS3MDL; i++) {
-    hardwareStatusMag[FIRST_ID_MAG_LIS3MDL + i] = imuIcm42688[i].begin(
-        {imuIcm42688Hspi[i], imuIcm42688CsGpioPort[i], imuIcm42688CsPin[i]});
+    hardwareStatusMag[FIRST_ID_MAG_LIS3MDL + i] = magLis3mdl[i].begin(
+        {imuIcm42688Hspi[0], GPIOB, GPIO_PIN_11});
   }
 #endif
 
@@ -1068,10 +1076,10 @@ void hm_readSensorData() {
           accelH3lis331dl[i].val;
     }
 #endif  // HAS_DEV(ACCEL_H3LIS331DL)
-#if HAS_DEV(ACCEL_ADXL375)
-    for (int i = 0; i < NUM_ACCEL_ADXL375; i++) {
+#if HAS_DEV(ACCEL_ADX375)
+    for (int i = 0; i < NUM_ACCEL_ADX375; i++) {
       accelAdx375[i].newData();
-      sensorData.accelData[FIRST_ID_ACCEL_ADXL375 + i] = accelAdxl375[i].data;
+      sensorData.accelData[FIRST_ID_ACCEL_ADX375 + i] = accelAdx375[i].data;
     }
 #endif  // HAS_DEV(IMU_LSM9DS1)
 

@@ -22,7 +22,7 @@ struct RegisterAddress {
 #define WHOAMI_VAL 0b00111101
 
 // fixed sensitivity
-#define MAG_SENSITIVITY 6842  // lsb/gauss at +-4 gauss
+constexpr float MAG_SENSITIVITY = 6842;  // lsb/gauss at +-4 gauss
 
 // tiny helper
 #define WRITE_DEV_REG(addr, val)                                     \
@@ -62,7 +62,12 @@ bool MagLis3mdl::begin(SpiCtrl_t spi_) {
 }
 
 void MagLis3mdl::newData() {
-  spi_readRegisters(&spi, REG_OUT_X_L, reinterpret_cast<uint8_t*>(&data.raw),
+  spi_readRegisters(&spi,
+		  to_size_type(RegisterAddress{
+		            .address = REG_OUT_X_L,
+		            .multiByteRequest = true,
+					.isRead = 1})
+		  , reinterpret_cast<uint8_t*>(&data.raw),
                     sizeof(data.raw));
 
   // and convert to real units. Note that ticks / (ticks / unit) = unit

@@ -55,13 +55,26 @@ void flashMb85rsx_init(FlashMb85rsxCtrl_s *mb85rsx, SPI_HandleTypeDef *hspi,
   // disable protection on all blocks
   FlashMb85rsxStatusReg_s reg = {.bp0 = false, .bp1 = false};
   spi_writeRegister(&mb85rsx->spi, WRITE_STATUS_REG, *(uint8_t *)&reg);
+
+  uint8_t arr[] = {1,2,3,4};
+  flashMb85rsx_writeStart(mb85rsx, 5, 4, arr);
+  HAL_Delay(10);
+  uint8_t arr2[4] = {0};
+  flashMb85rsx_readStart(mb85rsx, 5, 4, arr2);
+  if (arr[2] == arr2[2]) {
+	  // yay!
+  }
+  uint8_t arr3[4] = {0};
+  flashMb85rsx_readStart(mb85rsx, 5, 4, arr3);
+  if (arr[2] == arr3[2]) {
+	  // yay!
+  }
 }
 
 bool flashMb85rsx_readStart(FlashMb85rsxCtrl_s *mb85rsx, uint32_t startLoc,
                             uint32_t numBytes, uint8_t *pData) {
   // Check for valid parameters
-  if ((startLoc + numBytes) > mb85rsx->flashSizeBytes || pData == NULL ||
-      startLoc) {
+  if ((startLoc + numBytes) >= mb85rsx->flashSizeBytes || pData == NULL) {
     return false;
   }
 

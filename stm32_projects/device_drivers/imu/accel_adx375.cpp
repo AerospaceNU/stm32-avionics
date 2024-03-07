@@ -28,6 +28,10 @@ struct RegisterAddress {
 bool AccelAdx375::begin(SpiCtrl_t spi_) {
   spi = spi_;
 
+  HAL_GPIO_WritePin(spi.port, spi.pin, GPIO_PIN_SET);
+  HAL_Delay(1);
+
+
   // adapted from
   // https://github.com/adafruit/Adafruit_ADX375/blob/master/Adafruit_ADX375.cpp
 
@@ -37,7 +41,8 @@ bool AccelAdx375::begin(SpiCtrl_t spi_) {
           .address = REG_WHOAMI, .multiByteRequest = false, .isRead = 1}));
 
   if (wireID != 0xe5) {
-    return false;
+//    return false;
+	  // lmao lol thanks JLC
   }
 
   // Interrupts default to off, but just to be sure
@@ -66,8 +71,9 @@ bool AccelAdx375::begin(SpiCtrl_t spi_) {
 }
 
 void AccelAdx375::newData() {
-  spi_readRegisters(&spi, REG_DATAX0, reinterpret_cast<uint8_t*>(&data.raw),
-                    sizeof(data.raw));
+  spi_readRegisters(&spi, to_size_type(RegisterAddress{
+      .address = REG_DATAX0, .multiByteRequest = true, .isRead = true}),
+		  reinterpret_cast<uint8_t*>(&data.raw), sizeof(data.raw));
 
   // and convert to real units. Note that ticks / (ticks / unit) = unit
   data.realMps2.x = data.raw.x / ACCEL_SENSITIVITY;

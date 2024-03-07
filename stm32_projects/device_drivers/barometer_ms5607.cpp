@@ -41,8 +41,8 @@ bool barometerMs5607_init(BarometerMs5607Ctrl_s *ms5607,
   HAL_GPIO_WritePin(ms5607->csPort, ms5607->csPin, GPIO_PIN_SET);
 
   // PROM read
-  uint8_t rxBuffer[3];
-  uint8_t txBuffer[3];
+  uint8_t rxBuffer[3] = {0};
+  uint8_t txBuffer[3] = {0};
   uint8_t promRead[6] = {0xA2, 0xA4, 0xA6, 0xA8, 0xAA, 0xAC};
   for (int i = 0; i < 6; i++) {
     txBuffer[0] = promRead[i];

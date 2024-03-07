@@ -97,6 +97,8 @@ void Error_Handler(void);
 #define IMU1_INT_GPIO_Port GPIOE
 #define HIGH_G_INT_Pin GPIO_PIN_15
 #define HIGH_G_INT_GPIO_Port GPIOE
+#define MAG1_CS_Pin GPIO_PIN_11
+#define MAG1_CS_GPIO_Port GPIOB
 #define GPS_PPS_Pin GPIO_PIN_12
 #define GPS_PPS_GPIO_Port GPIOB
 #define GPS_TX_Pin GPIO_PIN_8
