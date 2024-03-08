@@ -159,9 +159,9 @@ void ImuIcm42688::newData() {
 
 	// and swap all the numbers around
 	if constexpr (std::endian::native == std::endian::little) {
-		auto arr = std::bit_cast<std::array<uint16_t, sizeof(AccelTempRaw)/sizeof(uint16_t)>>(raw);
-		for (auto& elem : arr) {
-			elem = std::byteswap(elem);
+		for (int i = 0; i < sizeof(raw) / sizeof(int16_t); i++) {
+			auto member = &raw.temp + i;
+			*member = std::byteswap(*member);
 		}
 	}
 
