@@ -159,22 +159,24 @@ void ImuIcm42688::newData() {
 
 	// and swap all the numbers around
 	if constexpr (std::endian::native == std::endian::little) {
-		for (int16_t *member = reinterpret_cast<int16_t*>(&raw.temp); member < reinterpret_cast<int16_t*>(&raw.angVel); member++)
-			*member = std::byteswap(*member);
+		auto arr = std::bit_cast<std::array<uint16_t, sizeof(AccelTempRaw)/sizeof(uint16_t)>>(raw);
+		for (auto& elem : arr) {
+			elem = std::byteswap(elem);
+		}
 	}
 
 	data.accelRaw = raw.accel;
 	data.angVelRaw = raw.angVel;
 
 	// and convert to real units. Note that ticks / (ticks / unit) = unit
-	float accelSensitivity = accelFS.sensitivity;
-	float gyroSensitivity = gyroFS.sensitivity;
-	data.accelRealMps2.x = raw.accel.x / accelSensitivity;
-	data.accelRealMps2.y = raw.accel.y / accelSensitivity;
-	data.accelRealMps2.z = raw.accel.z / accelSensitivity;
-	data.angVelRealRadps.x = raw.accel.x / gyroSensitivity;
-	data.angVelRealRadps.y = raw.accel.y / gyroSensitivity;
-	data.angVelRealRadps.z = raw.accel.z / gyroSensitivity;
+	float accelSensitivity = G_TO_MPS2(1.0) / accelFS.sensitivity;
+	float gyroSensitivity = DEG_TO_RAD(1.0) / gyroFS.sensitivity;
+	data.accelRealMps2.x = raw.accel.x * accelSensitivity;
+	data.accelRealMps2.y = raw.accel.y * accelSensitivity;
+	data.accelRealMps2.z = raw.accel.z * accelSensitivity;
+	data.angVelRealRadps.x = raw.angVel.x * gyroSensitivity;
+	data.angVelRealRadps.y = raw.angVel.y * gyroSensitivity;
+	data.angVelRealRadps.z = raw.angVel.z * gyroSensitivity;
 
 	// Convert temp per page 65
 	tempC = raw.temp / 132.48 + 25;
