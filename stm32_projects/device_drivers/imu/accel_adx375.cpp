@@ -65,7 +65,7 @@ bool AccelAdx375::begin(SpiCtrl_t spi_) {
       &spi,
       to_size_type(RegisterAddress{
           .address = REG_POWER_CTL, .multiByteRequest = false, .isRead = 0}),
-      0x8);
+      0b0001000);
 
   return true;
 }
