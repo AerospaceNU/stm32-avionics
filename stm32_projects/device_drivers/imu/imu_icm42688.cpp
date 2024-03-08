@@ -5,6 +5,7 @@
 #include "imu_icm42688.h"
 
 #include "const_map.h"
+#include "bit_helper.h"
 
 // registers in bank 0
 #define REG_GYRO_CONFIG0 79
@@ -18,9 +19,9 @@
 // Helper macros for read/write
 // SPI register address MSB is read/write (1 for read 0 for write, then 7 bit
 // address)
-#define REG_RW_MASK ~(1 << 7)
-#define REG_READ(x) (x & REG_RW_MASK) | 1
-#define REG_WRITE(x) (x & REG_RW_MASK)
+constexpr uint8_t REG_RW_MASK = (1 << 7);
+#define REG_READ(x) (x | REG_RW_MASK)
+#define REG_WRITE(x) (x & ~REG_RW_MASK)
 
 #define WHO_AM_I 0x47
 
@@ -41,7 +42,7 @@ constexpr ConstMap<
     accelFullscales({AccelFullscaleEntry{ImuIcm42688::AccelFullscale::FS_8G,
                                          {1, G_TO_MPS2(8), 4096}},
                      AccelFullscaleEntry{ImuIcm42688::AccelFullscale::FS_16G,
-                                         {1, G_TO_MPS2(16), 2048}}});
+                                         {0, G_TO_MPS2(16), 2048}}});
 
 constexpr ConstMap<
     ImuIcm42688::GyroFullscale, FullscaleEntry,
@@ -63,6 +64,7 @@ void ImuIcm42688::setGyroConfig(const GyroFullscale range,
   };
   GYRO_CONFIG0 config0{
       .odr = gyroRate,
+    		  .reserved=0,
       .fs = fsSetting.regValue,
   };
 
@@ -81,10 +83,11 @@ void ImuIcm42688::setAccelConfig(const AccelFullscale range,
   };
   ACCEL_CONFIG0 config0{
       .odr = accelRate,
+    		  .reserved=0,
       .fs = fsSetting.regValue,
   };
 
-  spi_writeRegisters(&spi, REG_WRITE(REG_GYRO_CONFIG0),
+  spi_writeRegisters(&spi, REG_WRITE(REG_ACCEL_CONFIG0),
                      reinterpret_cast<uint8_t*>(&config0), 1);
 
   accelFS = fsSetting;
@@ -106,11 +109,17 @@ bool ImuIcm42688::begin(SpiCtrl_t spi_) {
 
   // Reset the device. Sets to 2000dps/16g by default
   setBank(0);
+  volatile auto bank = spi_readRegister(&spi, REG_READ(REG_BANK_SEL));
+  if (bank != 0) {
+	  return false;
+  }
   spi_writeRegister(&spi, REG_WRITE(REG_DEVICE_CONFIG), 1);
   HAL_Delay(1);  // Wait 1ms per datasheet
 
   // check whoami
-  if (spi_readRegister(&spi, REG_READ(REG_WHO_AM_I)) != WHO_AM_I) {
+  auto id = spi_readRegister(&spi, REG_READ(REG_WHO_AM_I));
+
+  if (id != WHO_AM_I) {
     return false;
   }
 
@@ -130,37 +139,45 @@ bool ImuIcm42688::begin(SpiCtrl_t spi_) {
   spi_writeRegisters(&spi, REG_WRITE(REG_PWR_MGMT0),
                      reinterpret_cast<uint8_t*>(&pwrCfg), 1);
 
+  // randoms ane defaults
+  setAccelConfig(AccelFullscale::FS_16G, AccelDataRate::RATE_2KHZ);
+  setGyroConfig(GyroFullscale::FS_2000_DPS, GyroDataRate::RATE_2KHZ);
+
   return true;
 }
 
 void ImuIcm42688::newData() {
-  // Read data in
-  struct AccelTempRaw {
-    int16_t temp;
-    // depends on these orders being x,y,z
-    Axis3dRaw_s accel;
-    Axis3dRaw_s angVel;
-  } __attribute__((packed));
-  AccelTempRaw raw;
 
-  spi_readRegisters(&spi, REG_READ(REG_TEMP_DATA1),
-                    reinterpret_cast<uint8_t*>(&raw), sizeof(raw));
+	struct [[gnu::packed]] AccelTempRaw {
+		int16_t temp;
+		Axis3dRaw_s accel;
+		Axis3dRaw_s angVel;
+	};
+	AccelTempRaw raw;
+	spi_readRegisters(&spi, REG_READ(REG_TEMP_DATA1),
+			reinterpret_cast<uint8_t*>(&raw), sizeof(raw));
 
-  data.accelRaw = raw.accel;
-  data.angVelRaw = raw.angVel;
+	// and swap all the numbers around
+	if constexpr (std::endian::native == std::endian::little) {
+		for (int16_t *member = reinterpret_cast<int16_t*>(&raw.temp); member < reinterpret_cast<int16_t*>(&raw.angVel); member++)
+			*member = std::byteswap(*member);
+	}
 
-  // and convert to real units. Note that ticks / (ticks / unit) = unit
-  float accelSensitivity = accelFS.sensitivity;
-  float gyroSensitivity = gyroFS.sensitivity;
-  data.accelRealMps2.x = raw.accel.x / accelSensitivity;
-  data.accelRealMps2.y = raw.accel.y / accelSensitivity;
-  data.accelRealMps2.z = raw.accel.z / accelSensitivity;
-  data.angVelRealRadps.x = raw.accel.x / gyroSensitivity;
-  data.angVelRealRadps.y = raw.accel.y / gyroSensitivity;
-  data.angVelRealRadps.z = raw.accel.z / gyroSensitivity;
+	data.accelRaw = raw.accel;
+	data.angVelRaw = raw.angVel;
 
-  // Convert temp per page 65
-  tempC = raw.temp / 132.48 + 25;
+	// and convert to real units. Note that ticks / (ticks / unit) = unit
+	float accelSensitivity = accelFS.sensitivity;
+	float gyroSensitivity = gyroFS.sensitivity;
+	data.accelRealMps2.x = raw.accel.x / accelSensitivity;
+	data.accelRealMps2.y = raw.accel.y / accelSensitivity;
+	data.accelRealMps2.z = raw.accel.z / accelSensitivity;
+	data.angVelRealRadps.x = raw.accel.x / gyroSensitivity;
+	data.angVelRealRadps.y = raw.accel.y / gyroSensitivity;
+	data.angVelRealRadps.z = raw.accel.z / gyroSensitivity;
+
+	// Convert temp per page 65
+	tempC = raw.temp / 132.48 + 25;
 }
 
 double ImuIcm42688::getAccelFullscaleMps2() { return accelFS.fullscale; }
