@@ -6,11 +6,11 @@
 #if HAS_DEV(ACCEL_ADX375)
 
 struct RegisterAddress {
-  uint8_t address : 6;
-  // if we want the read/write pointer to auto advance
-  bool multiByteRequest : 1;
-  // set - request is a read. Reset - request is a write
-  bool isRead : 1;
+	uint8_t address :6;
+	// if we want the read/write pointer to auto advance
+	bool multiByteRequest :1;
+	// set - request is a read. Reset - request is a write
+	bool isRead :1;
 };
 
 #define REG_WHOAMI 0
@@ -25,62 +25,75 @@ struct RegisterAddress {
 #define ACCEL_SENSITIVITY 20.5;
 #define ACCEL_FS G_TO_MPS2(200)
 
+#include "usb_std.h"
+#include  <cstdarg>
+void CustomPrintf(const char *format, ...) {
+	char buffer[256];
+	va_list args;
+	va_start(args, format);
+	int len = vsprintf(buffer, format, args);
+	usbStd_transmit((uint8_t*) buffer, len);
+	va_end(args);
+}
+
 bool AccelAdx375::begin(SpiCtrl_t spi_) {
-  spi = spi_;
+	spi = spi_;
 
-  HAL_GPIO_WritePin(spi.port, spi.pin, GPIO_PIN_SET);
-  HAL_Delay(1);
+	HAL_GPIO_WritePin(spi.port, spi.pin, GPIO_PIN_SET);
+	HAL_Delay(1);
 
+	// adapted from
+	// https://github.com/adafruit/Adafruit_ADX375/blob/master/Adafruit_ADX375.cpp
 
-  // adapted from
-  // https://github.com/adafruit/Adafruit_ADX375/blob/master/Adafruit_ADX375.cpp
+	auto wireID = spi_readRegister(&spi, to_size_type(RegisterAddress {
+			.address = REG_WHOAMI, .multiByteRequest = false, .isRead = 1 }));
 
-  auto wireID = spi_readRegister(
-      &spi,
-      to_size_type(RegisterAddress{
-          .address = REG_WHOAMI, .multiByteRequest = false, .isRead = 1}));
+	if (wireID != 0xe5) {
+		return false;
+	}
 
-  if (wireID != 0xe5) {
-//    return false;
-	  // lmao lol thanks JLC
-  }
+	// Interrupts default to off, but just to be sure
+	spi_writeRegister(&spi, to_size_type(RegisterAddress { .address =
+	REG_INT_ENABLE, .multiByteRequest = false, .isRead = 0 }), 0);
 
-  // Interrupts default to off, but just to be sure
-  spi_writeRegister(
-      &spi,
-      to_size_type(RegisterAddress{
-          .address = REG_INT_ENABLE, .multiByteRequest = false, .isRead = 0}),
-      0);
+	// data format set to right justified/LSB first/sign extended; 3 wire spi
+	// enabled; interrupts active high
+	spi_writeRegister(&spi, to_size_type(RegisterAddress { .address =
+	REG_DATA_FORMAT, .multiByteRequest = false, .isRead = 0 }), 0b00001011);
 
-  // data format set to right justified/LSB first/sign extended; 3 wire spi
-  // enabled; interrupts active high
-  spi_writeRegister(
-      &spi,
-      to_size_type(RegisterAddress{
-          .address = REG_DATA_FORMAT, .multiByteRequest = false, .isRead = 0}),
-      0b00001011);
+	// And power up
+	spi_writeRegister(&spi, to_size_type(RegisterAddress { .address =
+	REG_POWER_CTL, .multiByteRequest = false, .isRead = 0 }), 0b0001000);
 
-  // And power up
-  spi_writeRegister(
-      &spi,
-      to_size_type(RegisterAddress{
-          .address = REG_POWER_CTL, .multiByteRequest = false, .isRead = 0}),
-      0b0001000);
-
-  return true;
+	return true;
 }
 
 void AccelAdx375::newData() {
-  spi_readRegisters(&spi, to_size_type(RegisterAddress{
-      .address = REG_DATAX0, .multiByteRequest = true, .isRead = true}),
-		  reinterpret_cast<uint8_t*>(&data.raw), sizeof(data.raw));
 
-  // and convert to real units. Note that ticks / (ticks / unit) = unit
-  data.realMps2.x = data.raw.x / ACCEL_SENSITIVITY;
-  data.realMps2.y = data.raw.y / ACCEL_SENSITIVITY;
-  data.realMps2.z = data.raw.z / ACCEL_SENSITIVITY;
+//	HAL_Delay(1000);
+//	CustomPrintf("adxl375 register map:\n");
+//	for (size_t i = 0; i < 0x39; i++) {
+//		auto val = spi_readRegister(&spi, to_size_type(RegisterAddress {
+//				.address = i, .multiByteRequest = false, .isRead = true }));
+//		CustomPrintf("0x%X = [0x%X]\n", i, val);
+//	}
+//	HAL_Delay(1000);
+
+	spi_readRegisters(&spi, to_size_type(RegisterAddress {
+			.address = REG_DATAX0, .multiByteRequest = true, .isRead = true }),
+			reinterpret_cast<uint8_t*>(&data.raw), sizeof(data.raw));
+
+	// and convert to real units. Note that ticks / (ticks / unit) = unit
+	data.realMps2.x = data.raw.x / ACCEL_SENSITIVITY
+	;
+	data.realMps2.y = data.raw.y / ACCEL_SENSITIVITY
+	;
+	data.realMps2.z = data.raw.z / ACCEL_SENSITIVITY
+	;
 }
 
-double AccelAdx375::getAccelFullscaleMps2() { return ACCEL_FS; }
+double AccelAdx375::getAccelFullscaleMps2() {
+	return ACCEL_FS;
+}
 
 #endif  // HAS_DEV(ACCEL_ADX375)

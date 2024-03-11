@@ -50,7 +50,7 @@ void Scheduler::run(void) {
 
     lastTime_ = hm_millis();
     // Visually show how fast scheduler is running using LED
-    hm_ledToggle(1);
+    hm_ledToggle(0);
 
     // Cleanup current state and initialize next state if changing states
     if (pNextState != pCurrentState_) {

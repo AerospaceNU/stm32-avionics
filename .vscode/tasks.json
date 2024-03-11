@@ -6,7 +6,7 @@
       "command": "cmake",
       "args": [
         "--build",
-        "build",
+        "build_stm32",
         "--target",
         "fcb_v0"
       ],
@@ -24,7 +24,7 @@
       "command": "cmake",
       "args": [
         "--build",
-        "build",
+        "build_stm32",
         "--target",
         "fcb_v1",
         "-j"
@@ -43,7 +43,7 @@
       "command": "cmake",
       "args": [
         "--build",
-        "build",
+        "build_stm32",
         "--target",
         "fcb_v2",
         "-j"
@@ -62,7 +62,7 @@
       "command": "cmake",
       "args": [
         "--build",
-        "build",
+        "build_stm32",
         "--target",
         "groundstation",
         "-j"
@@ -81,7 +81,7 @@
       "command": "cmake",
       "args": [
         "--build",
-        "build",
+        "build_stm32",
         "--target",
         "amazon-stm32-arduino",
         "-j"
@@ -100,7 +100,7 @@
       "command": "cmake",
       "args": [
         "--build",
-        "build",
+        "build_stm32",
         "--target",
         "desktop_sim",
         "-j"

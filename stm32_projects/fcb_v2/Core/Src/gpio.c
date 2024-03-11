@@ -53,8 +53,11 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, PERIPH_EN_Pin|USER_LED_Pin|IMU1_CS_Pin|HIGH_G_CS_Pin
-                          |FLASH_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, PERIPH_EN_Pin|USER_LED_Pin|FIRE2_Pin|IMU1_CS_Pin
+                          |FIRE3_Pin|HIGH_G_CS_Pin|FIRE4_Pin|FLASH_CS_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, FIRE1_Pin|RAD915_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(MAG1_CS_GPIO_Port, MAG1_CS_Pin, GPIO_PIN_RESET);
@@ -62,17 +65,21 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, BARO1_CS_Pin|FRAM_CS_Pin|RAD915_CS_Pin|GPIO_PIN_2, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(RAD915_RST_GPIO_Port, RAD915_RST_Pin, GPIO_PIN_RESET);
-
   /*Configure GPIO pins : PEPin PEPin PEPin PEPin
-                           PEPin */
-  GPIO_InitStruct.Pin = PERIPH_EN_Pin|USER_LED_Pin|IMU1_CS_Pin|HIGH_G_CS_Pin
-                          |FLASH_CS_Pin;
+                           PEPin PEPin PEPin PEPin */
+  GPIO_InitStruct.Pin = PERIPH_EN_Pin|USER_LED_Pin|FIRE2_Pin|IMU1_CS_Pin
+                          |FIRE3_Pin|HIGH_G_CS_Pin|FIRE4_Pin|FLASH_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PAPin PAPin */
+  GPIO_InitStruct.Pin = FIRE1_Pin|RAD915_RST_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PE7 PEPin PEPin */
   GPIO_InitStruct.Pin = GPIO_PIN_7|IMU1_INT_Pin|HIGH_G_INT_Pin;
@@ -99,13 +106,6 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = RAD915_RST_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(RAD915_RST_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = RAD915_IO3_Pin;

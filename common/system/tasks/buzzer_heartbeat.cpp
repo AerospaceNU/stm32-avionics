@@ -5,7 +5,7 @@
 static uint32_t last_time = 0;
 static int buzzerId_ = 0;
 const int goodFreq = 1000;
-const int badFreq = 300;
+const int badFreq = 500;
 
 void buzzerHeartbeat_setBuzzer(int buzzerId) { buzzerId_ = buzzerId; }
 

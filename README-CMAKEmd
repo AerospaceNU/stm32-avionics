@@ -41,7 +41,7 @@ On Windows, I had to add `-DCMAKE_GENERATOR=Ninja` to the above, since I have MS
 
 Windows:
 ```
-cmake -B build -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_C_COMPILER="C:\\Program Files (x86)\\Arm GNU Toolchain arm-none-eabi\\12.3 rel1\\bin" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32-cmake/cmake/stm32_gcc.cmake" -DCMAKE_GENERATOR=Ninja
+cmake -B build_stm32 -DPROJECT_BUILD_TYPE="stm32" -DCMAKE_C_COMPILER="C:\\Program Files (x86)\\Arm GNU Toolchain arm-none-eabi\\12.3 rel1\\bin" -DCMAKE_TOOLCHAIN_FILE="cmake/stm32-cmake/cmake/stm32_gcc.cmake" -DCMAKE_GENERATOR=Ninja
 ```
 
 ## Building code for a FCB
