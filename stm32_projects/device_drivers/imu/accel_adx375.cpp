@@ -22,7 +22,8 @@ struct RegisterAddress {
 // TODO the datasheet says this is +-11%, def needs calibration per-chip. at
 // least it doesn't change all that much vs temperature (.02%/deg C for
 // sensitivity, 10mG/deg C for 0g offset)
-#define ACCEL_SENSITIVITY 20.5;
+// Units are lsb per G
+constexpr float ACCEL_SENSITIVITY = 20.5 / G_TO_MPS2(1);
 #define ACCEL_FS G_TO_MPS2(200)
 
 #include "usb_std.h"
@@ -74,10 +75,20 @@ void AccelAdx375::newData() {
 			.address = REG_DATAX0, .multiByteRequest = true, .isRead = true }),
 			reinterpret_cast<uint8_t*>(&data.raw), sizeof(data.raw));
 
+	constexpr Axis3dReal_s accelOffset = {
+			.x = -2.76,
+			.y = 6.31,
+			.z = -5.63
+	};
+
 	// and convert to real units. Note that ticks / (ticks / unit) = unit
-	data.realMps2.x = data.raw.x / ACCEL_SENSITIVITY * ACCEL_FS;
-	data.realMps2.y = data.raw.y / ACCEL_SENSITIVITY * ACCEL_FS;
-	data.realMps2.z = data.raw.z / ACCEL_SENSITIVITY * ACCEL_FS;
+	data.realMps2.x = data.raw.x / ACCEL_SENSITIVITY;
+	data.realMps2.y = data.raw.y / ACCEL_SENSITIVITY;
+	data.realMps2.z = data.raw.z / ACCEL_SENSITIVITY;
+
+	data.realMps2.x += accelOffset.x;
+	data.realMps2.y += accelOffset.y;
+	data.realMps2.z += accelOffset.z;
 }
 
 double AccelAdx375::getAccelFullscaleMps2() {

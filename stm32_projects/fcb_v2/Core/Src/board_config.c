@@ -41,7 +41,7 @@ uint16_t accelAdx375CsPin[NUM_ACCEL_ADX375] = {HIGH_G_CS_Pin};
 // Index 0 of this struct is read to determine the sensor axis to measure accel in board X
 // So if board X = - sensor Y, the first index should be {AXIS_Y, -1}
 const Orientation_s accelBoardToLocal[NUM_ACCEL][3] = {
-    {{AXIS_X, -1}, {AXIS_Y, 1}, {AXIS_Z, -1}},
+    {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, 1}},
 };
 int accelFilterPriority[NUM_ACCEL] = {1};
 
@@ -92,12 +92,12 @@ uint16_t imuIcm42688CsPin[NUM_IMU_ICM42688] = {IMU1_CS_Pin};
 // Index 0 of this struct is read to determine the sensor axis to measure accel in board X
 // So if board X = - sensor Y, the first index should be {AXIS_Y, -1}
 const Orientation_s imuBoardToLocal[NUM_IMU][3] = {
-    {{AXIS_Y, -1}, {AXIS_X, -1}, {AXIS_Z, -1}}};
+    {{AXIS_Y, -1}, {AXIS_X, 1}, {AXIS_Z, 1}}};
 int imuAccelFilterPriority[NUM_IMU] = {2};
 
 SPI_HandleTypeDef* magLis3mdlHi2c[NUM_MAG_LIS3MDL] = {&hspi2};
 const Orientation_s magBoardToLocal[NUM_MAG][3] = {
-    {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, -1}}};
+    {{AXIS_Y, 1}, {AXIS_X, -1}, {AXIS_Z, 1}}};
 
 /* LEDs */
 

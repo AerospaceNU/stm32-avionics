@@ -549,7 +549,7 @@ void hm_hardwareInit() {
 
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200_WITH_CC1200
     radioTi915[i].has_cc1190 = true;
-#ense
+#else
     radioTi915[i].has_cc1190 = false;
 #endif
 #if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
@@ -576,7 +576,10 @@ void hm_hardwareInit() {
     // Enable HGM on CC1200s TODO: Make function to enable HGM in radio
     HAL_GPIO_WritePin(radioTi915HgmGpioPort[i], radioTi915HgmPin[i],
                       GPIO_PIN_SET);
-#endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
+#else
+    // No CC1190 -- crank output power since no input power limits (and no cc1190 to protect)
+    tiRadio_setOutputPower(radioTi915 + 0, 15);
+    #endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
   }
 #endif  // HAS_DEV(RADIO_TI_915)
 
