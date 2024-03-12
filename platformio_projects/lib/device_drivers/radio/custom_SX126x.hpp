@@ -70,7 +70,7 @@ public:
 		/*!
 		 * \brief Enables/disables driver debug features
 		 */
-		SX126x_DEBUG = 0,
+		SX126x_DEBUG = 1,
 
 		/*!
 		 * \brief List of matching supported by the sx126x

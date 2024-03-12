@@ -139,7 +139,7 @@ uint32_t SX126x::GetRandom( void )
 	// Set radio in continuous reception
 	SetRx(0);
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	delay(1);
 
 	ReadRegister( RANDOM_NUMBER_GENERATORBASEADDR, buf, 4 );
 
@@ -150,7 +150,7 @@ uint32_t SX126x::GetRandom( void )
 
 void SX126x::SetSleep( SleepParams_t sleepConfig )
 {
-	std::lock_guard<std::mutex> lg(IOLock2);
+	// std::lock_guard<std::mutex> lg(IOLock2);
 
 #ifdef ADV_DEBUG
 	printf("SetSleep ");
@@ -162,7 +162,7 @@ void SX126x::SetSleep( SleepParams_t sleepConfig )
 
 void SX126x::SetStandby( RadioStandbyModes_t standbyConfig )
 {
-	std::lock_guard<std::mutex> lg(IOLock2);
+	// std::lock_guard<std::mutex> lg(IOLock2);
 
 #ifdef ADV_DEBUG
 	printf("SetStandby ");
@@ -180,7 +180,7 @@ void SX126x::SetStandby( RadioStandbyModes_t standbyConfig )
 
 void SX126x::SetFs( void )
 {
-	std::lock_guard<std::mutex> lg(IOLock2);
+	// std::lock_guard<std::mutex> lg(IOLock2);
 
 #ifdef ADV_DEBUG
 	printf("SetFs ");
@@ -191,7 +191,7 @@ void SX126x::SetFs( void )
 
 void SX126x::SetTx( uint32_t timeout )
 {
-	std::lock_guard<std::mutex> lg(IOLock2);
+	// std::lock_guard<std::mutex> lg(IOLock2);
 
 	uint8_t buf[3];
 
@@ -212,7 +212,7 @@ void SX126x::SetTx( uint32_t timeout )
 
 void SX126x::SetRxBoosted( uint32_t timeout )
 {
-	std::lock_guard<std::mutex> lg(IOLock2);
+	// std::lock_guard<std::mutex> lg(IOLock2);
 
 	uint8_t buf[3];
 
@@ -235,7 +235,7 @@ void SX126x::SetRxBoosted( uint32_t timeout )
 
 void SX126x::SetRx( uint32_t timeout )
 {
-	std::lock_guard<std::mutex> lg(IOLock2);
+	// std::lock_guard<std::mutex> lg(IOLock2);
 
 	uint8_t buf[3];
 
@@ -256,7 +256,7 @@ void SX126x::SetRx( uint32_t timeout )
 
 void SX126x::SetRxDutyCycle( uint32_t rxTime, uint32_t sleepTime )
 {
-	std::lock_guard<std::mutex> lg(IOLock2);
+	// std::lock_guard<std::mutex> lg(IOLock2);
 
 	uint8_t buf[6];
 
@@ -275,7 +275,7 @@ void SX126x::SetRxDutyCycle( uint32_t rxTime, uint32_t sleepTime )
 
 void SX126x::SetCad( void )
 {
-	std::lock_guard<std::mutex> lg(IOLock2);
+	// std::lock_guard<std::mutex> lg(IOLock2);
 
 	HalPostTx();
 	HalPreRx();
@@ -285,7 +285,7 @@ void SX126x::SetCad( void )
 
 void SX126x::SetTxContinuousWave( void )
 {
-	std::lock_guard<std::mutex> lg(IOLock2);
+	// std::lock_guard<std::mutex> lg(IOLock2);
 
 #ifdef ADV_DEBUG
 	printf("SetTxContinuousWave ");
@@ -298,7 +298,7 @@ void SX126x::SetTxContinuousWave( void )
 
 void SX126x::SetTxInfinitePreamble( void )
 {
-	std::lock_guard<std::mutex> lg(IOLock2);
+	// std::lock_guard<std::mutex> lg(IOLock2);
 
 #ifdef ADV_DEBUG
 	printf("SetTxContinuousPreamble ");
@@ -928,7 +928,7 @@ void SX126x::SetNetworkType(SX126x::NetworkType_t nt) {
 }
 
 void SX126x::Reset() {
-	std::lock_guard<std::mutex> lg(IOLock);
+	// std::lock_guard<std::mutex> lg(IOLock);
 
 	HalGpioWrite(GPIO_PIN_RESET, 0);
 	delay(10);
@@ -937,7 +937,7 @@ void SX126x::Reset() {
 }
 
 void SX126x::Wakeup() {
-	std::lock_guard<std::mutex> lg(IOLock);
+	// std::lock_guard<std::mutex> lg(IOLock);
 
 	if (SX126x_DEBUG) {
 		printf("SX126x: Wakeup\n");
@@ -961,7 +961,7 @@ void SX126x::WriteCommand(SX126x::RadioCommands_t opcode, uint8_t *buffer, uint1
 	merged_buf[0] = opcode;
 	memcpy(merged_buf+1, buffer, size);
 
-	std::lock_guard<std::mutex> lg(IOLock);
+	// std::lock_guard<std::mutex> lg(IOLock);
 
 	if (SX126x_DEBUG) {
 		printf("SX126x: WriteCommand: 0x%02x %u\n", opcode, size);
@@ -975,7 +975,7 @@ void SX126x::WriteCommand(SX126x::RadioCommands_t opcode, uint8_t *buffer, uint1
 }
 
 void SX126x::ReadCommand(SX126x::RadioCommands_t opcode, uint8_t *buffer, uint16_t size) {
-	std::lock_guard<std::mutex> lg(IOLock);
+	// std::lock_guard<std::mutex> lg(IOLock);
 
 	WaitOnBusy();
 
@@ -992,7 +992,7 @@ void SX126x::ReadCommand(SX126x::RadioCommands_t opcode, uint8_t *buffer, uint16
 }
 
 void SX126x::WriteRegister(uint16_t address, uint8_t *buffer, uint16_t size) {
-	std::lock_guard<std::mutex> lg(IOLock);
+	// std::lock_guard<std::mutex> lg(IOLock);
 
 	if (SX126x_DEBUG) {
 		printf("SX126x: WriteRegister: 0x%04x %u\n", address, size);
@@ -1020,7 +1020,7 @@ void SX126x::WriteReg(uint16_t address, uint8_t value) {
 }
 
 void SX126x::ReadRegister(uint16_t address, uint8_t *buffer, uint16_t size) {
-	std::lock_guard<std::mutex> lg(IOLock);
+	// std::lock_guard<std::mutex> lg(IOLock);
 
 	WaitOnBusy();
 
@@ -1046,7 +1046,7 @@ uint8_t SX126x::ReadReg(uint16_t address) {
 }
 
 void SX126x::WriteBuffer(uint8_t offset, uint8_t *buffer, uint8_t size) {
-	std::lock_guard<std::mutex> lg(IOLock);
+	// std::lock_guard<std::mutex> lg(IOLock);
 
 	WaitOnBusy();
 
@@ -1062,7 +1062,7 @@ void SX126x::WriteBuffer(uint8_t offset, uint8_t *buffer, uint8_t size) {
 }
 
 void SX126x::ReadBuffer(uint8_t offset, uint8_t *buffer, uint8_t size) {
-	std::lock_guard<std::mutex> lg(IOLock);
+	// std::lock_guard<std::mutex> lg(IOLock);
 
 	WaitOnBusy();
 
@@ -1086,18 +1086,18 @@ void SX126x::SetDeviceType(SX126x::DeviceType_t devtype) {
 
 void SX126x::WaitOnBusyLong() {
 	while (HalGpioRead(GPIO_PIN_BUSY)) {
-		std::this_thread::sleep_for(std::chrono::microseconds(1));
+		delayMicroseconds(1);
 	}
 }
 
 void SX126x::WaitOnBusy() {
 	while (HalGpioRead(GPIO_PIN_BUSY)) {
-		std::this_thread::sleep_for(std::chrono::microseconds(10));
+		delayMicroseconds(10);
 	}
 }
 
 void SX126x::WaitOnCounter() {
-	std::this_thread::sleep_for(std::chrono::microseconds(126));
+	delayMicroseconds(126);
 }
 
 uint32_t SX126x::GetTimeOnAir(const SX126x::ModulationParams_t &modparams, const SX126x::PacketParams_t &pktparams) {

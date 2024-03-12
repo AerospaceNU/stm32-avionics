@@ -52,6 +52,11 @@ class ArduinoSx126x : public SX126x {
     SPI.transferBytes(buffer_out, buffer_in, size);
     SPI.endTransaction();
     digitalWrite(SX1262_CS, HIGH);
+
+    Serial.println("SPI result:");
+    for (int i = 0; i < size; i++) {
+      Serial.printf("out[%i]=%u, in[%i]=%u\n", i, buffer_out[i], i, buffer_in[i]);
+    }
   }
 };
 
@@ -93,10 +98,14 @@ void loop() {
 
   radio.SetModulationParams(ModulationParams2);
   radio.SetPacketParams(PacketParams2);
+
+  radio.SetRfFrequency(915150000);
+  radio.SetDio2AsRfSwitchCtrl(true);
+
   radio.SetBufferBaseAddresses(0, 128);
   Serial.print("Errors on configuration: "); Serial.println(radio.GetDeviceErrors().Value);
 
-  uint8_t testPayload[16];
+  uint8_t testPayload[32];
   for (int i = 0; i < sizeof(testPayload); i++) testPayload[i] = i;
   radio.SetPayload(testPayload, sizeof(testPayload));
   radio.SetTx(0);
