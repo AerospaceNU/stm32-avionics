@@ -106,6 +106,7 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_Delay(5000);
   main_cpp();
 
   /* USER CODE END 2 */

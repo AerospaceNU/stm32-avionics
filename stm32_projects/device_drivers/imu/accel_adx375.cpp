@@ -70,26 +70,14 @@ bool AccelAdx375::begin(SpiCtrl_t spi_) {
 
 void AccelAdx375::newData() {
 
-//	HAL_Delay(1000);
-//	CustomPrintf("adxl375 register map:\n");
-//	for (size_t i = 0; i < 0x39; i++) {
-//		auto val = spi_readRegister(&spi, to_size_type(RegisterAddress {
-//				.address = i, .multiByteRequest = false, .isRead = true }));
-//		CustomPrintf("0x%X = [0x%X]\n", i, val);
-//	}
-//	HAL_Delay(1000);
-
 	spi_readRegisters(&spi, to_size_type(RegisterAddress {
 			.address = REG_DATAX0, .multiByteRequest = true, .isRead = true }),
 			reinterpret_cast<uint8_t*>(&data.raw), sizeof(data.raw));
 
 	// and convert to real units. Note that ticks / (ticks / unit) = unit
-	data.realMps2.x = data.raw.x / ACCEL_SENSITIVITY
-	;
-	data.realMps2.y = data.raw.y / ACCEL_SENSITIVITY
-	;
-	data.realMps2.z = data.raw.z / ACCEL_SENSITIVITY
-	;
+	data.realMps2.x = data.raw.x / ACCEL_SENSITIVITY * ACCEL_FS;
+	data.realMps2.y = data.raw.y / ACCEL_SENSITIVITY * ACCEL_FS;
+	data.realMps2.z = data.raw.z / ACCEL_SENSITIVITY * ACCEL_FS;
 }
 
 double AccelAdx375::getAccelFullscaleMps2() {
