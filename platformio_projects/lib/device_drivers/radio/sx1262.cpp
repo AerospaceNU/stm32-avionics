@@ -2,6 +2,8 @@
 // Created by nathan on 5/14/23.
 //
 
+#if 0
+
 #include "sx1262.h"
 
 #ifdef HSPI
@@ -55,3 +57,4 @@ bool Sx1262::readData(uint8_t *buffer, size_t buffer_length) {
 
   return success;
 }
+#endif
