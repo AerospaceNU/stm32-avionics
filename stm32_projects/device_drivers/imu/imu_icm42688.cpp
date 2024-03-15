@@ -4,8 +4,8 @@
 
 #include "imu_icm42688.h"
 
-#include "const_map.h"
 #include "bit_helper.h"
+#include "const_map.h"
 
 // registers in bank 0
 #define REG_GYRO_CONFIG0 79
@@ -64,7 +64,7 @@ void ImuIcm42688::setGyroConfig(const GyroFullscale range,
   };
   GYRO_CONFIG0 config0{
       .odr = gyroRate,
-    		  .reserved=0,
+      .reserved = 0,
       .fs = fsSetting.regValue,
   };
 
@@ -83,7 +83,7 @@ void ImuIcm42688::setAccelConfig(const AccelFullscale range,
   };
   ACCEL_CONFIG0 config0{
       .odr = accelRate,
-    		  .reserved=0,
+      .reserved = 0,
       .fs = fsSetting.regValue,
   };
 
@@ -111,7 +111,7 @@ bool ImuIcm42688::begin(SpiCtrl_t spi_) {
   setBank(0);
   volatile auto bank = spi_readRegister(&spi, REG_READ(REG_BANK_SEL));
   if (bank != 0) {
-	  return false;
+    return false;
   }
   spi_writeRegister(&spi, REG_WRITE(REG_DEVICE_CONFIG), 1);
   HAL_Delay(1);  // Wait 1ms per datasheet
@@ -147,39 +147,38 @@ bool ImuIcm42688::begin(SpiCtrl_t spi_) {
 }
 
 void ImuIcm42688::newData() {
+  struct [[gnu::packed]] AccelTempRaw {
+    int16_t temp;
+    Axis3dRaw_s accel;
+    Axis3dRaw_s angVel;
+  };
+  AccelTempRaw raw;
+  spi_readRegisters(&spi, REG_READ(REG_TEMP_DATA1),
+                    reinterpret_cast<uint8_t*>(&raw), sizeof(raw));
 
-	struct [[gnu::packed]] AccelTempRaw {
-		int16_t temp;
-		Axis3dRaw_s accel;
-		Axis3dRaw_s angVel;
-	};
-	AccelTempRaw raw;
-	spi_readRegisters(&spi, REG_READ(REG_TEMP_DATA1),
-			reinterpret_cast<uint8_t*>(&raw), sizeof(raw));
+  // and swap all the numbers around
+  if constexpr (std::endian::native == std::endian::little) {
+    for (int i = 0; i < sizeof(raw) / sizeof(int16_t); i++) {
+      auto member = &raw.temp + i;
+      *member = std::byteswap(*member);
+    }
+  }
 
-	// and swap all the numbers around
-	if constexpr (std::endian::native == std::endian::little) {
-		for (int i = 0; i < sizeof(raw) / sizeof(int16_t); i++) {
-			auto member = &raw.temp + i;
-			*member = std::byteswap(*member);
-		}
-	}
+  data.accelRaw = raw.accel;
+  data.angVelRaw = raw.angVel;
 
-	data.accelRaw = raw.accel;
-	data.angVelRaw = raw.angVel;
+  // and convert to real units. Note that ticks / (ticks / unit) = unit
+  float accelSensitivity = G_TO_MPS2(1.0) / accelFS.sensitivity;
+  float gyroSensitivity = DEG_TO_RAD(1.0) / gyroFS.sensitivity;
+  data.accelRealMps2.x = raw.accel.x * accelSensitivity;
+  data.accelRealMps2.y = raw.accel.y * accelSensitivity;
+  data.accelRealMps2.z = raw.accel.z * accelSensitivity;
+  data.angVelRealRadps.x = raw.angVel.x * gyroSensitivity;
+  data.angVelRealRadps.y = raw.angVel.y * gyroSensitivity;
+  data.angVelRealRadps.z = raw.angVel.z * gyroSensitivity;
 
-	// and convert to real units. Note that ticks / (ticks / unit) = unit
-	float accelSensitivity = G_TO_MPS2(1.0) / accelFS.sensitivity;
-	float gyroSensitivity = DEG_TO_RAD(1.0) / gyroFS.sensitivity;
-	data.accelRealMps2.x = raw.accel.x * accelSensitivity;
-	data.accelRealMps2.y = raw.accel.y * accelSensitivity;
-	data.accelRealMps2.z = raw.accel.z * accelSensitivity;
-	data.angVelRealRadps.x = raw.angVel.x * gyroSensitivity;
-	data.angVelRealRadps.y = raw.angVel.y * gyroSensitivity;
-	data.angVelRealRadps.z = raw.angVel.z * gyroSensitivity;
-
-	// Convert temp per page 65
-	tempC = raw.temp / 132.48 + 25;
+  // Convert temp per page 65
+  tempC = raw.temp / 132.48 + 25;
 }
 
 double ImuIcm42688::getAccelFullscaleMps2() { return accelFS.fullscale; }

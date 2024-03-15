@@ -62,13 +62,11 @@ bool MagLis3mdl::begin(SpiCtrl_t spi_) {
 }
 
 void MagLis3mdl::newData() {
-  spi_readRegisters(&spi,
-		  to_size_type(RegisterAddress{
-		            .address = REG_OUT_X_L,
-		            .multiByteRequest = true,
-					.isRead = 1})
-		  , reinterpret_cast<uint8_t*>(&data.raw),
-                    sizeof(data.raw));
+  spi_readRegisters(
+      &spi,
+      to_size_type(RegisterAddress{
+          .address = REG_OUT_X_L, .multiByteRequest = true, .isRead = 1}),
+      reinterpret_cast<uint8_t*>(&data.raw), sizeof(data.raw));
 
   // and convert to real units. Note that ticks / (ticks / unit) = unit
   data.realGauss.x = data.raw.x / MAG_SENSITIVITY;

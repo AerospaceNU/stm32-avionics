@@ -288,13 +288,16 @@ static bool inSim = false;
 static CircularBuffer_s *simRxBuffer = NULL;
 
 void hm_hardwareInit() {
-
-	HAL_GPIO_WritePin(accelAdx375CsGpioPort[0], accelAdx375CsPin[0], GPIO_PIN_SET);
-	HAL_GPIO_WritePin(barometerMs5607CsGpioPort[0], barometerMs5607CsPin[0], GPIO_PIN_SET);
-	HAL_GPIO_WritePin(imuIcm42688CsGpioPort[0], imuIcm42688CsPin[0], GPIO_PIN_SET);
-	HAL_GPIO_WritePin(flashMb85rsxCsGpioPort[0], flashMb85rsxCsPin[0], GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, GPIO_PIN_SET);
-	HAL_Delay(10);
+  HAL_GPIO_WritePin(accelAdx375CsGpioPort[0], accelAdx375CsPin[0],
+                    GPIO_PIN_SET);
+  HAL_GPIO_WritePin(barometerMs5607CsGpioPort[0], barometerMs5607CsPin[0],
+                    GPIO_PIN_SET);
+  HAL_GPIO_WritePin(imuIcm42688CsGpioPort[0], imuIcm42688CsPin[0],
+                    GPIO_PIN_SET);
+  HAL_GPIO_WritePin(flashMb85rsxCsGpioPort[0], flashMb85rsxCsPin[0],
+                    GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, GPIO_PIN_SET);
+  HAL_Delay(10);
 
   /* Accelerometers */
 #if HAS_DEV(ACCEL_H3LIS331DL)
@@ -445,8 +448,8 @@ void hm_hardwareInit() {
 
 #if HAS_DEV(MAG_LIS3MDL)
   for (int i = 0; i < NUM_MAG_LIS3MDL; i++) {
-    hardwareStatusMag[FIRST_ID_MAG_LIS3MDL + i] = magLis3mdl[i].begin(
-        {imuIcm42688Hspi[0], GPIOB, GPIO_PIN_11});
+    hardwareStatusMag[FIRST_ID_MAG_LIS3MDL + i] =
+        magLis3mdl[i].begin({imuIcm42688Hspi[0], GPIOB, GPIO_PIN_11});
   }
 #endif
 
@@ -577,9 +580,10 @@ void hm_hardwareInit() {
     HAL_GPIO_WritePin(radioTi915HgmGpioPort[i], radioTi915HgmPin[i],
                       GPIO_PIN_SET);
 #else
-    // No CC1190 -- crank output power since no input power limits (and no cc1190 to protect)
+    // No CC1190 -- crank output power since no input power limits (and no
+    // cc1190 to protect)
     tiRadio_setOutputPower(radioTi915 + 0, 15);
-    #endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
+#endif  // RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200
   }
 #endif  // HAS_DEV(RADIO_TI_915)
 

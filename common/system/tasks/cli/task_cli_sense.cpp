@@ -107,9 +107,11 @@ void CliTasks::sense() {
     dtoa(float1, sizeof(float1), data->gpsData[i].generalData.hdop, 3);
     snprintf(cliStr, sizeof(cliStr), "GPS %d hdop: %s\r\n", i, float1);
     cli_send(cliStr);
-    snprintf(cliStr, sizeof(cliStr), "GPS %d sats (num): %u\r\n", i, data->gpsData[i].generalData.satsTracked);
+    snprintf(cliStr, sizeof(cliStr), "GPS %d sats (num): %u\r\n", i,
+             data->gpsData[i].generalData.satsTracked);
     cli_send(cliStr);
-    snprintf(cliStr, sizeof(cliStr), "GPS %d fix quality: %u\r\n", i, data->gpsData[i].generalData.fixQuality);
+    snprintf(cliStr, sizeof(cliStr), "GPS %d fix quality: %u\r\n", i,
+             data->gpsData[i].generalData.fixQuality);
     cli_send(cliStr);
   }
 #endif  // HAS_DEV(GPS)

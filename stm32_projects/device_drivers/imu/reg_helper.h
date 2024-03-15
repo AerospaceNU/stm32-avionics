@@ -36,8 +36,9 @@ requires(sizeof(T) <=
          sizeof(uint64_t)) using size_type_of = size_to_type<sizeof(T)>::result;
 
 /**
- * @brief Convert a register struct of type T to its standard uint form. Automatically converts structs of size 8, 16, 32, or 64 bits into a uintN_t.
- * 
+ * @brief Convert a register struct of type T to its standard uint form.
+ * Automatically converts structs of size 8, 16, 32, or 64 bits into a uintN_t.
+ *
  * @tparam T What kind of register struct we are converting to a size type.
  */
 template <typename T>
