@@ -1,9 +1,10 @@
 #include "accel_adx375.h"
 
-#include "math_utils.h"
-#include "reg_helper.h"
 
 #if HAS_DEV(ACCEL_ADX375)
+
+#include "reg_helper.h"
+#include "math_utils.h"
 
 struct RegisterAddress {
   uint8_t address : 6;
