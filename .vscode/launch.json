@@ -171,35 +171,35 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "/home/matt/stm32-avionics/.pio/build/blink/firmware.elf",
-            "projectEnvName": "blink",
-            "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "executable": "C:/Users/matth/Documents/GitHub/stm32-avionics/.pio/build/fcb_nrf/firmware.elf",
+            "projectEnvName": "fcb_nrf",
+            "toolchainBinDir": "C:/Users/matth/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/bin",
             "internalConsoleOptions": "openOnSessionStart",
-            "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
+            "svdPath": "C:/Users/matth/.platformio/platforms/nordicnrf52/misc/svd/nrf52840.svd",
             "preLaunchTask": {
                 "type": "PlatformIO",
-                "task": "Pre-Debug"
+                "task": "Pre-Debug (fcb_nrf)"
             }
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "/home/matt/stm32-avionics/.pio/build/blink/firmware.elf",
-            "projectEnvName": "blink",
-            "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "executable": "C:/Users/matth/Documents/GitHub/stm32-avionics/.pio/build/fcb_nrf/firmware.elf",
+            "projectEnvName": "fcb_nrf",
+            "toolchainBinDir": "C:/Users/matth/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/bin",
             "internalConsoleOptions": "openOnSessionStart",
-            "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd"
+            "svdPath": "C:/Users/matth/.platformio/platforms/nordicnrf52/misc/svd/nrf52840.svd"
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
-            "executable": "/home/matt/stm32-avionics/.pio/build/blink/firmware.elf",
-            "projectEnvName": "blink",
-            "toolchainBinDir": "/home/matt/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "executable": "C:/Users/matth/Documents/GitHub/stm32-avionics/.pio/build/fcb_nrf/firmware.elf",
+            "projectEnvName": "fcb_nrf",
+            "toolchainBinDir": "C:/Users/matth/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/bin",
             "internalConsoleOptions": "openOnSessionStart",
-            "svdPath": "/home/matt/.platformio/platforms/atmelsam/misc/svd/ATSAMD21G18A.svd",
+            "svdPath": "C:/Users/matth/.platformio/platforms/nordicnrf52/misc/svd/nrf52840.svd",
             "loadMode": "manual"
         }
     ]

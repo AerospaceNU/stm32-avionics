@@ -1,5 +1,7 @@
 #include "mag_lis3mdl.h"
 
+#if HAS_DEV(MAG_LIS3MDL)
+
 #include "reg_helper.h"
 
 struct RegisterAddress {
@@ -73,3 +75,5 @@ void MagLis3mdl::newData() {
   data.realGauss.y = data.raw.y / MAG_SENSITIVITY;
   data.realGauss.z = data.raw.z / MAG_SENSITIVITY;
 }
+
+#endif

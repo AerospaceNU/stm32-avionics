@@ -31,7 +31,7 @@ uint16_t combine_to_u16(uint8_t high, uint8_t low);
 }
 #endif
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && __cplusplus >= 202002L
 namespace std {
 template <std::integral T>
 constexpr T byteswap(T value) noexcept {

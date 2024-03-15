@@ -4,6 +4,8 @@
 
 #include "imu_icm42688.h"
 
+#if HAS_DEV(IMU_ICM42688)
+
 #include "bit_helper.h"
 #include "const_map.h"
 
@@ -24,8 +26,6 @@ constexpr uint8_t REG_RW_MASK = (1 << 7);
 #define REG_WRITE(x) (x & ~REG_RW_MASK)
 
 #define WHO_AM_I 0x47
-
-#if HAS_DEV(IMU_ICM42688)
 
 // ================================= //
 

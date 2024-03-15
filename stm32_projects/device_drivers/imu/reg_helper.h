@@ -6,6 +6,10 @@
 #include <iostream>
 #include <type_traits>
 
+#if __cplusplus >= 202002L
+    // C++20 (and later) code
+
+
 // from https://stackoverflow.com/a/75844949
 
 template <uint8_t size>
@@ -47,3 +51,4 @@ requires(sizeof(T) <=
     -> size_type_of<T> {
   return *reinterpret_cast<size_type_of<T>*>(&x);
 }
+#endif
