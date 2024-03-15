@@ -547,7 +547,7 @@ void hm_hardwareInit() {
     radioTi915[i].initialized = false;
     radioTi915[i].pinmask = {false, false, true};
 
-#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200_WITH_CC1200
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200_WITH_CC1190
     radioTi915[i].has_cc1190 = true;
 #else
     radioTi915[i].has_cc1190 = false;
@@ -561,7 +561,7 @@ void hm_hardwareInit() {
     hardwareStatusRadio[FIRST_ID_RADIO_TI_915 + i] =
         tiRadio_init(&radioTi915[i]);
 
-#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200_WITH_CC1200
+#if RADIO_TI_TYPE == RADIO_TI_TYPE_CC1200_WITH_CC1190
     // PA/LNA control pins. TODO this seems somewhat code-smell-y since we
     // have CC1200 registers in hardware manager?
 
