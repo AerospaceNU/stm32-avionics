@@ -53,17 +53,23 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, PERIPH_EN_Pin|USER_LED_Pin|FIRE2_Pin|IMU1_CS_Pin
-                          |FIRE3_Pin|HIGH_G_CS_Pin|FIRE4_Pin|FLASH_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, PERIPH_EN_Pin|USER_LED_Pin|FIRE2_Pin|FIRE3_Pin
+                          |FIRE4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, FIRE1_Pin|RAD915_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(MAG1_CS_GPIO_Port, MAG1_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, IMU1_CS_Pin|HIGH_G_CS_Pin|FLASH_CS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, BARO1_CS_Pin|FRAM_CS_Pin|RAD915_CS_Pin|GPIO_PIN_2, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(MAG1_CS_GPIO_Port, MAG1_CS_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, BARO1_CS_Pin|FRAM_CS_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, RAD915_CS_Pin|GPIO_PIN_2, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PEPin PEPin PEPin PEPin
                            PEPin PEPin PEPin PEPin */
