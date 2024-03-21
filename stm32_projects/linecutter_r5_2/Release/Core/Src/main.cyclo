@@ -1,4 +1,4 @@
-../Core/Src/main.cpp:135:6:void SystemClock_Config()	3
-../Core/Src/main.cpp:201:6:void PeriphCommonClock_Config()	2
-../Core/Src/main.cpp:71:5:int main()	1
-../Core/Src/main.cpp:229:6:void Error_Handler()	1
+../Core/Src/main.cpp:137:6:void SystemClock_Config()	3
+../Core/Src/main.cpp:203:6:void PeriphCommonClock_Config()	2
+../Core/Src/main.cpp:72:5:int main()	1
+../Core/Src/main.cpp:231:6:void Error_Handler()	1

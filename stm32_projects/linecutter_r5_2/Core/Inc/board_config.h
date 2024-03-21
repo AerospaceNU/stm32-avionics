@@ -16,4 +16,6 @@
 
 #define NUM_FLASH_S25FLX 1
 
+#define NUM_IMU_ICM20600 1
+
 #endif /* INC_BOARD_CONFIG_H_ */

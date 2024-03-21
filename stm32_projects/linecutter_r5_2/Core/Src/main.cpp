@@ -23,12 +23,13 @@
 #include "rf.h"
 #include "rtc.h"
 #include "spi.h"
+#include "usb.h"
 #include "gpio.h"
-
+#include "scheduler.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "scheduler.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -102,6 +103,7 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_RTC_Init();
+  MX_USB_PCD_Init();
   MX_RF_Init();
   /* USER CODE BEGIN 2 */
 
@@ -121,7 +123,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-//    MX_APPE_Process();
+    MX_APPE_Process();
 
     /* USER CODE BEGIN 3 */
   }
