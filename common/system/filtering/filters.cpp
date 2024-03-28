@@ -3,19 +3,18 @@
  */
 
 #include "filters.h"
-
+#include <iostream>
 #include <cmath>
 #include <cstring>
 
 #include "altitude_kalman.h"
 #include "board_config_common.h"
-#include "circular_buffer.h"
 #include "cli.h"
 #include "data_log.h"
 #include "hardware_manager.h"
 #include "math_utils.h"
 #include "orientation_estimator.h"
-
+#include "cpp_circular_buffer.h"
 #define RAD_TO_DEG 57.29578     // 180 / PI
 #define MATH_PI 3.141592653589  // PI
 #define R_DRY_AIR 287.0474909   // J/K/kg
@@ -30,24 +29,23 @@
 #define kGyroRefCount 10
 
 static double runningPresMedians[kPrevPresMedianCount + 1];
-static CircularBuffer_s runningPresMediansBuffer;
+static CircularBuffer <float,kPrevPresMedianCount> runningPresMediansBuffer;
 static uint8_t runningPresMedianCount;
 static double runningPres[kPrevPresCount + 1];
-static CircularBuffer_s runningPresBuffer;
+CircularBuffer <float,kPrevPresMedianCount> runningPresBuffer;
 static uint8_t runningPresCount;
 
 static double gravityRefBuffer[kGravityRefCount];
 static double runningGravityRef[kGravityRefCount + 1];
-static CircularBuffer_s runningGravityRefBuffer;
-
+static CircularBuffer <int32_t,kGravityRefCount + 1> runningGravityRefBuffer;
 static float gyroXRefBack[kGyroRefCount + 1];
-static CircularBuffer_s gyroXRefBuffer;
+static CircularBuffer <float,kGyroRefCount> gyroXRefBuffer;
 static float gyroXOffset;
 static float gyroYRefBack[kGyroRefCount + 1];
-static CircularBuffer_s gyroYRefBuffer;
+static CircularBuffer<float,kGyroRefCount> gyroYRefBuffer;
 static float gyroYOffset;
 static float gyroZRefBack[kGyroRefCount + 1];
-static CircularBuffer_s gyroZRefBuffer;
+static CircularBuffer<float,kGravityRefCount> gyroZRefBuffer;
 static float gyroZOffset;
 
 static FilterData_s filterData;
@@ -65,19 +63,6 @@ void filter_init(float dt) {
   kalman.setDt(dt);
   orientationEstimator.reset();
   orientationEstimator.setDt(dt);
-  // Initialize circular buffers for running medians/running pressure values
-  cb_init(&runningPresMediansBuffer, (unknownPtr_t)runningPresMedians,
-          kPrevPresMedianCount + 1, sizeof(double));
-  cb_init(&runningPresBuffer, (unknownPtr_t)runningPres, kPrevPresCount + 1,
-          sizeof(double));
-  cb_init(&runningGravityRefBuffer, (unknownPtr_t)runningGravityRef,
-          kGravityRefCount + 1, sizeof(double));
-  cb_init(&gyroXRefBuffer, (unknownPtr_t)gyroXRefBack, kGyroRefCount + 1,
-          sizeof(float));
-  cb_init(&gyroYRefBuffer, (unknownPtr_t)gyroYRefBack, kGyroRefCount + 1,
-          sizeof(float));
-  cb_init(&gyroZRefBuffer, (unknownPtr_t)gyroZRefBack, kGyroRefCount + 1,
-          sizeof(float));
   gyroXOffset = 0;
   gyroYOffset = 0;
   gyroZOffset = 0;
@@ -342,22 +327,21 @@ static void filterGyros(SensorData_s* curSensorVals) {
   filterData.yaw = atan2(siny_cosp, cosy_cosp) * RAD_TO_DEG;
 }
 
-void updateGyroOffsetOneAxis(CircularBuffer_s* refBuffer, const float& newValue,
+void updateGyroOffsetOneAxis(CircularBuffer<float,kPrevPresCount>* refBuffer, const float& newValue,
                              float* offset) {
   uint8_t i;
   float gyroSum = 0;
   static float referenceBuffer[kGyroRefCount];
-  if (cb_full(refBuffer)) {
-    cb_dequeue(refBuffer, 1);
-  }
-  cb_enqueue(refBuffer, (unknownPtr_t)&newValue);
-  cb_peek(refBuffer, (unknownPtr_t)referenceBuffer, nullptr);
-
-  for (i = 0; i < cb_count(refBuffer); ++i) {
-    gyroSum += referenceBuffer[i];
+  if (refBuffer->full()) {
+    //cb_dequeue(refBuffer, 1);
+    refBuffer->dequeue(1);
   }
 
-  *offset = gyroSum / (float)cb_count(refBuffer);
+  refBuffer->enqueue(newValue);
+
+  gyroSum = refBuffer->get_sum();
+  *offset = gyroSum / (float)refBuffer->count();
+  std::cout << "Gyro Offeset: " <<*offset << std::endl;
 }
 
 void filter_addGyroRef() {
@@ -446,20 +430,16 @@ static double median(double* input, uint8_t count) {
 }
 
 void filter_addGravityRef() {
-  if (cb_full(&runningGravityRefBuffer)) {
-    cb_dequeue(&runningGravityRefBuffer, 1);
+  if (runningGravityRefBuffer.full()) {
+    runningGravityRefBuffer.dequeue(1);
   }
-  cb_enqueue(&runningGravityRefBuffer,
-             (unknownPtr_t) & (filterData.rocket_acc_x));
+  runningGravityRefBuffer.enqueue(filterData.rocket_acc_x);
 
-  cb_peek(&runningGravityRefBuffer, (unknownPtr_t)gravityRefBuffer, nullptr);
-
-  size_t gravCount = cb_count(&runningGravityRefBuffer);
-
+  size_t gravCount = runningGravityRefBuffer.count();
   double accelSum = 0;
-  for (uint8_t i = 0; i < gravCount; ++i) {
-    accelSum += gravityRefBuffer[i];
-  }
+  accelSum = runningGravityRefBuffer.get_sum();
+  std::cout << "accelSum " <<  (int) accelSum << std::endl;
+
 
   // Check that we are mostly in the direction of gravity in some direction.
   // If the sum of our accelerations averages out to less than half G per
@@ -479,14 +459,14 @@ void filter_addGravityRef() {
   // buffer
   if (accelSum < 0) {
     gravityRef *= -1;
-    cb_flush(&runningGravityRefBuffer);
+    runningGravityRefBuffer.flush();
   }
 }
 
 void filter_addPressureRef(SensorData_s* curSensorVals) {
   // Average current pressures
   double currentPres = filter_getAveragePressure(curSensorVals);
-
+  std::cout << "runningPresMedianCount " <<  (int) runningPresMedianCount << std::endl;
   // For the first 10 seconds (before we have any current medians
   // just set the current pressure ref so we don't depend on
   // a single initial value
@@ -494,44 +474,52 @@ void filter_addPressureRef(SensorData_s* curSensorVals) {
     presRef = currentPres;
   }
   // Make room for new value, discarding oldest pressure stored if full
-  if (cb_full(&runningPresBuffer)) {
-    cb_dequeue(&runningPresBuffer, 1);
+  if (runningPresBuffer.full()) {
+    runningPresBuffer.dequeue(1);
   }
 
   // Add current pressure
-  cb_enqueue(&runningPresBuffer, (unknownPtr_t)&currentPres);
-
+  runningPresBuffer.enqueue(currentPres);
   ++runningPresCount;
-
+  std::cout << "runningPresCount " <<  (int) runningPresCount << " kPrevPresCount " << (int) kPrevPresCount << std::endl;
   // Add median to the running medians every n values
   if (runningPresCount == kPrevPresCount) {
     runningPresCount = 0;
     if (runningPresMedianCount < kPrevPresMedianCount) ++runningPresMedianCount;
     // Make room for new value, discarding oldest median stored if full
-    if (cb_full(&runningPresMediansBuffer)) {
-      cb_dequeue(&runningPresMediansBuffer, 1);
+    if (
+    runningPresMediansBuffer.full()) {
+      runningPresMediansBuffer.dequeue(1);
     }
 
     // Add median of most recent values
     size_t numElements = kPrevPresCount;
-    cb_peek(&runningPresBuffer, (unknownPtr_t)medianArray, &numElements);
-    double currentMedian = median(medianArray, kPrevPresCount);
-    cb_enqueue(&runningPresMediansBuffer, (unknownPtr_t)&currentMedian);
+    double currentMedian = runningPresBuffer.get_med();
+    runningPresMediansBuffer.enqueue(currentMedian);
 
+    
+
+
+    presRef = runningPresMediansBuffer.get_med();
+    std::cout << "Pressure reference: " <<presRef << std::endl;
+    /*
     // Only set pressure ref if we have enough values recorded
     if (runningPresMedianCount == kPrevPresMedianCount) {
       // Now, find median of the last 100 seconds of data and set that to be
       // current ref
-      size_t numMedElements = kPrevPresMedianCount;
-      cb_peek(&runningPresMediansBuffer, (unknownPtr_t)medianArray,
-              &numMedElements);
-      presRef = median(medianArray, kPrevPresMedianCount);
+      //size_t numMedElements = kPrevPresMedianCount;
+      //cb_peek(&runningPresMediansBuffer, (unknownPtr_t)medianArray,
+              //&numMedElements);
+      //runningPresMediansBuffer.peek(medianArray,numMedElements);
+      //presRef = median(medianArray, kPrevPresMedianCount);
+      
     } else {
       // Otherwise (for the first 100 seconds) set current pressure ref to the
       // median of the last 10 seconds so that we have at least a somewhat
       // trustworthy reference
       presRef = runningPresMedians[0];
     }
+    */
   }
 }
 
