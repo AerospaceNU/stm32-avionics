@@ -47,6 +47,7 @@ void CliTasks::help() {
   generateDoc("", "-c int*1",
               "Configure radio channel (in multiples of bandwidth), negative "
               "numbers allowed");
+  generateDoc("", "-s string*1", "Configure radio call sign");
   generateDoc("", "-h", "Help for config. Prints current configuration values");
   generateDoc("--create_flight", "",
               "Clear state log and move back to preflight");

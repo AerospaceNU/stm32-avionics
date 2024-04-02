@@ -53,6 +53,7 @@ typedef struct {
   char* r;      // ground temperature
   bool h;       // help flag
   char* c;      // Radio channel, can be negative
+  char* s;      // call sign
   char* lcCmd;  // Line cuttter command
   char* lcId;   // Line cuttter id
 } CliOptionVals_s;
@@ -66,6 +67,7 @@ typedef struct __attribute__((__packed__)) {
   double groundElevationM;
   double groundTemperatureC;
   int32_t radioChannel;
+  char callsign[8];
 } CliConfigs_s;
 
 /**

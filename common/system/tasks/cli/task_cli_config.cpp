@@ -188,6 +188,18 @@ void CliTasks::config() {
     }
   }
 
+  // Configure call sign
+  if (options.s) {
+    if (strlen(options.s) > 7) {
+      cli_sendAck(false, "Call sign must be seven characters or less");
+      return;
+    }
+    snprintf(cli_getConfigs()->callsign, sizeof(cli_getConfigs()->callsign),
+             "%s", options.s);
+    // Write new cli configs to flash
+    dataLog_writeCliConfigs();
+  }
+
   // Send positive ACK (all inputs have been appropriately processed)
   cli_sendAck(true, nullptr);
 
@@ -254,12 +266,14 @@ void CliTasks::config() {
     dtoa(val, sizeof(val), cli_getConfigs()->groundElevationM, 3);
     generateConfigHelp("Ground Elevation (m):", val);
     // Ground temperature
-
     dtoa(val, sizeof(val), cli_getConfigs()->groundTemperatureC, 3);
     generateConfigHelp("Ground Temperature (C):", val);
     // Radio channel
     snprintf(val, sizeof(val), "%" PRIi32, cli_getConfigs()->radioChannel);
     generateConfigHelp("Radio Channel:", val);
+    // Radio call sign
+    snprintf(val, sizeof(val), "%s", cli_getConfigs()->callsign);
+    generateConfigHelp("Call sign:", val);
   }
 
   // If reached, send complete message to CLI
