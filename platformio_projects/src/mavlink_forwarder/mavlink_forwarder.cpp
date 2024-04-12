@@ -48,7 +48,11 @@ void SERCOM1_Handler()
 }
 
 #define WIND_DIR_PIN A1
-#define WIND_SPEED_PIN A0
+#define WIND_SPEED1_PIN A0
+
+#define WIND_SPEED2_PIN A2
+#define WATER_TEMP_PIN A3
+
 #define ANALOG_READ_BITS (12)
 #define ANALOG_MAX (1 << ANALOG_READ_BITS)
 
@@ -59,6 +63,8 @@ CircularBuffer<uint8_t, 4000> radioToSerialBytes;
 
 LastPacketStats localStatistics;
 LastPacketStats remoteStatistics;
+
+int lastWindSentTime = 0;
 
 void radioPacketRxDone();
 
@@ -77,7 +83,9 @@ void setup() {
   pinPeripheral(PIN_SERIAL_TX, PIO_SERCOM); 
 
   pinMode(WIND_DIR_PIN, INPUT);
-  pinMode(WIND_SPEED_PIN, INPUT);
+  pinMode(WIND_SPEED1_PIN, INPUT);
+  pinMode(WIND_SPEED2_PIN, INPUT);
+  pinMode(WATER_TEMP_PIN, INPUT);
   analogReadResolution(ANALOG_READ_BITS);
 
   pinMode(LED_BUILTIN, OUTPUT);
@@ -129,20 +137,47 @@ T map_t(T x, T in_min, T in_max, T out_min, T out_max)
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-int lastWindSentTime = 0;
-/**
- * @brief If it's been more than 300ms since last wind send, send a wind message
- *
- */
-void sendWindNMEA() {
-  if ((millis() - lastWindSentTime) < 350) {
-    return;
+
+void sendVoltages() {
+
+  int speed1 = analogRead(WIND_SPEED1_PIN);
+  int speed2 = analogRead(WIND_SPEED2_PIN);
+  int temp1 = analogRead(WATER_TEMP_PIN);
+
+  // Ardupilot reports in cent-deg-c with int16 resolution, so 32768 total for a range of -327.68 to 327.68 with 0.01 volt precision
+  float speed1f = map_t<double>(speed1, 0, ANALOG_MAX, -300, 300);
+  float speed2f = map_t<double>(speed2, 0, ANALOG_MAX, -300, 300);
+  float temp1f = map_t<double>(temp1, 0, ANALOG_MAX, -300, 300);
+
+  // Create message, up until checksum
+  // Direction in degrees (relative), speed in tenths of a m/s
+  char str[256];
+  int len = snprintf(str, sizeof(str), "$WIXDR,C,%.5f,V,,C,%.5f,V,,C,%.5f,V,", speed1f, speed2f, temp1f);
+
+  // calculate checksum
+  uint8_t checksum = 0;
+  for (int i = 1; i < len; i++) {
+    checksum ^= str[i];
   }
+
+  // append checksum+newlines to message
+  snprintf(str + len, sizeof(str) - len + 4, "*%X%X\r\n",
+           (checksum >> 4) & 0x0f, checksum & 0x0f);
+
+  // WindVaneSerial.print(str);
+  // printf(str);
+
+  Serial1.print(str);
+  Serial.printf("V1 %.4f v2 %.4f v3 %.4f\n", speed1f, speed2f, temp1f);
+  Serial.println(str);
+}
+
+void sendWMV() {
 
   // Read in angle and remap. Might need to invert the polarity/apply
   // calibration later
   int sensor_value = analogRead(WIND_DIR_PIN);
-  int speed_val = analogRead(WIND_SPEED_PIN);
+  int speed_val = analogRead(WIND_SPEED1_PIN);
 
   int wind_dir = map_t(sensor_value, 0, ANALOG_MAX, 360, 0);
   float speed_mps = (0.0297 * speed_val - 11.5);
@@ -166,6 +201,19 @@ void sendWindNMEA() {
   Serial1.print(str);
   Serial.printf("Dir val %i speed val %i\n", sensor_value, speed_val);
   Serial.printf("Dir %i speed %f\n", wind_dir, speed_mps); Serial.println(str);
+}
+
+/**
+ * @brief If it's been more than 300ms since last wind send, send a wind message
+ *
+ */
+void sendWindNMEA() {
+  if ((millis() - lastWindSentTime) < 350) {
+    return;
+  }
+
+  sendVoltages();
+  sendWMV();
 
   // And write down last sent time
   digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
