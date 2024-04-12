@@ -2,6 +2,7 @@
 
 #include "RadioLib.h"
 #include "cpp_circular_buffer.h"
+#include "wiring_private.h"
 
 enum class DIO0Map {
   // Packet reception complete interrupt
@@ -34,10 +35,27 @@ struct __attribute__((packed)) LastPacketStats {
 #define RFM95_CS 8
 #define RFM95_INT 3  // dio0, super limiting. see page 98
 
+// WindVaneSerial. TX D11 (S1.0 primary), RX D12 (S1.3 primary)
+#define PIN_SERIAL2_RX (12ul)
+#define PAD_SERIAL2_RX (SERCOM_RX_PAD_3)
+#define PIN_SERIAL2_TX (11ul)
+#define PAD_SERIAL2_TX (UART_TX_PAD_0)
+Uart WindVaneSerial(&sercom1, PIN_SERIAL2_RX, PIN_SERIAL2_TX, PAD_SERIAL2_RX,
+             PAD_SERIAL2_TX);
+void SERCOM1_Handler()
+{
+  WindVaneSerial.IrqHandler();
+}
+
+#define WIND_DIR_PIN A1
+#define WIND_SPEED_PIN A0
+#define ANALOG_READ_BITS (12)
+#define ANALOG_MAX (1 << ANALOG_READ_BITS)
+
 RFM95 radio = new Module(RFM95_CS, RFM95_INT, RFM95_RST);
 
-CircularBuffer<uint8_t, 1024> serialToRadioBytes;
-CircularBuffer<uint8_t, 1024> radioToSerialBytes;
+CircularBuffer<uint8_t, 4000> serialToRadioBytes;
+CircularBuffer<uint8_t, 4000> radioToSerialBytes;
 
 LastPacketStats localStatistics;
 LastPacketStats remoteStatistics;
@@ -46,9 +64,24 @@ void radioPacketRxDone();
 
 void setup() {
   Serial.begin(115200);
+
+  Serial.println("Hullo!");
+
   // GPIO0 = RX, GPIO1 = TX
   Serial1.begin(115200);
   Serial1.setTimeout(0);
+
+  // D11 TX, D12 RX
+  WindVaneSerial.begin(115200);
+  pinPeripheral(PIN_SERIAL_RX, PIO_SERCOM); 
+  pinPeripheral(PIN_SERIAL_TX, PIO_SERCOM); 
+
+  pinMode(WIND_DIR_PIN, INPUT);
+  pinMode(WIND_SPEED_PIN, INPUT);
+  analogReadResolution(ANALOG_READ_BITS);
+
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
 
   int state = radio.begin();
   // radio.setDio0Action();
@@ -64,7 +97,7 @@ void setup() {
   state |= radio.setFrequency(914.15f);
   state |= radio.setOutputPower(10);
   // 11kbps raw, or 150ms per 200 byte packet
-  state |= radio.setBandwidth(250);
+  state |= radio.setBandwidth(500);
   state |= radio.setSpreadingFactor(7);
   state |= radio.setCodingRate(5);
 
@@ -90,11 +123,71 @@ void setup() {
   }
 }
 
+template <typename T>
+T map_t(T x, T in_min, T in_max, T out_min, T out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+int lastWindSentTime = 0;
+/**
+ * @brief If it's been more than 300ms since last wind send, send a wind message
+ *
+ */
+void sendWindNMEA() {
+  if ((millis() - lastWindSentTime) < 350) {
+    return;
+  }
+
+  // Read in angle and remap. Might need to invert the polarity/apply
+  // calibration later
+  int sensor_value = analogRead(WIND_DIR_PIN);
+  int speed_val = analogRead(WIND_SPEED_PIN);
+
+  int wind_dir = map_t(sensor_value, 0, ANALOG_MAX, 360, 0);
+  float speed_mps = (0.0297 * speed_val - 11.5);
+
+  // Create message, up until checksum
+  // Direction in degrees (relative), speed in tenths of a m/s
+  char str[100];
+  int len = snprintf(str, sizeof(str), "$WIMWV,%i,R,%.1f,M,A", wind_dir, speed_mps);
+
+  // calculate checksum
+  uint8_t checksum = 0;
+  for (int i = 1; i < len; i++) {
+    checksum ^= str[i];
+  }
+
+  // append checksum+newlines to message
+  snprintf(str + len, sizeof(str) - len + 4, "*%X%X\r\n",
+           (checksum >> 4) & 0x0f, checksum & 0x0f);
+
+  // WindVaneSerial.print(str);
+  Serial1.print(str);
+  Serial.printf("Dir val %i speed val %i\n", sensor_value, speed_val);
+  Serial.printf("Dir %i speed %f\n", wind_dir, speed_mps); Serial.println(str);
+
+  // And write down last sent time
+  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+  lastWindSentTime = millis();
+}
+
+/**
+ * @brief Send data we've gotten from the radio out over Serial1
+ * 
+ */
 void enqueueRadioRxToSerialBuffer() {
   // How much data we have to send
   int radioLen = radioToSerialBytes.count();
   // How empty the serial TX FIFO is
-  int serTxLenMax = Serial1.availableForWrite();
+  
+#ifdef IS_BOAT
+#define SerialPort Serial1
+#else
+#define SerialPort Serial
+#endif
+
+  int serTxLenMax = SerialPort.availableForWrite();
 
   int len = min(radioLen, serTxLenMax);
 
@@ -104,7 +197,7 @@ void enqueueRadioRxToSerialBuffer() {
     radioToSerialBytes.dequeue(len);
 
     // should already have at least this much space
-    Serial1.write(data, len);
+    SerialPort.write(data, len);
   } else {
     // couldn't dequeue? try starting over
     Serial.println("Error dequeueing radio->seriail buff");
@@ -112,6 +205,10 @@ void enqueueRadioRxToSerialBuffer() {
   }
 }
 
+/**
+ * @brief Move data from Serial1 (autopilot->radio) into our buffer
+ * 
+ */
 void enqueueSerialToRxBuffer() {
   // grab incoming data and buffer it ourselves
   int len = Serial1.available();
@@ -119,9 +216,10 @@ void enqueueSerialToRxBuffer() {
   Serial1.readBytes(data, len);
   for (auto d : data) {
     if (!serialToRadioBytes.enqueue(d)) {
+      Serial.println("> Serial->Radio buffer overflow!!");
       // buffer overflow? GUH.
       // Simply discard data
-      break;
+      return;
     }
   }
 }
@@ -152,7 +250,13 @@ void transmitOnePacket() {
   int radioLen = len + 1;
 
   // Send data out
+  digitalWrite(LED_BUILTIN, HIGH);
   radio.transmit(data, radioLen);
+  digitalWrite(LED_BUILTIN, LOW);
+  
+#ifdef IS_BOAT
+  Serial.printf("After tx, buffer has %i\n", serialToRadioBytes.count());
+#endif
 }
 
 // Dont wanna deal with syncronizing access between main thread and ISR,
@@ -175,8 +279,7 @@ void readoutPacket() {
     float snr_db = radio.getSNR();
     int noiseFloor = rssi / snr_db;
 
-    Serial.printf("> [len=%i] rssi=%i noise=%i status %i\n", len, rssi,
-                  noiseFloor, ret);
+    // Serial.printf("> [len=%i] rssi=%i noise=%i status %i\n", len, rssi, noiseFloor, ret);
     localStatistics.len = len;
     localStatistics.rssi = rssi;
     localStatistics.noiseFloor = noiseFloor;
@@ -200,6 +303,12 @@ void readoutPacket() {
 }
 
 void boatLoop() {
+  
+  sendWindNMEA();
+  delay(100);
+  return;
+
+
   transmitOnePacket();
 
   auto start = millis();
@@ -209,18 +318,30 @@ void boatLoop() {
   radio.startReceive();
 
   // Modem status = 1 means "clear" (page 105)
+  // bool rxClear = true;
+
+  // Loop until (packet rx done via interrupt) or (timedout and not in rx)
+  Serial.println("Waiting for pong");
   while (!receivedFlag && ((millis() - start) < gsWaitTimeout)) {
     enqueueSerialToRxBuffer();
     enqueueRadioRxToSerialBuffer();
 
-    int status = radio.getModemStatus();
-    Serial.print("Modem status: ");
-    Serial.println(status, BIN);
+    // int status = radio.getModemStatus();
+    // Serial.print("Status: "); Serial.println(status, BIN);
+    // rxClear = (status & (1 << 4));
 
-    delay(50);
+    delay(30);
+
+    // Send a wind message if it's time to
+    sendWindNMEA();
   }
+
+
   if (receivedFlag) {
+    Serial.println("Reading out");
     readoutPacket();
+  } else {
+    Serial.println("Timed out waiting for pong");
   }
 }
 
@@ -232,11 +353,7 @@ void gsLoop() {
     enqueueSerialToRxBuffer();
     enqueueRadioRxToSerialBuffer();
 
-    int status = radio.getModemStatus();
-    Serial.print("Modem status: ");
-    Serial.println(status, BIN);
-
-    delay(50);
+    delay(30);
   }
 
   if (receivedFlag) {
