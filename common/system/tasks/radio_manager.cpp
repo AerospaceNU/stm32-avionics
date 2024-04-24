@@ -23,8 +23,6 @@ static DataTransmitState_s lastSent[NUM_RADIO];
 
 static RadioPacket_s transmitPacket[NUM_RADIO];
 
-static const char *call = "KM6GNL";
-
 // https://stackoverflow.com/q/9695329
 #define ROUND_2_INT(f) ((int)((f) >= 0.0 ? (f + 0.5) : (f - 0.5)))
 
@@ -34,7 +32,8 @@ void radioManager_init() {
             sizeof(RadioRecievedPacket_s));
     hm_radioRegisterConsumer(i, &dataRx[i].rxBuffer);
 
-    strncpy(transmitPacket[i].callsign, call, 8);
+    snprintf(transmitPacket[i].callsign, sizeof(transmitPacket[i].callsign),
+             "%s", cli_getConfigs()->callsign);
 
 #ifdef SOFTWARE_VERSION
     transmitPacket[i].softwareVersion = SOFTWARE_VERSION;  // TODO set this;
@@ -69,6 +68,7 @@ void radioManager_tick() {
 }
 
 void radioManager_sendInternal(int radioId) {
+  strncpy(transmitPacket[radioId].callsign, cli_getConfigs()->callsign, 8);
   hm_radioSend(radioId, (uint8_t *)&transmitPacket[radioId],
                sizeof(RadioPacket_s));
 }

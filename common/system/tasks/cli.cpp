@@ -40,6 +40,7 @@ static CliOptionVals_s cliOptionVals = {
     .r = NULL,      // ground temperature
     .h = false,     // help flag
     .c = NULL,      // Radio channel, can be negative
+    .s = NULL,      // call sign
     .lcCmd = NULL,  // Line cuttter command
     .lcId = NULL    // Line cuttter id
 };
@@ -60,6 +61,7 @@ static struct option longOptions[] = {
     {0, 0, 0, 0}};
 
 static CliConfigs_s cliConfigs = {0};
+static const char* defaultCall = "KC1UAW";
 
 static CliComms_e lastCommsType;  // Used to help send ack to right places
 static uint8_t lastStringId = 0xFF;
@@ -102,6 +104,7 @@ void cli_setDefaultConfig() {
   cliConfigs.groundElevationM = 0;
   cliConfigs.groundTemperatureC = 14.85;
   cliConfigs.radioChannel = 1;
+  snprintf(cliConfigs.callsign, sizeof(cliConfigs.callsign), "%s", defaultCall);
   triggerManager_setDefaultConfig();
 }
 
@@ -192,7 +195,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
   int optionIndex = 0;
   optind = 0;
   primaryCommand = NONE;
-  while ((opt = getopt_long(argc, argv, "f:t:m:p:d:w:C:e:r:c:i:DhN",
+  while ((opt = getopt_long(argc, argv, "f:t:m:p:d:w:C:e:r:c:s:i:DhN",
                             longOptions, &optionIndex)) != -1) {
     switch (opt) {
       case 0:
@@ -210,6 +213,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
         cliOptionVals.r = NULL;
         cliOptionVals.h = false;
         cliOptionVals.c = NULL;
+        cliOptionVals.s = NULL;
         cliOptionVals.lcCmd = NULL;
         cliOptionVals.lcId = NULL;
         break;
@@ -303,6 +307,14 @@ CliCommand_e cli_parse(CliComms_e commsType) {
           cliOptionVals.c = optarg;
         } else if (primaryCommand == LINECUTTER) {
           cliOptionVals.lcCmd = optarg;
+        } else {
+          invalidOptCommand = true;
+        }
+        break;
+      case 's':
+        // Call sign
+        if (primaryCommand == CONFIG) {
+          cliOptionVals.s = optarg;
         } else {
           invalidOptCommand = true;
         }
