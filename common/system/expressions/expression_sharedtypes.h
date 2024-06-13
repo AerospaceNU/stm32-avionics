@@ -36,7 +36,7 @@ typedef struct {
 } SerializedBinaryFunc_s;
 
 typedef union {
-  Event_e event;
+  Event event;
   float constant;
   FilterData_e variable;
   SerializedUnaryFunc_s unary;
