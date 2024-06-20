@@ -26,10 +26,52 @@ void AltitudeKalman::correct(const double baroAltitude,
 
   xHat.estimatedAltitude += kalman_gain[0] * deltaAltitude;
   xHat.estimatedVelocity += kalman_gain[1] * deltaAltitude;
+  if (xHat.estimatedAltitude < -50) {
+	  xHat.estimatedAltitude -= 10;
+  }
+  if (xHat.estimatedVelocity < -50) {
+	  xHat.estimatedVelocity -= 10;
+  }
 }
 
 const AltitudeKalmanOutput_s AltitudeKalman::getXhat() const { return xHat; }
 
 void AltitudeKalman::setDt(double dt) { m_dt = dt; }
 
-void AltitudeKalman::reset() { xHat = {0, 0}; }
+void AltitudeKalman::calculateDt() {
+  m_dt = ((current_ts == 0) || !has_ran)
+             ? 0.015
+             : (double)(current_ts - last_ts) / 1000.0;
+  if (m_dt == 0 || m_dt > 0.750) {
+    m_dt = 0.015;
+  }
+  has_ran = true;
+}
+
+void AltitudeKalman::pushTimeStamps(const uint32_t ts) {
+  last_ts = current_ts;
+  current_ts = ts;
+}
+
+void AltitudeKalman::updateDt(const uint32_t ts) {
+  pushTimeStamps(ts);
+  calculateDt();
+}
+
+void AltitudeKalman::pushDTList() {
+  dt_list.push_back(m_dt);
+  if (dt_list.size() > 100) {
+    dt_list.erase(dt_list.begin());
+  }
+}
+
+double AltitudeKalman::calculateGain(int g) {
+  double gain =
+      has_ran ? (m_dt * KALMAN_M[g]) + KALMAN_B[g] : DEFAULT_KALMAN_GAIN[g];
+  return gain;
+}
+
+void AltitudeKalman::reset() {
+  xHat = {0, 0};
+  has_ran = false;
+  }
