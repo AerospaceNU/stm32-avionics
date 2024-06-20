@@ -12,11 +12,6 @@ set(SIMULATOR_FILES_LIST
         desktop_hardware_manager.cpp 
         board_config.c)
 
-# add asan
-set (WITH_ASAN ON)
-if (WITH_ASAN)
-    add_compile_options(-fsanitize=address -g -Wall -fsanitize=undefined)
-endif ()
 
 add_executable(desktop_sim 
   ${SIMULATOR_FILES_LIST}
