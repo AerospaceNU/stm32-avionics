@@ -2,24 +2,20 @@
 
 #include <cmath>
 #include <iostream>
+#include <functional>
+
+#include "hal_callbacks.h"
+#include "usart.h"
+
+using std::placeholders::_1;
+
+DynamixelMotor::DynamixelMotor(UART_HandleTypeDef* huart) : m_huart{huart} {
+	std::function<void(uint16_t)> callbackFunction = std::bind(&DynamixelMotor::processReadData, this, _1);
+	halCallbacks_registerUartRxIdleCallback(m_huart, callbackFunction);
+}
 
 uint8_t DynamixelMotor::ping() {
-  m_txPacket.header[0] = 0xff;
-  m_txPacket.header[1] = 0xff;
-  m_txPacket.header[2] = 0xfd;
-  m_txPacket.header[3] = 0x00;
-
-  m_txPacket.id = 0x01;
-  m_txPacket.length_l = 0x03;
-  m_txPacket.length_h = 0x00;
-  m_txPacket.instruction = 0x01;
-
-  m_txPacket.payload[0] = 0x19;
-  m_txPacket.payload[1] = 0x4e;
-
-  this->write(m_txPacket);
   this->read(m_rxPacket);
-
   return 0;
 }
 
@@ -29,6 +25,7 @@ uint8_t DynamixelMotor::spinToPosition(double degrees) {
 
   return 0;
 }
+
 
 uint8_t DynamixelMotor::setGoalPosition(double degrees) {
   if (degrees < 0) {
@@ -65,28 +62,26 @@ uint8_t DynamixelMotor::setGoalPosition(double degrees) {
   // m_txPacket.payload[5] = crc >> 8;
 
   this->write(m_txPacket);
-  this->read(m_rxPacket);
 
   return 0;
 }
 
 uint8_t DynamixelMotor::startSpin() { return 0; }
 
+uint8_t DynamixelMotor::processReadData(uint16_t size) {
+	  this->read(m_rxPacket);
+	  return 0;
+}
+
 uint8_t DynamixelMotor::read(DynamixelPacket_t& buf) {
-  uint16_t received;
-  HAL_Delay(0.2);
-  HAL_UART_Receive(m_huart, (uint8_t*)(&buf), 3, 1000);
-  if (received) {
-    std::cout << "here" << std::endl;
-  }
+  HAL_HalfDuplex_EnableReceiver(m_huart);
+  HAL_UARTEx_ReceiveToIdle_IT(m_huart, (uint8_t*)(&buf), 10);
+  return 0;
 }
 
 uint8_t DynamixelMotor::write(DynamixelPacket_t& buf) {
-  std::cout << "TX: ";
-  this->printPacket(buf);
-  std::cout << "\n";
-
-  HAL_UART_Transmit(m_huart, (uint8_t*)&buf, 16, 1000);
+  HAL_HalfDuplex_EnableTransmitter(m_huart);
+  HAL_UART_Transmit(m_huart, (uint8_t*)&buf, 16, 100);
 
   return 0;
 }
@@ -96,7 +91,7 @@ void DynamixelMotor::printPacket(DynamixelPacket_t& buf) {
   int s = sizeof(DynamixelPacket_t);
 
   while (s--) {
-    printf("%02x ", *string_ptr++);
+    //printf("%02x ", *string_ptr++);
   }
 }
 

@@ -7,7 +7,7 @@
 
 class DynamixelMotor {
  public:
-  explicit DynamixelMotor(UART_HandleTypeDef* huart) : m_huart{huart} {}
+  explicit DynamixelMotor(UART_HandleTypeDef* huart);
 
   static const constexpr uint32_t kMaxPayloadSize = 50;
 
@@ -35,6 +35,9 @@ class DynamixelMotor {
   const uint32_t m_baudRate = 9600;
 
   uint8_t read(DynamixelPacket_t& buf);
+
+  uint8_t processReadData(uint16_t size);
+
   uint8_t write(DynamixelPacket_t& buf);
 
   void printPacket(DynamixelPacket_t& buf);
