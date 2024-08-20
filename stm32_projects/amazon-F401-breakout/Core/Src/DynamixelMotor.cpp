@@ -1,8 +1,8 @@
 #include "DynamixelMotor.h"
 
 #include <cmath>
-#include <iostream>
 #include <functional>
+#include <iostream>
 
 #include "hal_callbacks.h"
 #include "usart.h"
@@ -10,89 +10,84 @@
 using std::placeholders::_1;
 
 DynamixelMotor::DynamixelMotor(UART_HandleTypeDef* huart) : m_huart{huart} {
-	std::function<void(uint16_t)> callbackFunction = std::bind(&DynamixelMotor::processReadData, this, _1);
-	halCallbacks_registerUartRxIdleCallback(m_huart, callbackFunction);
+  std::function<void(uint16_t)> callbackFunction =
+      std::bind(&DynamixelMotor::processReadData, this, _1);
+  halCallbacks_registerUartRxIdleCallback(m_huart, callbackFunction);
 }
 
 uint8_t DynamixelMotor::ping() {
+  m_txPacket.length_l = 0x03;
+  m_txPacket.length_h = 0x00;
+  m_txPacket.instruction = 0x01;
+
+  this->write(m_txPacket);
   this->read(m_rxPacket);
   return 0;
 }
-
-uint8_t DynamixelMotor::spinToPosition(double degrees) {
-  this->setGoalPosition(degrees);
-  this->startSpin();
-
-  return 0;
-}
-
 
 uint8_t DynamixelMotor::setGoalPosition(double degrees) {
   if (degrees < 0) {
     degrees = 360 + degrees;
   }
-  uint16_t degreeConversion = std::round(degrees / 0.088);
+  uint32_t degreeConversion = std::round(degrees / 0.088);
 
-  m_txPacket.header[0] = 0xff;
-  m_txPacket.header[1] = 0xff;
-  m_txPacket.header[2] = 0xfd;
-  m_txPacket.header[3] = 0x00;
-
-  m_txPacket.id = 0x01;
   m_txPacket.length_l = 0x09;
   m_txPacket.length_h = 0x00;
   m_txPacket.instruction = 0x03;
 
+  // Goal position write location
   m_txPacket.payload[0] = 0x74;
   m_txPacket.payload[1] = 0x00;
-  m_txPacket.payload[2] = 0x00;
-  m_txPacket.payload[3] = 0x02;
-  m_txPacket.payload[4] = 0x00;
-  m_txPacket.payload[5] = 0x00;
 
-  m_txPacket.payload[6] = 0xca;
-  m_txPacket.payload[7] = 0x89;
-
-  // m_txPacket.payload[2] = degreeConversion & 0x00ff;
-  // m_txPacket.payload[3] = degreeConversion >> 8;
-
-  // uint16_t crc = updateCrc(0, (uint8_t*)&m_txPacket, 12);
-
-  // m_txPacket.payload[4] = crc & 0x00ff;
-  // m_txPacket.payload[5] = crc >> 8;
+  m_txPacket.payload[2] = degreeConversion & 0xff;
+  m_txPacket.payload[3] = (degreeConversion >> 8) & 0xff;
+  m_txPacket.payload[4] = (degreeConversion >> 16) & 0xff;
+  m_txPacket.payload[5] = (degreeConversion >> 24) & 0xff;
 
   this->write(m_txPacket);
+  this->read(m_rxPacket);
 
   return 0;
 }
 
-uint8_t DynamixelMotor::startSpin() { return 0; }
-
 uint8_t DynamixelMotor::processReadData(uint16_t size) {
-	  this->read(m_rxPacket);
-	  return 0;
+  this->read(m_rxPacket);
+  return 0;
 }
 
 uint8_t DynamixelMotor::read(DynamixelPacket_t& buf) {
   HAL_HalfDuplex_EnableReceiver(m_huart);
-  HAL_UARTEx_ReceiveToIdle_IT(m_huart, (uint8_t*)(&buf), 10);
+  HAL_UARTEx_ReceiveToIdle_IT(m_huart, (uint8_t*)(&buf), kMaxPayloadSize);
   return 0;
 }
 
 uint8_t DynamixelMotor::write(DynamixelPacket_t& buf) {
+  uint8_t writeLength = prepareTxPacket();
+
   HAL_HalfDuplex_EnableTransmitter(m_huart);
-  HAL_UART_Transmit(m_huart, (uint8_t*)&buf, 16, 100);
+  HAL_UART_Transmit(m_huart, (uint8_t*)&buf, writeLength, 100);
 
   return 0;
 }
 
-void DynamixelMotor::printPacket(DynamixelPacket_t& buf) {
-  unsigned char* string_ptr = (unsigned char*)&buf;
-  int s = sizeof(DynamixelPacket_t);
+uint16_t DynamixelMotor::prepareTxPacket() {
+  m_txPacket.header[0] = 0xff;
+  m_txPacket.header[1] = 0xff;
+  m_txPacket.header[2] = 0xfd;
+  m_txPacket.header[3] = 0x00;
+  m_txPacket.id = m_id;
 
-  while (s--) {
-    //printf("%02x ", *string_ptr++);
-  }
+  // Minus 3 bytes of instruction and CRC
+  uint16_t payloadLength = (m_txPacket.length_h << 8) + m_txPacket.length_l - 3;
+  // 4 bytes header, 1 byte id, instruction, 2 bytes length, CRC
+  uint16_t packetLength = payloadLength + 10;
+  // Calculate CRC and put high and low byte at end of payload
+  uint16_t crc = updateCrc(0, (uint8_t*)&m_txPacket, packetLength - 2);
+  m_txPacket.payload[payloadLength] = crc & 0x00ff;
+  m_txPacket.payload[payloadLength + 1] = crc >> 8;
+
+  // 4 bytes header, 1 byte id, instruction, 2 bytes length, CRC
+  return payloadLength + 10;
 }
 
 uint16_t DynamixelMotor::updateCrc(uint16_t crc_accum, uint8_t* data_blk_ptr,
