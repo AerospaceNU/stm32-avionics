@@ -5,12 +5,16 @@
 
 #include "stm32f4xx_hal.h"
 
+enum Toggle : uint8_t {
+  OFF = 0,
+  ON = 1,
+};
+
 class DynamixelMotor {
  public:
   explicit DynamixelMotor(UART_HandleTypeDef* huart);
 
   static const constexpr uint32_t kMaxPayloadSize = 1000;
-
   struct DynamixelPacket_t {
     uint8_t header[4];
     uint8_t id;
@@ -20,13 +24,11 @@ class DynamixelMotor {
     uint8_t payload[kMaxPayloadSize + 2];  // +2 for CRC space;
   };
 
-  uint8_t spinToPosition(double degrees);
-
   uint8_t ping();
 
-  uint8_t setGoalPosition(double degrees);
+  uint8_t torqueEnable(Toggle toggle);
 
-  uint8_t startSpin();
+  uint8_t goalPosition(double degrees);
 
  private:
   DynamixelPacket_t m_txPacket = {};

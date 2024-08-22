@@ -25,7 +25,23 @@ uint8_t DynamixelMotor::ping() {
   return 0;
 }
 
-uint8_t DynamixelMotor::setGoalPosition(double degrees) {
+uint8_t DynamixelMotor::torqueEnable(Toggle toggle) {
+  m_txPacket.length_l = 0x06;
+  m_txPacket.length_h = 0x00;
+  m_txPacket.instruction = 0x03;
+
+  // Torque enable write location
+  m_txPacket.payload[0] = 0x40;
+  m_txPacket.payload[1] = 0x00;
+
+  m_txPacket.payload[2] = toggle;
+
+  this->write(m_txPacket);
+  this->read(m_rxPacket);
+  return 0;
+}
+
+uint8_t DynamixelMotor::goalPosition(double degrees) {
   if (degrees < 0) {
     degrees = 360 + degrees;
   }
@@ -46,14 +62,10 @@ uint8_t DynamixelMotor::setGoalPosition(double degrees) {
 
   this->write(m_txPacket);
   this->read(m_rxPacket);
-
   return 0;
 }
 
-uint8_t DynamixelMotor::processReadData(uint16_t size) {
-  this->read(m_rxPacket);
-  return 0;
-}
+uint8_t DynamixelMotor::processReadData(uint16_t size) { return 0; }
 
 uint8_t DynamixelMotor::read(DynamixelPacket_t& buf) {
   HAL_HalfDuplex_EnableReceiver(m_huart);
