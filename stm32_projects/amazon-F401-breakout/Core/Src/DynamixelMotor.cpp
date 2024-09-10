@@ -9,10 +9,9 @@
 
 using std::placeholders::_1;
 
-DynamixelMotor::DynamixelMotor(UART_HandleTypeDef* huart) : m_huart{huart} {
-  std::function<void(uint16_t)> callbackFunction =
+DynamixelMotor::DynamixelMotor(const uint8_t id, DynamixelCommandQueue* commandQueue) : m_id{id}, m_commandQueue{commandQueue} {
+	m_readCallback =
       std::bind(&DynamixelMotor::processReadData, this, _1);
-  halCallbacks_registerUartRxIdleCallback(m_huart, callbackFunction);
 }
 
 uint8_t DynamixelMotor::ping() {
@@ -21,7 +20,6 @@ uint8_t DynamixelMotor::ping() {
   m_txPacket.instruction = 0x01;
 
   this->write(m_txPacket);
-  this->read(m_rxPacket);
   return 0;
 }
 
@@ -37,7 +35,21 @@ uint8_t DynamixelMotor::torqueEnable(Toggle toggle) {
   m_txPacket.payload[2] = toggle;
 
   this->write(m_txPacket);
-  this->read(m_rxPacket);
+  return 0;
+}
+
+uint8_t DynamixelMotor::setOperatingMode(OperatingMode mode) {
+  m_txPacket.length_l = 0x06;
+  m_txPacket.length_h = 0x00;
+  m_txPacket.instruction = 0x03;
+
+  // Operating mode write location
+  m_txPacket.payload[0] = 0x0B;
+  m_txPacket.payload[1] = 0x00;
+
+  m_txPacket.payload[2] = mode;
+
+  this->write(m_txPacket);
   return 0;
 }
 
@@ -61,24 +73,15 @@ uint8_t DynamixelMotor::goalPosition(double degrees) {
   m_txPacket.payload[5] = (degreeConversion >> 24) & 0xff;
 
   this->write(m_txPacket);
-  this->read(m_rxPacket);
   return 0;
 }
 
 uint8_t DynamixelMotor::processReadData(uint16_t size) { return 0; }
 
-uint8_t DynamixelMotor::read(DynamixelPacket_t& buf) {
-  HAL_HalfDuplex_EnableReceiver(m_huart);
-  HAL_UARTEx_ReceiveToIdle_IT(m_huart, (uint8_t*)(&buf), kMaxPayloadSize);
-  return 0;
-}
-
 uint8_t DynamixelMotor::write(DynamixelPacket_t& buf) {
   uint8_t writeLength = prepareTxPacket();
 
-  HAL_HalfDuplex_EnableTransmitter(m_huart);
-  HAL_UART_Transmit(m_huart, (uint8_t*)&buf, writeLength, 100);
-
+  m_commandQueue->sendMessage((uint8_t*)(&buf), writeLength, m_readCallback, (uint8_t*)(&m_rxPacket));
   return 0;
 }
 
