@@ -3,18 +3,25 @@
 
 #include <cstdint>
 
-#include "stm32f4xx_hal.h"
+#include "dynamixel_command_queue.h"
 
 enum Toggle : uint8_t {
   OFF = 0,
   ON = 1,
 };
 
+enum OperatingMode : uint8_t {
+	CURRENT = 0,
+	VELOCITY = 1,
+	POSITION = 3,
+	EXT_POSITION = 4
+};
+
 class DynamixelMotor {
  public:
-  explicit DynamixelMotor(UART_HandleTypeDef* huart);
+  DynamixelMotor(const uint8_t id, DynamixelCommandQueue* commandQueue);
 
-  static const constexpr uint32_t kMaxPayloadSize = 1000;
+  static const constexpr uint32_t kMaxPayloadSize = 50;
   struct DynamixelPacket_t {
     uint8_t header[4];
     uint8_t id;
@@ -28,16 +35,17 @@ class DynamixelMotor {
 
   uint8_t torqueEnable(Toggle toggle);
 
+  uint8_t setOperatingMode(OperatingMode mode);
+
   uint8_t goalPosition(double degrees);
 
  private:
   DynamixelPacket_t m_txPacket = {};
   DynamixelPacket_t m_rxPacket = {};
-  UART_HandleTypeDef* m_huart;
+  DynamixelCommandQueue* m_commandQueue;
+  std::function<void(uint16_t)> m_readCallback;
 
-  const uint8_t m_id = 1;
-
-  uint8_t read(DynamixelPacket_t& buf);
+  const uint8_t m_id;
 
   uint8_t processReadData(uint16_t size);
 
