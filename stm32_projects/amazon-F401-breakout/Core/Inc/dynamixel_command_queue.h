@@ -55,12 +55,16 @@ public:
 		if (m_isAwaitResponse && (HAL_GetTick() - m_prevSendTimeMs < kResponseTimeoutMs)) {
 			return;
 		}
+		if (m_isAwaitResponse) {
+			volatile int a = 3;
+		}
 		CommandData currentCommand;
 		m_messageBuffer.peek(&currentCommand, 1);
 		m_messageBuffer.dequeue(1);
 		m_currentMessageCallback = currentCommand.callback;
 		HAL_HalfDuplex_EnableTransmitter(m_huart);
 		HAL_UART_Transmit(m_huart, (uint8_t*)&(currentCommand.message), currentCommand.messageSize, 100);
+		HAL_Delay(200);
 		m_prevSendTimeMs = HAL_GetTick();
 		m_isAwaitResponse = true;
 		HAL_HalfDuplex_EnableReceiver(m_huart);
@@ -72,7 +76,7 @@ private:
 
 	static const constexpr uint32_t kMaxBufferSize = 100;
 	static const constexpr uint32_t kMaxMessageCount = 100;
-	static const constexpr uint32_t kResponseTimeoutMs = 1000;
+	static const constexpr uint32_t kResponseTimeoutMs = 5000;
 	struct CommandData {
 		  uint8_t message[kMaxBufferSize];
 		  uint16_t messageSize;
