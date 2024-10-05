@@ -40,12 +40,12 @@ class DynamixelMotor {
   uint8_t goalPosition(double degrees);
 
  private:
+  const uint8_t m_id;
+  DynamixelCommandQueue* m_commandQueue;
   DynamixelPacket_t m_txPacket = {};
   DynamixelPacket_t m_rxPacket = {};
-  DynamixelCommandQueue* m_commandQueue;
   std::function<void(uint16_t)> m_readCallback;
 
-  const uint8_t m_id;
 
   uint8_t processReadData(uint16_t size);
 

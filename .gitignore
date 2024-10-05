@@ -6,6 +6,7 @@
 
 # files
 .mxproject
+**/.DS_Store
 
 # build files
 *.map

@@ -55,9 +55,6 @@ public:
 		if (m_isAwaitResponse && (HAL_GetTick() - m_prevSendTimeMs < kResponseTimeoutMs)) {
 			return;
 		}
-		if (m_isAwaitResponse) {
-			volatile int a = 3;
-		}
 		CommandData currentCommand;
 		m_messageBuffer.peek(&currentCommand, 1);
 		m_messageBuffer.dequeue(1);
