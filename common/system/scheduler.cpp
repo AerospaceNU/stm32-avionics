@@ -1,5 +1,7 @@
 #include "scheduler.h"
 
+#include <initializer_list>
+
 #include "cli_tasks.h"
 #include "hardware_manager.h"
 #include "state_ascent.h"
@@ -11,6 +13,7 @@
 #include "state_log.h"
 #include "state_post_flight.h"
 #include "state_pre_flight.h"
+
 
 void Scheduler::run(void) {
   /* Create all necessary states initially and store in list */
@@ -47,6 +50,10 @@ void Scheduler::run(void) {
       while ((hm_millis() - lastTime_) < pCurrentState_->getPeriodMS()) {
       }
     }
+
+    for (auto i : {1, 2}) {
+    	hm_dynamixelSetGoalPosition(i, 120);
+	}
 
     lastTime_ = hm_millis();
     // Visually show how fast scheduler is running using LED

@@ -116,6 +116,9 @@
 #ifndef NUM_SERVO_PWM
 #define NUM_SERVO_PWM 0
 #endif  // NUM_SERVO_PWM
+#ifndef NUM_DYNAMIXEL
+#define NUM_DYNAMIXEL 0
+#endif // NUM_DYNAMIXEL
 #ifndef NUM_USB_STD
 #define NUM_USB_STD 0
 #endif  // NUM_USB_STD
@@ -395,6 +398,12 @@ extern uint16_t ledDigitalPin[NUM_LED_DIGITAL];
 #if HAS_DEV(LINE_CUTTER_BLE)
 extern uint8_t lineCutterBleAddress[NUM_LINE_CUTTER_BLE];
 #endif  // HAS_DEV(LINE_CUTTER_BLE)
+
+#define FIRST_ID_DYNAMIXEL 0
+#if HAS_DEV(DYNAMIXEL)
+extern UART_HandleTypeDef* dynamixelHuart;
+extern uint8_t dynamixelId[NUM_DYNAMIXEL];
+#endif // HAS_DEV(DYNAMIXEL)
 
 /* Pyro */
 

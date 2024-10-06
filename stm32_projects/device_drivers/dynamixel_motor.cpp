@@ -9,10 +9,14 @@
 
 using std::placeholders::_1;
 
-DynamixelMotor::DynamixelMotor(const uint8_t id,
-                               DynamixelCommandQueue* commandQueue)
-    : m_id{id}, m_commandQueue{commandQueue} {
+
+
+bool DynamixelMotor::init(const uint8_t id,
+                               DynamixelCommandQueue* commandQueue) {
+  m_id = id;
+  m_commandQueue = commandQueue;
   m_readCallback = std::bind(&DynamixelMotor::processReadData, this, _1);
+  return true;
 }
 
 uint8_t DynamixelMotor::ping() {

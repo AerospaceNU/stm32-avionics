@@ -50,6 +50,8 @@
 
 #define NUM_SERVO_PWM 4
 
+#define NUM_DYNAMIXEL 2
+
 #define NUM_USB_STD 1
 
 

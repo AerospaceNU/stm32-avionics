@@ -144,6 +144,9 @@ uint32_t servoPwmChannel[NUM_SERVO_PWM] = {TIM_CHANNEL_4, TIM_CHANNEL_3,
 float servoPwmMinPulseMs[NUM_SERVO_PWM] = {0.75, 0.75, 0.75, 0.75};
 float servoPwmMaxPulseMs[NUM_SERVO_PWM] = {2.25, 2.25, 2.25, 2.25};
 
+uint8_t dynamixelId[NUM_DYNAMIXEL] = {1, 2};
+UART_HandleTypeDef* dynamixelHuart = &huart2;
+
 /* Various analog sensors */
 
 ADC_HandleTypeDef* stmHadcInstances[NUM_STM_HADC] = {

@@ -101,6 +101,9 @@ extern bool hardwareStatusRadio[NUM_RADIO];
 #if HAS_DEV(SERVO)
 extern bool hardwareStatusServo[NUM_SERVO];
 #endif  // HAS_DEV(SERVO)
+#if HAS_DEV(DYNAMIXEL)
+extern bool hardwareStatusDynamixel[NUM_DYNAMIXEL];
+#endif // HAS_DEV(DYNAMIXEL)
 #if HAS_DEV(USB)
 extern bool hardwareStatusUsb[NUM_USB];
 #endif  // HAS_DEV(USB)
@@ -159,6 +162,7 @@ bool hm_lineCuttersSendCut(int device);
 
 /* Outputs */
 void hm_servoSetAngle(int servoId, float degrees);
+void hm_dynamixelSetGoalPosition(int dynamixelId, float degrees);
 void hm_pyroFire(int pyroId, uint32_t duration);
 void hm_pyroSet(int pyroId, bool enabled);
 void hm_pyroSetPwm(int pyroId, uint32_t frequency, uint32_t pulseWidth,

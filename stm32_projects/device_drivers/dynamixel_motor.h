@@ -19,7 +19,9 @@ enum OperatingMode : uint8_t {
 
 class DynamixelMotor {
  public:
-  DynamixelMotor(const uint8_t id, DynamixelCommandQueue* commandQueue);
+  DynamixelMotor() {}
+
+  bool init(const uint8_t id, DynamixelCommandQueue* commandQueue);
 
   static const constexpr uint32_t kMaxPayloadSize = 50;
   struct DynamixelPacket_t {
@@ -40,8 +42,8 @@ class DynamixelMotor {
   uint8_t goalPosition(double degrees);
 
  private:
-  const uint8_t m_id;
-  DynamixelCommandQueue* m_commandQueue;
+  uint8_t m_id = 0;
+  DynamixelCommandQueue* m_commandQueue = nullptr;
   DynamixelPacket_t m_txPacket = {};
   DynamixelPacket_t m_rxPacket = {};
   std::function<void(uint16_t)> m_readCallback;
