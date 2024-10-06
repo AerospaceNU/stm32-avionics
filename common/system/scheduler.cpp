@@ -43,6 +43,9 @@ void Scheduler::run(void) {
   uint32_t lastTime_ = hm_millis();
   EndCondition_e endCondition = NoChange;
 
+  static double degrees = 0;
+  static uint32_t lastUpdate = hm_millis();
+
   // Keep running scheduler forever
   while (1) {
     // Limit rate scheduler runs at
@@ -50,10 +53,13 @@ void Scheduler::run(void) {
       while ((hm_millis() - lastTime_) < pCurrentState_->getPeriodMS()) {
       }
     }
-
-    for (auto i : {1, 2}) {
-    	hm_dynamixelSetGoalPosition(i, 120);
-	}
+    if (hm_millis() - lastUpdate > 5000) {
+		for (auto i : {0, 1}) {
+			degrees += 60;
+			hm_dynamixelSetGoalPosition(i, degrees);
+			lastUpdate = hm_millis();
+		}
+    }
 
     lastTime_ = hm_millis();
     // Visually show how fast scheduler is running using LED

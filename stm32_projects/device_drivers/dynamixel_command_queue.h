@@ -59,7 +59,6 @@ class DynamixelCommandQueue {
     HAL_HalfDuplex_EnableTransmitter(m_huart);
     HAL_UART_Transmit(m_huart, (uint8_t*)&(currentCommand.message),
                       currentCommand.messageSize, 100);
-    HAL_Delay(200);
     m_prevSendTimeMs = HAL_GetTick();
     m_isAwaitResponse = false;
     HAL_HalfDuplex_EnableReceiver(m_huart);
