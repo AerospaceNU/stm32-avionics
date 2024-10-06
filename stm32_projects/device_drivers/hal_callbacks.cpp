@@ -91,7 +91,7 @@ typedef struct {
   UART_HandleTypeDef *huart;
   void (*rxHalfCallback)(void *);
   void (*rxCallback)(void *);
-  void (*rxIdleCallback)(void *, size_t);  // user data, size
+  std::function<void(void *, size_t)> rxIdleCallback;
   void *rxHalfCallbackUserData;
   void *rxCallbackUserData;
   void *rxIdleCallbackUserData;
@@ -161,9 +161,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
   }
 }
 
-void halCallbacks_registerUartRxIdleCallback(UART_HandleTypeDef *huart,
-                                             void (*callback)(void *, size_t),
-                                             void *userData) {
+void halCallbacks_registerUartRxIdleCallback(
+    UART_HandleTypeDef *huart, std::function<void(void *, size_t)> callback,
+    void *userData) {
   // See if handle already has callback registered to it
   for (int i = 0; i < numUartCallbacksRegistered; i++) {
     if (uartCallbacks[i].huart == huart) {

@@ -288,7 +288,6 @@ static bool inSim = false;
 static CircularBuffer_s *simRxBuffer = NULL;
 
 void hm_hardwareInit() {
-
   /* Accelerometers */
 #if HAS_DEV(ACCEL_H3LIS331DL)
   for (int i = 0; i < NUM_ACCEL_H3LIS331DL; i++) {

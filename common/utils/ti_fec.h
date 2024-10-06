@@ -6,7 +6,8 @@
 #include "board_config_common.h"
 
 #define DEBUG_PRINTF(a...) \
-  {}
+  {                        \
+  }
 // #define DEBUG_PRINTF(...) printf(__VA_ARGS__);
 
 #define TI_FEC_CRC_LEN_BYTES 2

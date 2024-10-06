@@ -1,10 +1,12 @@
 #include "accel_adx375.h"
 
-
 #if HAS_DEV(ACCEL_ADX375)
 
-#include "reg_helper.h"
+#include <cstdarg>
+
 #include "math_utils.h"
+#include "reg_helper.h"
+#include "usb_std.h"
 
 struct RegisterAddress {
   uint8_t address : 6;
@@ -26,18 +28,6 @@ struct RegisterAddress {
 // Units are lsb per G
 constexpr float ACCEL_SENSITIVITY = 20.5 / G_TO_MPS2(1);
 #define ACCEL_FS G_TO_MPS2(200)
-
-#include <cstdarg>
-
-#include "usb_std.h"
-void CustomPrintf(const char *format, ...) {
-  char buffer[256];
-  va_list args;
-  va_start(args, format);
-  int len = vsprintf(buffer, format, args);
-  usbStd_transmit((uint8_t *)buffer, len);
-  va_end(args);
-}
 
 bool AccelAdx375::begin(SpiCtrl_t spi_) {
   spi = spi_;

@@ -483,7 +483,7 @@ void tiRadio_setRadioFrequency(TiRadioCtrl_s *radio, TiRadioBand_e band,
   if (band == TIRADIO_BAND_136_160MHz) {
     loDividerValue = 24;
   } else {
-    loDividerValue = static_cast<uint8_t>((band)*2);
+    loDividerValue = static_cast<uint8_t>((band) * 2);
   }
 
   // program band (also enable FS out of lock detector, which is useful for

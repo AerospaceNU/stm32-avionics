@@ -24,7 +24,7 @@ void Gps::fillTimeStamp() {
 
 uint64_t Gps::timestampSecondsFromDate(int year, int month, int day, int hour,
                                        int minute, int second) {
-  struct tm t {};
+  struct tm t{};
   memset(&t, 0, sizeof(tm));  // Initialize to all 0's
   t.tm_year = year - 1900;    // This is year-1900, so 112 = 2012
   t.tm_mon = month - 1;       // January is 0

@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # Clang-format
-for file in $(find common desktop_projects stm32_projects/device_drivers platformio_projects/src platformio_projects/lib/device_drivers platformio_projects/lib/new_hal -type f -iregex '.*\.\(h\|c\|cpp\)')
+for file in $(find common desktop_projects stm32_projects/device_drivers platformio_projects/src platformio_projects/lib/device_drivers platformio_projects/lib/new_hal -type f \( -iname \*.h -o -iname \*.hpp -o -iname \*.c -o -iname \*.cpp \))
 do
-	clang-format-11 -i $file
+    echo "Formatting $file"
+	clang-format -i $file
         if [ $? -ne 0 ];
         then
             exit -1

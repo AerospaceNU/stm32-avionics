@@ -19,7 +19,7 @@ static UartCallbackProperty_s uartCallbacks[MAX_UART_HANDLES];
 static int numUartCallbacksRegistered = 0;
 
 void halCallbacks_registerUartRxIdleCallback(UART_HandleTypeDef *huart,
-											std::function<void (uint16_t)> callback) {
+											std::function<void (uint16 _t)> callback) {  
   // See if handle already has callback registered to it
   for (int i = 0; i < numUartCallbacksRegistered; i++) {
     if (uartCallbacks[i].huart == huart) {
