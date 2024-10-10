@@ -9,10 +9,12 @@
 
 using std::placeholders::_1;
 
-
+const double DEGREES_TO_POS_UNIT = 1 / 0.088;
+const double RPM_TO_VEL_UNIT = 1 / 0.229;
+const double RPM2_TO_ACC_UNIT = 1 / 214.577;
 
 bool DynamixelMotor::init(const uint8_t id,
-                               DynamixelCommandQueue* commandQueue) {
+                          DynamixelCommandQueue* commandQueue) {
   m_id = id;
   m_commandQueue = commandQueue;
   m_readCallback = std::bind(&DynamixelMotor::processReadData, this, _1);
@@ -43,13 +45,33 @@ uint8_t DynamixelMotor::torqueEnable(Toggle toggle) {
   return 0;
 }
 
+uint8_t DynamixelMotor::setDriveMode(ProfileConfig profileConfig,
+                                     DirectionMode direction) {
+  uint8_t profileBit = profileConfig << 2;
+  uint8_t directionBit = direction;
+  uint8_t mode = 0x00 | profileBit | directionBit;
+
+  m_txPacket.length_l = 0x06;
+  m_txPacket.length_h = 0x00;
+  m_txPacket.instruction = 0x03;
+
+  // Drive mode write location
+  m_txPacket.payload[0] = 0x0a;
+  m_txPacket.payload[1] = 0x00;
+
+  m_txPacket.payload[2] = mode;
+
+  this->write(m_txPacket);
+  return 0;
+}
+
 uint8_t DynamixelMotor::setOperatingMode(OperatingMode mode) {
   m_txPacket.length_l = 0x06;
   m_txPacket.length_h = 0x00;
   m_txPacket.instruction = 0x03;
 
   // Operating mode write location
-  m_txPacket.payload[0] = 0x0B;
+  m_txPacket.payload[0] = 0x0b;
   m_txPacket.payload[1] = 0x00;
 
   m_txPacket.payload[2] = mode;
@@ -59,10 +81,7 @@ uint8_t DynamixelMotor::setOperatingMode(OperatingMode mode) {
 }
 
 uint8_t DynamixelMotor::goalPosition(double degrees) {
-  if (degrees < 0) {
-    degrees = 360 + degrees;
-  }
-  uint32_t degreeConversion = std::round(degrees / 0.088);
+  int32_t degreeConversion = std::round(degrees * DEGREES_TO_POS_UNIT);
 
   m_txPacket.length_l = 0x09;
   m_txPacket.length_h = 0x00;
@@ -76,6 +95,46 @@ uint8_t DynamixelMotor::goalPosition(double degrees) {
   m_txPacket.payload[3] = (degreeConversion >> 8) & 0xff;
   m_txPacket.payload[4] = (degreeConversion >> 16) & 0xff;
   m_txPacket.payload[5] = (degreeConversion >> 24) & 0xff;
+
+  this->write(m_txPacket);
+  return 0;
+}
+
+uint8_t DynamixelMotor::profileVelocity(double rpm) {
+  uint32_t rpmConversion = std::round(rpm * RPM_TO_VEL_UNIT);
+
+  m_txPacket.length_l = 0x09;
+  m_txPacket.length_h = 0x00;
+  m_txPacket.instruction = 0x03;
+
+  // Profile velocity write location
+  m_txPacket.payload[0] = 0x70;
+  m_txPacket.payload[1] = 0x00;
+
+  m_txPacket.payload[2] = rpmConversion & 0xff;
+  m_txPacket.payload[3] = (rpmConversion >> 8) & 0xff;
+  m_txPacket.payload[4] = (rpmConversion >> 16) & 0xff;
+  m_txPacket.payload[5] = (rpmConversion >> 24) & 0xff;
+
+  this->write(m_txPacket);
+  return 0;
+}
+
+uint8_t DynamixelMotor::profileAcceleration(double rpm2) {
+  uint32_t rpm2Conversion = std::round(rpm2 * RPM2_TO_ACC_UNIT);
+
+  m_txPacket.length_l = 0x09;
+  m_txPacket.length_h = 0x00;
+  m_txPacket.instruction = 0x03;
+
+  // Profile velocity write location
+  m_txPacket.payload[0] = 0x6c;
+  m_txPacket.payload[1] = 0x00;
+
+  m_txPacket.payload[2] = rpm2Conversion & 0xff;
+  m_txPacket.payload[3] = (rpm2Conversion >> 8) & 0xff;
+  m_txPacket.payload[4] = (rpm2Conversion >> 16) & 0xff;
+  m_txPacket.payload[5] = (rpm2Conversion >> 24) & 0xff;
 
   this->write(m_txPacket);
   return 0;

@@ -10,11 +10,21 @@ enum Toggle : uint8_t {
   ON = 1,
 };
 
+enum ProfileConfig : uint8_t {
+  VELOCITY_BASED = 0,
+  TIME_BASED = 1,
+};
+
+enum DirectionMode : uint8_t {
+  NORMAL = 0,
+  REVERSE = 1,
+};
+
 enum OperatingMode : uint8_t {
   CURRENT = 0,
   VELOCITY = 1,
   POSITION = 3,
-  EXT_POSITION = 4
+  EXT_POSITION = 4,
 };
 
 class DynamixelMotor {
@@ -37,9 +47,15 @@ class DynamixelMotor {
 
   uint8_t torqueEnable(Toggle toggle);
 
+  uint8_t setDriveMode(ProfileConfig profileConfig, DirectionMode direction);
+
   uint8_t setOperatingMode(OperatingMode mode);
 
   uint8_t goalPosition(double degrees);
+
+  uint8_t profileVelocity(double rpm);
+
+  uint8_t profileAcceleration(double rpm2);
 
  private:
   uint8_t m_id = 0;
