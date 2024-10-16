@@ -33,6 +33,7 @@ typedef enum {
   HELP,
   TRIGGERFIRE,
   VERSION,
+  MOTORCONTROL,
   NUM_CLI_COMMANDS,
 } CliCommand_e;
 

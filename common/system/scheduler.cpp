@@ -53,13 +53,13 @@ void Scheduler::run(void) {
       while ((hm_millis() - lastTime_) < pCurrentState_->getPeriodMS()) {
       }
     }
-    if (hm_millis() - lastUpdate > 5000) {
-		for (auto i : {0, 1}) {
-			degrees += 60;
-			hm_dynamixelSetGoalPosition(i, degrees);
-			lastUpdate = hm_millis();
-		}
-    }
+//    if (hm_millis() - lastUpdate > 5000) {
+//		for (auto i : {0, 1}) {
+//			degrees += 600;
+//			hm_dynamixelSetGoalPosition(i, degrees);
+//			lastUpdate = hm_millis();
+//		}
+//    }
 
     lastTime_ = hm_millis();
     // Visually show how fast scheduler is running using LED

@@ -17,9 +17,9 @@ class DynamixelCommandQueue {
  public:
   explicit DynamixelCommandQueue(UART_HandleTypeDef* huart)
       : m_huart{huart}, m_isAwaitResponse{false} {
-    std::function<void(void*, size_t)> callbackFunction =
+    auto handleReadCallback =
         std::bind(&DynamixelCommandQueue::processReadData, this, _1, _2);
-    halCallbacks_registerUartRxIdleCallback(m_huart, callbackFunction, nullptr);
+     halCallbacks_registerUartRxIdleCallback(m_huart, handleReadCallback, nullptr);
   }
 
   uint8_t sendMessage(uint8_t* buffer, uint16_t writeLength,
@@ -42,6 +42,7 @@ class DynamixelCommandQueue {
     if (m_currentMessageCallback) {
       m_currentMessageCallback(size);
     }
+    m_isAwaitResponse = false;
   }
 
   void tick() {
@@ -70,12 +71,16 @@ class DynamixelCommandQueue {
   static const constexpr uint32_t kMaxBufferSize = 100;
   static const constexpr uint32_t kMaxMessageCount = 100;
   static const constexpr uint32_t kResponseTimeoutMs = 5000;
+
   struct CommandData {
     uint8_t message[kMaxBufferSize];
     uint16_t messageSize;
     uint8_t* responseBuffer;
     std::function<void(uint16_t)> callback;
   };
+
+  std::function<void(void*, size_t)> m_handleReadCallback;
+
   CircularBuffer<CommandData, 100> m_messageBuffer;
   UART_HandleTypeDef* m_huart;
   std::function<void(uint16_t)> m_currentMessageCallback;

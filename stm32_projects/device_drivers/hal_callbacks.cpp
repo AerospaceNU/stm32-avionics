@@ -167,7 +167,7 @@ void halCallbacks_registerUartRxIdleCallback(
   // See if handle already has callback registered to it
   for (int i = 0; i < numUartCallbacksRegistered; i++) {
     if (uartCallbacks[i].huart == huart) {
-      uartCallbacks[i].rxIdleCallback = callback;
+      uartCallbacks[i].rxIdleCallback = std::move(callback);
       uartCallbacks[i].rxIdleCallbackUserData = userData;
       return;  // No need to keep going if handle already found to be registered
     }
@@ -175,7 +175,10 @@ void halCallbacks_registerUartRxIdleCallback(
 
   // If reached, handle hasn't been registered, so create a new association
   uartCallbacks[numUartCallbacksRegistered].huart = huart;
-  uartCallbacks[numUartCallbacksRegistered].rxIdleCallback = callback;
+  uartCallbacks[numUartCallbacksRegistered].rxIdleCallback = std::move(callback);
+  if (uartCallbacks[numUartCallbacksRegistered].rxIdleCallback == NULL) {
+	  volatile int a = 3;
+  }
   uartCallbacks[numUartCallbacksRegistered].rxIdleCallbackUserData = userData;
   numUartCallbacksRegistered++;
 }
@@ -186,6 +189,8 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
       if (uartCallbacks[i].rxIdleCallback != NULL) {
         uartCallbacks[i].rxIdleCallback(uartCallbacks[i].rxIdleCallbackUserData,
                                         size);
+      } else {
+    	  volatile int a = 3;
       }
       return;  // No need to keep searching if callback was found
     }

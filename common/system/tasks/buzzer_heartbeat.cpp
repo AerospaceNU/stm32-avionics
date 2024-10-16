@@ -30,6 +30,7 @@ void pyroSoundOff(bool pyroContCheck, int& pyroCounter) {
 }
 
 void buzzerHeartbeat_tick(BuzzerState state) {
+	return;
   static int pyroCounter = 0;
   bool pyroContCheck;
 

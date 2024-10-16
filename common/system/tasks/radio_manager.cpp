@@ -79,8 +79,8 @@ void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
 }
 
 // Packet rates, in hz
-#define ORIENTATION_RATE 10
-#define POSITION_RATE 10
+#define ORIENTATION_RATE 1
+#define POSITION_RATE 1
 #define HARDWARE_STATUS_RATE 1
 
 void radioManager_transmitData(int radioId, SensorData_s *sensorData,

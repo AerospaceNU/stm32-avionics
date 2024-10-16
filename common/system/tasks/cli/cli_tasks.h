@@ -16,6 +16,7 @@ void help();
 void triggerFire();
 void sendLineCutterString();  // Send a string to a line cutter
 void version();
+void motorControl();
 
 }  // namespace CliTasks
 

@@ -607,9 +607,12 @@ void hm_hardwareInit() {
 #if HAS_DEV(DYNAMIXEL)
 for (int i = 0; i < NUM_DYNAMIXEL; i++) {
 	hardwareStatusDynamixel[FIRST_ID_DYNAMIXEL + i] = dynamixelMotor[i].init(dynamixelId[i], &dynamixelCommandQueue);
+	dynamixelMotor[i].profileAcceleration(0);
 	dynamixelMotor[i].setOperatingMode(OperatingMode::EXT_POSITION);
 	dynamixelMotor[i].torqueEnable(Toggle::ON);
+	dynamixelMotor[i].setDriveMode(ProfileConfig::VELOCITY_BASED, DirectionMode::NORMAL);
 }
+
 #endif // HAS_DEV(DYNAMIXEL)
 
   /* USB */
