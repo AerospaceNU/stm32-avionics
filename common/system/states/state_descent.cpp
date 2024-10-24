@@ -8,12 +8,14 @@
 #include "filters.h"
 #include "hardware_manager.h"
 #include "state_log.h"
+#include "guided_descent.h"
 
 void DescentState::init() {
   uint32_t apogeeTime = hm_millis();
   dataLog_getFlightMetadata()->apogeeTimestamp = apogeeTime;
   dataLog_writeFlightMetadata();
   eventManager_setEventComplete(Event_e::apogee);
+  guided_descent::setInitializationTimestamp(apogeeTime);
   transitionResetTimer = hm_millis();
   altitude = 0;
   stateLog_write(this->getID());
@@ -26,6 +28,7 @@ EndCondition_e DescentState::run() {
   // Collect, filter, and log all sensor data
   SensorData_s* sensorData = hm_getSensorData();
   FilterData_s* filterData = filter_getData();
+  guided_descent::update(sensorData);
   dataLog_write(sensorData, filterData, this->getID());
 
   // Reset touchdown threshold counter if recent change in z position is large

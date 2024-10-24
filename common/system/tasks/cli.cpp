@@ -103,6 +103,8 @@ void cli_setDefaultConfig() {
   cliConfigs.groundElevationM = 0;
   cliConfigs.groundTemperatureC = 14.85;
   cliConfigs.radioChannel = 1;
+  cliConfigs.dynamixelZeroOffset[0] = 0;
+  cliConfigs.dynamixelZeroOffset[1] = 0;
   triggerManager_setDefaultConfig();
 }
 
@@ -271,7 +273,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
         }
         break;
       case 'N':
-        if (primaryCommand == CONFIG) {
+        if (primaryCommand == CONFIG || primaryCommand == MOTORCONTROL) {
           cliOptionVals.N = true;
         } else {
           invalidOptCommand = true;

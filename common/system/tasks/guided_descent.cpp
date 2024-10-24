@@ -6,35 +6,29 @@
  */
 #include "guided_descent.h"
 
+#include "data_log.h"
 #include "hardware_manager.h"
 
-const double LENGTH_TO_DEGREES = 360;
-const double RPM = 60;
+using namespace guided_descent;
 
-//
+const double CM_LENGTH_TO_DEGREES = 1;
 
-//const DynamixelCommandQueue commandQueue = DynamixelCommandQueue();
-//const DynamixelMotor motor = DynamixelMotor();
-
-//int setup() {
-//  motor.init(1, &commandQueue);
-//  motor.setDriveMode(ProfileConfig::VELOCITY_BASED, DirectionMode::NORMAL);
-//  motor.setOperatingMode(OperatingMode::EXT_POSITION);
-//}
 
 struct LengthEntry {
 	uint32_t timestamp;
-	double length;
+	double lengthCm;
 };
 
 static LengthEntry motor1Control[] = {
-		{5000, 3},
-    {12000, 8}
+	{5000, 3},
+    {12000, 8},
+	{0xFFFFFFFF, 0} // Sentinel value indicating end of the control list
 };
 
 static LengthEntry motor2Control[] = {
-		{5000, -5},
-    {12000, -8}
+	{5000, -5},
+    {12000, -8},
+	{0xFFFFFFFF, 0} // Sentinel value indicating end of the control list
 };
 
 
@@ -44,30 +38,57 @@ static uint8_t motor2_idx = 0;
 static uint32_t startTimestamp = 0;
 static bool runMotors = false;
 
-void setStartTime(uint32_t timestamp) {
+double goalLengthToDegrees(double goalLength) {
+  return goalLength * CM_LENGTH_TO_DEGREES;
+}
+
+void guided_descent::setInitializationTimestamp(uint32_t timestamp) {
 	startTimestamp = timestamp;
 	runMotors = true;
-
 }
 
-void update() {
-//	currentTimestamp = hm_millis();
-//
-//	if (!runMotors) {
-//		return;
-//	}
-//
-//	if (currentTimestamp - startTimestamp > motor1Control[motor1_idx].timestamp) {
-//		hm_dynamixelSetGoalPosition(0, goalLengthToDegrees(motor1Control[motor1_idx].length))
-//		motor1_idx++;
-//	}
-//
-//	if (currentTimestamp - startTimestamp > motor2Control[motor2_idx].timestamp) {
-//		hm_dynamixelSetGoalPosition(1, goalLengthToDegrees(motor2Control[motor2_idx].length))
-//		motor2_idx++;
-//	}
+void guided_descent::setMotor(SensorData_s* sensorData, uint32_t motorIdx, double lengthCm) {
+	if (motorIdx >= NUM_DYNAMIXEL) {
+		return;
+	}
+	double goalDegrees = goalLengthToDegrees(lengthCm);
+	goalDegrees += cli_getConfigs()->dynamixelZeroOffset[motorIdx];
+	hm_dynamixelSetGoalPosition(motorIdx, goalDegrees);
+	sensorData->dynamixelSetDegrees[motorIdx] = goalDegrees;
+	sensorData->dynamixelLengthCm[motorIdx] = lengthCm;
 }
 
-double goalLengthToDegrees(double goalLength) {
-  return goalLength * LENGTH_TO_DEGREES;
+
+void guided_descent::update(SensorData_s* sensorData){
+	if (!runMotors) {
+		return;
+	}
+	uint32_t currentTimestamp = hm_millis() - startTimestamp;
+	// Motor 1
+	if (motor1Control[motor1_idx].timestamp != 0xFFFFFFFF) {
+		if (motor1Control[motor1_idx].timestamp <= currentTimestamp) {
+			setMotor(sensorData, 0, motor1Control[motor1_idx].lengthCm);
+			++motor1_idx;
+		}
+	}
+	// Motor 2
+	if (motor2Control[motor2_idx].timestamp != 0xFFFFFFFF) {
+		if (motor2Control[motor2_idx].timestamp <= currentTimestamp) {
+			setMotor(sensorData, 1, motor2Control[motor2_idx].lengthCm);
+			++motor2_idx;
+		}
+	}
 }
+
+void guided_descent::setZeroOffset(uint32_t motorIdx, double offset) {
+	if (motorIdx >= NUM_DYNAMIXEL) {
+		return;
+	}
+
+	CliConfigs_s* configs = cli_getConfigs();
+	configs->dynamixelZeroOffset[motorIdx] = offset;
+}
+
+
+
+

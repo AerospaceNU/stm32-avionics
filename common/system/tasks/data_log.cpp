@@ -57,6 +57,10 @@ typedef struct __attribute__((__packed__)) {
 #if HAS_DEV(PYRO_CONT)
   uint8_t pyroContinuity;
 #endif  // HAS_DEV(PYRO_CONT)
+#if HAS_DEV(DYNAMIXEL)
+  double dynamixelSetDegrees[NUM_DYNAMIXEL];
+  double dynamixelLengthCm[NUM_DYNAMIXEL];
+#endif // HAS_DEV(DYNAMIXEL)
   uint16_t triggerStatus;
   double heading, vtg;
   double pos_x, pos_y, pos_z;
@@ -386,6 +390,12 @@ void dataLog_write(SensorData_s *sensorData, FilterData_s *filterData,
           (uint8_t)((sensorData->pyroContData[i] & 0b1) << i);
     }
 #endif  // HAS_DEV(PYRO_CONT)
+#if HAS_DEV(DYNAMIXEL)
+    for (int i = 0; i < NUM_DYNAMIXEL; i++) {
+      fcbLogData->dynamixelSetDegrees[i] = sensorData->dynamixelSetDegrees[i];
+      fcbLogData->dynamixelLengthCm[i] = sensorData->dynamixelLengthCm[i];
+    }
+#endif  // HAS_DEV(DYNAMIXEL)
     fcbLogData->triggerStatus = triggerManager_status();
     fcbLogData->heading = filterData->heading;
     fcbLogData->vtg = filterData->vtg;

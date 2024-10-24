@@ -8,6 +8,7 @@
 #include "filters.h"
 #include "hardware_manager.h"
 #include "radio_manager.h"
+#include "guided_descent.h"
 
 #if HAS_DEV(LINE_CUTTER_BLE)
 #include "line_cutter_ble.h"
@@ -24,6 +25,8 @@ void InitializeState::init() {
 
   dataLog_init();
   dataLog_loadCliConfigs();
+  guided_descent::setZeroOffset(0, cli_getConfigs()->dynamixelZeroOffset[0]);
+  guided_descent::setZeroOffset(1, cli_getConfigs()->dynamixelZeroOffset[1]);
 
   // Start CLI, which will run in the background in other states
   cli_init();

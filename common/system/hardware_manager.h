@@ -44,6 +44,10 @@ typedef struct __attribute__((__packed__)) {
 #if HAS_DEV(PYRO_CONT)
   bool pyroContData[NUM_PYRO_CONT];
 #endif  // HAS_DEV(PYRO_CONT)
+#if HAS_DEV(DYNAMIXEL)
+  double dynamixelSetDegrees[NUM_DYNAMIXEL];
+  double dynamixelLengthCm[NUM_DYNAMIXEL];
+#endif // HAS_DEV(DYNAMIXEL)
 } SensorData_s;
 
 // Sensor fullscales, in m/s/s
