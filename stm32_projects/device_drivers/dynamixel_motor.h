@@ -43,6 +43,8 @@ class DynamixelMotor {
     uint8_t payload[kMaxPayloadSize + 2];  // +2 for CRC space;
   };
 
+  uint8_t clearPosition();
+
   uint8_t ping();
 
   uint8_t torqueEnable(Toggle toggle);
@@ -56,6 +58,8 @@ class DynamixelMotor {
   uint8_t profileVelocity(double rpm);
 
   uint8_t profileAcceleration(double rpm2);
+
+  uint8_t reboot();
 
  private:
   uint8_t m_id = 0;

@@ -21,6 +21,24 @@ bool DynamixelMotor::init(const uint8_t id,
   return true;
 }
 
+uint8_t DynamixelMotor::clearPosition() {
+  m_txPacket.length_l = 0x08;
+  m_txPacket.length_h = 0x00;
+  m_txPacket.instruction = 0x10;
+
+  // Clear position
+  // (as opposed to clearing errors which I am not implementing)
+  m_txPacket.payload[0] = 0x01;
+  // Fixed values for this instruction
+  m_txPacket.payload[1] = 0x44;
+  m_txPacket.payload[2] = 0x58;
+  m_txPacket.payload[3] = 0x4c;
+  m_txPacket.payload[4] = 0x22;
+
+  this->write(m_txPacket);
+  return 0;
+}
+
 uint8_t DynamixelMotor::ping() {
   m_txPacket.length_l = 0x03;
   m_txPacket.length_h = 0x00;
@@ -135,6 +153,15 @@ uint8_t DynamixelMotor::profileAcceleration(double rpm2) {
   m_txPacket.payload[3] = (rpm2Conversion >> 8) & 0xff;
   m_txPacket.payload[4] = (rpm2Conversion >> 16) & 0xff;
   m_txPacket.payload[5] = (rpm2Conversion >> 24) & 0xff;
+
+  this->write(m_txPacket);
+  return 0;
+}
+
+uint8_t DynamixelMotor::reboot() {
+  m_txPacket.length_l = 0x03;
+  m_txPacket.length_h = 0x00;
+  m_txPacket.instruction = 0x08;
 
   this->write(m_txPacket);
   return 0;
