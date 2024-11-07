@@ -42,6 +42,7 @@ typedef struct {
   double pitch;
   double yaw;
   double angle_vertical;
+  double baroAltAgl;
 } FilterData_s;
 
 typedef enum {

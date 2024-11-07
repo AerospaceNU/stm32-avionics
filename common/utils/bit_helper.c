@@ -5,7 +5,7 @@ uint8_t set_bit(uint8_t value, uint8_t offset) {
 }
 
 uint8_t clear_bit(uint8_t value, uint8_t offset) {
-  return value & (uint8_t) ~(1u << offset);
+  return value & (uint8_t)~(1u << offset);
 }
 
 uint8_t get_bit(uint8_t value, uint8_t place) {

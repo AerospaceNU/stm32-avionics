@@ -29,7 +29,7 @@ static char applicationName[2];
 static CliOptionVals_s cliOptionVals = {
     .f = NULL,      // flight number
     .t = NULL,      // trigger number
-    .m = NULL,      // trigger mode
+    .m = NULL,      // trigger mode OR motor number
     .p = NULL,      // device port, e.g. pyro port or line cutter channel
     .d = NULL,      // trigger duration
     .w = NULL,      // trigger pulse width
@@ -57,6 +57,7 @@ static struct option longOptions[] = {
     {"triggerfire", no_argument, &primaryCommand, TRIGGERFIRE},
     {"linecutter", no_argument, &primaryCommand, LINECUTTER},
     {"version", no_argument, &primaryCommand, VERSION},
+    {"motorcontrol", no_argument, &primaryCommand, MOTORCONTROL},
     {0, 0, 0, 0}};
 
 static CliConfigs_s cliConfigs = {0};
@@ -102,6 +103,8 @@ void cli_setDefaultConfig() {
   cliConfigs.groundElevationM = 0;
   cliConfigs.groundTemperatureC = 14.85;
   cliConfigs.radioChannel = 1;
+  cliConfigs.dynamixelZeroOffset[0] = 0;
+  cliConfigs.dynamixelZeroOffset[1] = 0;
   triggerManager_setDefaultConfig();
 }
 
@@ -228,7 +231,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
         }
         break;
       case 'm':
-        if (primaryCommand == CONFIG) {
+        if (primaryCommand == CONFIG || primaryCommand == MOTORCONTROL) {
           cliOptionVals.m = optarg;
         } else {
           invalidOptCommand = true;
@@ -242,7 +245,7 @@ CliCommand_e cli_parse(CliComms_e commsType) {
         }
         break;
       case 'd':
-        if (primaryCommand == CONFIG) {
+        if (primaryCommand == CONFIG || primaryCommand == MOTORCONTROL) {
           cliOptionVals.d = optarg;
         } else {
           invalidOptCommand = true;
@@ -263,14 +266,14 @@ CliCommand_e cli_parse(CliComms_e commsType) {
         }
         break;
       case 'D':
-        if (primaryCommand == CONFIG) {
+        if (primaryCommand == CONFIG || primaryCommand == MOTORCONTROL) {
           cliOptionVals.D = true;
         } else {
           invalidOptCommand = true;
         }
         break;
       case 'N':
-        if (primaryCommand == CONFIG) {
+        if (primaryCommand == CONFIG || primaryCommand == MOTORCONTROL) {
           cliOptionVals.N = true;
         } else {
           invalidOptCommand = true;

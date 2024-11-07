@@ -33,6 +33,7 @@ typedef enum {
   HELP,
   TRIGGERFIRE,
   VERSION,
+  MOTORCONTROL,
   NUM_CLI_COMMANDS,
 } CliCommand_e;
 
@@ -66,6 +67,7 @@ typedef struct __attribute__((__packed__)) {
   double groundElevationM;
   double groundTemperatureC;
   int32_t radioChannel;
+  double dynamixelZeroOffset[NUM_DYNAMIXEL];
 } CliConfigs_s;
 
 /**

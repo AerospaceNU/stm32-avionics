@@ -5,6 +5,8 @@
 #ifndef STM32_PROJECTS_DEVICE_DRIVERS_HAL_CALLBACKS_H_
 #define STM32_PROJECTS_DEVICE_DRIVERS_HAL_CALLBACKS_H_
 
+#include <functional>
+
 #include "board_config_common.h"
 
 #ifdef HAL_SPI_MODULE_ENABLED
@@ -29,9 +31,10 @@ void halCallbacks_registerUartRxHalfCpltCallback(UART_HandleTypeDef *huart,
 void halCallbacks_registerUartRxCpltCallback(UART_HandleTypeDef *huart,
                                              void (*callback)(void *),
                                              void *userData);
-void halCallbacks_registerUartRxIdleCallback(UART_HandleTypeDef *huart,
-                                             void (*callback)(void *, size_t),
-                                             void *userData);
+
+void halCallbacks_registerUartRxIdleCallback(
+    UART_HandleTypeDef *huart, std::function<void(void *, size_t)> callback,
+    void *userData);
 #endif  // HAL_UART_MODULE_ENABLED
 
 #ifdef HAL_EXTI_MODULE_ENABLED

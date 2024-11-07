@@ -108,32 +108,24 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
   if (currentTime - lastSent[radioId].orientationLastSent >=
       1000 / ORIENTATION_RATE) {
     OrientationPacket_s data = {
-      state,
-      (int8_t)(filterData->qw * 100.0),
-      (int8_t)(filterData->qx * 100.0),
-      (int8_t)(filterData->qy * 100.0),
-      (int8_t)(filterData->qz * 100.0),
-      (float)filterData->rocket_ang_vel_x,
-      (float)filterData->rocket_ang_vel_y,
-      (float)filterData->rocket_ang_vel_z,
-      (float)filterData->world_acc_x,
-      (float)filterData->world_acc_y,
-      (float)filterData->world_acc_z,
+        state, (int8_t)(filterData->qw * 100.0),
+        (int8_t)(filterData->qx * 100.0), (int8_t)(filterData->qy * 100.0),
+        (int8_t)(filterData->qz * 100.0), (float)filterData->rocket_ang_vel_x,
+        (float)filterData->rocket_ang_vel_y,
+        (float)filterData->rocket_ang_vel_z, (float)filterData->world_acc_x,
+        (float)filterData->world_acc_y, (float)filterData->world_acc_z,
 #if HAS_DEV(MAG)
-      (float)sensorData->magData[0].realGauss.x,
-      (float)sensorData->magData[0].realGauss.y,
-      (float)sensorData->magData[0].realGauss.z,
+        (float)sensorData->magData[0].realGauss.x,
+        (float)sensorData->magData[0].realGauss.y,
+        (float)sensorData->magData[0].realGauss.z,
 #else
-      0,
-      0,
-      0,
+        0, 0, 0,
 #endif  // HAS_DEV(IMU)
 
-      // 16 bit means 16,000 max
-      // we can just multiply by 10 for 0.1 precision
-      // and improve more if required later
-      static_cast<int16_t>(ROUND_2_INT(filterData->angle_vertical * 10))
-    };
+        // 16 bit means 16,000 max
+        // we can just multiply by 10 for 0.1 precision
+        // and improve more if required later
+        static_cast<int16_t>(ROUND_2_INT(filterData->angle_vertical * 10))};
     transmitPacket[radioId].packetType = 2;
     transmitPacket[radioId].payload.orientation = data;
     lastSent[radioId].orientationLastSent = currentTime;
@@ -145,37 +137,37 @@ void radioManager_transmitData(int radioId, SensorData_s *sensorData,
       1000 / POSITION_RATE) {
     PositionPacket_s data = {
 #if HAS_DEV(BAROMETER)
-      (float)sensorData->barometerData[0].temperatureC,
+        (float)sensorData->barometerData[0].temperatureC,
 #else
-      0,
+        0,
 #endif  // HAS_DEV(BAROMETER)
-      (float)filterData->pos_z_agl,
-      (float)filterData->world_vel_z,
+        (float)filterData->pos_z_agl,
+        (float)filterData->world_vel_z,
 #if HAS_DEV(GPS)
-      sensorData->gpsData[0].generalData.latitude,
-      sensorData->gpsData[0].generalData.longitude,
-      sensorData->gpsData[0].generalData.altitude,
+        sensorData->gpsData[0].generalData.latitude,
+        sensorData->gpsData[0].generalData.longitude,
+        sensorData->gpsData[0].generalData.altitude,
 #else
-      0,
-      0,
-      0,
+        0,
+        0,
+        0,
 #endif  // HAS_DEV(GPS)
 #if HAS_DEV(VBAT)
-      (float)sensorData->vbatData[0],
+        (float)sensorData->vbatData[0],
 #else
-      0,
+        0,
 #endif  // HAS_DEV(VBAT)
-      0,
-      0,
+        0,
+        0,
 #if HAS_DEV(GPS)
-      (uint32_t)sensorData->gpsData[0].timeData.timestamp,
-      sensorData->gpsData[0].generalData.satsTracked,
+        (uint32_t)sensorData->gpsData[0].timeData.timestamp,
+        sensorData->gpsData[0].generalData.satsTracked,
 #else
-      0,
-      0,
+        0,
+        0,
 #endif  // HAS_DEV(GPS)
-      state,
-      0  // TODO bluetooth clients
+        state,
+        0  // TODO bluetooth clients
     };
 
     transmitPacket[radioId].packetType = TELEMETRY_ID_POSITION;

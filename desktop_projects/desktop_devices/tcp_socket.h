@@ -29,7 +29,7 @@ class TcpSocket {
   void setRXBuffer(CircularBuffer_s *rx_buffer);
 
  private:
-  struct sockaddr_in address {};
+  struct sockaddr_in address{};
   int addrlen = sizeof(address);
 
 #if defined(__WIN32__)

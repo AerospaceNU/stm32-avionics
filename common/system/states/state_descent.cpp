@@ -8,12 +8,14 @@
 #include "filters.h"
 #include "hardware_manager.h"
 #include "state_log.h"
+#include "guided_descent.h"
 
 void DescentState::init() {
   uint32_t apogeeTime = hm_millis();
   dataLog_getFlightMetadata()->apogeeTimestamp = apogeeTime;
   dataLog_writeFlightMetadata();
   eventManager_setEventComplete(Event_e::apogee);
+  guided_descent::setInitializationTimestamp(apogeeTime);
   transitionResetTimer = hm_millis();
   altitude = 0;
   stateLog_write(this->getID());
@@ -37,6 +39,10 @@ EndCondition_e DescentState::run() {
     if (hm_millis() - transitionResetTimer > kTransitionResetTimeThreshold) {
       return EndCondition_e::Touchdown;
     }
+  }
+
+  if (filterData->pos_z_agl < 50) {
+	  guided_descent::collapse(sensorData);
   }
 
   return EndCondition_e::NoChange;

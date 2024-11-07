@@ -93,6 +93,16 @@
 #include "servo_pwm.h"
 #endif  // HAS_DEV(SERVO_PWM)
 
+#if HAS_DEV(DYNAMIXEL)
+#include "dynamixel_motor.h"
+#include "dynamixel_command_queue.h"
+#endif // HAS_DEV(DYNAMIXEL)
+
+#if HAS_DEV(DYNAMIXEL)
+#include "dynamixel_motor.h"
+#include "dynamixel_command_queue.h"
+#endif // HAS_DEV(DYNAMIXEL)
+
 #if HAS_DEV(USB_STD)
 #include "usb_std.h"
 #endif  // HAS_DEV(USB_STD)
@@ -152,6 +162,10 @@ bool hardwareStatusRadio[NUM_RADIO];
 #if HAS_DEV(SERVO)
 bool hardwareStatusServo[NUM_SERVO];
 #endif  // HAS_DEV(SERVO)
+
+#if HAS_DEV(DYNAMIXEL)
+bool hardwareStatusDynamixel[NUM_DYNAMIXEL];
+#endif // HAS_DEV(DYNAMIXEL)
 #if HAS_DEV(USB)
 bool hardwareStatusUsb[NUM_USB];
 #endif  // HAS_DEV(USB)
@@ -266,6 +280,11 @@ static TiRadioCtrl_s radioTi915[NUM_RADIO_TI_915];
 static ServoPwmCtrl_t servoPwm[NUM_SERVO_PWM];
 #endif  // HAS_DEV(SERVO_PWM)
 
+#if HAS_DEV(DYNAMIXEL)
+static DynamixelCommandQueue dynamixelCommandQueue{dynamixelHuart};
+static DynamixelMotor dynamixelMotor[NUM_DYNAMIXEL];
+#endif // HAS_DEV(DYNAMIXEL)
+
 /* VBat Sensors */
 #if HAS_DEV(VBAT_STM_ADC)
 // static AdcDevCtrl_s vbatAdc[NUM_VBAT_STM_ADC];
@@ -288,7 +307,6 @@ static bool inSim = false;
 static CircularBuffer_s *simRxBuffer = NULL;
 
 void hm_hardwareInit() {
-
   /* Accelerometers */
 #if HAS_DEV(ACCEL_H3LIS331DL)
   for (int i = 0; i < NUM_ACCEL_H3LIS331DL; i++) {
@@ -585,6 +603,18 @@ void hm_hardwareInit() {
                       servoPwmMinPulseMs[i], servoPwmMaxPulseMs[i], -90, 90);
   }
 #endif  // HAS_DEV(SERVO_PWM)
+
+#if HAS_DEV(DYNAMIXEL)
+for (int i = 0; i < NUM_DYNAMIXEL; i++) {
+	hardwareStatusDynamixel[FIRST_ID_DYNAMIXEL + i] = dynamixelMotor[i].init(dynamixelId[i], &dynamixelCommandQueue);
+	dynamixelMotor[i].profileAcceleration(0);
+	dynamixelMotor[i].profileVelocity(0);
+	dynamixelMotor[i].setOperatingMode(OperatingMode::EXT_POSITION);
+	dynamixelMotor[i].torqueEnable(Toggle::ON);
+	dynamixelMotor[i].setDriveMode(ProfileConfig::VELOCITY_BASED, DirectionMode::NORMAL);
+}
+
+#endif // HAS_DEV(DYNAMIXEL)
 
   /* USB */
 #if HAS_DEV(USB_STD)
@@ -1029,6 +1059,15 @@ void hm_pyroUpdate(void *pUserData) {
 #endif  // HAS_DEV(PYRO_DIGITAL)
 }
 
+
+void hm_dynamixelSetGoalPosition(int dynamixelId, float degrees) {
+#if HAS_DEV(DYNAMIXEL)
+	if (IS_DEVICE(dynamixelId, DYNAMIXEL)) {
+		dynamixelMotor[dynamixelId].goalPosition(degrees);
+	}
+#endif // HAS_DEV(DYNAMIXEL)
+};
+
 void hm_dcMotorSetPercent(int dcMotorId, double percent) {
   if (fabs(percent) > 100) return;
 
@@ -1064,6 +1103,9 @@ static void hm_simReadSensorData() {
 }
 
 void hm_readSensorData() {
+#if HAS_DEV(DYNAMIXEL)
+	dynamixelCommandQueue.tick();
+#endif // HAS_DEV(DYNAMIXEL)
   if (!inSim) {
     // Accelerometer data
 #if HAS_DEV(ACCEL_H3LIS331DL)

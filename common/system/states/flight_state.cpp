@@ -15,6 +15,7 @@
 #include "hardware_manager.h"
 #include "radio_manager.h"
 #include "trigger_manager.h"
+#include "guided_descent.h"
 
 EndCondition_e FlightState::m_lastCliEndConn;
 
@@ -37,6 +38,9 @@ EndCondition_e FlightState::runState() {
 
   // Update pyros
   triggerManager_update(filterData);
+
+
+  guided_descent::update(sensorData);
 
   // Run buzzer heartbeat
   buzzerHeartbeat_tick(BuzzerState::PYRO);

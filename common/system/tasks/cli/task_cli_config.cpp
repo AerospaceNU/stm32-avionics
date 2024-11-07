@@ -260,6 +260,11 @@ void CliTasks::config() {
     // Radio channel
     snprintf(val, sizeof(val), "%" PRIi32, cli_getConfigs()->radioChannel);
     generateConfigHelp("Radio Channel:", val);
+
+#if HAS_DEV(DYNAMIXEL)
+    snprintf(val, sizeof(val), "Motor 0: %d, Motor 1: %d", (int)cli_getConfigs()->dynamixelZeroOffset[0], (int)cli_getConfigs()->dynamixelZeroOffset[1]);
+    generateConfigHelp("Dynamixel Offsets:", val);
+#endif // HAS_DEV(DYNAMIXEL)
   }
 
   // If reached, send complete message to CLI

@@ -390,6 +390,7 @@ static void filterPositionZ(SensorData_s* curSensorVals, bool hasPassedApogee) {
         (tempRef / lapseRate) *
         (pow(presAvg / presRef, -R_DRY_AIR * lapseRate / G_ACCEL_EARTH) - 1);
   }
+  filterData.baroAltAgl = baroAltAgl;
 #endif  // HAS_DEV(BAROMETER)
 
   // Kalman filtering, assuming Z is always up

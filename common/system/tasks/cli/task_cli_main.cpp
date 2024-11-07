@@ -109,6 +109,13 @@ EndCondition_e CliTasks::tick() {
           ILLEGAL_TRANSITION
         }
         break;
+      case CliCommand_e::MOTORCONTROL:
+        if (allowedTransitions[CliCommand_e::MOTORCONTROL]) {
+          CliTasks::motorControl();
+        } else {
+          ILLEGAL_TRANSITION
+        }
+        break;
       case CliCommand_e::LINECUTTER:
         if (allowedTransitions[CliCommand_e::LINECUTTER])
           CliTasks::sendLineCutterString();

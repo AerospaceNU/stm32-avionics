@@ -11,8 +11,9 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-#include <bit>
 #include <algorithm>
+#include <array>
+#include <bit>
 #endif
 
 #ifdef __cplusplus
