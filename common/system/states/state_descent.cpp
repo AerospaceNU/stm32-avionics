@@ -28,6 +28,7 @@ EndCondition_e DescentState::run() {
   // Collect, filter, and log all sensor data
   SensorData_s* sensorData = hm_getSensorData();
   FilterData_s* filterData = filter_getData();
+  guided_descent::update(sensorData);
   dataLog_write(sensorData, filterData, this->getID());
 
   // Reset touchdown threshold counter if recent change in z position is large
