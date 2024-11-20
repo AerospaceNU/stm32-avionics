@@ -150,12 +150,88 @@ class CircularBuffer {
     }
   }
 
+  float get_sum() {
+    Type* tailTracker = this->head;
+    float sum = 0;
+    while (tailTracker != this->tail) {
+      sum += *tailTracker;
+      this->incrementPointer(&tailTracker, 1);
+    }
+    return sum;
+  }
+
+  float get_avg() {
+    Type* tailTracker = this->head;
+    float sum = 0;
+    while (tailTracker != this->tail) {
+      sum += *tailTracker;
+      this->incrementPointer(&tailTracker, 1);
+    }
+    float avg = sum / count();
+    return avg;
+  }
+
+  float get_min() {
+    Type* tailTracker = this->head;
+    float min = *tailTracker;
+    while (tailTracker != this->tail) {
+      float new_val = *tailTracker;
+      if (new_val < min) {
+        min = new_val;
+      }
+      this->incrementPointer(&tailTracker, 1);
+    }
+    return min;
+  }
+  float get_max() {
+    Type* tailTracker = this->head;
+    float max = *tailTracker;
+    while (tailTracker != this->tail) {
+      float new_val = *tailTracker;
+      if (new_val > max) {
+        max = new_val;
+      }
+      this->incrementPointer(&tailTracker, 1);
+    }
+    return max;
+  }
+
+  float get_med() {
+    Type* tailTracker = this->head;
+    int length = count();
+    float arr[Capacity + 1];
+    int i = 0;
+    float med = 0;
+    while (tailTracker != this->tail) {
+      float cur_val = *tailTracker;
+      arr[i] = cur_val;
+      arr[i] = *tailTracker;
+      this->incrementPointer(&tailTracker, 1);
+      i += 1;
+    }
+    for (int i = 0; i < length; ++i) {
+      for (int j = 0; j < length - 1 - i; ++j) {
+        if (arr[j] > arr[j + 1]) {
+          // Swap arr[j] and arr[j + 1]
+          float temp = arr[j];
+          arr[j] = arr[j + 1];
+          arr[j + 1] = temp;
+        }
+      }
+    }
+    if (length % 2 == 1)
+      med = arr[length / 2];
+    else
+      med = (arr[length / 2 - 1] + arr[length / 2]) / 2;
+    return med;
+  }
   /**
    * Check if the buffer is currently full or not.
    *
    * @return bool: True if buffer is full, false otherwise.
    */
+
   bool full() const { return this->count() == Capacity; }
 };
 
-#endif /* COMMON_UTILS_CPP_CIRCULAR_BUFFER_H_ */
+#endif  // COMMON_UTILS_CPP_CIRCULAR_BUFFER_H_
