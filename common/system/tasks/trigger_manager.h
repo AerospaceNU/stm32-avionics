@@ -18,14 +18,14 @@ extern "C" {
 
 #define MAX_TRIGGER 16
 
-typedef enum {
+enum class TriggerType{
   TRIGGER_TYPE_EMPTY = 0,
   TRIGGER_TYPE_PYRO,
   TRIGGER_TYPE_LINE_CUTTER,
   TRIGGER_TYPE_DIGITAL_ON_PYRO,
   TRIGGER_TYPE_DIGITAL_OFF_PYRO,
   TRIGGER_TYPE_PWM_PYRO
-} TriggerType_e;
+};
 
 typedef struct __attribute__((__packed__)) {
   uint8_t mode;
