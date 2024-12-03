@@ -1,5 +1,7 @@
 #include "scheduler.h"
 
+#include <initializer_list>
+
 #include "cli_tasks.h"
 #include "hardware_manager.h"
 #include "state_ascent.h"
@@ -11,6 +13,7 @@
 #include "state_log.h"
 #include "state_post_flight.h"
 #include "state_pre_flight.h"
+
 
 void Scheduler::run(void) {
   /* Create all necessary states initially and store in list */
@@ -40,6 +43,9 @@ void Scheduler::run(void) {
   uint32_t lastTime_ = hm_millis();
   EndCondition_e endCondition = NoChange;
 
+  static double degrees = 0;
+  static uint32_t lastUpdate = hm_millis();
+
   // Keep running scheduler forever
   while (1) {
     // Limit rate scheduler runs at
@@ -47,6 +53,13 @@ void Scheduler::run(void) {
       while ((hm_millis() - lastTime_) < pCurrentState_->getPeriodMS()) {
       }
     }
+//    if (hm_millis() - lastUpdate > 5000) {
+//		for (auto i : {0, 1}) {
+//			degrees += 600;
+//			hm_dynamixelSetGoalPosition(i, degrees);
+//			lastUpdate = hm_millis();
+//		}
+//    }
 
     lastTime_ = hm_millis();
     // Visually show how fast scheduler is running using LED
