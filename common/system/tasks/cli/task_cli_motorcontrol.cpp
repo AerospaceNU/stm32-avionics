@@ -9,6 +9,7 @@
 #include "hardware_manager.h"
 
 void CliTasks::motorControl() {
+#if HAS_DEV(DYNAMIXEL)
   CliOptionVals_s options = cli_getOptions();
 
   if (options.D) {
@@ -47,4 +48,5 @@ void CliTasks::motorControl() {
 
   cli_sendAck(true, nullptr);
   cli_sendComplete(true, nullptr);
+#endif // HAS_DEV(DYNAMIXEL)
 }

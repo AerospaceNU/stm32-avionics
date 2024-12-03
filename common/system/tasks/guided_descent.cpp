@@ -112,6 +112,7 @@ void guided_descent::setInitializationTimestamp(uint32_t timestamp) {
 }
 
 void guided_descent::setMotor(SensorData_s* sensorData, uint32_t motorIdx, double lengthCm) {
+#if HAS_DEV(DYNAMIXEL)
 	if (motorIdx >= NUM_DYNAMIXEL) {
 		return;
 	}
@@ -120,6 +121,7 @@ void guided_descent::setMotor(SensorData_s* sensorData, uint32_t motorIdx, doubl
 	hm_dynamixelSetGoalPosition(motorIdx, goalDegrees);
 	sensorData->dynamixelSetDegrees[motorIdx] = goalDegrees;
 	sensorData->dynamixelLengthCm[motorIdx] = lengthCm;
+#endif // HAS_DEV(DYNAMIXEL)
 }
 
 

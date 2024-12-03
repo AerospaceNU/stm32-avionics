@@ -653,10 +653,10 @@ typedef struct
 /** @defgroup TIM_LL_EC_COUNTERMODE Counter Mode
   * @{
   */
-#define LL_TIM_COUNTERMODE_UP                  0x00000000U          /*!<Counter used as upcounter */
+#define LL_TIM_COUNTERMODE_UP                  0x00000000U          /*!< Counter used as upcounter */
 #define LL_TIM_COUNTERMODE_DOWN                TIM_CR1_DIR          /*!< Counter used as downcounter */
 #define LL_TIM_COUNTERMODE_CENTER_DOWN         TIM_CR1_CMS_0        /*!< The counter counts up and down alternatively. Output compare interrupt flags of output channels  are set only when the counter is counting down. */
-#define LL_TIM_COUNTERMODE_CENTER_UP           TIM_CR1_CMS_1        /*!<The counter counts up and down alternatively. Output compare interrupt flags of output channels  are set only when the counter is counting up */
+#define LL_TIM_COUNTERMODE_CENTER_UP           TIM_CR1_CMS_1        /*!< The counter counts up and down alternatively. Output compare interrupt flags of output channels  are set only when the counter is counting up */
 #define LL_TIM_COUNTERMODE_CENTER_UP_DOWN      TIM_CR1_CMS          /*!< The counter counts up and down alternatively. Output compare interrupt flags of output channels  are set only when the counter is counting up or down. */
 /**
   * @}
@@ -737,6 +737,15 @@ typedef struct
   */
 #endif /* USE_FULL_LL_DRIVER */
 
+/** Legacy definitions for compatibility purpose
+@cond 0
+  */
+#define LL_TIM_OCMODE_ASSYMETRIC_PWM1 LL_TIM_OCMODE_ASYMMETRIC_PWM1
+#define LL_TIM_OCMODE_ASSYMETRIC_PWM2 LL_TIM_OCMODE_ASYMMETRIC_PWM2
+/**
+@endcond
+  */
+
 /** @defgroup TIM_LL_EC_OCMODE Output Configuration Mode
   * @{
   */
@@ -752,8 +761,8 @@ typedef struct
 #define LL_TIM_OCMODE_RETRIG_OPM2              (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_0)                    /*!<Retrigerrable OPM mode 2*/
 #define LL_TIM_OCMODE_COMBINED_PWM1            (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_2)                    /*!<Combined PWM mode 1*/
 #define LL_TIM_OCMODE_COMBINED_PWM2            (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC1M_2) /*!<Combined PWM mode 2*/
-#define LL_TIM_OCMODE_ASSYMETRIC_PWM1          (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2) /*!<Asymmetric PWM mode 1*/
-#define LL_TIM_OCMODE_ASSYMETRIC_PWM2          (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M)                      /*!<Asymmetric PWM mode 2*/
+#define LL_TIM_OCMODE_ASYMMETRIC_PWM1          (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2) /*!<Asymmetric PWM mode 1*/
+#define LL_TIM_OCMODE_ASYMMETRIC_PWM2          (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M)                      /*!<Asymmetric PWM mode 2*/
 /**
   * @}
   */
@@ -957,11 +966,11 @@ typedef struct
 #define LL_TIM_ETR_FILTER_FDIV2_N8             (TIM_SMCR_ETF_2 | TIM_SMCR_ETF_0)                    /*!< fSAMPLING=fDTS/2, N=8 */
 #define LL_TIM_ETR_FILTER_FDIV4_N6             (TIM_SMCR_ETF_2 | TIM_SMCR_ETF_1)                    /*!< fSAMPLING=fDTS/4, N=6 */
 #define LL_TIM_ETR_FILTER_FDIV4_N8             (TIM_SMCR_ETF_2 | TIM_SMCR_ETF_1 | TIM_SMCR_ETF_0)   /*!< fSAMPLING=fDTS/4, N=8 */
-#define LL_TIM_ETR_FILTER_FDIV8_N6             TIM_SMCR_ETF_3                                       /*!< fSAMPLING=fDTS/8, N=8 */
-#define LL_TIM_ETR_FILTER_FDIV8_N8             (TIM_SMCR_ETF_3 | TIM_SMCR_ETF_0)                    /*!< fSAMPLING=fDTS/16, N=5 */
-#define LL_TIM_ETR_FILTER_FDIV16_N5            (TIM_SMCR_ETF_3 | TIM_SMCR_ETF_1)                    /*!< fSAMPLING=fDTS/16, N=6 */
-#define LL_TIM_ETR_FILTER_FDIV16_N6            (TIM_SMCR_ETF_3 | TIM_SMCR_ETF_1 | TIM_SMCR_ETF_0)   /*!< fSAMPLING=fDTS/16, N=8 */
-#define LL_TIM_ETR_FILTER_FDIV16_N8            (TIM_SMCR_ETF_3 | TIM_SMCR_ETF_2)                    /*!< fSAMPLING=fDTS/16, N=5 */
+#define LL_TIM_ETR_FILTER_FDIV8_N6             TIM_SMCR_ETF_3                                       /*!< fSAMPLING=fDTS/8, N=6 */
+#define LL_TIM_ETR_FILTER_FDIV8_N8             (TIM_SMCR_ETF_3 | TIM_SMCR_ETF_0)                    /*!< fSAMPLING=fDTS/16, N=8 */
+#define LL_TIM_ETR_FILTER_FDIV16_N5            (TIM_SMCR_ETF_3 | TIM_SMCR_ETF_1)                    /*!< fSAMPLING=fDTS/16, N=5 */
+#define LL_TIM_ETR_FILTER_FDIV16_N6            (TIM_SMCR_ETF_3 | TIM_SMCR_ETF_1 | TIM_SMCR_ETF_0)   /*!< fSAMPLING=fDTS/16, N=6 */
+#define LL_TIM_ETR_FILTER_FDIV16_N8            (TIM_SMCR_ETF_3 | TIM_SMCR_ETF_2)                    /*!< fSAMPLING=fDTS/16, N=8 */
 #define LL_TIM_ETR_FILTER_FDIV32_N5            (TIM_SMCR_ETF_3 | TIM_SMCR_ETF_2 | TIM_SMCR_ETF_0)   /*!< fSAMPLING=fDTS/32, N=5 */
 #define LL_TIM_ETR_FILTER_FDIV32_N6            (TIM_SMCR_ETF_3 | TIM_SMCR_ETF_2 | TIM_SMCR_ETF_1)   /*!< fSAMPLING=fDTS/32, N=6 */
 #define LL_TIM_ETR_FILTER_FDIV32_N8            TIM_SMCR_ETF                                         /*!< fSAMPLING=fDTS/32, N=8 */
@@ -1191,8 +1200,8 @@ typedef struct
 /* STM32L496xx || STM32L4A6xx || */
 /* STM32L4R5xx || STM32L4R7xx || STM32L4R9xx || STM32L4S5xx || STM32L4S7xx || STM32L4S9xx */
 #if defined (STM32L412xx) || defined (STM32L422xx) ||defined (STM32L431xx) || defined (STM32L432xx) || defined (STM32L433xx) || defined (STM32L442xx) || defined (STM32L443xx) || defined (STM32L451xx) || defined (STM32L452xx) || defined (STM32L462xx)
-#define LL_TIM_TIM2_ITR1_RMP_NONE          0x00000000U                                                 /* !< No internal trigger on TIM2_ITR1 */
-#define LL_TIM_TIM2_ITR1_RMP_USB_SOF       TIM2_OR1_ITR1_RMP                                           /* !< TIM2_ITR1 is connected to USB SOF */
+#define LL_TIM_TIM2_ITR1_RMP_NONE          0x00000000U                                                 /*!< No internal trigger on TIM2_ITR1 */
+#define LL_TIM_TIM2_ITR1_RMP_USB_SOF       TIM2_OR1_ITR1_RMP                                           /*!< TIM2_ITR1 is connected to USB SOF */
 #endif /* STM32L431xx || STM32L432xx || STM32L442xx || STM32L433xx || STM32L443xx || */
 /* STM32L451xx || STM32L452xx || STM32L462xx */
 #define LL_TIM_TIM2_ETR_RMP_GPIO TIM2_OR1_RMP_MASK                                                     /*!< TIM2_ETR is connected to GPIO */
@@ -1326,6 +1335,7 @@ typedef struct
 /**
 @endcond
   */
+
 /**
   * @}
   */
@@ -1356,10 +1366,6 @@ typedef struct
 #define LL_TIM_ReadReg(__INSTANCE__, __REG__) READ_REG((__INSTANCE__)->__REG__)
 /**
   * @}
-  */
-
-/** @defgroup TIM_LL_EM_Exported_Macros Exported_Macros
-  * @{
   */
 
 /**
@@ -1458,11 +1464,6 @@ typedef struct
   */
 #define __LL_TIM_GET_ICPSC_RATIO(__ICPSC__)  \
   ((uint32_t)(0x01U << (((__ICPSC__) >> 16U) >> TIM_CCMR1_IC1PSC_Pos)))
-
-
-/**
-  * @}
-  */
 
 
 /**
@@ -1922,6 +1923,17 @@ __STATIC_INLINE void LL_TIM_CC_DisablePreload(TIM_TypeDef *TIMx)
 }
 
 /**
+  * @brief  Indicates whether the capture/compare control bits (CCxE, CCxNE and OCxM) preload is enabled.
+  * @rmtoll CR2          CCPC          LL_TIM_CC_IsEnabledPreload
+  * @param  TIMx Timer instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_TIM_CC_IsEnabledPreload(const TIM_TypeDef *TIMx)
+{
+  return ((READ_BIT(TIMx->CR2, TIM_CR2_CCPC) == (TIM_CR2_CCPC)) ? 1UL : 0UL);
+}
+
+/**
   * @brief  Set the updated source of the capture/compare control bits (CCxE, CCxNE and OCxM).
   * @note Macro IS_TIM_COMMUTATION_EVENT_INSTANCE(TIMx) can be used to check
   *       whether or not a timer instance is able to generate a commutation event.
@@ -2065,7 +2077,7 @@ __STATIC_INLINE void LL_TIM_CC_DisableChannel(TIM_TypeDef *TIMx, uint32_t Channe
   *         @arg @ref LL_TIM_CHANNEL_CH6
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t LL_TIM_CC_IsEnabledChannel(TIM_TypeDef *TIMx, uint32_t Channels)
+__STATIC_INLINE uint32_t LL_TIM_CC_IsEnabledChannel(const TIM_TypeDef *TIMx, uint32_t Channels)
 {
   return ((READ_BIT(TIMx->CCER, Channels) == (Channels)) ? 1UL : 0UL);
 }
@@ -2151,8 +2163,8 @@ __STATIC_INLINE void LL_TIM_OC_ConfigOutput(TIM_TypeDef *TIMx, uint32_t Channel,
   *         @arg @ref LL_TIM_OCMODE_RETRIG_OPM2
   *         @arg @ref LL_TIM_OCMODE_COMBINED_PWM1
   *         @arg @ref LL_TIM_OCMODE_COMBINED_PWM2
-  *         @arg @ref LL_TIM_OCMODE_ASSYMETRIC_PWM1
-  *         @arg @ref LL_TIM_OCMODE_ASSYMETRIC_PWM2
+  *         @arg @ref LL_TIM_OCMODE_ASYMMETRIC_PWM1
+  *         @arg @ref LL_TIM_OCMODE_ASYMMETRIC_PWM2
   * @retval None
   */
 __STATIC_INLINE void LL_TIM_OC_SetMode(TIM_TypeDef *TIMx, uint32_t Channel, uint32_t Mode)
@@ -2191,8 +2203,8 @@ __STATIC_INLINE void LL_TIM_OC_SetMode(TIM_TypeDef *TIMx, uint32_t Channel, uint
   *         @arg @ref LL_TIM_OCMODE_RETRIG_OPM2
   *         @arg @ref LL_TIM_OCMODE_COMBINED_PWM1
   *         @arg @ref LL_TIM_OCMODE_COMBINED_PWM2
-  *         @arg @ref LL_TIM_OCMODE_ASSYMETRIC_PWM1
-  *         @arg @ref LL_TIM_OCMODE_ASSYMETRIC_PWM2
+  *         @arg @ref LL_TIM_OCMODE_ASYMMETRIC_PWM1
+  *         @arg @ref LL_TIM_OCMODE_ASYMMETRIC_PWM2
   */
 __STATIC_INLINE uint32_t LL_TIM_OC_GetMode(const TIM_TypeDef *TIMx, uint32_t Channel)
 {
@@ -2406,7 +2418,7 @@ __STATIC_INLINE void LL_TIM_OC_DisableFast(TIM_TypeDef *TIMx, uint32_t Channel)
   *         @arg @ref LL_TIM_CHANNEL_CH6
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t LL_TIM_OC_IsEnabledFast(TIM_TypeDef *TIMx, uint32_t Channel)
+__STATIC_INLINE uint32_t LL_TIM_OC_IsEnabledFast(const TIM_TypeDef *TIMx, uint32_t Channel)
 {
   uint8_t iChannel = TIM_GET_CHANNEL_INDEX(Channel);
   const __IO uint32_t *pReg = (__IO uint32_t *)((uint32_t)((uint32_t)(&TIMx->CCMR1) + OFFSET_TAB_CCMRx[iChannel]));
@@ -2482,7 +2494,7 @@ __STATIC_INLINE void LL_TIM_OC_DisablePreload(TIM_TypeDef *TIMx, uint32_t Channe
   *         @arg @ref LL_TIM_CHANNEL_CH6
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t LL_TIM_OC_IsEnabledPreload(TIM_TypeDef *TIMx, uint32_t Channel)
+__STATIC_INLINE uint32_t LL_TIM_OC_IsEnabledPreload(const TIM_TypeDef *TIMx, uint32_t Channel)
 {
   uint8_t iChannel = TIM_GET_CHANNEL_INDEX(Channel);
   const __IO uint32_t *pReg = (__IO uint32_t *)((uint32_t)((uint32_t)(&TIMx->CCMR1) + OFFSET_TAB_CCMRx[iChannel]));
@@ -2567,7 +2579,7 @@ __STATIC_INLINE void LL_TIM_OC_DisableClear(TIM_TypeDef *TIMx, uint32_t Channel)
   *         @arg @ref LL_TIM_CHANNEL_CH6
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t LL_TIM_OC_IsEnabledClear(TIM_TypeDef *TIMx, uint32_t Channel)
+__STATIC_INLINE uint32_t LL_TIM_OC_IsEnabledClear(const TIM_TypeDef *TIMx, uint32_t Channel)
 {
   uint8_t iChannel = TIM_GET_CHANNEL_INDEX(Channel);
   const __IO uint32_t *pReg = (__IO uint32_t *)((uint32_t)((uint32_t)(&TIMx->CCMR1) + OFFSET_TAB_CCMRx[iChannel]));
@@ -3116,7 +3128,7 @@ __STATIC_INLINE void LL_TIM_IC_DisableXORCombination(TIM_TypeDef *TIMx)
   * @param  TIMx Timer instance
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t LL_TIM_IC_IsEnabledXORCombination(TIM_TypeDef *TIMx)
+__STATIC_INLINE uint32_t LL_TIM_IC_IsEnabledXORCombination(const TIM_TypeDef *TIMx)
 {
   return ((READ_BIT(TIMx->CR2, TIM_CR2_TI1S) == (TIM_CR2_TI1S)) ? 1UL : 0UL);
 }
@@ -5053,7 +5065,7 @@ __STATIC_INLINE void LL_TIM_GenerateEvent_BRK2(TIM_TypeDef *TIMx)
   * @{
   */
 
-ErrorStatus LL_TIM_DeInit(TIM_TypeDef *TIMx);
+ErrorStatus LL_TIM_DeInit(const TIM_TypeDef *TIMx);
 void LL_TIM_StructInit(LL_TIM_InitTypeDef *TIM_InitStruct);
 ErrorStatus LL_TIM_Init(TIM_TypeDef *TIMx, const LL_TIM_InitTypeDef *TIM_InitStruct);
 void LL_TIM_OC_StructInit(LL_TIM_OC_InitTypeDef *TIM_OC_InitStruct);

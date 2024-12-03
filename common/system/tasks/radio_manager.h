@@ -51,6 +51,8 @@ void radioManager_transmitData(int radioId, SensorData_s* sensorData,
 // Send a string over radio
 // Note that this BLOCKS for up to 150ms!!
 void radioManager_transmitString(int radioId, uint8_t* data, size_t len);
+
+void radioManager_transmitMotorControl(int radioId, double motor1Position, double motor2Position);
 // Default function is same, but sends over CLI
 void radioManager_transmitStringDefault(uint8_t* data, size_t len);
 

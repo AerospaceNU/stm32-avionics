@@ -13,6 +13,7 @@
 #include "board_config_common.h"
 #include "hardware_manager.h"
 #include "radio_manager.h"
+#include "guided_descent.h"
 
 #define INPUT_BUFFER_SIZE 2048
 #define MAX_ARGS 200
@@ -83,6 +84,12 @@ static void cli_parseRadio(RadioRecievedPacket_s* packet) {
     } else {
       cli_sendAck(false, "Bad CRC!");
     }
+  }
+  else if (parsedPacket->packetType == TELEMETRY_ID_MOTOR_POSITION) {
+	  if (packet->crc) {
+		  guided_descent::setMotor(hm_getSensorData(), 0, parsedPacket->payload.motorPosition.motor1Position);
+		  guided_descent::setMotor(hm_getSensorData(), 1, parsedPacket->payload.motorPosition.motor2Position);
+	  }
   }
 }
 

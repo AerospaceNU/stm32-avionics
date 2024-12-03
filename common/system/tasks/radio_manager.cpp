@@ -79,8 +79,8 @@ void radioManager_addMessageCallback(int radioId, RadioCallback_t callback) {
 }
 
 // Packet rates, in hz
-#define ORIENTATION_RATE 10
-#define POSITION_RATE 10
+#define ORIENTATION_RATE 1
+#define POSITION_RATE 1
 #define HARDWARE_STATUS_RATE 1
 
 void radioManager_transmitData(int radioId, SensorData_s *sensorData,
@@ -290,6 +290,40 @@ void radioManager_transmitString(int radioId, uint8_t *data, size_t len) {
     len -= txLen;
     data += txLen;
   }
+}
+
+void radioManager_transmitMotorControl(int radioId, double motor1Position, double motor2Position) {
+
+    transmitPacket[radioId].timestampMs = hm_millis();
+    transmitPacket[radioId].packetType = TELEMETRY_ID_MOTOR_POSITION;
+
+    // copy txLen many bytes into the string, and set the rest to null chars
+    transmitPacket[radioId].payload.motorPosition.motor1Position = motor1Position;
+    transmitPacket[radioId].payload.motorPosition.motor2Position = motor2Position;
+
+#ifndef DESKTOP_SIM
+    for (int i = 0; i < 3; i++) {
+      // This is intended to be called twice to hopefully successfully send at
+      // least once
+      radioManager_sendInternal(radioId);
+      radioManager_sendInternal(radioId);
+
+      // The radio seems to not actually send the packet unless we actually call
+      // RadioUpdate a bunch
+      // TODO: This is a HACK
+      uint32_t start;
+      for (int i = 0; i < 9; i++) {
+        hm_radioUpdate();
+        start = hm_millis();
+        while ((hm_millis() - start) < 5) {
+        }
+        hm_watchdogRefresh();
+      }
+    }
+#else
+    radioManager_sendInternal(radioId);
+#endif
+
 }
 
 void radioManager_transmitStringDefault(uint8_t *data, size_t len) {

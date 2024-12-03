@@ -178,9 +178,9 @@ void HAL_PCDEx_BCD_VBUSDetect(PCD_HandleTypeDef *hpcd)
 
   /* Primary detection: checks if connected to Standard Downstream Port
   (without charging capability) */
-  USBx->GCCFG &= ~ USB_OTG_GCCFG_DCDEN;
+  USBx->GCCFG &= ~USB_OTG_GCCFG_DCDEN;
   HAL_Delay(50U);
-  USBx->GCCFG |=  USB_OTG_GCCFG_PDEN;
+  USBx->GCCFG |= USB_OTG_GCCFG_PDEN;
   HAL_Delay(50U);
 
   if ((USBx->GCCFG & USB_OTG_GCCFG_PDET) == 0U)
@@ -196,9 +196,9 @@ void HAL_PCDEx_BCD_VBUSDetect(PCD_HandleTypeDef *hpcd)
   {
     /* start secondary detection to check connection to Charging Downstream
     Port or Dedicated Charging Port */
-    USBx->GCCFG &= ~ USB_OTG_GCCFG_PDEN;
+    USBx->GCCFG &= ~(USB_OTG_GCCFG_PDEN);
     HAL_Delay(50U);
-    USBx->GCCFG |=  USB_OTG_GCCFG_SDEN;
+    USBx->GCCFG |= USB_OTG_GCCFG_SDEN;
     HAL_Delay(50U);
 
     if ((USBx->GCCFG & USB_OTG_GCCFG_SDET) == USB_OTG_GCCFG_SDET)
@@ -470,7 +470,6 @@ void HAL_PCDEx_BCD_VBUSDetect(PCD_HandleTypeDef *hpcd)
   }
 }
 
-
 /**
   * @brief  Activate LPM feature.
   * @param  hpcd PCD handle
@@ -505,7 +504,6 @@ HAL_StatusTypeDef HAL_PCDEx_DeActivateLPM(PCD_HandleTypeDef *hpcd)
 
   return HAL_OK;
 }
-
 #endif /* defined (USB) */
 
 /**

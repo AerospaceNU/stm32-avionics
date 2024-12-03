@@ -17,9 +17,9 @@ class DynamixelCommandQueue {
  public:
   explicit DynamixelCommandQueue(UART_HandleTypeDef* huart)
       : m_huart{huart}, m_isAwaitResponse{false} {
-    auto handleReadCallback =
+    m_handleReadCallback =
         std::bind(&DynamixelCommandQueue::processReadData, this, _1, _2);
-     halCallbacks_registerUartRxIdleCallback(m_huart, handleReadCallback, nullptr);
+     halCallbacks_registerUartRxIdleCallback(m_huart, m_handleReadCallback, nullptr);
   }
 
   uint8_t sendMessage(uint8_t* buffer, uint16_t writeLength,
@@ -61,7 +61,7 @@ class DynamixelCommandQueue {
     HAL_UART_Transmit(m_huart, (uint8_t*)&(currentCommand.message),
                       currentCommand.messageSize, 100);
     m_prevSendTimeMs = HAL_GetTick();
-    m_isAwaitResponse = false;
+    m_isAwaitResponse = true;
     HAL_HalfDuplex_EnableReceiver(m_huart);
     HAL_UARTEx_ReceiveToIdle_IT(m_huart, currentCommand.responseBuffer,
                                 kMaxBufferSize);

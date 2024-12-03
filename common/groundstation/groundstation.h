@@ -31,8 +31,12 @@ typedef struct __attribute__((__packed__)) {
   double groundTemp;
 } HeartbeatData_s;
 
+const uint8_t TYPE_STRING = 0;
+const uint8_t TYPE_MOTOR = 1;
+
 typedef struct __attribute__((packed)) {
   uint8_t destination;
+  uint8_t type;
   uint16_t len;
   uint8_t data[256];
 } GroundstationUsbCommand_s;

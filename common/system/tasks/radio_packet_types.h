@@ -39,7 +39,7 @@ PACKED_STRUCT { LineCutterData_s data; }
 LineCutterPacket_s;
 
 // Uplinked string (not necessarily null-terminated)
-#define TELEMETRY_ID_STRING 5
+#define  TELEMETRY_ID_STRING 5
 #define RADIO_MAX_STRING 48
 #if RADIO_MAX_STRING > 0xff
 #error "Radio string length longer than 1 byte!"
@@ -74,6 +74,12 @@ HardwareStatusPacket_s;
 PACKED_STRUCT { LineCutterFlightVars_s data; }
 LineCutterVarsPacket_s;
 
+#define TELEMETRY_ID_MOTOR_POSITION 9
+PACKED_STRUCT {
+	double motor1Position;
+	double motor2Position;
+} MotorPositionPacket_s;
+
 typedef union {
   OrientationPacket_s orientation;
   PositionPacket_s positionData;
@@ -84,6 +90,7 @@ typedef union {
   AltInfoPacket_s altitudeInfo;
 #endif  // HAS_DEV(BAROMETER)
   HardwareStatusPacket_s hardwareStatus;
+  MotorPositionPacket_s motorPosition;
 } PayloadPacket_u;
 
 PACKED_STRUCT {

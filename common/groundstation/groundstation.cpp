@@ -85,10 +85,15 @@ void Groundstation::runOnce() {
       if (command.destination == GROUNDSTATION) {
         GroundstationParseCommand(&command);
       } else {
-        int dest = command.destination == RAD_433 ? FIRST_ID_RADIO_TI_433
-                                                  : FIRST_ID_RADIO_TI_915;
+			int dest = command.destination == RAD_433 ? FIRST_ID_RADIO_TI_433
+													  : FIRST_ID_RADIO_TI_915;
+    	  if (command.type == TYPE_STRING) {
 
-        radioManager_transmitString(dest, command.data, command.len);
+			radioManager_transmitString(dest, command.data, command.len);
+    	  } else {
+    		  MotorPositionPacket_s* packet = (MotorPositionPacket_s*)(command.data);
+    		  radioManager_transmitMotorControl(dest, packet->motor1Position, packet->motor2Position);
+    	  }
       }
       cb_dequeue(buffer, count);
     } else if (command.destination != GROUNDSTATION ||
