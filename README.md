@@ -16,7 +16,7 @@ Next, open STM32 Cube IDE. If you do not have Cube you can install it from this 
 
 When opening the IDE, you can use the default workspace. Using the cloned directory may cause problems. 
 
-Once the IDE is open, you can import the project. Navigate to `File -> Import -> General -> Existing Projects into Workspace`. Browse for the `stm32-avionics` folder. Make sure `Search for nested projects` is checked and that none of the other options are checked, then import all projects. All projects should build at this point by clicking on the hammer icon when one of their files is open.
+Once the IDE is open, you can import the project. Navigate to `File -> Import -> General -> Existing Projects into Workspace`. Browse for the `stm32-avionics/stm32_projects` folder. Make sure `Search for nested projects` is checked and that none of the other options are checked, then import all projects. All projects should build at this point by clicking on the hammer icon when one of their files is open.
 
 ## Installing Formatting & Linting
 
